@@ -63,3 +63,6 @@ Thumbs.db
 .cache/
 *.bak
 *.tmp
+
+# Database
+database.db
