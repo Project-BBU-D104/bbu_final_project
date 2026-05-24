@@ -1,3 +1,4 @@
+import 'package:frontend/screen/product/product_screen.dart';
 import 'package:get/get.dart';
 import 'app_routes.dart';
 
@@ -27,6 +28,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.product,
+      page: () => const ProductScreen(),
     ),
   ];
 }
