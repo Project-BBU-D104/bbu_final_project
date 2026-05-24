@@ -1,6 +1,7 @@
 import 'package:frontend/controllers/app_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
+
 class LandingController extends GetxController {
   @override
   void onReady() {

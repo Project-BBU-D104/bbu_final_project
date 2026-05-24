@@ -25,8 +25,6 @@ class MyApp extends StatelessWidget {
       translations: AppTranslation(),
       locale: const Locale('km', 'KHM'), // default
       fallbackLocale: const Locale('km', 'KHM'),
-      // locale: const Locale('en', 'US'), // default
-      // fallbackLocale: const Locale('en', 'US'),
     );
   }
 }

@@ -11,7 +11,7 @@ class LandingScreen extends StatelessWidget {
       body: Container(
         color: Colors.white,
         child: const Center(child: Text("Landing Screen")),
-      ),
+      )
     );
-  }
+  } 
 }
