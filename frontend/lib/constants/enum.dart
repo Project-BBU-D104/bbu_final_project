@@ -1,12 +1,7 @@
 enum StorageKey {
-  workspaces,
   currentLanguage,
-  currentWorkspace,
-  isBackToWorkspace,
-  allowMultipleSite,
   rawCookie,
   userLogon,
-  currentPOSProfile,
   systemMode,
 }
 
