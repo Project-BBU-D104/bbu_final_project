@@ -68,16 +68,6 @@ String get apiResourceUrl {
 //   // appVersion = "${info.version}+${info.buildNumber}";
 // }
 
-/// AES Decrypt method
-// String eDecrypted(String encrypted) {
-//   return onDecrypted(encrypted);
-// }
-
-/// AES Encrypt method
-// String eEcrypted(String plainText) {
-//   return onEcrypted(plainText);
-// }
-
 ///Future Delayed 250 milliseconds default
 Future<void> onDelayed([Duration? duration]) async {
   await Future.delayed(duration ?? const Duration(milliseconds: 250));
