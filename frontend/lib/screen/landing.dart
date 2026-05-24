@@ -8,10 +8,73 @@ class LandingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: infoColor,
-      body: Container(
-        color: Colors.white,
-        child: const Center(child: Text("Landing Screen")),
-      )
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFF5F7FA), Colors.white],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo
+              Container(
+                height: 90,
+                width: 90,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 15,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: Image.network(
+                    "https://static.vecteezy.com/vite/assets/photo-masthead-375-BoK_p8LG.webp",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              // InventoryPro នៅកណ្ដាល
+              const Center(
+                child: Text(
+                  "InventoryPro",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // Synchronizing warehouse data... នៅក្រោម
+              const Center(
+                child: Text(
+                  "Synchronizing warehouse data...",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-  } 
+  }
 }
