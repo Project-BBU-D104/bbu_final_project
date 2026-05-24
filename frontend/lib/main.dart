@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
 
-      initialRoute: AppRoutes.landing,
+      initialRoute: AppRoutes.login,
       getPages: AppPages.pages,
 
       // translate
