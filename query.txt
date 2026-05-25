@@ -1,0 +1,205 @@
+These for SQLite Only
+
+-- Roles Table
+CREATE TABLE roles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    isactive BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Users Table
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role_id INTEGER NOT NULL,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    disable BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+-- Customers Table (user_id made optional)
+CREATE TABLE customers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT NOT NULL,
+    photo TEXT,
+    phone TEXT,
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Suppliers Table
+CREATE TABLE suppliers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Categories Table
+CREATE TABLE categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Products Table (Added SKU, min_qty, soft delete)
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL,
+    supplier_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    sku TEXT UNIQUE,
+    barcode TEXT UNIQUE,
+    photo TEXT,
+    cost_price REAL NOT NULL,
+    sale_price REAL NOT NULL,
+    qty INTEGER DEFAULT 0,
+    min_qty INTEGER DEFAULT 0,
+    unit TEXT,
+    description TEXT,
+    deleted_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+);
+
+-- Warehouses Table
+CREATE TABLE warehouses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    location TEXT
+);
+
+-- Warehouse Stock Table (Multi-location support)
+CREATE TABLE warehouse_stock (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    warehouse_id INTEGER NOT NULL,
+    qty INTEGER DEFAULT 0,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id),
+    UNIQUE(product_id, warehouse_id)
+);
+
+-- Purchases Table (Added payment tracking, soft delete)
+CREATE TABLE purchases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    supplier_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    invoice_no TEXT NOT NULL UNIQUE,
+    purchase_date DATE NOT NULL,
+    subtotal REAL DEFAULT 0,
+    tax_amount REAL DEFAULT 0,
+    discount_amount REAL DEFAULT 0,
+    total_amount REAL NOT NULL,
+    paid_amount REAL DEFAULT 0,
+    due_amount REAL DEFAULT 0,
+    payment_status TEXT DEFAULT 'unpaid',
+    status TEXT DEFAULT 'pending',
+    deleted_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Purchase Details Table
+CREATE TABLE purchase_details (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    purchase_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    qty INTEGER NOT NULL,
+    cost_price REAL NOT NULL,
+    subtotal REAL NOT NULL,
+    FOREIGN KEY (purchase_id) REFERENCES purchases(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Sales Table (Added status, payment tracking, soft delete)
+CREATE TABLE sales (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER,
+    user_id INTEGER NOT NULL,
+    invoice_no TEXT NOT NULL UNIQUE,
+    sale_date DATE NOT NULL,
+    subtotal REAL DEFAULT 0,
+    tax_amount REAL DEFAULT 0,
+    discount_amount REAL DEFAULT 0,
+    total_amount REAL NOT NULL,
+    paid_amount REAL DEFAULT 0,
+    due_amount REAL DEFAULT 0,
+    payment_status TEXT DEFAULT 'unpaid',
+    status TEXT DEFAULT 'pending',
+    payment_method TEXT,
+    deleted_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Sale Details Table
+CREATE TABLE sale_details (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sale_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    qty INTEGER NOT NULL,
+    sale_price REAL NOT NULL,
+    subtotal REAL NOT NULL,
+    FOREIGN KEY (sale_id) REFERENCES sales(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Stock Movements Table (Added reference_type and warehouse_id)
+CREATE TABLE stock_movements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    warehouse_id INTEGER,
+    type TEXT CHECK(type IN ('in', 'out', 'adjustment', 'transfer')) NOT NULL,
+    qty INTEGER NOT NULL,
+    reference_type TEXT,
+    reference_id INTEGER,
+    note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id)
+);
+
+-- Product Transfers Table
+CREATE TABLE product_transfers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_warehouse_id INTEGER NOT NULL,
+    to_warehouse_id INTEGER NOT NULL,
+    transfer_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (from_warehouse_id) REFERENCES warehouses(id),
+    FOREIGN KEY (to_warehouse_id) REFERENCES warehouses(id)
+);
+
+-- Audit Logs Table (New addition for security)
+CREATE TABLE audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    action TEXT NOT NULL,
+    table_name TEXT NOT NULL,
+    record_id INTEGER,
+    old_value TEXT,
+    new_value TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
