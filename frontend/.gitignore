@@ -12,6 +12,8 @@
 .swiftpm/
 migrate_working_dir/
 
+
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -34,9 +36,8 @@ migrate_working_dir/
 /build/
 /coverage/
 
-# Environment Variables
-.env
-.env.*
+# Env files
+assets/.env
 
 # Symbolication related
 app.*.symbols
