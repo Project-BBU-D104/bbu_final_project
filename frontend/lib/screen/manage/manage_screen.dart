@@ -24,15 +24,15 @@ class ManageScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.3,
+                  childAspectRatio: 1.1,
                   children: [
                     CardFeatureWidget(
                       onTap: () => {
-                        controller.goToProduct(),
+                        controller.goToCategory(),
                       },
                       icon: Icons.category_outlined,
-                      title: "Product",
-                      subtitle: "Product Management",
+                      title: "Category",
+                      subtitle: "Category Management",
                     ),
                     CardFeatureWidget(
                       onTap: () => {
@@ -55,11 +55,30 @@ class ManageScreen extends StatelessWidget {
                   children: [
                     CardFeatureWidget(
                       onTap: () => {
-                        controller.goToProduct(),
+                        controller.goToSupplier(),
                       },
                       icon: Icons.category_outlined,
-                      title: "Product",
-                      subtitle: "Product Management",
+                      title: "Supplier",
+                      subtitle: "Supplier Management",
+                    ),
+                  ],
+                ),
+                Text(
+                  "Stock Management"
+                ),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.3,
+                  children: [
+                    CardFeatureWidget(
+                      onTap: () => {
+                        controller.goToStock(),
+                      },
+                      icon: Icons.category_outlined,
+                      title: "Stock Movement",
+                      subtitle: "Stock Movement",
                     ),
                   ],
                 ),
