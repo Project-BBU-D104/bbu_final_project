@@ -80,9 +80,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   "Log in to stay on top of your tasks and projects.",
                   style: TextStyle(
                     fontSize: 28,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w500,
                     color: Colors.white,
-                    height: 1.2,
+                    height: 1.0,
                   ),
                 ),
               ),
@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         _buildInput(
                           controller: nameController,
-                          hint: "Full Name",
+                          hint: "Enter username",
                           icon: Icons.person_outline,
                         ),
 
@@ -125,8 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         _buildInput(
                           controller: emailController,
-                          hint: "Enter your email address",
-                          icon: Icons.mail_outline,
+                          hint: "Enter password",
+                          icon: Icons.lock_outline,
                         ),
 
                         const SizedBox(height: 12),
@@ -146,14 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               "Remember Me",
                               style: TextStyle(
                                 color: Colors.black54,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Text(
-                              "Forgot Password?",
-                              style: TextStyle(
-                                color: Color(0xFF23B2B9),
                                 fontSize: 12,
                               ),
                             ),
@@ -179,115 +171,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const Text(
                               "Login",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                           ),
                         ),
-
-                        const SizedBox(height: 20),
-
-                        /// DIVIDER
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(color: Colors.grey.shade300),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Text(
-                                "OR CONTINUE WITH",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(color: Colors.grey.shade300),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        ///BUTTONS
-                        Row(
-                          children: [
-                            /// button apple
-                            Expanded(
-                              child: SizedBox(
-                                height: 48,
-                                child: ElevatedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.apple,
-                                    color: Colors.white,
-                                  ),
-                                  label: const Text(
-                                    "Apple",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF0F172A),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 12),
-
-                            /// button google
-                            Expanded(
-                              child: SizedBox(
-                                height: 48,
-                                child: OutlinedButton(
-                                  onPressed: () {},
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFF8FAFC),
-                                    side: const BorderSide(
-                                      color: Color(0xFFE5E7EB),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(
-                                        "assets/icon/google.png",
-                                        height: 20,
-                                        width: 20,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      const Text(
-                                        "Google",
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
                       ],
                     ),
                   ),

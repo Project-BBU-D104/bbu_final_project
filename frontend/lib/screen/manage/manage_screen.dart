@@ -10,20 +10,30 @@ class ManageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            CardFeatureWidget(
-              onTap: () => {
-                controller.goToProduct(),
-              },
-              icon: Icons.category_outlined,
-              title: "Product",
-              subtitle: "Product Management",
-            ),
-          ],
+        body: SafeArea(
+          child: SingleChildScrollView(
+          child: Column(
+            children: [
+              CardFeatureWidget(
+                onTap: () => {
+                  controller.goToProduct(),
+                },
+                icon: Icons.category_outlined,
+                title: "Product",
+                subtitle: "Product Management",
+              ),
+              CardFeatureWidget(
+                onTap: () => {
+                  controller.goToProduct(),
+                },
+                icon: Icons.category_outlined,
+                title: "Product",
+                subtitle: "Product Management",
+              ),
+            ],
+          ),
         ),
-      ),
+        ),
     );
   }
 }
