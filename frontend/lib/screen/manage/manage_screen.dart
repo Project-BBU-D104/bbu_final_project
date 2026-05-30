@@ -11,29 +11,63 @@ class ManageScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-          child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CardFeatureWidget(
-                onTap: () => {
-                  controller.goToProduct(),
-                },
-                icon: Icons.category_outlined,
-                title: "Product",
-                subtitle: "Product Management",
-              ),
-              CardFeatureWidget(
-                onTap: () => {
-                  controller.goToProduct(),
-                },
-                icon: Icons.category_outlined,
-                title: "Product",
-                subtitle: "Product Management",
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Product & Category Management"
+                ),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.3,
+                  children: [
+                    CardFeatureWidget(
+                      onTap: () => {
+                        controller.goToProduct(),
+                      },
+                      icon: Icons.category_outlined,
+                      title: "Product",
+                      subtitle: "Product Management",
+                    ),
+                    CardFeatureWidget(
+                      onTap: () => {
+                        controller.goToProduct(),
+                      },
+                      icon: Icons.category_outlined,
+                      title: "Product",
+                      subtitle: "Product Management",
+                    ),
+                  ],
+                ),
+                Text(
+                  "Supplier Management"
+                ),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.3,
+                  children: [
+                    CardFeatureWidget(
+                      onTap: () => {
+                        controller.goToProduct(),
+                      },
+                      icon: Icons.category_outlined,
+                      title: "Product",
+                      subtitle: "Product Management",
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        ),
+      ),
     );
   }
 }

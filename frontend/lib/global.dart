@@ -21,12 +21,6 @@ final showLicense = false.obs;
 
 String serverUrl = "";
 
-/// get value from env setting
-// dynamic env(ENV key) {
-//   final vkey = key.toString().split('.').last; // Output: active
-//   return dotenv.env[toUpperSnakeCase(vkey)];
-// }
-
 // convert to UPPER_SNAKE_CASE
 String toUpperSnakeCase(String input) {
   return input
