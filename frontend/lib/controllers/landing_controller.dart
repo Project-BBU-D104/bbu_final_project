@@ -12,6 +12,6 @@ class LandingController extends GetxController {
   void _route() async {
     Get.put(AppController(), permanent: true);
     await Future.delayed(Duration(seconds: 1));
-    Get.offAllNamed(AppRoutes.home);
+    Get.offAllNamed(AppRoutes.login);
   }
 }

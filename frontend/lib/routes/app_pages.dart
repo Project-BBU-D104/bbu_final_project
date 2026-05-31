@@ -44,7 +44,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.stockMovement,
-      page: () => const StockMovementscreen(),
+      page: () => StockMovementscreen(),
     ),
   ];
 }

@@ -6,19 +6,27 @@ class StockMovementscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1323),
+      backgroundColor: const Color(0xFFF5F7FA),
 
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1323),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text(
           "Stock Movement",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.notifications_none, color: Colors.white),
+            child: Icon(
+              Icons.notifications_none,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),
@@ -27,7 +35,6 @@ class StockMovementscreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Tabs
             Row(
               children: [
                 _tabButton("All Records", true),
@@ -40,7 +47,6 @@ class StockMovementscreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Date Filter
             Row(
               children: [
                 Expanded(
@@ -49,21 +55,20 @@ class StockMovementscreen extends StatelessWidget {
                       horizontal: 12,
                       vertical: 14,
                     ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF18233B),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    decoration: _cardDecoration(),
                     child: const Row(
                       children: [
                         Icon(
                           Icons.calendar_month,
-                          color: Colors.white70,
                           size: 18,
+                          color: Colors.black87,
                         ),
                         SizedBox(width: 8),
                         Text(
                           "Oct 24 - Oct 31, 2023",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: Colors.black87,
+                          ),
                         ),
                       ],
                     ),
@@ -78,51 +83,51 @@ class StockMovementscreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Total Inbound
             _summaryCard(
               title: "Total Inbound",
               value: "1,240",
-              color: Colors.greenAccent,
-              subtitle: "+ 15% from last week",
+              color: Colors.green,
+              subtitle: "+15% from last week",
             ),
 
             const SizedBox(height: 15),
 
-            // Total Outbound
             _summaryCard(
               title: "Total Outbound",
               value: "842",
-              color: Colors.redAccent,
-              subtitle: "- 5% from last week",
+              color: Colors.red,
+              subtitle: "-5% from last week",
             ),
 
             const SizedBox(height: 15),
 
-            // Most Active Location
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF18233B),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Column(
+              decoration: _cardDecoration(),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Most Active Location",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                    ),
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.greenAccent),
+                      Icon(
+                        Icons.location_on,
+                        color: Colors.green,
+                      ),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           "North Warehouse - Sector A",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black87,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -135,23 +140,22 @@ class StockMovementscreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Movement Log
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF18233B),
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: _cardDecoration(),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.history, color: Colors.white70),
-                      SizedBox(width: 8),
-                      Text(
+                      Icon(
+                        Icons.history,
+                        color: Colors.grey.shade700,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
                         "Movement Log",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black87,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -164,16 +168,16 @@ class StockMovementscreen extends StatelessWidget {
                     "Industrial Ball Bearings - SKF 6205",
                     "Inbound Shipment",
                     "+250",
-                    Colors.greenAccent,
+                    Colors.green,
                   ),
 
-                  const Divider(color: Colors.white24),
+                  const Divider(),
 
                   _movementItem(
                     "Steel Pipes",
                     "Outbound Shipment",
                     "-120",
-                    Colors.redAccent,
+                    Colors.red,
                   ),
                 ],
               ),
@@ -183,52 +187,54 @@ class StockMovementscreen extends StatelessWidget {
       ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Colors.blue,
         onPressed: () {},
-        child: const Icon(Icons.add, color: Colors.black),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
+    );
+  }
 
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF0D1323),
-        selectedItemColor: Colors.greenAccent,
-        unselectedItemColor: Colors.white54,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: "Stock",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner),
-            label: "Scan",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_none),
-            label: "Alerts",
-          ),
-        ],
-      ),
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 15,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
   }
 
   Widget _tabButton(String title, bool active) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 18,
+        vertical: 10,
+      ),
       decoration: BoxDecoration(
         color: active
-            ? Colors.greenAccent.withOpacity(0.2)
-            : const Color(0xFF18233B),
+            ? Colors.blue.shade50
+            : Colors.white,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: active
+              ? Colors.blue
+              : Colors.grey.shade300,
+        ),
       ),
       child: Text(
         title,
         style: TextStyle(
-          color: active ? Colors.greenAccent : Colors.white70,
-          fontWeight: FontWeight.bold,
+          color: active
+              ? Colors.blue
+              : Colors.black87,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -237,11 +243,11 @@ class StockMovementscreen extends StatelessWidget {
   Widget _iconButton(IconData icon) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF18233B),
-        borderRadius: BorderRadius.circular(12),
+      decoration: _cardDecoration(),
+      child: Icon(
+        icon,
+        color: Colors.black87,
       ),
-      child: Icon(icon, color: Colors.white),
     );
   }
 
@@ -254,35 +260,51 @@ class StockMovementscreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF18233B),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: _cardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white70)),
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.grey.shade600,
+            ),
+          ),
           const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
               color: color,
-              fontSize: 28,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(subtitle, style: TextStyle(color: color, fontSize: 12)),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: color,
+              fontSize: 13,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _movementItem(String title, String type, String qty, Color color) {
+  Widget _movementItem(
+    String title,
+    String type,
+    String qty,
+    Color color,
+  ) {
     return Row(
       children: [
         CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(Icons.inventory, color: color),
+          backgroundColor: color.withOpacity(0.12),
+          child: Icon(
+            Icons.inventory_2_outlined,
+            color: color,
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -292,11 +314,16 @@ class StockMovementscreen extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black87,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(type, style: const TextStyle(color: Colors.white70)),
+              Text(
+                type,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                ),
+              ),
             ],
           ),
         ),

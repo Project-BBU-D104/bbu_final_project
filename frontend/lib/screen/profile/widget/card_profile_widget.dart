@@ -14,16 +14,38 @@ class CardProfileWidget extends StatelessWidget {
             child: Column(
               children: [
                 CircleAvatar(
+                  radius: 40,
                   backgroundImage: NetworkImage(
                     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu3-_TbUInL975rAfMjR83kQAjePhVRRJFfw&s',
-                    ),
+                  ),
                 ),
-                Text("Sabrey"),
-                Text("Admin"),
-                ElevatedButton.icon(
-                  onPressed: (){},
-                  label: Text("Edit Profile"),
-                  icon: Icon(Icons.edit)
+                const SizedBox(height: 5,),
+                Text("Lim Sabrey",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 23,   
+                  ),
+                ),
+                Text("Admin", style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,   
+                  ),),
+                const SizedBox(height: 10,),
+                SizedBox(
+                  height: 40,
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: (){},
+                    label: Text("Edit Profile"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 68, 238, 193),
+                      foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    icon: Icon(Icons.edit)
+                  ),
                 )
               ],
             ),
