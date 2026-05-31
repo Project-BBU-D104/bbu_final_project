@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:frontend/screen/home/home_content.dart';
 import 'package:frontend/screen/manage/manage_screen.dart';
@@ -36,4 +37,18 @@ class HomeController extends GetxController{
     ManageScreen(),
     ProfileScreen(),
   ];
+
+  // quick action
+  void gotoCategory(){
+    Get.toNamed(AppRoutes.category);
+  }
+  void gotoProduct(){
+    Get.toNamed(AppRoutes.product);
+  }
+  void gotoSupplier(){
+    Get.toNamed(AppRoutes.supplier);
+  }
+  void gotoStock(){
+    Get.toNamed(AppRoutes.stockMovement);
+  }
 }
