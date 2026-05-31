@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/home_controller.dart';
+import 'package:frontend/widget/card_feature_widget.dart';
 import 'package:get/get.dart';
 class QuickActionWidget extends StatelessWidget {
   QuickActionWidget({super.key});
@@ -17,35 +18,35 @@ class QuickActionWidget extends StatelessWidget {
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            childAspectRatio: 1.6,
+            childAspectRatio: 1.3,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              cardQuickAction(
-                onTab: (){
+              CardFeatureWidget(
+                onTap: (){
                   ctr.gotoCategory();
                 },
                 icon: Icons.category_outlined,
                 title: "Category List",
                 subtitle: "Category Management",
               ),
-              cardQuickAction(
-                onTab: (){
+              CardFeatureWidget(
+                onTap: (){
                   ctr.gotoProduct();
                 },
                 icon: Icons.category_outlined,
                 title: "Product List",
                 subtitle: "Product Management",
               ),
-              cardQuickAction(
-                onTab: (){
+              CardFeatureWidget(
+                onTap: (){
                   ctr.gotoSupplier();
                 },
                 icon: Icons.category_outlined,
                 title: "Supplier List",
                 subtitle: "Supplier Management",
               ),
-              cardQuickAction(
-                onTab: (){
+              CardFeatureWidget(
+                onTap: (){
                   ctr.gotoStock();
                 },
                 icon: Icons.category_outlined,
@@ -58,38 +59,4 @@ class QuickActionWidget extends StatelessWidget {
       )
     );
   }
-}
-
-Widget cardQuickAction(
-  {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-
-    VoidCallback? onTab
-  }
-){
-  return InkWell(
-    onTap: onTab,
-    child: Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon),
-            const SizedBox(height: 10,),
-            Text(title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18
-              )
-            ),
-            Text(subtitle),
-          ],
-        ),
-      )
-    ),
-  );
 }

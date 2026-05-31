@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/manage_controller.dart';
-import 'package:frontend/screen/manage/widget/card_feature_widget.dart';
+import 'package:frontend/widget/card_feature_widget.dart';
 import 'package:get/get.dart';
 
 class ManageScreen extends StatelessWidget {
