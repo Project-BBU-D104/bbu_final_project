@@ -1,3 +1,5 @@
+import 'package:frontend/binding/category_binding.dart';
+import 'package:frontend/binding/product_binding.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
@@ -32,11 +34,13 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.category,
-      page: () => const CategoryScreen(),
+      page: () => CategoryScreen(),
+      binding: CategoryBinding(),
     ),
     GetPage(
       name: AppRoutes.product,
-      page: () => const ProductScreen(),
+      page: () => ProductScreen(),
+      binding: ProductBinding(),
     ),
     GetPage(
       name: AppRoutes.supplier,

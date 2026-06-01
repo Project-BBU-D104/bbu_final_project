@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/product_controller.dart';
+import 'package:get/get.dart';
 
 class ProductScreen extends StatelessWidget {
-  const ProductScreen({super.key});
+  ProductScreen({super.key});
+
+  final ctr = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
