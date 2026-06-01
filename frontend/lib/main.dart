@@ -4,10 +4,20 @@ import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 import 'localization/app_translation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/gestures.dart'; 
 
 Future<void> main() async {
   await dotenv.load(fileName: "assets/.env");
   runApp(const MyApp());
+}
+
+class _CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-
+      scrollBehavior: _CustomScrollBehavior(),
       initialRoute: AppRoutes.landing,
       getPages: AppPages.pages,
 
