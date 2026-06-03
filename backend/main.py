@@ -2,8 +2,9 @@
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI
 from sqlmodel import Session, select
+from fastapi.middleware.cors import CORSMiddleware
 from database import Tests, create_db_and_tables, get_session
-
+from app.routes import users_router
 
 # This function runs when FastAPI starts up
 @asynccontextmanager
@@ -15,17 +16,23 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-# Route 1: Create a new item and save it to SQLite
-@app.post("/tests/")
-def create_item(item: Tests, session: Session = Depends(get_session)):
-    session.add(item)
-    session.commit()
-    session.refresh(item)
-    return item
+# Add CORS middleware (optional, for frontend requests)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-# Route 2: Get all items from the SQLite table
-@app.get("/items/")
-def read_items(session: Session = Depends(get_session)):
-    items = session.exec(select(Tests)).all()
-    return items
+# Include routers
+app.include_router(users_router)
+
+@app.get("/")
+def root():
+    return {"message": "Welcome to User Management API"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
