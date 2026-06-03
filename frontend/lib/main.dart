@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       // translate
       translations: AppTranslation(),
       locale: const Locale('km', 'KHM'), // default
-      fallbackLocale: const Locale('km', 'KHM'),
+      fallbackLocale: const Locale('km', 'KHM'), 
     );
   }
 }
