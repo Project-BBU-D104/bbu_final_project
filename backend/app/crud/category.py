@@ -2,7 +2,7 @@ from sqlmodel import Session, select
 from app.models.category import Category
 from app.schemas.category import CategoryCreate
 
-def create_db_category(session: Session, category: CategoryCreate):
+def create_category(session: Session, category: CategoryCreate):
     db_category = Category.from_orm(category)
     session.add(db_category)
     session.commit()

@@ -4,7 +4,9 @@ from fastapi import Depends, FastAPI
 from sqlmodel import Session, select
 from fastapi.middleware.cors import CORSMiddleware
 from database import Tests, create_db_and_tables, get_session
-from app.routes import users_router
+from app.routes import users_router,category_router
+
+import app.models
 
 # This function runs when FastAPI starts up
 @asynccontextmanager
@@ -14,6 +16,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 
 # Add CORS middleware (optional, for frontend requests)
@@ -28,6 +31,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(users_router)
+app.include_router(category_router)
 
 @app.get("/")
 def root():
@@ -36,3 +40,8 @@ def root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+
+@app.on_event("startup")
+def startup():
+    create_db_and_tables()
