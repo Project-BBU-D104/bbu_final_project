@@ -1,10 +1,5 @@
-enum StorageKey {
-  currentLanguage,
-  rawCookie,
-  userLogon,
-  systemMode,
-}
+  enum StorageKey {
+    changeMenuLanguage
+  }
 
-enum ENV { estcServerUrl, aesIv, aesKey }
-
-enum SystemMode { system, light, dark }
+  enum SystemMode { system, light, dark }
