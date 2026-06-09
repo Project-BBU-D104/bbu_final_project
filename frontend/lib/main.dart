@@ -9,6 +9,12 @@ import 'package:flutter/gestures.dart';
 Future<void> main() async {
   await dotenv.load(fileName: "assets/.env");
   runApp(const MyApp());
+
+  await _initConfig();
+}
+
+Future<void> _initConfig() async {
+  await dotenv.load(fileName: "assets/.env");
 }
 
 class _CustomScrollBehavior extends MaterialScrollBehavior {
