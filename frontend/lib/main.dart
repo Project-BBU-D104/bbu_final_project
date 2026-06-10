@@ -8,9 +8,8 @@ import 'package:flutter/gestures.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: "assets/.env");
-  runApp(const MyApp());
-
   await _initConfig();
+  runApp(const MyApp());
 }
 
 Future<void> _initConfig() async {

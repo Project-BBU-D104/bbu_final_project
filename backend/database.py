@@ -18,9 +18,9 @@ class Tests(SQLModel, table=True):
     price: float
 
 
-# 3. Helper function to create the table in the DB file
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+# 3. Create the tables test only
+def create_tests_table_only():
+    SQLModel.metadata.create_all(engine, tables=[Tests.__table__])
 
 
 # 4. Helper function to get a database session for API routes

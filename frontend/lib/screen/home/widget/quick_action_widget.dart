@@ -13,7 +13,12 @@ class QuickActionWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Quick Action", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+          Text("Quick Action",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
           const SizedBox(height: 10,),
           GridView.count(
             crossAxisCount: 2,
