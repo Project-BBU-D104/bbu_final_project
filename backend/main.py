@@ -1,21 +1,10 @@
 # backend/main.py
-from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI
-from sqlmodel import Session, select
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import Tests, create_db_and_tables, get_session
+from database import create_tests_table_only
 from app.routes import users_router,category_router
 
-import app.models
-
-# This function runs when FastAPI starts up
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    create_db_and_tables()  # Automatically creates the database file and table
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 
 
@@ -44,4 +33,4 @@ def health_check():
 
 @app.on_event("startup")
 def startup():
-    create_db_and_tables()
+    create_tests_table_only()

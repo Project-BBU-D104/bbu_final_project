@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from app.models.category import Category
-from app.schemas.category import CategoryCreate
+from app.schemas.category import CategoryCreate, CategoryUpdate
+from datetime import datetime
 
 def create_category(session: Session, category: CategoryCreate):
     db_category = Category.from_orm(category)
@@ -15,12 +16,15 @@ def get_all_category(session: Session):
 def get_category(session: Session, category_id: int):
     return session.get(Category, category_id)
 
-def update_category(session: Session, category_id: int, category: CategoryCreate):
+def update_category(session: Session, category_id: int, category: CategoryUpdate):
     db_category = session.get(Category, category_id)
     if db_category:
-        db_category.name = category.name
-        db_category.description = category.description
-        db_category.created_at = category.created_at
+        if category.name is not None:
+            db_category.name = category.name
+        if category.description is not None:
+            db_category.description = category.description
+
+        db_category.updated_at = category.updated_at or datetime.utcnow()
         session.add(db_category)
         session.commit()
         session.refresh(db_category)
