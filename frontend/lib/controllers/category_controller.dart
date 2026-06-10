@@ -20,8 +20,6 @@ class CategoryController extends GetxController {
       final resp = await api.get("category/");
     if (resp is List) {
         categoryList.value = List<Map<String, dynamic>>.from(resp);
-    } else {
-      categoryList.clear();
     }
     
     } catch (e) {
