@@ -322,11 +322,7 @@ packages:
       sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
     version: "1.18.0"
-=======
-    version: "1.17.0"
->>>>>>> 6b73359f42622d33d7efbf978a67b4c96773019f
   objective_c:
     dependency: transitive
     description:
