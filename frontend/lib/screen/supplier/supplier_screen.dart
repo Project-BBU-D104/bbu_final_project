@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/supplier_controller.dart';
-import 'package:get/get.dart';
-import 'widgets/supplier_top_action_widget.dart';
-import 'widgets/supplier_add_widget.dart';
-import 'widgets/supplier_edit_widget.dart';
-import 'widgets/supplier_bottom_action_widget.dart';
 
 enum SupplierStatus { verified, onHold, active, pending }
 
@@ -177,6 +171,7 @@ class _FilterPill extends StatelessWidget {
 // ── Supplier Card ─────────────────────────────────────────────────────────────
 
 class _SupplierCard extends StatelessWidget {
+  
   final Supplier supplier;
 
   const _SupplierCard({required this.supplier});
@@ -242,10 +237,8 @@ class _SupplierCard extends StatelessWidget {
                 ),
                 // Status badge
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: supplier.status.badgeColor,
                     borderRadius: BorderRadius.circular(6),
@@ -296,10 +289,16 @@ class _SupplierCard extends StatelessWidget {
             child: Row(
               children: [
                 // Phone icon
-                _IconButton(icon: Icons.phone_outlined, onTap: () {}),
+                _IconButton(
+                  icon: Icons.phone_outlined,
+                  onTap: () {},
+                ),
                 const SizedBox(width: 10),
                 // Email icon
-                _IconButton(icon: Icons.mail_outline_rounded, onTap: () {}),
+                _IconButton(
+                  icon: Icons.mail_outline_rounded,
+                  onTap: () {},
+                ),
                 const Spacer(),
                 // View History
                 GestureDetector(
@@ -436,11 +435,102 @@ class _SupplierScreenState extends State<SupplierScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final SupplierController controller = Get.put(SupplierController());
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Supplier")),
-      body: Center(child: Text("Supplier Screen")),
+      backgroundColor: _bgDark, // Now white (Colors.white)
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Search bar ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: _filterBg,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: _cardBorder),
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        style: const TextStyle(
+                          color: _textPrimary,
+                          fontSize: 13,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'Search suppliers...',
+                          hintStyle: TextStyle(
+                            color: _textSecondary,
+                            fontSize: 13,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search_rounded,
+                            color: _textSecondary,
+                            size: 18,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Filter icon button
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: _filterBg,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: _cardBorder),
+                    ),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      color: _textSecondary,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Filter pills ──
+            Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: _filters.map((f) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _FilterPill(
+                        label: f,
+                        active: _activeFilter == f,
+                        onTap: () => setState(() => _activeFilter = f),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
+            // ── Supplier list ──
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _filteredSuppliers.length,
+                itemBuilder: (context, index) {
+                  return _SupplierCard(supplier: _filteredSuppliers[index]);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
