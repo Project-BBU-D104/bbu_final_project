@@ -74,18 +74,18 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
 
               /// TITLE
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  "Log in to stay on top of your tasks and projects.",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    height: 1.0,
-                  ),
-                ),
-              ),
+              // const Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 24),
+              //   child: Text(
+              //     "Log in to stay on top of your tasks and projects.",
+              //     style: TextStyle(
+              //       fontSize: 28,
+              //       fontWeight: FontWeight.w500,
+              //       color: Colors.white,
+              //       height: 1.0,
+              //     ),
+              //   ),
+              // ),
 
               const SizedBox(height: 35),
 

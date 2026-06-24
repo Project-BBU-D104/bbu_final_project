@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/screen/category/widget/card_category_widget.dart';
+import 'package:frontend/widget/button_change_table_or_card_widget.dart';
+import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -11,34 +13,28 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = lightColor.shade50;
-    final cardColor = whiteColor;
-    final primaryAccent = primaryColor;
     final textColor = darkColor;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: lightColor.shade50,
       appBar: AppBar(
         backgroundColor: titleColor,
         surfaceTintColor: titleColor,
         elevation: 0.5,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: textColor),
+          icon: Icon(Icons.arrow_back, color: darkColor),
           onPressed: () => Get.back(),
         ),
         title: Text(
-          "Inventory Pro",
+          "Category",
           style: TextStyle(
-            color: textColor,
+            color: darkColor,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: textColor),
-            onPressed: () {},
-          ),
+          ButtonChangeTableOrCardWidget(),
         ],
       ),
       body: Padding(
@@ -56,11 +52,11 @@ class CategoryScreen extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: cardColor,
+                      color: whiteColor,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: darkColor.withValues(alpha: 0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),
@@ -68,27 +64,10 @@ class CategoryScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.search,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 12),
                         Expanded(
-                          child: TextField(
-                            style: TextStyle(color: textColor),
-                            decoration: const InputDecoration(
-                              hintText:
-                                  "Search Industrial categories...",
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.tune,
-                          color: primaryAccent,
+                          child: SearchWidget(
+                            title: "Search Category",
+                          )
                         ),
                       ],
                     ),
@@ -104,16 +83,8 @@ class CategoryScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        MainAxisAlignment.end,
                     children: [
-                      Text(
-                        "Categories",
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
                       Text(
                         "${ctr.categoryList.length} CATEGORIES",
                         style: TextStyle(

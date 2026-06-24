@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widget/chip_widget.dart';
+import 'package:frontend/widget/search_widget.dart';
 
 enum SupplierStatus { verified, onHold, active, pending }
 
@@ -396,8 +398,6 @@ class _IconButton extends StatelessWidget {
   }
 }
 
-// ── Main Screen ───────────────────────────────────────────────────────────────
-
 class SupplierScreen extends StatefulWidget {
   const SupplierScreen({super.key});
 
@@ -436,7 +436,7 @@ class _SupplierScreenState extends State<SupplierScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bgDark, // Now white (Colors.white)
+      backgroundColor: _bgDark,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,26 +454,8 @@ class _SupplierScreenState extends State<SupplierScreen> {
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: _cardBorder),
                       ),
-                      child: TextField(
-                        controller: _searchController,
-                        style: const TextStyle(
-                          color: _textPrimary,
-                          fontSize: 13,
-                        ),
-                        decoration: const InputDecoration(
-                          hintText: 'Search suppliers...',
-                          hintStyle: TextStyle(
-                            color: _textSecondary,
-                            fontSize: 13,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search_rounded,
-                            color: _textSecondary,
-                            size: 18,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 12),
-                        ),
+                      child: SearchWidget(
+                        title: 'Search suppliers',
                       ),
                     ),
                   ),
