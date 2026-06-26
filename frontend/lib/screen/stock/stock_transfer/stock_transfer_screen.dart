@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class StockTransferScreen extends StatelessWidget {
   StockTransferScreen({super.key});
 
-  final ctr = Get.put(StockTransferController());
+  final ctr = Get.find<StockTransferController>();
 
   @override
   Widget build(BuildContext context) {

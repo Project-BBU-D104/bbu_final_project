@@ -1,6 +1,16 @@
 import 'package:frontend/binding/category_binding.dart';
 import 'package:frontend/binding/customer_binding.dart';
+import 'package:frontend/binding/home_binding.dart';
+import 'package:frontend/binding/payment_binding.dart';
 import 'package:frontend/binding/product_binding.dart';
+import 'package:frontend/binding/role_binding.dart';
+import 'package:frontend/binding/sale_binding.dart';
+import 'package:frontend/binding/stock_adjustment_binding.dart';
+import 'package:frontend/binding/stock_movement_binding.dart';
+import 'package:frontend/binding/stock_transfer_binding.dart';
+import 'package:frontend/binding/supplier_binding.dart';
+import 'package:frontend/binding/user_binding.dart';
+import 'package:frontend/binding/warehouse_binding.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
@@ -39,6 +49,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.home,
       page: () => HomeScreen(),
+      binding: HomeBinding(),
     ),
     GetPage(
       name: AppRoutes.login,
@@ -61,7 +72,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.supplier,
-      page: () =>   SupplierScreen(),
+      page: () => SupplierScreen(),
+      binding: SupplierBinding(),
     ),
     GetPage(
       name: AppRoutes.customer,
@@ -71,18 +83,22 @@ class AppPages {
     GetPage(
       name: AppRoutes.stockMovement,
       page: () => StockMovementscreen(),
+      binding: StockMovementBinding(),
     ),
     GetPage(
       name: AppRoutes.stockAdjustment,
       page: () => StockAdjustmentScreen(),
+      binding: StockAdjustmentBinding(),
     ),
     GetPage(
       name: AppRoutes.stockTransfer,
       page: () => StockTransferScreen(),
+      binding: StockTransferBinding(),
     ),
     GetPage(
       name: AppRoutes.sale,
       page: () => SaleScreen(),
+      binding: SaleBinding(),
     ),
     GetPage(
       name: AppRoutes.saleList,
@@ -91,18 +107,22 @@ class AppPages {
     GetPage(
       name: AppRoutes.salePayment,
       page: () => PaymentScreen(),
+      binding: PaymentBinding(),
     ),
     GetPage(
       name: AppRoutes.role,
       page: () => RoleScreen(),
+      binding: RoleBinding(),
     ),
     GetPage(
       name: AppRoutes.user,
       page: () => UserScreen(),
+      binding: UserBinding(),
     ),
     GetPage(
       name: AppRoutes.warehouse,
       page: () => WarehouseScreen(),
+      binding: WarehouseBinding(),
     ),
     GetPage(
       name: AppRoutes.addProduct,

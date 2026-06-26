@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/payment_controller.dart';
+import 'package:get/get.dart';
 
 class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key});
+ PaymentScreen({super.key});
+
+  final ctr = Get.find<PaymentController>();
 
   @override
   Widget build(BuildContext context) {

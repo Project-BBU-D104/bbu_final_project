@@ -10,7 +10,7 @@ class EditStockTransferWidget extends StatelessWidget {
 
   EditStockTransferWidget({super.key, this.selectedAdjustmentType, this.selectedProduct, this.selectedWarehouse});
 
-final ctr = Get.put(StockTransferController());
+final ctr = Get.find<StockTransferController>();
 
   @override
   Widget build(BuildContext context) {

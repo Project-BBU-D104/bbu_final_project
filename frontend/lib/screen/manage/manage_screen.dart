@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 class ManageScreen extends StatelessWidget {
   ManageScreen({super.key});
+  
   final controller = Get.put(ManageController()); 
 
   @override

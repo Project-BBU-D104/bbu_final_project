@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class WarehouseScreen extends StatelessWidget {
     WarehouseScreen({super.key});
 
-  final ctr = Get.put(WarehouseController());
+  final ctr = Get.find<WarehouseController>();
 
   @override
   Widget build(BuildContext context) {

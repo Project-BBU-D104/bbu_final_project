@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class StockAdjustmentScreen extends StatelessWidget {
 StockAdjustmentScreen({super.key});
 
-  final ctr = Get.put(StockAdjustmentController());
+  final ctr = Get.find<StockAdjustmentController>();
 
   @override
   Widget build(BuildContext context) {

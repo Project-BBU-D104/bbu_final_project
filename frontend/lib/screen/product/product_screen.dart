@@ -8,7 +8,7 @@ import 'package:frontend/controllers/product_controller.dart';
 class ProductScreen extends StatelessWidget {
   ProductScreen({super.key});
 
-final productCtrl = Get.put(ProductController());
+final productCtrl = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 class CategoryScreen extends StatelessWidget {
   CategoryScreen({super.key});
 
-  final ctr = Get.put(CategoryController());
+  final ctr = Get.find<CategoryController>();
 
   @override
   Widget build(BuildContext context) {

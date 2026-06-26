@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 
 class SupplierScreen extends StatelessWidget {
   SupplierScreen({super.key});
-  final controller = Get.put(SupplierController());
+  final controller = Get.find<SupplierController>();
   @override
   Widget build(BuildContext context) {
 

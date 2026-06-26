@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 class QuickActionWidget extends StatelessWidget {
   QuickActionWidget({super.key});
 
-  final ctr = Get.put(HomeController());
+  final ctr = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {

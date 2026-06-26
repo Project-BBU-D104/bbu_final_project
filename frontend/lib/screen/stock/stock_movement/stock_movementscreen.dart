@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/stock_movement_controller.dart';
+import 'package:get/get.dart';
 
 class StockMovementscreen extends StatelessWidget {
-  const StockMovementscreen({super.key});
+    StockMovementscreen({super.key});
+
+  final ctr = Get.find<StockMovementController>();
 
   @override
   Widget build(BuildContext context) {
