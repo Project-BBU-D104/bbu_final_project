@@ -28,6 +28,14 @@ class QuickActionWidget extends StatelessWidget {
             children: [
               CardFeatureWidget(
                 onTap: (){
+                  ctr.gotoSale();
+                },
+                icon: Icons.category_outlined,
+                title: "Sale",
+                subtitle: "Go to Sale",
+              ),
+              CardFeatureWidget(
+                onTap: (){
                   ctr.gotoCategory();
                 },
                 icon: Icons.category_outlined,
@@ -50,14 +58,7 @@ class QuickActionWidget extends StatelessWidget {
                 title: "Supplier List",
                 subtitle: "Supplier Management",
               ),
-              CardFeatureWidget(
-                onTap: (){
-                  ctr.gotoStock();
-                },
-                icon: Icons.category_outlined,
-                title: "Stock List",
-                subtitle: "Stock Management",
-              ),
+               
             ],
           )
         ],

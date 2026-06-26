@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/product/widget/filter_widget.dart';
+import 'package:frontend/screen/product/widget/product_card_widget.dart';
+import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/product_controller.dart';
 
@@ -34,38 +37,8 @@ class ProductScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  TextField(
-                    onChanged: (val) => productCtrl.searchQuery.value = val,
-                    decoration: InputDecoration(
-                      hintText: 'Search products...',
-                      hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Color(0xFFAAAAAA),
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFF5F5F5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF1DB584),
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                    ),
-                    style: const TextStyle(color: Color(0xFF333333)),
+                  SearchWidget(
+                    title: 'Search Product',
                   ),
                   const SizedBox(height: 16),
 
@@ -74,7 +47,7 @@ class ProductScreen extends StatelessWidget {
                     child: Obx(
                       () => Row(
                         children: [
-                          FilterChipButton(
+                          FilterWidget(
                             icon: Icons.tune,
                             label: productCtrl.selectedCategory.value == 'All'
                                 ? 'Category'
@@ -88,7 +61,7 @@ class ProductScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          FilterChipButton(
+                          FilterWidget(
                             icon: Icons.sort,
                             label: productCtrl.selectedStatus.value == 'All'
                                 ? 'Status'
@@ -102,7 +75,7 @@ class ProductScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          FilterChipButton(
+                          FilterWidget(
                             icon: Icons.list,
                             label: productCtrl.selectedRecency.value == 'All'
                                 ? 'Recency'
@@ -148,7 +121,7 @@ class ProductScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: list.length,
                   itemBuilder: (context, idx) =>
-                      ProductCard(product: list[idx]),
+                      ProductCardWidget(product: list[idx]),
                 );
               }),
             ),
@@ -220,190 +193,6 @@ class ProductScreen extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class FilterChipButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onPressed;
-
-  const FilterChipButton({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const activeColor = Color(0xFF1DB584);
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8F5E9) : const Color(0xFFF5F5F5),
-          border: Border.all(
-            color: isSelected ? activeColor : const Color(0xFFDDDDDD),
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? activeColor : const Color(0xFF666666),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? activeColor : const Color(0xFF666666),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.expand_more,
-              size: 16,
-              color: isSelected ? activeColor : const Color(0xFF666666),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final Product product;
-  const ProductCard({super.key, required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Get.snackbar('Product Selected', 'SKU: ${product.sku}'),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE0E0E0)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  product.asset,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: Icon(
-                        Icons.fastfood,
-                        color: Colors.grey[400],
-                        size: 32,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product.name,
-                          style: const TextStyle(
-                            color: Color(0xFF333333),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      _buildStatusTag(product),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'SKU: ${product.sku}',
-                    style: const TextStyle(
-                      color: Color(0xFF999999),
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    'Stock: ${product.stock} units',
-                    style: const TextStyle(
-                      color: Color(0xFF666666),
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      color: Color(0xFF1DB584),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusTag(Product p) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: p.statusColor.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        p.status,
-        style: TextStyle(
-          color: p.statusColor,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );

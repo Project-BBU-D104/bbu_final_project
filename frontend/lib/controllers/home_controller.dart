@@ -51,4 +51,7 @@ class HomeController extends GetxController{
   void gotoStock(){
     Get.toNamed(AppRoutes.stockMovement);
   }
+  void gotoSale(){
+    Get.toNamed(AppRoutes.sale);
+  }
 }
