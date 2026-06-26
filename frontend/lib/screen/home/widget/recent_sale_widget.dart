@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class RecentStockInWidget extends StatelessWidget {
-  const RecentStockInWidget({super.key});
+class RecentStockOutWidget extends StatelessWidget {
+  const RecentStockOutWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,7 @@ class RecentStockInWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 10,),
-          Text("Recent Stock In",
+          Text("Recent Sale Order",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           SizedBox(height: 10,),

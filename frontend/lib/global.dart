@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
-
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
 //// Variables
 // final storage = GetStorage(".appsettings");
 // final app = locator<IAppService>();
@@ -229,3 +230,43 @@ Widget get bgBlur {
 //     fit: BoxFit.cover,
 //   );
 // }
+
+
+
+Future<void> callPhone(String phone) async {
+  if (Platform.isAndroid || Platform.isIOS) {
+    final Uri uri = Uri(
+      scheme: 'tel',
+      path: phone,
+    );
+
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+  } else if (Platform.isWindows) {
+    // Windows: open browser/search or copy number
+    print("Phone call not supported on Windows: $phone");
+  }
+}
+
+Future<void> openGoogleMap(String url) async {
+  final Uri uri = Uri.parse(url);
+
+  await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+  );
+}
+
+Future<void> openEmail(String email) async {
+  final Uri emailUri = Uri(
+    scheme: 'mailto',
+    path: email,
+    query: 'subject=Hello&body=I want to contact you',
+  );
+
+  if (await canLaunchUrl(emailUri)) {
+    await launchUrl(emailUri);
+  }
+}

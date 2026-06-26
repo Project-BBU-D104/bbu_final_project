@@ -42,7 +42,9 @@ CREATE TABLE suppliers (
     name TEXT NOT NULL,
     phone TEXT,
     email TEXT,
+    map Text,
     address TEXT,
+    status BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
