@@ -6,6 +6,7 @@ class PurchasesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text("Purchases Screen")),
       body: Center(child: Text("Purchases Screen")),
     );
   }

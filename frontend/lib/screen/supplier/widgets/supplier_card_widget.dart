@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/global.dart';
+import 'package:frontend/widget/status_widget.dart';
 
 class SupplierCardWidget extends StatelessWidget {
    
@@ -82,7 +83,7 @@ class SupplierCardWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                status(item["status"]!)
+                StatusWidget( text:item["status"]!)
               ],
             ),
           ),
@@ -144,33 +145,4 @@ Widget iconBox(IconData icon,{ VoidCallback? onTap}){
     );
   }
 
-  Widget status(String text){
-    Color color =
-    text=="Verified"
-    ? Colors.green
-    : text=="On Hold"
-    ? Colors.red
-    : Colors.blue;
-    return Container(
-      padding:
-      const EdgeInsets.symmetric(
-        horizontal:14,
-        vertical:8
-      ),
-      decoration:BoxDecoration(
-        color:
-        color.withOpacity(.15),
-        borderRadius:
-        BorderRadius.circular(10)
-      ),
-
-      child:Text(
-        text,
-        style:TextStyle(
-          color:color,
-          fontWeight:
-          FontWeight.bold
-        ),
-      ),
-    );
-  }
+  

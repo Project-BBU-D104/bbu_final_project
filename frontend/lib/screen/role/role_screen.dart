@@ -6,6 +6,7 @@ class RoleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text("Role Screen")),
       body: Center(child: Text("Role Screen")),
     );
   }

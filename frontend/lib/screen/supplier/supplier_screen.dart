@@ -13,7 +13,6 @@ class SupplierScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xfff8fafc),
       appBar: AppBar(
         title: const Text("Suppliers"),
       ),

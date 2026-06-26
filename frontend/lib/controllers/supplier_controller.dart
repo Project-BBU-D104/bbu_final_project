@@ -18,11 +18,11 @@ class SupplierController extends GetxController {
       "icon": "🚀",
     },
     {
-      "name": "Alexander K. Sterling",
+      "name": "Alexander2 K. Sterling",
       "email": "2A2kW@example.com",
       "phone": "+855 (012) 345-678",
       "address": "30 St. Brooklyn",
-      "status": "Verified",
+      "status": "Pending",
       "created_at": "4 Days ago",
       "icon": "🚀",
     },
