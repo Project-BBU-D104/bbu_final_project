@@ -1,14 +1,17 @@
 These for SQLite Only
 
--- Roles Table
-CREATE TABLE roles (
+//Can be use 
+
+-- Categories Table
+CREATE TABLE categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
-    isactive BOOLEAN DEFAULT 0,
+    icon TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Users Table
 CREATE TABLE users (
@@ -21,6 +24,21 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+
+
+
+//Can't use yet
+
+-- Roles Table
+CREATE TABLE roles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    isactive BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Customers Table (user_id made optional)
@@ -48,15 +66,6 @@ CREATE TABLE suppliers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Categories Table
-CREATE TABLE categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    description TEXT,
-    icon TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 -- Warehouses Table
 CREATE TABLE warehouses (
