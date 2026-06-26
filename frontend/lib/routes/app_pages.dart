@@ -1,9 +1,11 @@
 import 'package:frontend/binding/category_binding.dart';
+import 'package:frontend/binding/customer_binding.dart';
 import 'package:frontend/binding/product_binding.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
+import 'package:frontend/screen/product/widget/add_product_widget.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
@@ -64,6 +66,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.customer,
       page: () => CustomerScreen(),
+      binding: CustomerBinding(),
     ),
     GetPage(
       name: AppRoutes.stockMovement,
@@ -100,6 +103,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.warehouse,
       page: () => WarehouseScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.addProduct,
+      page: () => AddProductWidget(),
     ),
   ];
 }

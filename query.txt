@@ -26,7 +26,6 @@ CREATE TABLE users (
 -- Customers Table (user_id made optional)
 CREATE TABLE customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
     name TEXT NOT NULL,
     photo TEXT,
     phone TEXT,
@@ -83,14 +82,12 @@ CREATE TABLE products (
     category_id INTEGER NOT NULL,
     supplier_id INTEGER NOT NULL,
     name TEXT NOT NULL,
-    sku TEXT UNIQUE,
     barcode TEXT UNIQUE,
     photo TEXT,
-    icon TEXT,
     cost_price REAL NOT NULL,
     sale_price REAL NOT NULL,
     qty INTEGER DEFAULT 0,
-    min_qty INTEGER DEFAULT 0,
+    allow_insert_qty INTEGER DEFAULT 0,
     unit TEXT,
     description TEXT,
     deleted_at TIMESTAMP,

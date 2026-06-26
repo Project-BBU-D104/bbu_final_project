@@ -13,7 +13,6 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = darkColor;
 
     return Scaffold(
       backgroundColor: lightColor.shade50,
@@ -83,7 +82,7 @@ class CategoryScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisAlignment:
-                        MainAxisAlignment.end,
+                        MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "${ctr.categoryList.length} CATEGORIES",
@@ -92,6 +91,24 @@ class CategoryScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: Colors.orange.shade700,
                         ),
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange.shade700,
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Add Category",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        onPressed: (){
+                          ctr.addCategory(context);
+                        },
                       ),
                     ],
                   ),

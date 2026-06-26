@@ -6,11 +6,13 @@ import 'package:get/get.dart';
 import 'package:frontend/controllers/product_controller.dart';
 
 class ProductScreen extends StatelessWidget {
-  const ProductScreen({super.key});
+  ProductScreen({super.key});
+
+final productCtrl = Get.put(ProductController());
 
   @override
   Widget build(BuildContext context) {
-    final productCtrl = Get.find<ProductController>();
+    
     return PopScope(
       canPop: true,
       child: Scaffold(
@@ -129,7 +131,7 @@ class ProductScreen extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Get.snackbar('Action', 'Redirecting to add product form...');
+            productCtrl.gotoAddProduct();
           },
           backgroundColor: const Color(0xFF1DB584),
           shape: RoundedRectangleBorder(

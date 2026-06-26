@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class Product {
@@ -97,5 +98,9 @@ class ProductController extends GetxController {
 
       return queryMatch && catMatch && statusMatch && recencyMatch;
     }).toList();
+  }
+
+  void gotoAddProduct(){
+    Get.toNamed(AppRoutes.addProduct);
   }
 }

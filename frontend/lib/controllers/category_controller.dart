@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/screen/category/widget/add_category_widget.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:get/get.dart';
 
@@ -28,4 +30,18 @@ class CategoryController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  void addCategory(BuildContext context) {
+   
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return AddCategoryWidget(); 
+    }
+  );
+}
 }

@@ -1,13 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/customer_controller.dart';
+import 'package:frontend/screen/customer/widget/customer_card_widget.dart';
+import 'package:frontend/screen/customer/widget/customer_kpi_widget.dart';
+import 'package:frontend/widget/search_widget.dart';
+import 'package:get/get.dart';
 
 class CustomerScreen extends StatelessWidget {
-  const CustomerScreen({super.key});
+  CustomerScreen({super.key});
+
+  final ctr = Get.find<CustomerController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Customer Screen")),
-      body: Text("Customer Screen"),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              SearchWidget(title: "Search Customers by name or ID",),
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 2,
+                children: [
+                    CustomerKpiWidget(
+                    title: "Total Customers",
+                    value: "1,000",
+                    ),
+                    CustomerKpiWidget(
+                    title : "Active Customers",
+                    value: "1,000",
+                    ),
+                    CustomerKpiWidget(
+                    title: "Inactive Customers",
+                    value: "1,000",
+                    ),
+                ],
+              ),
+              CustomerCardWidget(),
+            ],
+          ),
+        )
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          ctr.addCustomer(context);
+        }, 
+        child: const Icon(Icons.add)
+      ),
     );
   }
 }
+
+ 
