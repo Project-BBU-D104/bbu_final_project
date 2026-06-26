@@ -25,6 +25,8 @@ class StatusWidget extends StatelessWidget {
         return Colors.green;
       case "low stock":
         return Colors.yellow;
+      case "in transit":
+        return Colors.green;
       case "out of stock":
         return Colors.red;
       default:
