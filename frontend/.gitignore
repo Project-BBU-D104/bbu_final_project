@@ -50,7 +50,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
+.config/
 .config/.appsettings*
 .config/.appsettings.bak
 .config/.appsettings.gs
