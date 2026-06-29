@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/role_controller.dart';
+import 'package:frontend/controllers/user_controller.dart';
 import 'package:get/get.dart';
 
-class AddRoleWidget extends StatelessWidget {
-  AddRoleWidget({super.key});
+class AddUserWidget extends StatelessWidget {
+  AddUserWidget({super.key});
 
-  final ctr = Get.find<RoleController>();
+  final ctr = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class AddRoleWidget extends StatelessWidget {
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 70,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 100,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +24,7 @@ class AddRoleWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Add Role",
+                "Add User",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -42,25 +42,53 @@ class AddRoleWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Role Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          DropdownButtonFormField<String>(
+            value: ctr.selectedUser.value,
+            decoration: const InputDecoration(
+              hintText: "Select User Type",
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            ),
+            items: const [
+              DropdownMenuItem(
+                value: "admin",
+                child: Text("Admin"),
+              ),
+              DropdownMenuItem(
+                value: "cashier",
+                child: Text("Cashier"),
+              ),
+            ],
+            onChanged: (value) {
+              ctr.selectedUser.value = value ?? '';
+            },
+          ),
+
+          Text("Username", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
           const TextField(
             decoration: InputDecoration(
-              hintText: "Name",
+              hintText: "Username",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-          Text("Description", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          TextField(
-            maxLines: 8,
-            minLines: 3,
+          const TextField(
             decoration: InputDecoration(
-              hintText: "Description",
+              hintText: "Email",
               border: OutlineInputBorder(),
-              alignLabelWithHint: true,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text("Password", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5),
+          const TextField(
+            decoration: InputDecoration(
+              hintText: "Password",
+              border: OutlineInputBorder(),
             ),
           ),
 
@@ -76,10 +104,12 @@ class AddRoleWidget extends StatelessWidget {
                   ctr.isChecked.value = value!;
                 },
               ),
-              const Text("Status"),
+              const Text("Disable User"),
             ],
           );
         }),
+
+          const SizedBox(height: 15),
 
           SizedBox(
             width: double.infinity,

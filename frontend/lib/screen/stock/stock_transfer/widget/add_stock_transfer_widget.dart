@@ -50,63 +50,63 @@ final ctr = Get.find<StockTransferController>();
             Text("From Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
-                      value: selectedProduct,
-                      decoration: const InputDecoration(
-                        hintText: "From Warehouse",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "warehouse1",
-                          child: Text("Warehouse 1"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse2",
-                          child: Text("Warehouse 2"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse3",
-                          child: Text("Warehouse 3"),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        selectedProduct = value;
-                      },
-                    ),
+              value: selectedProduct,
+              decoration: const InputDecoration(
+                hintText: "From Warehouse",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: "warehouse1",
+                  child: Text("Warehouse 1"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse2",
+                  child: Text("Warehouse 2"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse3",
+                  child: Text("Warehouse 3"),
+                ),
+              ],
+              onChanged: (value) {
+                selectedProduct = value;
+              },
+            ),
                      
             const SizedBox(height: 15),
         
             Text("To Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
-                      value: selectedProduct,
-                      decoration: const InputDecoration(
-                        hintText: "To Warehouse",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "warehouse1",
-                          child: Text("Warehouse 1"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse2",
-                          child: Text("Warehouse 2"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse3",
-                          child: Text("Warehouse 3"),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        selectedProduct = value;
-                      },
-                    ),
+              value: selectedProduct,
+              decoration: const InputDecoration(
+                hintText: "To Warehouse",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: "warehouse1",
+                  child: Text("Warehouse 1"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse2",
+                  child: Text("Warehouse 2"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse3",
+                  child: Text("Warehouse 3"),
+                ),
+              ],
+              onChanged: (value) {
+                selectedProduct = value;
+              },
+            ),
 
-                     const Text("Transfer Date",
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+            const SizedBox(height: 10),
+            const Text("Transfer Date", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
             const SizedBox(height: 5),
 
             Obx(() => InkWell(

@@ -14,21 +14,24 @@ StockAdjustmentScreen({super.key});
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Stock Adjustment")),
-      body: Column(
-        children: [
-          SearchWidget(title: "Search Stock Adjustment"),
-
-          Row(
-            children: [
-              ChipWidget(title: "All"),
-              ChipWidget(title: "Increases"),
-              ChipWidget(title: "Decreases"),
-              ChipWidget(title: "Rejected"),
-            ]
-          ),
-          SizedBox(height: 10,),
-          StockAdjustmentCardWidget(),
-        ]
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            SearchWidget(title: "Search Stock Adjustment"),
+        
+            Row(
+              children: [
+                ChipWidget(title: "All"),
+                ChipWidget(title: "Increases"),
+                ChipWidget(title: "Decreases"),
+                ChipWidget(title: "Rejected"),
+              ]
+            ),
+            SizedBox(height: 10,),
+            StockAdjustmentCardWidget(),
+          ]
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){

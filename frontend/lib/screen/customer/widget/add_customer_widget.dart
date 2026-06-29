@@ -13,6 +13,7 @@ class AddCustomerWidget extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom + 200,
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
@@ -37,35 +38,37 @@ class AddCustomerWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
+          Text("Customer Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5),
           const TextField(
             decoration: InputDecoration(
-              labelText: "Customer Name",
+              hintText: "Customer Name",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-
+          Text("Phone Number", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5),
           const TextField(
             decoration: InputDecoration(
-              labelText: "Phone Number",
+              hintText: "Phone Number",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-
-          SizedBox(
-            height: 120,
-            child: const TextField(
-              maxLines: null,
-              expands: true,
+          Text("Address", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5),
+           TextField(
+              maxLines: 8,
+              minLines: 3,
               decoration: InputDecoration(
-                labelText: "Address",
+                hintText: "Address",
                 border: OutlineInputBorder(),
+                alignLabelWithHint: true,
               ),
             ),
-          ),
 
           const SizedBox(height: 15),
 

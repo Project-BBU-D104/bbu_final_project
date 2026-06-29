@@ -13,6 +13,7 @@ class AddCategoryWidget extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom + 200,
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
@@ -37,30 +38,40 @@ class AddCategoryWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
+          Text("Category Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
           const TextField(
             decoration: InputDecoration(
-              labelText: "Category Name",
+              hintText: "Category Name",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
+          Text("Icon", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
           const TextField(
             decoration: InputDecoration(
-              labelText: "Description",
+              hintText: "Icon",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
+          Text("Description", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
           const TextField(
+            maxLines: 8,
+            minLines: 3,
             decoration: InputDecoration(
-              labelText: "Icon",
+              hintText: "Description",
               border: OutlineInputBorder(),
+              alignLabelWithHint: true,
             ),
           ),
+ 
 
           const SizedBox(height: 15),
 

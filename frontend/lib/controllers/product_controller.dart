@@ -28,9 +28,13 @@ class Product {
 
 class ProductController extends GetxController {
   var searchQuery = ''.obs;
-  var selectedCategory = 'All'.obs;
+  var filterCategory = 'All'.obs;
   var selectedStatus = 'All'.obs;
   var selectedRecency = 'All'.obs;
+
+var selectedCategory = RxnString();
+var selectedSupplier = RxnString();
+var selectedUnit = RxnString();
 
   final List<Product> _masterList = [
     Product(
@@ -86,8 +90,10 @@ class ProductController extends GetxController {
       );
 
       final catMatch =
-          selectedCategory.value == 'All' ||
-          item.category == selectedCategory.value;
+          filterCategory.value == 'All' ||
+          filterCategory.value == 'All' ||
+          item.category == filterCategory.value;
+          item.category == filterCategory.value;
 
       final statusMatch =
           selectedStatus.value == 'All' || item.status == selectedStatus.value;

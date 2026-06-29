@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/product_controller.dart';
+import 'package:get/get.dart';
 
 class AddProductWidget extends StatelessWidget {
-  String? selectedCategory;
-  String? selectedSupplier;
-  String? selectedUnit;
+  AddProductWidget({super.key});
 
-  bool isChecked = false;
-
-  AddProductWidget({super.key, this.selectedCategory, this.selectedSupplier, this.selectedUnit});
+  final ctr = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,7 @@ class AddProductWidget extends StatelessWidget {
                       Text("Category", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
                    DropdownButtonFormField<String>(
-                    value: selectedCategory,
+                    value: ctr.selectedCategory.value,
                     decoration: const InputDecoration(
                       hintText: "Category",
                       border: OutlineInputBorder(),
@@ -76,7 +74,7 @@ class AddProductWidget extends StatelessWidget {
                       ),
                     ],
                     onChanged: (value) {
-                      selectedCategory = value;
+                      ctr.selectedCategory.value = value ?? '';
                     },
                   ),
                     const SizedBox(height: 10),
@@ -85,7 +83,7 @@ class AddProductWidget extends StatelessWidget {
                       const SizedBox(height: 5),
           
                    DropdownButtonFormField<String>(
-                    value: selectedSupplier,
+                    value: ctr.selectedSupplier.value,
                     decoration: const InputDecoration(
                       hintText: "Supplier",
                       border: OutlineInputBorder(),
@@ -102,7 +100,7 @@ class AddProductWidget extends StatelessWidget {
                       ),
                     ],
                     onChanged: (value) {
-                      selectedCategory = value;
+                      ctr.selectedSupplier.value = value ?? '';
                     },
                   ),
                       
@@ -118,78 +116,110 @@ class AddProductWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
           
-                      Text("Cost Price", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
-          
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: "Cost Price",
-                        border: OutlineInputBorder(),
-                      ),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Cost Price", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                            const SizedBox(height: 5),
+                                  
+                            const TextField(
+                              decoration: InputDecoration(
+                                hintText: "Cost Price",
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ],
+                        )),
+                         const SizedBox(width: 10),
+                         Expanded(child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Sale Price", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                            const SizedBox(height: 5),
+                            const TextField(
+                              decoration: InputDecoration(
+                                hintText: "Sale Price",
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                              ],
+                            )),
+                          ],
                     ),
+                     
                     const SizedBox(height: 10),
 
-                    Text("Sale Price", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                        
+                            const SizedBox(height: 5),
+                        
+                            const TextField(
+                              decoration: InputDecoration(
+                                hintText: "Quantity",
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            ],
+                          )
+                        ),
 
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: "Sale Price",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                        const SizedBox(width: 10),
 
-                    Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Unit", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
 
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: "Quantity",
-                        border: OutlineInputBorder(),
+                         const SizedBox(height: 5),
+                        DropdownButtonFormField<String>(
+                        value: ctr.selectedUnit.value,
+                        decoration: const InputDecoration(
+                          hintText: "Unit",
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: "kg",
+                            child: Text("Kg"),
+                          ),
+                          DropdownMenuItem(
+                            value: "unit",
+                            child: Text("Unit"),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          ctr.selectedUnit.value = value ?? '';
+                        },
                       ),
-                    ),
-                
-                
-                    const SizedBox(height: 10),
-                    Text("Unit", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                    const SizedBox(height: 5),
-                     DropdownButtonFormField<String>(
-                    value: selectedUnit,
-                    decoration: const InputDecoration(
-                      hintText: "Unit",
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "kg",
-                        child: Text("Kg"),
-                      ),
-                      DropdownMenuItem(
-                        value: "unit",
-                        child: Text("Unit"),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      selectedCategory = value;
-                    },
-                  ),
+                          ],
+                        )),
+                          ],
+                        ),
                 
                     const SizedBox(height: 10),
                     Text("Description", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
-                    SizedBox(
-                      height: 120,
-                      child: const TextField(
-                        maxLines: null,
-                        expands: true,
-                        decoration: InputDecoration(
+                       TextField(
+                        minLines: 3,
+                        maxLines: 8,
+                        decoration: const InputDecoration(
                           hintText: "Description",
                           border: OutlineInputBorder(),
+                            alignLabelWithHint: true,
                         ),
                       ),
-                    ),
+                      
                       
                     const SizedBox(height: 15),
                       

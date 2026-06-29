@@ -1,13 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/user_controller.dart';
+import 'package:frontend/screen/user/widget/kpi_user_widget.dart';
+import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
+import 'package:frontend/widget/search_widget.dart';
+import 'package:get/get.dart';
 
 class UserScreen extends StatelessWidget {
-  const UserScreen({super.key});
+   UserScreen({super.key});
+
+  final ctr = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("User Screen")),
-      body: Center(child: Text("User Screen")),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              SearchWidget(title: "Search User..."),
+          
+              SizedBox(
+                width: double.infinity,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: KpiUserWidget(
+                        title: "Active Users",
+                        value: 100,
+                      ),
+                    ),
+                    Expanded(
+                      child: KpiUserWidget(
+                        title: "Inactive Users",
+                        value: 100,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          
+              SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("100 Users"),
+                
+                  ElevatedButton(
+                    onPressed: (){
+                      ctr.addUser(context);
+                    }, 
+                    child: Text("New User")
+                  )
+                ],
+              ),
+
+              SizedBox(height: 15),
+              UserCardListWidget(),
+          
+            ],
+          ),
+        ),
+      )
     );
   }
 }
