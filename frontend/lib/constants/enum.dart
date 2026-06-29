@@ -1,5 +1,6 @@
   enum StorageKey {
-    changeMenuLanguage
+    appStartUp,
+    lastUserLogin
   }
 
   enum SystemMode { system, light, dark }

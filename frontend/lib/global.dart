@@ -147,70 +147,7 @@ showError(String title, String description) async {
     );
   }
 }
-
-/// get current language
-// Locale get getCurrentLanguage {
-//   final key = storage.readStorage(StorageKey.currentLanguage);
-//   var lang = Locale('en', "US");
-//   switch (key) {
-//     case "km":
-//       lang = Locale('km', "KHM");
-//       break;
-//     default:
-//       break;
-//   }
-//   return lang;
-// }
-
-///workspace
-// SystemMode get currentSystemMode {
-//   var val = storage.readStorage<String>(StorageKey.systemMode) ?? "light";
-//   SystemMode mode = SystemMode.light;
-//   switch (val) {
-//     case "light":
-//       mode = SystemMode.light;
-//       break;
-//     case "dark":
-//       mode = SystemMode.dark;
-//       break;
-//     default:
-//       mode = SystemMode.system;
-//       break;
-//   }
-//   return mode;
-// }
-
-// MaterialColor get background {
-//   Color light = HexColor.fromHex("#ffffff");
-//   Color dark = HexColor.fromHex("#101010");
-//   switch (currentSystemMode) {
-//     case SystemMode.dark:
-//       return createMaterialColor(dark);
-//     case SystemMode.light:
-//       return createMaterialColor(light);
-
-//     default:
-//       final brightness =
-//           WidgetsBinding.instance.platformDispatcher.platformBrightness;
-//       if (brightness == Brightness.dark) {
-//         return createMaterialColor(dark);
-//       } else {
-//         return createMaterialColor(light);
-//       }
-//   }
-// }
-
-///get backgroud box decoration
-// BoxDecoration get bgBoxDecoration {
-//   return BoxDecoration(
-//     color: background,
-//     image: DecorationImage(
-//       image: AssetImage(backgroundPath),
-//       fit: BoxFit.fill,
-//     ),
-//   );
-// }
-
+ 
 ///get background blur/glass
 Widget get bgBlur {
   return BackdropFilter(
@@ -220,19 +157,7 @@ Widget get bgBlur {
     ),
   );
 }
-
-///get logo no background
-// Widget loadLogoNoBg([double? width, double? height]) {
-//   return Image.asset(
-//     logoNoBackgroundPath,
-//     width: width ?? 70,
-//     height: height ?? 70,
-//     fit: BoxFit.cover,
-//   );
-// }
-
-
-
+ 
 Future<void> callPhone(String phone) async {
   if (Platform.isAndroid || Platform.isIOS) {
     final Uri uri = Uri(

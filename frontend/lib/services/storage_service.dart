@@ -1,8 +1,9 @@
+import 'package:frontend/constants/enum.dart';
+import 'package:get_storage/get_storage.dart';
 import 'dart:convert';
 
-import 'package:frontend/constants/enum.dart';
 import 'package:frontend/utils/helper.dart';
-import 'package:get_storage/get_storage.dart';
+
 
 final _box = GetStorage(".appsettings");
 final _helper = Helper();
@@ -12,12 +13,15 @@ abstract class IStorageService {
   Future<void> writeStorage(StorageKey key, dynamic value);
   Future<void> removeStorage(StorageKey key);
   Future<void> removeStorageMultiple(List<StorageKey> keys);
+  //startup route
+  Future<void> appStartUpWrite({required String route});
+  String get appStartUpRead;
 
-  //current POS Profile
-  Future<void> changeMenuLanguageWrite({required Map<String, dynamic> data});
-  Future<void> changeMenuLanguageRemove();
-  Map<String, dynamic> get changeMenuLanguageRead;
- 
+  //current user login
+  Future<void> lastUserLoginWrite({required Map<String, dynamic> data});
+  Future<void> lastUserLoginRemove();
+  Map<String, dynamic> get lastUserLoginRead;
+
 }
 
 class StorageService implements IStorageService {
@@ -28,50 +32,71 @@ class StorageService implements IStorageService {
     if (_box.hasData(vkey)) {
       return _box.read<T>(vkey);
     }
-    return null as T?;
+    return null;
   }
 
+  ///method write storage value
   @override
   Future<void> writeStorage(StorageKey key, dynamic value) async {
     final vkey = key.toString().split('.').last; // Output: active
-    await _box.write(vkey, value);
+    _box.write(vkey, value);
   }
 
+  ///method remove storage key
   @override
   Future<void> removeStorage(StorageKey key) async {
-    final vkey = key.toString().split('.').last; // Output: active
-    await _box.remove(vkey);
+    _removeStorage(key);
   }
 
+  ///method remove multiple storage keys
   @override
   Future<void> removeStorageMultiple(List<StorageKey> keys) async {
-    for (var key in keys) {
-      await removeStorage(key);
+    for (var k in keys) {
+      await _removeStorage(k);
     }
   }
+  
+  ///method remove storage key
+  Future<void> _removeStorage(StorageKey key) async {
+    final vkey = key.toString().split('.').last; // Output: active
+    _box.remove(vkey);
+  }
 
-  //change menu language
   @override
-  Future<void> changeMenuLanguageWrite({
+  Future<void> appStartUpWrite({required String route}) async {
+    await writeStorage(StorageKey.appStartUp, route);
+  }
+
+  @override
+  String get appStartUpRead {
+    String? route = readStorage<String>(StorageKey.appStartUp);
+    return route ?? "";
+  }
+
+  //Last user login
+  @override
+  Future<void> lastUserLoginWrite({
     required Map<String, dynamic> data,
   }) async {
-    var encryptData = _helper.onEcrypted(jsonEncode(data));
+    var encryptData = _helper.onEncrypted(jsonEncode(data));
 
-    await writeStorage(StorageKey.changeMenuLanguage, encryptData);
+    await writeStorage(StorageKey.lastUserLogin, encryptData);
+   
   }
 
   @override
-  Future<void> changeMenuLanguageRemove() async {
-    await removeStorage(StorageKey.changeMenuLanguage);
+  Future<void> lastUserLoginRemove() async {
+    await removeStorage(StorageKey.lastUserLogin);
   }
 
   @override
-  Map<String, dynamic> get changeMenuLanguageRead {
-    var data = readStorage<String>(StorageKey.changeMenuLanguage);
+  Map<String, dynamic> get lastUserLoginRead {
+    var data = readStorage<String>(StorageKey.lastUserLogin);
     if (data != null) {
       Map<String, dynamic> result = jsonDecode(_helper.onDecrypted(data));
       return result;
     }
     return {};
   }
+  
 }
