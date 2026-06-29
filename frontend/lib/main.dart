@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/locator.dart';
 import 'package:get/get.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
@@ -17,8 +18,9 @@ Future<void> main() async {
 
 
   _initStorage();
+  
   await GetStorage.init();
-
+ setupLocator();
 
   runApp(const MyApp());
 

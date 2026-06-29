@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/login_controller.dart';
+import 'package:frontend/screen/auth/widget/input_login_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/routes/app_routes.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
 
-class _LoginScreenState extends State<LoginScreen> {
-  bool rememberMe = false;
-
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    super.dispose();
-  }
+  final LoginController controller = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +21,10 @@ class _LoginScreenState extends State<LoginScreen> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF23B2B9), Color(0xFF179FA6)],
+              colors: [
+                Color(0xFF23B2B9),
+                Color(0xFF179FA6),
+              ],
             ),
           ),
           child: Column(
@@ -41,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 24),
 
-              /// HEADER (RESTORED)
+              /// HEADER
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
@@ -71,17 +62,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
-
-             
-
               const SizedBox(height: 35),
 
-              /// LOGIN CARD
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.only(left: 24, right: 24, top: 32),
+                  padding: const EdgeInsets.only(
+                    left: 24,
+                    right: 24,
+                    top: 32,
+                  ),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -103,46 +93,47 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 28),
 
-                        _buildInput(
-                          controller: nameController,
+                        InputLoginWidget(
+                          controller: controller.usernameController,
                           hint: "Enter username",
                           icon: Icons.person_outline,
                         ),
 
                         const SizedBox(height: 16),
 
-                        _buildInput(
-                          controller: emailController,
-                          hint: "Enter password",
-                          icon: Icons.lock_outline,
+                        Obx(
+                          () => InputLoginWidget(
+                            controller: controller.passwordController,
+                            hint: "Enter password",
+                            icon: Icons.lock_outline,
+                            obscureText: controller.obscurePassword.value,
+                            onTogglePassword: controller.togglePassword,
+                          ),
                         ),
 
                         const SizedBox(height: 12),
 
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: rememberMe,
-                              onChanged: (v) {
-                                setState(() {
-                                  rememberMe = v ?? false;
-                                });
-                              },
-                              activeColor: const Color(0xFF23B2B9),
-                            ),
-                            const Text(
-                              "Remember Me",
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 12,
+                        Obx(
+                          () => Row(
+                            children: [
+                              Checkbox(
+                                value: controller.rememberMe.value,
+                                activeColor: const Color(0xFF23B2B9),
+                                onChanged: controller.toggleRemember,
                               ),
-                            ),
-                          ],
+                              const Text(
+                                "Remember Me",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(height: 24),
 
-                        /// LOGIN BUTTON
                         SizedBox(
                           width: double.infinity,
                           height: 54,
@@ -154,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             onPressed: () {
-                              Get.offNamed(AppRoutes.home);
+                              controller.onLogin();
                             },
                             child: const Text(
                               "Login",
@@ -173,29 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInput({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: TextField(
-        controller: controller,
-        style: const TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          hintText: hint,
-          prefixIcon: Icon(icon, color: Colors.black26, size: 20),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/locator.dart';
+import 'package:frontend/services/storage_service.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
@@ -9,16 +11,13 @@ import 'dart:io';
 //// Variables
 // final storage = GetStorage(".appsettings");
 // final app = locator<IAppService>();
-// final storage = locator<IStorageService>();
+
+final storage = locator<IStorageService>();
 
 String appName = "ePOS App";
 String deviceID = "";
 String appVersion = "0.0.0";
 
-// variable Rx
-final licenseInfo = <String, dynamic>{}.obs;
-final showLicense = false.obs;
-//end variable Rx
 
 String serverUrl = "";
 
@@ -32,36 +31,6 @@ String toUpperSnakeCase(String input) {
       )
       .toUpperCase();
 }
-
-/// [server_url]/api/method/
-String get apiBaseUrl {
-  return "$serverUrl/api/method/";
-}
-
-///[base-url]api/method/epos_app.api.
-String get apiUrl {
-  return "$serverUrl/api/method/epos_app.api.";
-}
-
-/// [server_url]/api/resource/
-String get apiResourceUrl {
-  return "$serverUrl/api/resource/";
-}
-
-////Methods
-//* all method *//
-
-// Future<void> initApp() async {
-//   final info = await PackageInfo.fromPlatform();
-//   deviceID = await app.getDeviceId;
-//   appVersion = info.version;
-//   showLicense(false);
-
-//   if (kDebugMode) {
-//     print(info);
-//   }
-//   // appVersion = "${info.version}+${info.buildNumber}";
-// }
 
 ///Future Delayed 250 milliseconds default
 Future<void> onDelayed([Duration? duration]) async {
