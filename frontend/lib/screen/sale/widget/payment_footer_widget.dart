@@ -54,7 +54,7 @@ class PaymentFooterWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 const Text(
-                  '3 Items Selected',
+                  '3 Items',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -70,14 +70,7 @@ class PaymentFooterWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Total Value',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              
               const SizedBox(height: 2),
               const Text(
                 '\$45.00',

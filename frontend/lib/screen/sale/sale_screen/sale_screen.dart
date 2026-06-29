@@ -12,56 +12,72 @@ class SaleScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Sale Screen"),
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: const [
-                    ChipWidget(title: "All"),
-                    ChipWidget(title: "Pending"),
-                    ChipWidget(title: "Completed"),
-                    ChipWidget(title: "Canceled"),
-                  ],
+
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          int crossAxisCount = 2;
+
+          if (constraints.maxWidth < 600) {
+            crossAxisCount = 2; // phone
+          } else if (constraints.maxWidth < 900) {
+            crossAxisCount = 3; // small tablet
+          } else {
+            crossAxisCount = 4; // large screen
+          }
+
+          return Column(
+            children: [
+              // 🔹 Scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Chips
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: const [
+                          ChipWidget(title: "All"),
+                          ChipWidget(title: "Pending"),
+                          ChipWidget(title: "Completed"),
+                          ChipWidget(title: "Canceled"),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Grid
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 8,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.72,
+                        ),
+                        itemBuilder: (context, index) {
+                          return const CardItemWidget();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 12),
-
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.72,
-                  children: const [
-                    CardItemWidget(),
-                    CardItemWidget(),
-                    CardItemWidget(),
-                    CardItemWidget(),
-                    CardItemWidget(),
-                    CardItemWidget(),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: const PaymentFooterWidget(),
               ),
-            ),
-          ),
-        ],
+
+              // 🔹 Bottom Footer (fixed, safe)
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: const PaymentFooterWidget(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

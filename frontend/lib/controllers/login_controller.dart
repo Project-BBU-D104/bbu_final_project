@@ -27,7 +27,7 @@ class LoginController extends GetxController {
     );
 
      
-    Get.toNamed(AppRoutes.home);
+    Get.offAllNamed('/home');
   }
 
   @override
