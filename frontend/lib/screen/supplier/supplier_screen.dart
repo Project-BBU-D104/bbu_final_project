@@ -59,6 +59,10 @@ class SupplierScreen extends StatelessWidget {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => controller.addSupplier(context),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
