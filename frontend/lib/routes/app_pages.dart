@@ -3,6 +3,7 @@ import 'package:frontend/binding/customer_binding.dart';
 import 'package:frontend/binding/home_binding.dart';
 import 'package:frontend/binding/payment_binding.dart';
 import 'package:frontend/binding/product_binding.dart';
+import 'package:frontend/binding/purchase_binding.dart';
 import 'package:frontend/binding/role_binding.dart';
 import 'package:frontend/binding/sale_binding.dart';
 import 'package:frontend/binding/stock_adjustment_binding.dart';
@@ -68,7 +69,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.purchase,
       page: () => PurchasesScreen(),
-      // bindings: ProductBinding(),
+      binding: PurchaseBinding(),
     ),
     GetPage(
       name: AppRoutes.supplier,

@@ -40,8 +40,9 @@ class AddUserWidget extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 10),
-
+          
+          Text("Role", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            SizedBox(height: 5),
           DropdownButtonFormField<String>(
             value: ctr.selectedUser.value,
             decoration: const InputDecoration(
@@ -63,7 +64,8 @@ class AddUserWidget extends StatelessWidget {
               ctr.selectedUser.value = value ?? '';
             },
           ),
-
+          
+          const SizedBox(height: 10),
           Text("Username", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
           const TextField(

@@ -7,7 +7,7 @@ class SaleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Sale Screen")),
-      body: Center(child: Text("Sale Scree11n")),
+      body: Center(child: Text("Sale Screen")),
     );
   }
 }
