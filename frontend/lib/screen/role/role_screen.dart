@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/screen/role/widget/role_card_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +13,7 @@ class RoleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Role Screen")),
+      appBar: CustomAppBar(title: "Role"),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(

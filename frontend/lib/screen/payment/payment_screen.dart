@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/payment_controller.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class PaymentScreen extends StatelessWidget {
@@ -10,7 +11,7 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Payment Screen")),
+      appBar: CustomAppBar(title: "Payment"),
       body: Center(child: Text("Payment Screen")),
     );
   }

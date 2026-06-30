@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase_controller.dart';
 import 'package:frontend/screen/purchases/widget/purchase_card_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_kpi_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ class PurchasesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Purchases Screen")),
+      appBar: CustomAppBar(title: "Purchases"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

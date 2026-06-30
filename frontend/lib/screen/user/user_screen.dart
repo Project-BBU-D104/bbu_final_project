@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/screen/user/widget/kpi_user_widget.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("User Screen")),
+      appBar: CustomAppBar(title: "User"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

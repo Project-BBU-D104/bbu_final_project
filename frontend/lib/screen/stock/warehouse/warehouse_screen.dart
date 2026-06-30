@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/screen/stock/warehouse/widget/warehouse_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ class WarehouseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Warehouse Screen")),
+      appBar: CustomAppBar(title: "Warehouse"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

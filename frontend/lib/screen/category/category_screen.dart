@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/screen/category/widget/card_category_widget.dart';
-import 'package:frontend/widget/button_change_table_or_card_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -16,62 +16,23 @@ class CategoryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: lightColor.shade50,
-      appBar: AppBar(
-        backgroundColor: titleColor,
-        surfaceTintColor: titleColor,
-        elevation: 0.5,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: darkColor),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          "Category",
-          style: TextStyle(
-            color: darkColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          ButtonChangeTableOrCardWidget(),
-        ],
-      ),
+      appBar: CustomAppBar(title: "Category"),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Obx(
           () => CustomScrollView(
             slivers: [
+              SliverToBoxAdapter(
+                child: const SizedBox(
+                  height: 10,
+                ),
+              ),
+
               /// Search Bar
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: whiteColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: darkColor.withValues(alpha: 0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: SearchWidget(
-                            title: "Search Category",
-                          )
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                child: SearchWidget(
+                  title: "Search Category",
+                )
               ),
 
               /// Header
@@ -88,9 +49,7 @@ class CategoryScreen extends StatelessWidget {
                         "${ctr.categoryList.length} CATEGORIES",
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade700,
-                        ),
+                          fontWeight: FontWeight.bold,                        ),
                       ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(

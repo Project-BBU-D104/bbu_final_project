@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/stock_movement_controller.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class StockMovementscreen extends StatelessWidget {
@@ -10,30 +11,7 @@ class StockMovementscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text(
-          "Stock Movement",
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(
-              Icons.notifications_none,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: "Stock Movements"),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

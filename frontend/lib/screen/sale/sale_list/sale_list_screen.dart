@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale_controller.dart';
 import 'package:frontend/screen/sale/widget/sale_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ class SaleListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Sale List Screen")),
+      appBar: CustomAppBar(title: "Sale List"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

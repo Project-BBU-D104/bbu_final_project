@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/screen/product/widget/filter_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/product_controller.dart';
@@ -15,27 +16,8 @@ class ProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: titleColor,
-      appBar: AppBar(
-        backgroundColor: titleColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.transparent, 
-        leading: IconButton(
-          icon: const Icon(
-            CupertinoIcons.back,
-            color: Colors.black87,
-          ),
-          onPressed: () => Get.back(),
-        ),
-        title: const Text(
-          'Product',
-          style: TextStyle(
-            color: Colors.black87,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+      appBar: CustomAppBar(
+          title: 'Product',
       ),
 
       body: CustomScrollView(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/screen/customer/widget/customer_card_widget.dart';
 import 'package:frontend/screen/customer/widget/customer_kpi_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ class CustomerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Customer Screen")),
+      appBar: CustomAppBar(title: "Customer"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

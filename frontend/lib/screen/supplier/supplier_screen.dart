@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,9 +14,7 @@ class SupplierScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Suppliers"),
-      ),
+      appBar: CustomAppBar(title: "Suppliers"),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

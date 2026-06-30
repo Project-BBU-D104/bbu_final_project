@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screen/sale/widget/card_item_widget.dart';
 import 'package:frontend/screen/sale/widget/payment_footer_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 
 class SaleScreen extends StatelessWidget {
   const SaleScreen({super.key});
@@ -9,9 +10,7 @@ class SaleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Sale Screen"),
-      ),
+      appBar: CustomAppBar(title: "Sale"),
 
       body: LayoutBuilder(
         builder: (context, constraints) {

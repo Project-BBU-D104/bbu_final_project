@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/home_controller.dart';
 import 'package:get/get.dart';
 
@@ -19,6 +20,7 @@ class HomeScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Obx(() {
         return NavigationBar(
+          backgroundColor: titleColor,
           selectedIndex: controller.selectedIndex.value,
           onDestinationSelected: controller.onTabChanged,
           destinations: const [

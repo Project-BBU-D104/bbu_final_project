@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/stock_adjustment_controller.dart';
 import 'package:frontend/screen/stock/stock_adjustment/widget/stock_adjustment_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ StockAdjustmentScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Stock Adjustment")),
+      appBar: CustomAppBar(title: "Stock Adjustment"),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
