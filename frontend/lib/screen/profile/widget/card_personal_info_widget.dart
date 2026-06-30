@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class CardPersonalInfoWidget extends StatelessWidget {
   const CardPersonalInfoWidget({super.key});
@@ -8,6 +9,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Card(
+        color: titleColor,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

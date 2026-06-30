@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class SettingWidget extends StatelessWidget {
   const SettingWidget({super.key});
@@ -6,6 +7,7 @@ class SettingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: titleColor,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(

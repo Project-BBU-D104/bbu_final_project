@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:get/get.dart';
 
@@ -15,6 +16,7 @@ class AddProductWidget extends StatelessWidget {
         child: SingleChildScrollView(
           child: SizedBox(
             child: Card(
+              color: titleColor,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -226,6 +228,10 @@ class AddProductWidget extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: successColor,
+                          foregroundColor: titleColor
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                         },

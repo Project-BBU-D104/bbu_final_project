@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/category/widget/add_category_widget.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:get/get.dart';
 
 class CategoryController extends GetxController {
@@ -32,16 +33,10 @@ class CategoryController extends GetxController {
   }
 
   void addCategory(BuildContext context) {
-   
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return AddCategoryWidget(); 
-    }
-  );
-}
+    AppBottomSheets.show(
+      context,
+      child: AddCategoryWidget()
+    );
+  }
+
 }

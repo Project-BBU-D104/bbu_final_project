@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StockInChartWidget extends StatelessWidget {
@@ -15,6 +16,7 @@ class StockInChartWidget extends StatelessWidget {
       {"month": "May", "amount": 3000},
     ];
     return Card(
+      color: titleColor,
       child: SfCartesianChart(title: ChartTitle(
         text: 'Monthly Sales',
         alignment: ChartAlignment.near,

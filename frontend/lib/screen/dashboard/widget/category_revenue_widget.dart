@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class CategoryRevenueWidget extends StatelessWidget {
@@ -14,6 +15,7 @@ class CategoryRevenueWidget extends StatelessWidget {
     ];
 
     return Card(
+      color: titleColor,
       child: SizedBox(
         height: 300,
         child: SfCircularChart(

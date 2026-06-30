@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class RecentStockOutWidget extends StatelessWidget {
   const RecentStockOutWidget({super.key});
@@ -15,6 +16,7 @@ class RecentStockOutWidget extends StatelessWidget {
           ),
           SizedBox(height: 10,),
           Card(
+            color: titleColor,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
