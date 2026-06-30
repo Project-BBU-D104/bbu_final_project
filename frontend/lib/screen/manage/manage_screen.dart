@@ -1,196 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/manage_controller.dart';
 import 'package:frontend/widget/card_feature_widget.dart';
 import 'package:get/get.dart';
 
 class ManageScreen extends StatelessWidget {
   ManageScreen({super.key});
-  
-  final controller = Get.put(ManageController()); 
+
+  final controller = Get.put(ManageController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Product & Category Management"
-                ),
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.1,
-                  children: [
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToCategory(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Category",
-                      subtitle: "Category Management",
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  for (var section in controller.sections) ...[
+                    Text(
+                      section["title"],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToProduct(),
+
+                    const SizedBox(height: 10),
+
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: (section["items"] as List).length,
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: _getCrossAxisCount(constraints.maxWidth),
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: _getAspectRatio(constraints.maxWidth),
+                      ),
+                      itemBuilder: (context, index) {
+                        final item = (section["items"] as List)[index];
+
+                        return CardFeatureWidget(
+                          title: item["title"],
+                          subtitle: item["subtitle"],
+                          icon: item["icon"],
+                          onTap: () => controller.goTo(item["route"]),
+                        );
                       },
-                      icon: Icons.category_outlined,
-                      title: "Product",
-                      subtitle: "Product Management",
                     ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToPurchase(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Purchase",
-                      subtitle: "Purchase Management",
-                    ),
+
+                    const SizedBox(height: 15),
                   ],
-                ),
-                Text(
-                  "Supplier Management"
-                ),
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.3,
-                  children: [
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToSupplier(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Supplier",
-                      subtitle: "Supplier Management",
-                    ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToCustomer(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Customer",
-                      subtitle: "Customer",
-                    ),
-                  ],
-                ),
-                Text(
-                  "Stock Management"
-                ),
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.3,
-                  children: [
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToStockMovement(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Stock Movement",
-                      subtitle: "Stock Movement",
-                    ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToStockAdjustment(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Stock Adjustment",
-                      subtitle: "Stock Adjustment",
-                    ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToStockTransfer(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Stock Transfer",
-                      subtitle: "Stock Transfer",
-                    ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToWareHouse(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "WareHouse",
-                      subtitle: "WareHouse",
-                    ),
-                  ],
-                ),
-                Text(
-                  "Sale Management"
-                ),
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.3,
-                  children: [
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToSaleList(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Sale List",
-                      subtitle: "View Sale Lists",
-                    ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToSale(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Sale",
-                      subtitle: "Go to Sale",
-                    ),
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToSalePayment(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Sale Payment",
-                      subtitle: "Go to Payment",
-                    ),
-                  ],
-                ),
-                Text(
-                  "User & Role Management"
-                ),
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.3,
-                  children: [
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToRole(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "Role",
-                      subtitle: "Go to Role",
-                    ), 
-                    CardFeatureWidget(
-                      onTap: () => {
-                        controller.goToUser(),
-                      },
-                      icon: Icons.category_outlined,
-                      title: "User",
-                      subtitle: "View User Lists",
-                    ),
-                    
-                  ],
-                ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
+  }
+
+  // ✅ RESPONSIVE COLUMNS
+  int _getCrossAxisCount(double width) {
+    if (width < 600) return 2; // mobile
+    if (width < 900) return 3; // tablet
+    return 4; // desktop
+  }
+
+  // ✅ FIX OVERFLOW BY ADJUSTING HEIGHT
+  double _getAspectRatio(double width) {
+    if (width < 600) return 1.6;
+    if (width < 900) return 1.5;
+    return 1.4;
   }
 }

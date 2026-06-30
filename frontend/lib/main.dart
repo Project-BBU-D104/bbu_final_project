@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/app_background.dart';
 import 'package:frontend/locator.dart';
 import 'package:get/get.dart';
 import 'routes/app_pages.dart';
@@ -48,6 +49,7 @@ Future<void> _initStorage() async {
 
 class _CustomScrollBehavior extends MaterialScrollBehavior {
   @override
+  // override behavior
   Set<PointerDeviceKind> get dragDevices => {
     PointerDeviceKind.touch,
     PointerDeviceKind.mouse,
@@ -61,7 +63,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      // hide debug
       debugShowCheckedModeBanner: false,
+
       scrollBehavior: _CustomScrollBehavior(),
       initialRoute: AppRoutes.landing,
       getPages: AppPages.pages,
@@ -69,7 +73,23 @@ class MyApp extends StatelessWidget {
       // translate
       translations: AppTranslation(),
       locale: const Locale('km', 'KHM'), // default
-      fallbackLocale: const Locale('km', 'KHM'), 
+      fallbackLocale: const Locale('km', 'KHM'),
+
+      // theme
+      transitionDuration: const Duration(milliseconds: 0),
+      defaultTransition: Transition.noTransition,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.transparent,
+      ),
+      builder: (context, child) {
+        return Stack(
+          children: [
+            const AppBackground(child: SizedBox.expand()),
+            child ?? const SizedBox(),
+          ],
+        );
+      },
+
     );
   }
 }

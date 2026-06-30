@@ -10,10 +10,12 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: controller.pageController,
-        onPageChanged: controller.onPageChanged,
-        children: controller.tabPages,
+      body: SafeArea(
+        child: PageView(
+          controller: controller.pageController,
+          onPageChanged: controller.onPageChanged,
+          children: controller.tabPages,
+        ),
       ),
       bottomNavigationBar: Obx(() {
         return NavigationBar(
@@ -36,8 +38,6 @@ class HomeScreen extends StatelessWidget {
               icon: Icon(Icons.person_2_outlined),
               label: 'Profile',
             ),
-             
-             
           ],
         );
       }),

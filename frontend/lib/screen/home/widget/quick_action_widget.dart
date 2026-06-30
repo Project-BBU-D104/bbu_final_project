@@ -9,6 +9,20 @@ class QuickActionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    int crossAxisCount = width < 500 ? 2 : 4;
+
+    double aspectRatio;
+
+    if (width < 360) {
+      aspectRatio = 1.1;
+    } else if (width < 450) {
+      aspectRatio = 1.3;
+    } 
+    else {
+      aspectRatio = 1.2;
+    }
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -21,42 +35,41 @@ class QuickActionWidget extends StatelessWidget {
           ),
           const SizedBox(height: 10,),
           GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
             shrinkWrap: true,
-            childAspectRatio: 1.3,
+            childAspectRatio: aspectRatio,
             physics: const NeverScrollableScrollPhysics(),
             children: [
               CardFeatureWidget(
                 onTap: (){
                   ctr.gotoSale();
                 },
-                icon: Icons.category_outlined,
+                icon: Icons.shopping_cart_outlined,
                 title: "Sale",
-                subtitle: "Go to Sale",
+                
               ),
               CardFeatureWidget(
                 onTap: (){
                   ctr.gotoCategory();
                 },
                 icon: Icons.category_outlined,
-                title: "Category List",
-                subtitle: "Category Management",
+                title: "Category",
               ),
               CardFeatureWidget(
                 onTap: (){
                   ctr.gotoProduct();
                 },
-                icon: Icons.category_outlined,
-                title: "Product List",
-                subtitle: "Product Management",
+                icon: Icons.inventory_2_outlined,
+                title: "Product",
               ),
               CardFeatureWidget(
                 onTap: (){
                   ctr.gotoSupplier();
                 },
-                icon: Icons.category_outlined,
-                title: "Supplier List",
-                subtitle: "Supplier Management",
+                icon: Icons.local_shipping_outlined,
+                title: "Supplier",
               ),
                
             ],

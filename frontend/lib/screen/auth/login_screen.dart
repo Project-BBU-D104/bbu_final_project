@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/login_controller.dart';
 import 'package:frontend/screen/auth/widget/input_login_widget.dart';
 import 'package:get/get.dart';
-import 'package:frontend/routes/app_routes.dart';
-
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -62,7 +60,10 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 40),
+              const SizedBox(height: 40),
+              const SizedBox(height: 40),
+              const SizedBox(height: 40),
 
               Expanded(
                 child: Container(
