@@ -1,3 +1,4 @@
+import 'package:frontend/binding/audit_logs_binding.dart';
 import 'package:frontend/binding/category_binding.dart';
 import 'package:frontend/binding/customer_binding.dart';
 import 'package:frontend/binding/home_binding.dart';
@@ -12,6 +13,7 @@ import 'package:frontend/binding/stock_transfer_binding.dart';
 import 'package:frontend/binding/supplier_binding.dart';
 import 'package:frontend/binding/user_binding.dart';
 import 'package:frontend/binding/warehouse_binding.dart';
+import 'package:frontend/screen/audit_logs/audit_logs_screen.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
@@ -124,6 +126,11 @@ class AppPages {
       name: AppRoutes.warehouse,
       page: () => WarehouseScreen(),
       binding: WarehouseBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.auditLogs,
+      page: () => AuditLogsScreen(),
+      binding: AuditLogsBinding(),
     ),
     GetPage(
       name: AppRoutes.addProduct,

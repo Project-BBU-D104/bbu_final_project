@@ -22,5 +22,7 @@ class AppRoutes {
   static const role = '/role';
   static const user = '/user';
   static const warehouse = '/warehouse';
+
+  static const auditLogs = '/audit-logs';
   
 }

@@ -50,11 +50,17 @@ class ManageController extends GetxController{
     {
       "title": "Stock Management",
       "items": [
+        // {
+        //   "title": "Stock Movement",
+        //   "subtitle": "Stock Movement",
+        //   "icon": Icons.swap_horiz,
+        //   "route": AppRoutes.stockMovement,
+        // },
         {
-          "title": "Stock Movement",
-          "subtitle": "Stock Movement",
-          "icon": Icons.swap_horiz,
-          "route": AppRoutes.stockMovement,
+          "title": "Audit Logs",
+          "subtitle": "Audit Logs",
+          "icon": Icons.history_outlined,
+          "route": AppRoutes.auditLogs,
         },
         {
           "title": "Stock Adjustment",

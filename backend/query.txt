@@ -36,7 +36,7 @@ CREATE TABLE roles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
-    isactive BOOLEAN DEFAULT 0,
+    is_active BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -96,7 +96,7 @@ CREATE TABLE products (
     cost_price REAL NOT NULL,
     sale_price REAL NOT NULL,
     qty INTEGER DEFAULT 0,
-    allow_insert_qty INTEGER DEFAULT 0,
+    allow_insert_qty BOOLEAN 0,
     unit TEXT,
     description TEXT,
     deleted_at TIMESTAMP,
@@ -190,21 +190,6 @@ CREATE TABLE sale_payments (
 
     FOREIGN KEY (sale_id) REFERENCES sales(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
--- Stock Movements Table (Added reference_type and warehouse_id)
-CREATE TABLE stock_movements (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_id INTEGER NOT NULL,
-    warehouse_id INTEGER,
-    type TEXT CHECK(type IN ('in', 'out', 'adjustment', 'transfer')) NOT NULL,
-    qty INTEGER NOT NULL,
-    reference_type TEXT,
-    reference_id INTEGER,
-    note TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id),
-    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id)
 );
 
 -- Product Transfers Table
