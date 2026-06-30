@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/global.dart';
 import 'package:frontend/screen/category/widget/add_category_widget.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
@@ -41,7 +40,7 @@ class CategoryController extends GetxController {
   }
 
   void onSaveCategory() async {
-      // save category
+
   }
 
 }

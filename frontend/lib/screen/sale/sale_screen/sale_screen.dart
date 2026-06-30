@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/sale_controller.dart';
 import 'package:frontend/screen/sale/widget/card_item_widget.dart';
 import 'package:frontend/screen/sale/widget/payment_footer_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
+import 'package:get/get.dart';
 
 class SaleScreen extends StatelessWidget {
-  const SaleScreen({super.key});
+  SaleScreen({super.key});
+
+  final ctr = Get.find<SaleController>();
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +75,11 @@ class SaleScreen extends StatelessWidget {
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
-                  child: const PaymentFooterWidget(),
+                  child:  PaymentFooterWidget(
+                    onTap: () {
+                        ctr.onCurrentSale();
+                    },
+                  ),
                 ),
               ),
             ],

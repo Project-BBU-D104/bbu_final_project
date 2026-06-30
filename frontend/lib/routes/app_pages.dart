@@ -23,6 +23,7 @@ import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
+import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/screen/stock/stock_adjustment/stock_adjustment_screen.dart';
 import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
 import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart';
@@ -135,6 +136,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.addProduct,
       page: () => AddProductWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.currentSale,
+      page: () => CurrentSaleWidget(),
     ),
   ];
 }

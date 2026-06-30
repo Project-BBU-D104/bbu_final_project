@@ -6,4 +6,8 @@ class SaleController extends GetxController{
   void onNewSale(){
     Get.toNamed(AppRoutes.sale);
   }
+
+  void onCurrentSale(){
+    Get.toNamed(AppRoutes.currentSale);
+  }
 }

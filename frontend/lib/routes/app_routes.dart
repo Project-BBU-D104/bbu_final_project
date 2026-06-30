@@ -24,5 +24,6 @@ class AppRoutes {
   static const warehouse = '/warehouse';
 
   static const auditLogs = '/audit-logs';
+  static const currentSale = '/current-sale';
   
 }
