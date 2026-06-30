@@ -9,7 +9,7 @@ class StockMovementscreen extends StatelessWidget {
   final ctr = Get.find<StockMovementController>();
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Stock Movements"),
 

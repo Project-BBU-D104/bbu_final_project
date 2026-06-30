@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/user/widget/add_user_widget.dart';
+import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController{
@@ -9,15 +10,9 @@ class UserController extends GetxController{
   var isChecked = false.obs;
 
   void addUser(BuildContext context){
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return AddUserWidget(); 
-      }
+    AppBottomSheets.show(
+      context,
+      child: AddUserWidget()
     );
   }
 }

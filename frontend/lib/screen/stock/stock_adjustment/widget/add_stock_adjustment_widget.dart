@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class AddStockAdjustmentWidget extends StatelessWidget {
   
@@ -129,8 +130,9 @@ class AddStockAdjustmentWidget extends StatelessWidget {
             Row(
               children: [
                 Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Reference Number", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    Text("Reference NO", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     SizedBox(height: 5,),
                     const TextField(
                       decoration: InputDecoration(
@@ -140,7 +142,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                     ),
                   ],
                 )),
-                 const SizedBox(width: 5),
+                 const SizedBox(width: 10),
 
              Expanded(child: Column(
                children: [
@@ -176,7 +178,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
               ],
               )
             ),
-                 const SizedBox(width: 5),
+                 const SizedBox(width: 10),
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -213,6 +215,10 @@ class AddStockAdjustmentWidget extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: successColor,
+                  foregroundColor: titleColor,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },

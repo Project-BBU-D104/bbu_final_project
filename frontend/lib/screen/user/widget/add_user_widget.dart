@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:get/get.dart';
 
@@ -14,7 +15,7 @@ class AddUserWidget extends StatelessWidget {
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 100,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 50,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,6 +117,10 @@ class AddUserWidget extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: successColor,
+                foregroundColor: titleColor,
+              ),
               onPressed: () {
                 Navigator.pop(context);
               },

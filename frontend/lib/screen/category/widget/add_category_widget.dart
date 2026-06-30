@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class AddCategoryWidget extends StatelessWidget {
   const AddCategoryWidget({super.key});
@@ -78,6 +79,11 @@ class AddCategoryWidget extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: successColor,
+                foregroundColor: Colors.white,
+                 
+              ),
               onPressed: () {
                 Navigator.pop(context);
               },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/stock_transfer_controller.dart';
 import 'package:get/get.dart';
 
@@ -131,6 +132,10 @@ final ctr = Get.find<StockTransferController>();
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: successColor,
+                  foregroundColor: titleColor,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },

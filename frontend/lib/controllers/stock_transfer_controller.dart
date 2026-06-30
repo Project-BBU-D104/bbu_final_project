@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/add_stock_transfer_widget.dart';
+import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:get/get.dart';
 
 class StockTransferController extends GetxController{
@@ -28,15 +29,9 @@ class StockTransferController extends GetxController{
 
 
   void addStockTransfer(BuildContext context){
-     showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return AddStockTransferWidget(); 
-    }
-  );
+    AppBottomSheets.show(
+      context,
+      child: AddStockTransferWidget()
+    );
   }
 }
