@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/category_controller.dart';
+import 'package:get/get.dart';
 
 class AddCategoryWidget extends StatelessWidget {
-  const AddCategoryWidget({super.key});
+  AddCategoryWidget({super.key});
+
+  final ctr = Get.find<CategoryController>();
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +89,7 @@ class AddCategoryWidget extends StatelessWidget {
                  
               ),
               onPressed: () {
-                Navigator.pop(context);
+                ctr.onSaveCategory();
               },
               child: const Text("Save"),
             ),
