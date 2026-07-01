@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/global.dart';
-import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {

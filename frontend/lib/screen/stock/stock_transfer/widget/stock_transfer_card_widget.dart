@@ -3,12 +3,14 @@ import 'package:frontend/controllers/stock_transfer_controller.dart';
 import 'package:get/get.dart';
 
 class StockTransferCardWidget extends StatelessWidget {
-  const StockTransferCardWidget({super.key});
+
+  final Map<String, dynamic> stockTransfer;
+  const StockTransferCardWidget({super.key, required this.stockTransfer});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.find<StockTransferController>().gotoStockTransferDetail({}),
+      onTap: () => Get.find<StockTransferController>().gotoStockTransferDetail(stockTransfer ?? {}),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -31,7 +33,7 @@ class StockTransferCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "ID: #TR-8821",
+                  "#${stockTransfer['id']}",
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 13,
@@ -45,8 +47,8 @@ class StockTransferCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.green.shade300),
                   ),
-                  child: const Text(
-                    "Qty: 42",
+                  child: Text(
+                    "Qty: ${stockTransfer['qty'] ?? 0}",
                     style: TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.w600,
@@ -59,8 +61,8 @@ class StockTransferCardWidget extends StatelessWidget {
             const SizedBox(height: 10),
       
             /// TITLE
-            const Text(
-              "Apple",
+            Text(
+              stockTransfer['product_name'] ?? "Product Name",
               style: TextStyle(
                 color: Colors.black87,
                 fontSize: 18,
@@ -83,7 +85,7 @@ class StockTransferCardWidget extends StatelessWidget {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "SOURCE",
                         style: TextStyle(
@@ -93,7 +95,7 @@ class StockTransferCardWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "Warehouse 1",
+                        stockTransfer['from_warehouse_name'] ?? "Warehouse 1",
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w600,
@@ -109,7 +111,7 @@ class StockTransferCardWidget extends StatelessWidget {
       
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: const [
+                    children: [
                       Text(
                         "DESTINATION",
                         style: TextStyle(
@@ -119,7 +121,7 @@ class StockTransferCardWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "Warehouse 2",
+                        stockTransfer['to_warehouse_name'] ?? "Warehouse 2",
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w600,
@@ -138,12 +140,12 @@ class StockTransferCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  children: const [
+                  children: [
                     Icon(Icons.calendar_today,
                         size: 16, color: Colors.grey),
                     SizedBox(width: 6),
                     Text(
-                      "Oct 24, 2023",
+                      stockTransfer['created_at'] ?? "2023-06-26",
                       style: TextStyle(color: Colors.grey),
                     ),
                   ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class KpiUserWidget extends StatelessWidget {
   final String title;
@@ -8,6 +9,7 @@ class KpiUserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: titleColor,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(

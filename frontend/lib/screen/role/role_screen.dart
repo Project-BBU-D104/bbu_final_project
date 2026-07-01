@@ -14,13 +14,24 @@ class RoleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Role"),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            SearchWidget(title: "Search Role"),
-            RoleCardWidget(),
-          ]
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              SizedBox(height: 8,),
+              SearchWidget(title: "Search Role"),
+               SizedBox(height: 8,),
+              
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ctr.roleList.length,
+                itemBuilder: (context, index) => RoleCardWidget( role: ctr.roleList[index],),
+              ),
+              SizedBox(height: 80,)
+            ]
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

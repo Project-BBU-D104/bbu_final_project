@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 class UserScreen extends StatelessWidget {
    UserScreen({super.key});
 
-  final ctr = Get.put(UserController());
+  final ctr = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,10 @@ class UserScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              SearchWidget(title: "Search User..."),
           
+              SizedBox(height: 8),
+              SearchWidget(title: "Search User..."),
+              SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
                 child: Row(

@@ -15,26 +15,41 @@ class StockTransferScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Stock Transfer"),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            SizedBox(height: 8,),
-            SearchWidget(title: "Search Stock Transfer"),
-            SizedBox(height: 8,),
-            Row(
-              children: [
-                ChipWidget(title: "All"),
-                ChipWidget(title: "Sent"),
-                ChipWidget(title: "Received"),
-              ],
-            ),
-            
-            SizedBox(height: 8,),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              SizedBox(height: 8,),
+              SearchWidget(title: "Search Stock Transfer"),
+              SizedBox(height: 8,),
+              Row(
+                children: [
+                  ChipWidget(title: "All"),
+                  ChipWidget(title: "Sent"),
+                  ChipWidget(title: "Received"),
+                ],
+              ),
+              
+              SizedBox(height: 8,),
         
-            StockTransferCardWidget(),
-          ],
-            ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ctr.stockTransfer.length,
+                padding: const EdgeInsets.only(bottom: 100), 
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: StockTransferCardWidget( 
+                      stockTransfer: ctr.stockTransfer[index],
+                    ),
+                  );
+                },
+              ),
+            ],
+              ),
+        ),
       ),
     floatingActionButton: FloatingActionButton(
       onPressed: (){

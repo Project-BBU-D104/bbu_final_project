@@ -3,13 +3,13 @@ import 'package:frontend/controllers/stock_transfer_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
 
-class AddWarehouseWidget extends StatelessWidget {
+class EditWarehouseWidget extends StatelessWidget {
   
   String? selectedProduct;
   String? selectedWarehouse;
   String? selectedAdjustmentType;
 
-  AddWarehouseWidget({super.key, this.selectedAdjustmentType, this.selectedProduct, this.selectedWarehouse});
+  EditWarehouseWidget({super.key, this.selectedAdjustmentType, this.selectedProduct, this.selectedWarehouse});
 
 final ctr = Get.find<WarehouseController>();
 

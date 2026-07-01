@@ -26,6 +26,7 @@ import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
+import 'package:frontend/screen/sale/sale_list/widget/sale_list_detail_widget.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
 import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/screen/sale/widget/payment_success_widget.dart';
@@ -181,6 +182,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.stockTransferDetail,
       page: () => StockDetailCardWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.saleListDetail,
+      page: () => SaleListDetailWidget(),
     ),
   ];
 }

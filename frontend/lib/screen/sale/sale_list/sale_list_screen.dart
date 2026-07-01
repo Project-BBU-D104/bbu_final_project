@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale_controller.dart';
-import 'package:frontend/screen/sale/widget/sale_card_widget.dart';
+import 'package:frontend/screen/sale/sale_list/widget/sale_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
@@ -20,8 +20,13 @@ class SaleListScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+
+              SizedBox(height: 10,),
+
               SearchWidget(title: "Search Sale"),
-          
+              
+              SizedBox(height: 10,),
+
               Row(
                 children: [
                   ChipWidget(title: "All"),
@@ -33,8 +38,19 @@ class SaleListScreen extends StatelessWidget {
 
               SizedBox(height: 10,),
 
-              SaleCardWidget(),
-          
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ctr.saleList.length,
+                itemBuilder: (context, index) {
+                  final sale = ctr.saleList[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SaleCardWidget(sale: sale),
+                  );
+                },
+              ),
+              SizedBox(height: 80,)
             ]
           ),
         ),

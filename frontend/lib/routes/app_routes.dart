@@ -5,7 +5,6 @@ class AppRoutes {
   
   static const home = '/home';
 
-
   static const category = '/category';
   static const product = '/product';
   static const addProduct = '/add-product';
@@ -34,6 +33,5 @@ class AppRoutes {
   static const productCardDetail = '/product-card-detail';
   static const stockAdjustmentDetail = '/stock-adjustment-detail';
   static const stockTransferDetail = '/stock-transfer-detail';
-
-
+  static const saleListDetail = '/sale-list-detail';
 }

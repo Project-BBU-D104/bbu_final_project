@@ -22,8 +22,8 @@ class StockAdjustmentController extends GetxController{
     "new_qty": 70,
     "reason": "New stock received",
     "reference_no": "ADJ-20260701-001",
-    "created_at": DateTime.now(),
-    "updated_at": DateTime.now(),
+    "created_at": "2026-07-01 10:00:00",
+    "updated_at": "2026-07-01 10:00:00",
   },
   {
     "id": "SA0002",
@@ -39,8 +39,8 @@ class StockAdjustmentController extends GetxController{
     "new_qty": 35,
     "reason": "Damaged products",
     "reference_no": "ADJ-20260701-002",
-    "created_at": DateTime.now(),
-    "updated_at": DateTime.now(),
+    "created_at": "2026-07-01 10:00:00",
+    "updated_at": "2026-07-01 10:00:00",
   },
   {
     "id": "SA0003",
@@ -56,8 +56,8 @@ class StockAdjustmentController extends GetxController{
     "new_qty": 25,
     "reason": "Stock correction",
     "reference_no": "ADJ-20260701-003",
-    "created_at": DateTime.now(),
-    "updated_at": DateTime.now(),
+    "created_at": "2026-07-01 10:00:00",
+    "updated_at": "2026-07-01 10:00:00",
   },
   {
     "id": "SA0004",
@@ -73,8 +73,8 @@ class StockAdjustmentController extends GetxController{
     "new_qty": 16,
     "reason": "Display unit removed",
     "reference_no": "ADJ-20260701-004",
-    "created_at": DateTime.now(),
-    "updated_at": DateTime.now(),
+    "created_at": "2026-07-01 10:00:00",
+    "updated_at": "2026-07-01 10:00:00",
   },
   {
     "id": "SA0005",
@@ -90,8 +90,8 @@ class StockAdjustmentController extends GetxController{
     "new_qty": 170,
     "reason": "Supplier replacement",
     "reference_no": "ADJ-20260701-005",
-    "created_at": DateTime.now(),
-    "updated_at": DateTime.now(),
+    "created_at": "2026-07-01 10:00:00",
+    "updated_at": "2026-07-01 10:00:00",
   },
 ];
 

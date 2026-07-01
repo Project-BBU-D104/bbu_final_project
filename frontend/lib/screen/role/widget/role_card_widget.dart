@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/widget/status_widget.dart';
+import 'package:get/get.dart';
 
 class RoleCardWidget extends StatelessWidget {
-  const RoleCardWidget({super.key});
+
+  final Map<String, dynamic> role;
+  RoleCardWidget({super.key, required this.role});
+
+  final ctr = Get.find<RoleController>();
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +29,16 @@ class RoleCardWidget extends StatelessWidget {
             /// Title + Status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children: [
                 Text(
-                  "Admin",
+                  role["name"],
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
                 ),
+                
                 StatusWidget(
                   text: "Active",
                 ),
@@ -41,8 +48,8 @@ class RoleCardWidget extends StatelessWidget {
             const SizedBox(height: 10),
 
             /// Description
-            const Text(
-              "Responsible for overall inventory accuracy, staff scheduling, and shipping/receiving oversight.",
+            Text(
+              role["description"],
               style: TextStyle(
                 fontSize: 13,
                 height: 1.5,
@@ -50,19 +57,62 @@ class RoleCardWidget extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 14),
+            SizedBox(height: 8,),
 
-            /// Footer
             Row(
-              children: const [
-                Icon(Icons.verified_user, size: 16, color: Colors.black45),
-                SizedBox(width: 6),
+              children: [
+                Icon(
+                  Icons.calendar_month_outlined,
+                  size: 15,
+                  color: Colors.black54,
+                ),
+                SizedBox(width: 5,),
                 Text(
-                  "System Role",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black45,
-                  ),
+                  role["created_at"]
+                ),
+                Spacer(),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) {
+                    switch (value) {
+                      case "edit":
+                        ctr.editRole(context, role);
+                        break;
+
+                      case "delete":
+                        ctr.onDeleteRole(role["id"]);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: "edit",
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_outlined, size: 20),
+                          SizedBox(width: 10),
+                          Text("Edit"),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: "delete",
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
