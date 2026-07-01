@@ -14,7 +14,12 @@ class SaleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Sale"),
+      appBar: CustomAppBar(
+        title: "Sale",
+        onBack: () {
+          Get.offAllNamed('/home');
+        },
+      ),
 
       body: LayoutBuilder(
         builder: (context, constraints) {

@@ -10,4 +10,12 @@ class SaleController extends GetxController{
   void onCurrentSale(){
     Get.toNamed(AppRoutes.currentSale);
   }
+
+  void onPayment(){
+    Get.toNamed(AppRoutes.saleWithPayment);
+  }
+
+  void onConfirm(){
+    Get.offNamed(AppRoutes.paymentSuccess);
+  }
 }

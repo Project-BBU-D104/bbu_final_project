@@ -17,6 +17,7 @@ import 'package:frontend/screen/audit_logs/audit_logs_screen.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
+import 'package:frontend/screen/payment/sale_with_payment_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/add_product_widget.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
@@ -24,6 +25,7 @@ import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
 import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
+import 'package:frontend/screen/sale/widget/payment_success_widget.dart';
 import 'package:frontend/screen/stock/stock_adjustment/stock_adjustment_screen.dart';
 import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
 import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart';
@@ -140,6 +142,14 @@ class AppPages {
     GetPage(
       name: AppRoutes.currentSale,
       page: () => CurrentSaleWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.saleWithPayment,
+      page: () => SaleWithPaymentScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.paymentSuccess,
+      page: () => PaymentSuccessWidget(),
     ),
   ];
 }

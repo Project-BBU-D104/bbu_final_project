@@ -19,11 +19,14 @@ class AppRoutes {
   static const sale = '/sale';
   static const saleList = '/sale-list';
   static const salePayment = '/sale-payment';
+  static const saleWithPayment = '/sale-with-payment';
   static const role = '/role';
   static const user = '/user';
   static const warehouse = '/warehouse';
 
   static const auditLogs = '/audit-logs';
   static const currentSale = '/current-sale';
+
+  static const paymentSuccess = '/payment-success';
   
 }

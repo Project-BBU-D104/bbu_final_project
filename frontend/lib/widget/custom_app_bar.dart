@@ -6,11 +6,13 @@ import 'package:get/get.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showBack;
+  final VoidCallback? onBack;
 
   const CustomAppBar({
     super.key,
     required this.title,
     this.showBack = true,
+    this.onBack,
   });
 
   @override
@@ -27,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 CupertinoIcons.back,
                 color: darkColor,
               ),
-              onPressed: () => Get.back(),
+              onPressed: onBack ?? () => Get.back(),
             )
           : null,
 

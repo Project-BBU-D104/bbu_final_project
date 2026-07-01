@@ -11,7 +11,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E2A38),
       body: SafeArea(
         bottom: false,
         child: Container(
@@ -60,10 +59,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 40),
-              const SizedBox(height: 40),
-              const SizedBox(height: 40),
-              const SizedBox(height: 40),
+              const SizedBox(height: 180),
 
               Expanded(
                 child: Container(
