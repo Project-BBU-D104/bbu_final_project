@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class PurchaseKpiWidget extends StatelessWidget {
   final String title;
@@ -8,7 +9,7 @@ class PurchaseKpiWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
- 
+        color: titleColor,
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(

@@ -227,6 +227,7 @@ class AddProductWidget extends StatelessWidget {
                       
                     SizedBox(
                       width: double.infinity,
+                      height: 45,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: successColor,
@@ -235,7 +236,12 @@ class AddProductWidget extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text("Save"),
+                        child: const Text("Save",
+                          style: TextStyle(
+                            fontSize: 18,
+                            
+                          ),
+                        )
                       ),
                     ),
                   ],

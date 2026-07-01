@@ -109,4 +109,16 @@ var selectedUnit = RxnString();
   void gotoAddProduct(){
     Get.toNamed(AppRoutes.addProduct);
   }
+
+  void gotoProductDetail(Product product) {
+    Get.toNamed(AppRoutes.productCardDetail, arguments: product);
+  }
+
+  void onEditProduct(Product product) {
+    Get.toNamed(AppRoutes.editProduct, arguments: product);
+  }
+
+  void onDeleteProduct(Product product) {
+    print('Delete product: ${product.name}');
+  }
 }

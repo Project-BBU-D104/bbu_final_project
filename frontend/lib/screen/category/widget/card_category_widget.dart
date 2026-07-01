@@ -1,17 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/category_controller.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class CardCategoryWidget extends StatelessWidget {
   final Map<String, dynamic> category;
 
-  const CardCategoryWidget({
+  CardCategoryWidget({
     super.key,
     required this.category,
   });
 
+  final ctr = Get.find<CategoryController>();
+
+  String formatDate(String? value) {
+    if (value == null || value.isEmpty) return "-";
+
+    try {
+      final date = DateTime.parse(value).toLocal();
+      return DateFormat("dd MMM yyyy • hh:mm a").format(date);
+    } catch (e) {
+      return "-";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 5),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: titleColor,
@@ -19,53 +36,121 @@ class CardCategoryWidget extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// Category Icon
           Container(
-            padding: const EdgeInsets.all(8),
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
-              borderRadius:
-                  BorderRadius.circular(8),
+              color: primaryColor.withOpacity(.12),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
-              Icons.category,
+              Icons.category_rounded,
               color: primaryColor,
-              size: 20,
+              size: 30,
             ),
           ),
 
-          Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              Text(
-                category["name"]?.toString() ??
-                    "",
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.black87,
+          const SizedBox(width: 16),
+
+          /// Category Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  category["name"]?.toString() ?? "",
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  category["description"]?.toString() ?? "",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 15,
+                      color: Colors.grey.shade500,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      "Created: ${formatDate(category["created_at"]?.toString())}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          /// Popup Menu
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              switch (value) {
+                case "edit":
+                  ctr.onEditCategory(category["id"], context);
+                  break;
+
+                case "delete":
+                  ctr.onDeleteCategory(category["id"]);
+                  break;
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: "edit",
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_outlined, size: 20),
+                    SizedBox(width: 10),
+                    Text("Edit"),
+                  ],
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                category["description"]?.toString() ??
-                    "",
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
+              PopupMenuItem(
+                value: "delete",
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
                 ),
               ),
             ],

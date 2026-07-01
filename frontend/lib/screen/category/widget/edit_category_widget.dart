@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/category_controller.dart';
+import 'package:get/get.dart';
 
-class EditCategoryWidget  extends StatelessWidget {
-  const EditCategoryWidget({super.key});
+class EditCategoryWidget extends StatelessWidget {
+  EditCategoryWidget({super.key});
+
+  final ctr = Get.find<CategoryController>();
 
   @override
   Widget build(BuildContext context) {
@@ -10,9 +15,10 @@ class EditCategoryWidget  extends StatelessWidget {
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 200,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 100,
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
@@ -37,40 +43,56 @@ class EditCategoryWidget  extends StatelessWidget {
 
           const SizedBox(height: 10),
 
+          Text("Category Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
           const TextField(
             decoration: InputDecoration(
-              labelText: "Category Name",
+              hintText: "Category Name",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
+          Text("Icon", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
           const TextField(
             decoration: InputDecoration(
-              labelText: "Description",
+              hintText: "Icon",
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
+          Text("Description", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
           const TextField(
+            maxLines: 8,
+            minLines: 3,
             decoration: InputDecoration(
-              labelText: "Icon",
+              hintText: "Description",
               border: OutlineInputBorder(),
+              alignLabelWithHint: true,
             ),
           ),
+ 
 
           const SizedBox(height: 15),
 
           SizedBox(
             width: double.infinity,
+            height: 45,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: successColor,
+                foregroundColor: Colors.white,
+                 
+              ),
               onPressed: () {
-                Navigator.pop(context);
+                ctr.onSaveCategory();
               },
-              child: const Text("Save"),
+              child: const Text("Save", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),)
             ),
           ),
         ],

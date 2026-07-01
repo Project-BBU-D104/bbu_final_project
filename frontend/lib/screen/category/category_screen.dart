@@ -18,7 +18,7 @@ class CategoryScreen extends StatelessWidget {
       backgroundColor: lightColor.shade50,
       appBar: CustomAppBar(title: "Category"),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Obx(
           () => CustomScrollView(
             slivers: [
@@ -49,7 +49,8 @@ class CategoryScreen extends StatelessWidget {
                         "${ctr.categoryList.length} CATEGORIES",
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,                        ),
+                          fontWeight: FontWeight.bold,                        
+                        ),
                       ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
@@ -94,25 +95,18 @@ class CategoryScreen extends StatelessWidget {
 
               /// Grid
               else
-                SliverGrid(
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 1.15,
-                  ),
+                SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final item =
-                          ctr.categoryList[index];
-
-                      return CardCategoryWidget(
-                        category: item,
+                      final item = ctr.categoryList[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: CardCategoryWidget(
+                          category: item,
+                        ),
                       );
                     },
-                    childCount:
-                        ctr.categoryList.length,
+                    childCount: ctr.categoryList.length,
                   ),
                 ),
 

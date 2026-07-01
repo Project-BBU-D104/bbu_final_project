@@ -11,7 +11,7 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.snackbar('Product Selected', 'SKU: ${product.sku}'),
+      onTap: () => Get.find<ProductController>().gotoProductDetail(product),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),

@@ -82,6 +82,7 @@ class AddCategoryWidget extends StatelessWidget {
 
           SizedBox(
             width: double.infinity,
+            height: 45,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: successColor,
@@ -91,7 +92,7 @@ class AddCategoryWidget extends StatelessWidget {
               onPressed: () {
                 ctr.onSaveCategory();
               },
-              child: const Text("Save"),
+              child: const Text("Save", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),)
             ),
           ),
         ],

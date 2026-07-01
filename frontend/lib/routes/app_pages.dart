@@ -20,6 +20,8 @@ import 'package:frontend/screen/payment/payment_screen.dart';
 import 'package:frontend/screen/payment/sale_with_payment_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/add_product_widget.dart';
+import 'package:frontend/screen/product/widget/edit_product_widget.dart';
+import 'package:frontend/screen/product/widget/product_card_detail_widget.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
@@ -140,6 +142,10 @@ class AppPages {
       page: () => AddProductWidget(),
     ),
     GetPage(
+      name: AppRoutes.editProduct,
+      page: () => EditProductWidget(),
+    ),
+    GetPage(
       name: AppRoutes.currentSale,
       page: () => CurrentSaleWidget(),
     ),
@@ -150,6 +156,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.paymentSuccess,
       page: () => PaymentSuccessWidget(),
+    ),
+
+    GetPage(
+      name: AppRoutes.productCardDetail,
+      page: () => ProductCardDetailWidget(),
     ),
   ];
 }

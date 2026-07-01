@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class PurchaseCardWidget extends StatelessWidget {
-  const PurchaseCardWidget({super.key});
+  
+  final Map<String, dynamic> purchase;
+
+  const PurchaseCardWidget({super.key,required this.purchase,});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +29,8 @@ class PurchaseCardWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '#INV-2024-001',
+              Text(
+                purchase['invoice_no'],
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -65,8 +68,8 @@ class PurchaseCardWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Nexus Logistics',
+              Text(
+                purchase['supplier_name'] ?? 'Unknown Supplier',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -97,8 +100,8 @@ class PurchaseCardWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Oct 24, 2023',
+                  Text(
+                    purchase['purchase_date'],
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -111,7 +114,7 @@ class PurchaseCardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'PAYMENT',
+                    'STATUS',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -130,8 +133,8 @@ class PurchaseCardWidget extends StatelessWidget {
                         width: 1.5,
                       ),
                     ),
-                    child: const Text(
-                      'PAID',
+                    child: Text(
+                      purchase['status'] ?? 'Unknown',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -167,8 +170,8 @@ class PurchaseCardWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      '\$12,450',
+                    Text(
+                      "\$${purchase['total_amount']}",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -193,8 +196,8 @@ class PurchaseCardWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      '\$12,450',
+                    Text(
+                      "\$${purchase['paid_amount']}",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -219,8 +222,8 @@ class PurchaseCardWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      '\$0',
+                    Text(
+                      "\$${purchase['due_amount']}",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

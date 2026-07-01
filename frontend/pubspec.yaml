@@ -42,6 +42,8 @@ dependencies:
 
   # Config / Device
   flutter_dotenv: ^5.1.0
+  
+  
 
   # chart
   syncfusion_flutter_charts: ^33.2.8

@@ -6,7 +6,6 @@ import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/product_controller.dart';
-import 'package:flutter/cupertino.dart';
 
 class ProductScreen extends StatelessWidget {
   ProductScreen({super.key});

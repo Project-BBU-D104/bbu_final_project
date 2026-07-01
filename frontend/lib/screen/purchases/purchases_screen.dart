@@ -15,41 +15,57 @@ class PurchasesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Purchases"),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              
-              Row(
-                children: [
-                  Expanded(
-                    child: PurchaseKpiWidget(
-                      title: "Total Purchases",
-                      value: 1000,
-                      
-                    ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+
+            // KPI ROW
+            Row(
+              children: [
+                Expanded(
+                  child: PurchaseKpiWidget(
+                    title: "Total Purchases",
+                    value: 1000,
                   ),
-                  Expanded(
-                    child: PurchaseKpiWidget(
-                      title: "Active Supplier",
-                      value: 1000,
-                      
-                    ),
+                ),
+                Expanded(
+                  child: PurchaseKpiWidget(
+                    title: "Active Supplier",
+                    value: 1000,
                   ),
-                ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // SEARCH
+            SearchWidget(title: "Search Purchases..."),
+
+            const SizedBox(height: 10),
+
+            // LIST (ONLY SCROLL AREA)
+            Expanded(
+              child: ListView.builder(
+                itemCount: ctr.purchaseList.length,
+                itemBuilder: (context, index) {
+                  final purchase = ctr.purchaseList[index];
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: PurchaseCardWidget(purchase: purchase),
+                  );
+                },
               ),
-              
-              SearchWidget(title: "Search Purchases..."),
-
-              PurchaseCardWidget(),
-
-            ]
-          ),
-        )
+            ),            
+          ],
+        ),
       ),
+
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           ctr.addPurchase(context);
         },
         child: const Icon(Icons.add),
