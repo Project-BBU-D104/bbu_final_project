@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/stock_adjustment_controller.dart';
+import 'package:frontend/controllers/stock_transfer_controller.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
-class StockAdjustmentDetailWidget extends StatelessWidget {
-  StockAdjustmentDetailWidget({super.key});
+class StockDetailCardWidget extends StatelessWidget {
+  StockDetailCardWidget({super.key});
 
-  final ctr = Get.find<StockAdjustmentController>();
+  final ctr = Get.find<StockTransferController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Stock Adjustment Detail",
+        title: "Stock Transfer Detail",
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text("Stock Adjustment Detail Content"),
-      ),
+      body: Text("Stock Detail Card Widget"),
 
       bottomNavigationBar: SafeArea(
         child: Container(
@@ -28,7 +25,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ctr.onDeleteStockAdjustment(1);
+                    ctr.onDeleteStockTransfer(1);
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: const Text("Delete"),
@@ -46,7 +43,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ctr.editStockAdjustment(context, {});
+                    ctr.editStockTransfer(context, {});
                   },
                   icon: const Icon(Icons.edit_outlined),
                   label: const Text("Edit"),

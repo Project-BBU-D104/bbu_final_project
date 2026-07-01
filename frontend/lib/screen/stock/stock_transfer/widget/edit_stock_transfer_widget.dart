@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/stock_transfer_controller.dart';
 import 'package:get/get.dart';
 
@@ -30,7 +31,7 @@ final ctr = Get.find<StockTransferController>();
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Add Stock Transfer",
+                  "Edit Stock Transfer",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -50,63 +51,105 @@ final ctr = Get.find<StockTransferController>();
             Text("From Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
-                      value: selectedProduct,
-                      decoration: const InputDecoration(
-                        hintText: "From Warehouse",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "warehouse1",
-                          child: Text("Warehouse 1"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse2",
-                          child: Text("Warehouse 2"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse3",
-                          child: Text("Warehouse 3"),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        selectedProduct = value;
-                      },
-                    ),
+              value: selectedProduct,
+              decoration: const InputDecoration(
+                hintText: "From Warehouse",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: "warehouse1",
+                  child: Text("Warehouse 1"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse2",
+                  child: Text("Warehouse 2"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse3",
+                  child: Text("Warehouse 3"),
+                ),
+              ],
+              onChanged: (value) {
+                selectedProduct = value;
+              },
+            ),
                      
             const SizedBox(height: 15),
         
             Text("To Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
-                      value: selectedProduct,
-                      decoration: const InputDecoration(
-                        hintText: "To Warehouse",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "warehouse1",
-                          child: Text("Warehouse 1"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse2",
-                          child: Text("Warehouse 2"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse3",
-                          child: Text("Warehouse 3"),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        selectedProduct = value;
-                      },
-                    ),
+              value: selectedProduct,
+              decoration: const InputDecoration(
+                hintText: "To Warehouse",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: "warehouse1",
+                  child: Text("Warehouse 1"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse2",
+                  child: Text("Warehouse 2"),
+                ),
+                DropdownMenuItem(
+                  value: "warehouse3",
+                  child: Text("Warehouse 3"),
+                ),
+              ],
+              onChanged: (value) {
+                selectedProduct = value;
+              },
+            ),
 
-                     const Text("Transfer Date",
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+            const SizedBox(height: 15),
+            Text("Product", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            SizedBox(height: 5,),
+            DropdownButtonFormField<String>(
+              value: selectedProduct,
+              decoration: const InputDecoration(
+                hintText: "Select Product",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: "apple",
+                  child: Text("Apple"),
+                ),
+                DropdownMenuItem(
+                  value: "banana",
+                  child: Text("Banana"),
+                ),
+                DropdownMenuItem(
+                  value: "orange",
+                  child: Text("Orange"),
+                ),
+              ],
+              onChanged: (value) {
+                selectedProduct = value;
+              },
+            ),
+
+            const SizedBox(height: 15),
+            Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            SizedBox(height: 5,),
+            TextFormField(
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                hintText: "Enter Quantity",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+            ),
+ 
+
+            const SizedBox(height: 10),
+            const Text("Transfer Date", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
             const SizedBox(height: 5),
 
             Obx(() => InkWell(
@@ -131,6 +174,10 @@ final ctr = Get.find<StockTransferController>();
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: successColor,
+                  foregroundColor: titleColor,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },

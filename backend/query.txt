@@ -197,6 +197,8 @@ CREATE TABLE product_transfers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     from_warehouse_id INTEGER NOT NULL,
     to_warehouse_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    qty INTEGER NOT NULL,
     transfer_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (from_warehouse_id) REFERENCES warehouses(id),

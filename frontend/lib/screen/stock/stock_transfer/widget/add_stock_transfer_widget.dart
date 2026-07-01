@@ -106,6 +106,48 @@ final ctr = Get.find<StockTransferController>();
               },
             ),
 
+            const SizedBox(height: 15),
+            Text("Product", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            SizedBox(height: 5,),
+            DropdownButtonFormField<String>(
+              value: selectedProduct,
+              decoration: const InputDecoration(
+                hintText: "Select Product",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: "apple",
+                  child: Text("Apple"),
+                ),
+                DropdownMenuItem(
+                  value: "banana",
+                  child: Text("Banana"),
+                ),
+                DropdownMenuItem(
+                  value: "orange",
+                  child: Text("Orange"),
+                ),
+              ],
+              onChanged: (value) {
+                selectedProduct = value;
+              },
+            ),
+
+            const SizedBox(height: 15),
+            Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            SizedBox(height: 5,),
+            TextFormField(
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                hintText: "Enter Quantity",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+            ),
+ 
+
             const SizedBox(height: 10),
             const Text("Transfer Date", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
             const SizedBox(height: 5),

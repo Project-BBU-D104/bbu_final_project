@@ -8,6 +8,7 @@ class ChipWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
+      backgroundColor: titleColor,
       label: Text(title,
         style: TextStyle(
           color: darkColor.shade100,

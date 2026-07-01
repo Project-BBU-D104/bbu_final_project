@@ -32,6 +32,8 @@ class AppRoutes {
 
   static const paymentSuccess = '/payment-success';
   static const productCardDetail = '/product-card-detail';
+  static const stockAdjustmentDetail = '/stock-adjustment-detail';
+  static const stockTransferDetail = '/stock-transfer-detail';
 
 
 }

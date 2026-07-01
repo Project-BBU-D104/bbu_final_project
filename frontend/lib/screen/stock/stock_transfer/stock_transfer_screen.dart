@@ -15,20 +15,27 @@ class StockTransferScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Stock Transfer"),
-      body: Column(
-        children: [
-          SearchWidget(title: "Search Stock Transfer"),
-
-          Row(
-            children: [
-              ChipWidget(title: "All"),
-              ChipWidget(title: "Sent"),
-              ChipWidget(title: "Received"),
-            ],
-          ),
-          StockTransferCardWidget(),
-        ],
-    ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            SizedBox(height: 8,),
+            SearchWidget(title: "Search Stock Transfer"),
+            SizedBox(height: 8,),
+            Row(
+              children: [
+                ChipWidget(title: "All"),
+                ChipWidget(title: "Sent"),
+                ChipWidget(title: "Received"),
+              ],
+            ),
+            
+            SizedBox(height: 8,),
+        
+            StockTransferCardWidget(),
+          ],
+            ),
+      ),
     floatingActionButton: FloatingActionButton(
       onPressed: (){
         ctr.addStockTransfer(context);

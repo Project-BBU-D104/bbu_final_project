@@ -30,8 +30,10 @@ import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
 import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/screen/sale/widget/payment_success_widget.dart';
 import 'package:frontend/screen/stock/stock_adjustment/stock_adjustment_screen.dart';
+import 'package:frontend/screen/stock/stock_adjustment/widget/stock_adjustment_detail_widget.dart';
 import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
 import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart';
+import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_detail_card_widget.dart';
 import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
@@ -171,6 +173,14 @@ class AppPages {
     GetPage(
       name: AppRoutes.supplierDetail,
       page: () => SupplierDetailCardWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.stockAdjustmentDetail,
+      page: () => StockAdjustmentDetailWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.stockTransferDetail,
+      page: () => StockDetailCardWidget(),
     ),
   ];
 }

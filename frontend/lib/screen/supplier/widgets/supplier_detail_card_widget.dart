@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class SupplierDetailCardWidget extends StatelessWidget {
@@ -21,27 +22,21 @@ class SupplierDetailCardWidget extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xffF4F6FA),
 
-      appBar: AppBar(
-        title: const Text("Supplier Profile"),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+      appBar: CustomAppBar(
+        title: "Supplier Detail",
       ),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-
-            /// ================= HEADER CARD =================
+ 
             Container(
               padding: const EdgeInsets.all(20),
               decoration: _card(),
               child: Column(
                 children: [
 
-                  /// AVATAR + NAME
                   Row(
                     children: [
                       CircleAvatar(
@@ -101,7 +96,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            /// ================= INFO SECTION =================
             Container(
               padding: const EdgeInsets.all(20),
               decoration: _card(),
@@ -133,7 +127,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
         ),
       ),
 
-      /// ================= ACTION BUTTONS =================
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -184,8 +177,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
       ),
     );
   }
-
-  /// ================= WIDGET HELPERS =================
 
   BoxDecoration _card() {
     return BoxDecoration(

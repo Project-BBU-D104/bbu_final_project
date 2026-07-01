@@ -195,7 +195,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                 )),
               ],
             ),
-        
+            SizedBox(height: 10,),
             Text("Reason", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                SizedBox(height: 5,),
               TextField(
@@ -208,12 +208,11 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                 ),
               ),
             
-           
-        
             const SizedBox(height: 15),
         
             SizedBox(
               width: double.infinity,
+              height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: successColor,
@@ -222,7 +221,11 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text("Save"),
+                child: const Text("Save",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
               ),
             ),
           ],

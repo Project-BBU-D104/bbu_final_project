@@ -15,23 +15,42 @@ StockAdjustmentScreen({super.key});
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Stock Adjustment"),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            SearchWidget(title: "Search Stock Adjustment"),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+
+              SizedBox(height: 8,),
+
+              SearchWidget(title: "Search Stock Adjustment"),
+
+              SizedBox(height: 8,),
+
+              Row(
+                children: [
+                  ChipWidget(title: "All"),
+                  ChipWidget(title: "Increases"),
+                  ChipWidget(title: "Decreases"),
+                  ChipWidget(title: "Rejected"),
+                ]
+              ),
         
-            Row(
-              children: [
-                ChipWidget(title: "All"),
-                ChipWidget(title: "Increases"),
-                ChipWidget(title: "Decreases"),
-                ChipWidget(title: "Rejected"),
-              ]
-            ),
-            SizedBox(height: 10,),
-            StockAdjustmentCardWidget(),
-          ]
+              SizedBox(height: 10,),
+              
+               ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: ctr.stockAdjustmentList.length,
+                  itemBuilder: (context, index){
+                    return StockAdjustmentCardWidget(stockAdjustment: ctr.stockAdjustmentList[index]);
+                  }
+                ),
+
+              SizedBox(height: 80,),
+
+            ]
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
