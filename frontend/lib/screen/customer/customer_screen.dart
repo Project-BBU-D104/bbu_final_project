@@ -20,7 +20,12 @@ class CustomerScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+
+              SizedBox(height: 8,),
+
               SearchWidget(title: "Search Customers by name or ID",),
+
+              SizedBox(height: 8,),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -41,7 +46,18 @@ class CustomerScreen extends StatelessWidget {
                     ),
                 ],
               ),
-              CustomerCardWidget(),
+              SizedBox(height: 8,),
+
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ctr.customerList.length,
+                itemBuilder: (context, index){
+                  final customer = ctr.customerList[index];
+                  return CustomerCardWidget(customer: customer);
+                },
+              ),
+              SizedBox(height: 70,),
             ],
           ),
         )

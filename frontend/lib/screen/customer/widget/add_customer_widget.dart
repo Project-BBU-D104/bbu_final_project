@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class AddCustomerWidget extends StatelessWidget {
   const AddCustomerWidget({super.key});
@@ -74,11 +75,16 @@ class AddCustomerWidget extends StatelessWidget {
 
           SizedBox(
             width: double.infinity,
+            height: 45,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: successColor,
+                foregroundColor: titleColor,
+              ),
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Save"),
+              child: const Text("Save", style: TextStyle(fontSize: 18),),
             ),
           ),
         ],

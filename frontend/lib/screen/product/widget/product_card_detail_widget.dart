@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 class ProductCardDetailWidget extends StatelessWidget {
   ProductCardDetailWidget({super.key});
 
-  final ctr = Get.find<ProductController>();
+  final ctr = Get.put(ProductController());
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 
 class CustomerKpiWidget extends StatelessWidget {
   final String title;
@@ -8,14 +9,15 @@ class CustomerKpiWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-      Text(value, style: TextStyle(fontWeight: FontWeight.bold),)
-    ],
-  )
- );
+      color: titleColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+          Text(value, style: TextStyle(fontWeight: FontWeight.bold),)
+        ],
+      )
+    );
   }
 }

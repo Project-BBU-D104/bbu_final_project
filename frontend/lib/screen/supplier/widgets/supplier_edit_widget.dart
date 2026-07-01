@@ -1,111 +1,137 @@
-// import 'package:flutter/material.dart';
-// import 'package:frontend/controllers/supplier_controller.dart';
-// import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:get/get.dart';
 
-// class SupplierEditForm extends StatelessWidget {
-//   const SupplierEditForm({super.key});
+class SupplierEditWidget extends StatelessWidget {
+  SupplierEditWidget({super.key});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final SupplierController controller = Get.find<SupplierController>();
+  final ctr = Get.find<SupplierController>();
 
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Row(
-//           children: [
-//             Container(
-//               padding: const EdgeInsets.all(6),
-//               decoration: const BoxDecoration(
-//                 shape: BoxShape.circle,
-//                 color: Color(0xFF161A26),
-//               ),
-//               child: const Icon(
-//                 Icons.info_outline,
-//                 color: Color(0xFF33E1A1),
-//                 size: 20,
-//               ),
-//             ),
-//             const SizedBox(width: 10),
-//             const Text(
-//               "Core Details",
-//               style: TextStyle(
-//                 fontSize: 18,
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.white,
-//               ),
-//             ),
-//           ],
-//         ),
-//         const SizedBox(height: 20),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 50,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Edit Supplier",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
 
-//         const Text(
-//           "Supplier Photo",
-//           style: TextStyle(
-//             color: Colors.grey,
-//             fontSize: 12,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//         const SizedBox(height: 6),
-//         ListTile(
-//           tileColor: const Color(0xFF161A26),
-//           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-//           leading: const CircleAvatar(
-//             backgroundColor: Colors.grey,
-//             child: Icon(Icons.person, color: Colors.white),
-//           ),
-//           title: const Text(
-//             "Change Supplier Photo",
-//             style: TextStyle(color: Colors.white, fontSize: 14),
-//           ),
-//           trailing: const Icon(Icons.camera_alt, color: Colors.grey),
-//           onTap: () => controller.pickPhoto(),
-//         ),
-//         const SizedBox(height: 16),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
 
-//         _buildField("Supplier Name", controller.nameCtrl),
-//         _buildField("Phone Number", controller.phoneCtrl),
-//         _buildField("Contact Email", controller.emailCtrl),
-//         _buildField("Address", controller.addressCtrl, maxLines: 3),
-//       ],
-//     );
-//   }
+          const SizedBox(height: 10),
 
-//   Widget _buildField(
-//     String label,
-//     TextEditingController ctrl, {
-//     int maxLines = 1,
-//   }) {
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 16.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             label,
-//             style: const TextStyle(
-//               color: Colors.grey,
-//               fontSize: 12,
-//               fontWeight: FontWeight.bold,
-//             ),
-//           ),
-//           const SizedBox(height: 6),
-//           TextFormField(
-//             controller: ctrl,
-//             maxLines: maxLines,
-//             style: const TextStyle(color: Colors.white),
-//             decoration: InputDecoration(
-//               filled: true,
-//               fillColor: const Color(0xFF161A26),
-//               border: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(8),
-//                 borderSide: BorderSide.none,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+          Text("Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          const TextField(
+            decoration: InputDecoration(
+              hintText: "Name",
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text("Phone", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          const TextField(
+            decoration: InputDecoration(
+              hintText: "Phone",
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text("Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          const TextField(
+            decoration: InputDecoration(
+              hintText: "Email",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text("Map", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          const TextField(
+            maxLines: 8,
+            minLines: 3,
+            decoration: InputDecoration(
+              hintText: "Map",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text("Address", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          const TextField(
+            maxLines: 8,
+            minLines: 3,
+            decoration: InputDecoration(
+              hintText: "Address",
+              border: OutlineInputBorder(),
+            ),
+          ),
+           
+          Obx(() {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Checkbox(
+                value: ctr.isActive.value,
+                onChanged: (value) {
+                  ctr.isActive.value = value!;
+                },
+              ),
+              const Text("Status"),
+            ],
+          );
+        }),
+
+          
+          const SizedBox(height: 15),
+
+          SizedBox(
+            width: double.infinity,
+            height: 45,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: successColor,
+                foregroundColor: titleColor,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Save", 
+                style: TextStyle(fontSize: 18)
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

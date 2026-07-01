@@ -23,6 +23,7 @@ import 'package:frontend/screen/product/widget/add_product_widget.dart';
 import 'package:frontend/screen/product/widget/edit_product_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_detail_widget.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
+import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
@@ -33,6 +34,7 @@ import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
 import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart';
 import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
+import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:get/get.dart';
 import 'app_routes.dart';
@@ -162,5 +164,14 @@ class AppPages {
       name: AppRoutes.productCardDetail,
       page: () => ProductCardDetailWidget(),
     ),
+    GetPage(
+      name: AppRoutes.purchaseDetail,
+      page: () => PurchaseDetailWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.supplierDetail,
+      page: () => SupplierDetailCardWidget(),
+    ),
   ];
 }
+  

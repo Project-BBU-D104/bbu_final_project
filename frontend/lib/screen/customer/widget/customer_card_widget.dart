@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/customer_controller.dart';
+import 'package:frontend/widget/status_widget.dart';
+import 'package:get/get.dart';
 
 class CustomerCardWidget extends StatelessWidget {
-  const CustomerCardWidget({super.key});
+
+  final Map<String, dynamic> customer;
+  CustomerCardWidget({super.key, required this.customer});
+
+  final ctr = Get.find<CustomerController>();
 
   @override
   Widget build(BuildContext context) {
     return Card(
-    
+      color: titleColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
@@ -24,7 +32,6 @@ class CustomerCardWidget extends StatelessWidget {
             // TOP USER INFO
             Row(
               children: [
-
                 Stack(
                   children: [
                     Container(
@@ -32,9 +39,9 @@ class CustomerCardWidget extends StatelessWidget {
                       height: 65,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        image: const DecorationImage(
+                        image: DecorationImage(
                           image: NetworkImage(
-                            "https://i.pravatar.cc/150?img=12",
+                            customer['photo'] ?? "https://i.pravatar.cc/150?img=12",
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -46,14 +53,14 @@ class CustomerCardWidget extends StatelessWidget {
                       right: -2,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.greenAccent,
+                        decoration: BoxDecoration(
+                          color: successColor,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.check,
                           size: 12,
-                          color: Colors.black,
+                          color: darkColor,
                         ),
                       ),
                     )
@@ -71,100 +78,111 @@ class CustomerCardWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
 
-                          const Text(
-                            "Alexander Sterling",
+                          Text(
+                            customer['name'] ?? "Unknown Customer",
                             style: TextStyle(
-                              
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
 
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Text(
-                              "ACTIVE",
-                              style: TextStyle(
-                                color: Colors.greenAccent,
-                                fontSize: 11,
-                              ),
-                            ),
-                          )
+                          StatusWidget(text: "Active", color: successColor,)
                         ],
                       ),
 
-                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            customer['phone'] ?? "Unknown Phone",
+                            style: TextStyle(
+                              
+                              fontSize: 16,
+                            ),
+                          ),
+                            PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert),
+                            onSelected: (value) {
+                              switch (value) {
+                                case "edit":
+                                  ctr.editCustomer(context, customer);
+                                  break;
 
-                      const Text(
-                        "ID: CST-20948",
-                        style: TextStyle(
-                          
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-
-            const SizedBox(height: 18),
-
-            // PHONE
-            const Row(
-              children: [
-                Icon(
-                  Icons.phone,
-                   
-                  size: 20,
-                ),
-
-                SizedBox(width: 15),
-
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "+1 (555) 012-9834",
-                        style: TextStyle(
-                          
-                          fontSize: 16,
-                        ),
+                                case "delete":
+                                  ctr.onDeleteCustomer(customer["id"]);
+                                  break;
+                              }
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                value: "edit",
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit_outlined, size: 20),
+                                    SizedBox(width: 10),
+                                    Text("Edit"),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: "delete",
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Delete",
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                         Icon(
-                          Icons.more_vert,
-                           
-                        )
                     ],
                   ),
                 )
               ],
             ),
 
-            const SizedBox(height: 5),
-
+            const SizedBox(height: 10),
             // ADDRESS
-            const Row(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Icon(
                   Icons.location_on_outlined,
                 ),
-
-                SizedBox(width: 15),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    "882 Industrial Pkwy, Suite 400\nNorth Austin, TX 78758",
+                    customer['address'] ?? "Unknown Address",
                     style: TextStyle(
-                      
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 5),
+            // ADDRESS
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.date_range_outlined,
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    customer['created_at'] ?? "Unknown Date",
+                    style: TextStyle(
                       fontSize: 16,
                     ),
                   ),

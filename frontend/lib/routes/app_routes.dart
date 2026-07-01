@@ -11,7 +11,9 @@ class AppRoutes {
   static const addProduct = '/add-product';
   static const editProduct = '/edit-product';
   static const purchase = '/purchase';
+  static const purchaseDetail = '/purchase-detail';
   static const supplier = '/supplier';
+  static const supplierDetail = '/supplier-detail';
   static const customer = '/customer';
   static const stockMovement = '/stock-movement';
   static const stockAdjustment = '/stock-adjustment';

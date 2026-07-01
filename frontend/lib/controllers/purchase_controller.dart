@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/purchases/widget/add_purchase_widget.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:get/get.dart';
@@ -338,5 +339,20 @@ class PurchaseController extends GetxController{
       context,
       child: AddPurchaseWidget()
     );
+  }
+
+  void gotoPurchaseDetail(Map<String, dynamic> purchase){
+    Get.toNamed(AppRoutes.purchaseDetail);
+  }
+
+  void editPurchase(BuildContext context, Map<String, dynamic> purchase){
+    // AppBottomSheets.show(
+    //   context,
+    //   child: EditPurchaseWidget(purchase: purchase)
+    // );
+  }
+
+  void deletePurchase(int purchaseId){
+    // Implement the logic to delete the purchase with the given purchaseId
   }
 }
