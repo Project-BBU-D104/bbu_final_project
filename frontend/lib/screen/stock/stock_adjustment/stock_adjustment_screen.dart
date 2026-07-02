@@ -23,7 +23,7 @@ StockAdjustmentScreen({super.key});
 
               SizedBox(height: 8,),
 
-              SearchWidget(title: "Search Stock Adjustment"),
+              SearchWidget(title: "Search Stock Adjustment".tr),
 
               SizedBox(height: 8,),
 

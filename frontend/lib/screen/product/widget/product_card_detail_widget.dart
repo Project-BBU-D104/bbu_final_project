@@ -30,7 +30,7 @@ class ProductCardDetailWidget extends StatelessWidget {
                     ctr.onDeleteProduct(product);
                   },
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text("Delete"),
+                  label: Text("Delete".tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
                     minimumSize: const Size.fromHeight(52),
@@ -48,7 +48,7 @@ class ProductCardDetailWidget extends StatelessWidget {
                     ctr.onEditProduct(product);
                   },
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text("Edit Product"),
+                  label: Text("Edit".tr),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff1DB584),
                     foregroundColor: Colors.white,
@@ -70,28 +70,28 @@ class ProductCardDetailWidget extends StatelessWidget {
           children: [
 
             /// IMAGE
-            // Container(
-            //   width: double.infinity,
-            //   height: 230,
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(22),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.black.withOpacity(.05),
-            //         blurRadius: 15,
-            //         offset: const Offset(0, 6),
-            //       )
-            //     ],
-            //   ),
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.circular(22),
-            //     child: Image.asset(
-            //       product.asset,
-            //       fit: BoxFit.cover,
-            //     ),
-            //   ),
-            // ),
+            Container(
+              width: double.infinity,
+              height: 230,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
+                  )
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Image.asset(
+                  product.photo ?? "",
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
 
             const SizedBox(height: 20),
 

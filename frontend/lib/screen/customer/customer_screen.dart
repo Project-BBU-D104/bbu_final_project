@@ -23,7 +23,7 @@ class CustomerScreen extends StatelessWidget {
 
               SizedBox(height: 8,),
 
-              SearchWidget(title: "Search Customers by name or ID",),
+              SearchWidget(title: "Search Customers by name or ID".tr),
 
               SizedBox(height: 8,),
               GridView.count(

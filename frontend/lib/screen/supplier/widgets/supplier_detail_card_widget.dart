@@ -14,8 +14,8 @@ class SupplierDetailCardWidget extends StatelessWidget {
     final supplier = Get.arguments as Map<String, String>?;
 
     if (supplier == null) {
-      return const Scaffold(
-        body: Center(child: Text("No supplier data found")),
+      return  Scaffold(
+        body: Center(child: Text("No supplier data found".tr)),
       );
     }
 
@@ -23,7 +23,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
       backgroundColor: const Color(0xffF4F6FA),
 
       appBar: CustomAppBar(
-        title: "Supplier Detail",
+        title: "Supplier Detail".tr,
       ),
 
       body: SingleChildScrollView(
@@ -87,7 +87,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     children: [
                       _miniBox(Icons.phone, supplier['phone'] ?? '-'),
                       const SizedBox(width: 10),
-                      _miniBox(Icons.location_on, "Address"),
+                      _miniBox(Icons.location_on, "Map"),
                     ],
                   ),
                 ],
@@ -103,8 +103,8 @@ class SupplierDetailCardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  const Text(
-                    "Supplier Information",
+                  Text(
+                    "Supplier Information".tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     ctr.deleteSupplier(supplierId: 1);
                   },
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text("Delete"),
+                  label: Text("Delete".tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
                     side: const BorderSide(color: Colors.red),
@@ -160,7 +160,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     ctr.editSupplier(context);
                   },
                   icon: const Icon(Icons.edit),
-                  label: const Text("Edit"),
+                  label: Text("Edit".tr),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: successColor,
                     foregroundColor: titleColor,
@@ -199,7 +199,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            title,
+            title.tr,
             style: const TextStyle(color: Colors.grey),
           ),
           Flexible(
@@ -250,7 +250,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                text,
+                text.tr,
                 overflow: TextOverflow.ellipsis,
               ),
             ),

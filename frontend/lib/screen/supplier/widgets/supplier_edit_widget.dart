@@ -24,8 +24,8 @@ class SupplierEditWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Edit Supplier",
+              Text(
+                "Edit Supplier".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -43,55 +43,55 @@ class SupplierEditWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Supplier Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Name",
+              hintText: "Enter Supplier Name".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
-          Text("Phone", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Phone",
+              hintText: "Enter Phone Number".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
-          Text("Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Email",
+              hintText: "Enter Email".tr,
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          Text("Map", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Map".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             maxLines: 8,
             minLines: 3,
             decoration: InputDecoration(
-              hintText: "Map",
+              hintText: "Enter Map".tr,
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          Text("Address", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             maxLines: 8,
             minLines: 3,
             decoration: InputDecoration(
-              hintText: "Address",
+              hintText: "Enter Address".tr,
               border: OutlineInputBorder(),
             ),
           ),
@@ -106,7 +106,7 @@ class SupplierEditWidget extends StatelessWidget {
                   ctr.isActive.value = value!;
                 },
               ),
-              const Text("Status"),
+              Text("Status".tr),
             ],
           );
         }),
@@ -125,7 +125,7 @@ class SupplierEditWidget extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Save", 
+              child: Text("Save".tr, 
                 style: TextStyle(fontSize: 18)
               ),
             ),

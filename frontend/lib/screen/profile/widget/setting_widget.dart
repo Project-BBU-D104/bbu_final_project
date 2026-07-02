@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/widget/dailog_select_language_widget.dart';
 import 'package:get/get.dart';
 
 class SettingWidget extends StatelessWidget {
-  const SettingWidget({super.key});
+  SettingWidget({super.key});
+
+   final themeController = Get.put(ThemeController());
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +25,15 @@ class SettingWidget extends StatelessWidget {
               ],
             ),
             Divider(),
-            cardInfo(
-              active: false,
-              icon: Icons.dark_mode_outlined,
-              title: "Dark Mode",
+            Obx(
+              () => cardInfo(
+                active: themeController.isDark.value,
+                icon: Icons.dark_mode_outlined,
+                title: "Dark Mode",
+                onSwitch: (value) {
+                  themeController.toggleTheme();
+                },
+              ),
             ),
             SizedBox(height: 5,),
             cardInfo(
@@ -55,6 +63,7 @@ Widget cardInfo({
   required String title,
   bool? active,
   VoidCallback? onTap,
+  Function(bool value)? onSwitch,
 }) {
   return InkWell(
     onTap: onTap,
@@ -62,7 +71,7 @@ Widget cardInfo({
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: Theme.of(Get.context!).cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Colors.grey.shade300,
@@ -70,25 +79,30 @@ Widget cardInfo({
       ),
       child: Row(
         children: [
-          Icon(icon),
-          SizedBox(width: 10,),
+          Icon(
+            icon,
+            color: Theme.of(Get.context!).iconTheme.color,
+          ),
+
+          const SizedBox(width: 10),
+
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.black87,
+              style: TextStyle(
+                color: Theme.of(Get.context!).textTheme.bodyLarge?.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          if (active != null)
+
+          // SWITCH MODE
+          if (active != null && onSwitch != null)
             Switch(
               value: active,
-              onChanged: (value) {},
-            ),
-    
-          // Show arrow when active is null
-          if (active == null)
+              onChanged: onSwitch,
+            )
+          else if (active == null)
             const Icon(Icons.chevron_right),
         ],
       ),

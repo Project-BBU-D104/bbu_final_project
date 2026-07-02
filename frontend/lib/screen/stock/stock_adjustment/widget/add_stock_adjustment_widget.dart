@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:get/get.dart';
 
 class AddStockAdjustmentWidget extends StatelessWidget {
   
@@ -26,8 +27,8 @@ class AddStockAdjustmentWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Add Stock Adjustment",
+                Text(
+                  "Add Stock Adjustment".tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -44,12 +45,12 @@ class AddStockAdjustmentWidget extends StatelessWidget {
             ),
         
             const SizedBox(height: 10),
-            Text("Product", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("Product".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
               value: selectedProduct,
-              decoration: const InputDecoration(
-                hintText: "Product",
+              decoration: InputDecoration(
+                hintText: "Select Product".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
@@ -72,12 +73,12 @@ class AddStockAdjustmentWidget extends StatelessWidget {
               },
             ),
             const SizedBox(height: 10),
-            Text("Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
               value: selectedWarehouse,
-              decoration: const InputDecoration(
-                hintText: "Warehouse",
+              decoration: InputDecoration(
+                hintText: "Select Warehouse".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
@@ -101,23 +102,23 @@ class AddStockAdjustmentWidget extends StatelessWidget {
             ),
         
             const SizedBox(height: 10),
-             Text("Adjustment Type", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+             Text("Adjustment Type".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
               value: selectedAdjustmentType,
-              decoration: const InputDecoration(
-                hintText: "Adjustment Type",
+              decoration: InputDecoration(
+                hintText: "Select Adjustment Type".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: "increase",
-                  child: Text("Increase"),
+                  child: Text("Increase".tr),
                 ),
                 DropdownMenuItem(
                   value: "decrease",
-                  child: Text("Decrease"),
+                  child: Text("Decrease".tr),
                 ),
               ],
               onChanged: (value) {
@@ -132,11 +133,11 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Reference NO", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    Text("Reference NO".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     SizedBox(height: 5,),
-                    const TextField(
+                    TextField(
                       decoration: InputDecoration(
-                        hintText: "Reference Number",
+                        hintText: "Enter Reference Number".tr,
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -145,12 +146,13 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                  const SizedBox(width: 10),
 
              Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
                children: [
-                 Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                 Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                   SizedBox(height: 5,),
-                  const TextField(
+                  TextField(
                     decoration: InputDecoration(
-                      hintText: "Quantity",
+                      hintText: "Enter Quantity".tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -167,11 +169,11 @@ class AddStockAdjustmentWidget extends StatelessWidget {
               child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Previous Stock", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                Text("Previous Stock".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                 SizedBox(height: 5,),
-                const TextField(
+                TextField(
                   decoration: InputDecoration(
-                    hintText: "Previous Stock",
+                    hintText: "Enter Previous Stock".tr,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -182,12 +184,12 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("New Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    Text("New Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     
                     SizedBox(height: 5,),
-                    const TextField(
+                    TextField(
                       decoration: InputDecoration(
-                        hintText: "New Quantity",
+                        hintText: "Enter New Quantity".tr,
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -196,13 +198,13 @@ class AddStockAdjustmentWidget extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10,),
-            Text("Reason", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("Reason".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                SizedBox(height: 5,),
               TextField(
                 maxLines: 8,
                 minLines: 3,
                 decoration: InputDecoration(
-                  hintText: "Reason",
+                  hintText: "Enter Reason".tr,
                   border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
@@ -221,7 +223,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text("Save",
+                child: Text("Save".tr,
                   style: TextStyle(
                     fontSize: 18,
                   ),

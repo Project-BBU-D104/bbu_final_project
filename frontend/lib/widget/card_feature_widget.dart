@@ -76,6 +76,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CardFeatureWidget extends StatelessWidget {
   final String title;
@@ -117,7 +118,7 @@ class CardFeatureWidget extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              title,
+              title.tr,
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -130,7 +131,7 @@ class CardFeatureWidget extends StatelessWidget {
             const SizedBox(height: 4),
 
             Text(
-              subtitle ?? '',
+              subtitle ?? ''.tr,
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

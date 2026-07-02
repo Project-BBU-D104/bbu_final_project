@@ -60,8 +60,8 @@ class CategoryScreen extends StatelessWidget {
                           Icons.add,
                           color: Colors.white,
                         ),
-                        label: const Text(
-                          "Add Category",
+                        label: Text(
+                          "Add Category".tr,
                           style: TextStyle(
                             color: Colors.white,
                           ),

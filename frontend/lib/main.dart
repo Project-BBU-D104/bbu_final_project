@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/app_background.dart';
 import 'package:frontend/controllers/language_controller.dart';
 import 'package:frontend/locator.dart';
+import 'package:frontend/themes/app_theme.dart';
 import 'package:get/get.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
@@ -85,9 +86,10 @@ class MyApp extends StatelessWidget {
         // theme
         transitionDuration: const Duration(milliseconds: 0),
         defaultTransition: Transition.noTransition,
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.transparent,
-        ),
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+
+        themeMode: ThemeMode.light,
         builder: (context, child) {
           return Stack(
             children: [

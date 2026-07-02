@@ -113,14 +113,14 @@ class CustomerCardWidget extends StatelessWidget {
                                   break;
                               }
                             },
-                            itemBuilder: (context) => const [
+                            itemBuilder: (context) => [
                               PopupMenuItem(
                                 value: "edit",
                                 child: Row(
                                   children: [
                                     Icon(Icons.edit_outlined, size: 20),
                                     SizedBox(width: 10),
-                                    Text("Edit"),
+                                    Text("Edit".tr),
                                   ],
                                 ),
                               ),
@@ -135,7 +135,7 @@ class CustomerCardWidget extends StatelessWidget {
                                     ),
                                     SizedBox(width: 10),
                                     Text(
-                                      "Delete",
+                                      "Delete".tr,
                                       style: TextStyle(color: Colors.red),
                                     ),
                                   ],

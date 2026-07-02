@@ -26,13 +26,13 @@ class PurchasesScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: PurchaseKpiWidget(
-                    title: "Total Purchases",
+                    title: "Total Purchases".tr,
                     value: 1000,
                   ),
                 ),
                 Expanded(
                   child: PurchaseKpiWidget(
-                    title: "Active Supplier",
+                    title: "Active Supplier".tr,
                     value: 1000,
                   ),
                 ),

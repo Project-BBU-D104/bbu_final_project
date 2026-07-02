@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
+import 'package:get/get.dart';
 
 class AddCustomerWidget extends StatelessWidget {
   const AddCustomerWidget({super.key});
@@ -22,8 +23,8 @@ class AddCustomerWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Add Customer",
+                Text(
+                  "Add Customer".tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -52,33 +53,33 @@ class AddCustomerWidget extends StatelessWidget {
       
             const SizedBox(height: 10),
       
-            Text("Customer Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            Text("Customer Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
-            const TextField(
+            TextField(
               decoration: InputDecoration(
-                hintText: "Customer Name",
+                hintText: "Enter Customer Name".tr,
                 border: OutlineInputBorder(),
               ),
             ),
       
             const SizedBox(height: 10),
-            Text("Phone Number", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
-            const TextField(
+            TextField(
               decoration: InputDecoration(
-                hintText: "Phone Number",
+                hintText: "Enter Phone Number".tr,
                 border: OutlineInputBorder(),
               ),
             ),
       
             const SizedBox(height: 10),
-            Text("Address", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
              TextField(
                 maxLines: 8,
                 minLines: 3,
                 decoration: InputDecoration(
-                  hintText: "Address",
+                  hintText: "Enter Address".tr,
                   border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
@@ -97,7 +98,7 @@ class AddCustomerWidget extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text("Save", style: TextStyle(fontSize: 18),),
+                child: Text("Save".tr, style: TextStyle(fontSize: 18),),
               ),
             ),
           ],

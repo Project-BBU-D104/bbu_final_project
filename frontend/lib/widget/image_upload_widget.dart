@@ -33,7 +33,7 @@ class ImageUploadWidget extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: ctr.pickImage,
                 icon: const Icon(Icons.photo),
-                label: const Text("Pick Image"),
+                label: Text("Pick Image".tr),
               ),
             ),
           ],

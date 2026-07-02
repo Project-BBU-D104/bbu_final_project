@@ -21,7 +21,7 @@ class StockTransferScreen extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 8,),
-              SearchWidget(title: "Search Stock Transfer"),
+              SearchWidget(title: "Search Stock Transfer".tr),
               SizedBox(height: 8,),
               Row(
                 children: [

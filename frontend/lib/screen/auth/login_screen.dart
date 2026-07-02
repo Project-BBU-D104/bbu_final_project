@@ -79,8 +79,8 @@ class LoginScreen extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        const Text(
-                          "Login",
+                        Text(
+                          "Login".tr,
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
@@ -92,7 +92,7 @@ class LoginScreen extends StatelessWidget {
 
                         InputLoginWidget(
                           controller: controller.usernameController,
-                          hint: "Enter username",
+                          hint: "Enter username".tr,
                           icon: Icons.person_outline,
                         ),
 
@@ -101,31 +101,10 @@ class LoginScreen extends StatelessWidget {
                         Obx(
                           () => InputLoginWidget(
                             controller: controller.passwordController,
-                            hint: "Enter password",
+                            hint: "Enter password".tr,
                             icon: Icons.lock_outline,
                             obscureText: controller.obscurePassword.value,
                             onTogglePassword: controller.togglePassword,
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        Obx(
-                          () => Row(
-                            children: [
-                              Checkbox(
-                                value: controller.rememberMe.value,
-                                activeColor: const Color(0xFF23B2B9),
-                                onChanged: controller.toggleRemember,
-                              ),
-                              const Text(
-                                "Remember Me",
-                                style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
 
@@ -144,8 +123,8 @@ class LoginScreen extends StatelessWidget {
                             onPressed: () {
                               controller.onLogin();
                             },
-                            child: const Text(
-                              "Login",
+                            child: Text(
+                              "Login".tr,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

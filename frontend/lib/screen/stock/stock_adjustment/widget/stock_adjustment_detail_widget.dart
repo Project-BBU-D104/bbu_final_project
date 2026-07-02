@@ -12,7 +12,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Stock Adjustment Detail",
+        title: "Stock Adjustment Detail".tr,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -31,7 +31,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
                     ctr.onDeleteStockAdjustment(1);
                   },
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text("Delete"),
+                  label: Text("Delete".tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
                     minimumSize: const Size.fromHeight(52),
@@ -49,7 +49,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
                     ctr.editStockAdjustment(context, {});
                   },
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text("Edit"),
+                  label: Text("Edit".tr),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff1DB584),
                     foregroundColor: Colors.white,

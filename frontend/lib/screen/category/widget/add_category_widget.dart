@@ -24,8 +24,8 @@ class AddCategoryWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Category",
+              Text(
+                "Add Category".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -43,35 +43,35 @@ class AddCategoryWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Category Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Category Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Category Name",
+              hintText: "Enter Category Name".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
-          Text("Icon", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Icon".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Icon",
+              hintText: "Enter Icon".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
 
-          Text("Description", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          const TextField(
+          TextField(
             maxLines: 8,
             minLines: 3,
             decoration: InputDecoration(
-              hintText: "Description",
+              hintText: "Enter Description".tr,
               border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
@@ -92,7 +92,7 @@ class AddCategoryWidget extends StatelessWidget {
               onPressed: () {
                 ctr.onSaveCategory();
               },
-              child: const Text("Save", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),)
+              child: Text("Save".tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),)
             ),
           ),
         ],

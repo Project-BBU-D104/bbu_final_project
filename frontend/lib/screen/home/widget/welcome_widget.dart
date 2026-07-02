@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class WelcomeWidget extends StatelessWidget {
   const WelcomeWidget({super.key});
@@ -39,12 +40,12 @@ class WelcomeWidget extends StatelessWidget {
 
           const SizedBox(width: 16),
 
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Good Morning 👋",
+                  "Good Morning 👋".tr,
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -61,7 +62,7 @@ class WelcomeWidget extends StatelessWidget {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  "Welcome back to home",
+                  "Welcome Back".tr,
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 13,

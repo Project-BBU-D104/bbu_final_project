@@ -23,8 +23,8 @@ class RecentStockInWidget extends StatelessWidget {
 
         Row(
           children: [
-            const Text(
-              "Recent Purchase Order",
+            Text(
+              "Recent Purchase Order".tr,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const Spacer(),
@@ -33,7 +33,7 @@ class RecentStockInWidget extends StatelessWidget {
                 Get.toNamed(AppRoutes.purchase);
               },
               child: Text(
-                "View All",
+                "View All".tr,
                 style: TextStyle( fontWeight: FontWeight.bold),
               ),
             ),
@@ -52,33 +52,33 @@ class RecentStockInWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header row
-                  const Row(
+                  Row(
                     children: [
                       Expanded(
                         flex: 3,
                         child: Text(
-                          'Product',
+                          'Product'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
                         flex: 2,
                         child: Text(
-                          'Qty',
+                          'Qty'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
                         flex: 2,
                         child: Text(
-                          'Price',
+                          'Price'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
                         flex: 3,
                         child: Text(
-                          'Date',
+                          'Date'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                           textAlign: TextAlign.end,
                         ),

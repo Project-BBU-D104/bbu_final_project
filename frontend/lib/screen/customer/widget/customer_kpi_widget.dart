@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:get/get.dart';
 
 class CustomerKpiWidget extends StatelessWidget {
   final String title;
@@ -14,7 +15,7 @@ class CustomerKpiWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+          Text(title.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
           Text(value, style: TextStyle(fontWeight: FontWeight.bold),)
         ],
       )

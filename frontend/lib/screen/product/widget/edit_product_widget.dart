@@ -26,8 +26,8 @@ class EditProductWidget extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Edit Product",
+                        Text(
+                          "Edit Product".tr,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -55,21 +55,21 @@ class EditProductWidget extends StatelessWidget {
                     ),
                       
                     const SizedBox(height: 10),
-                    Text("Product Name", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    Text("Product Name".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     const SizedBox(height: 5),
-                     const TextField(
+                     TextField(
                       decoration: InputDecoration(
-                        hintText: "Product Name",
+                        hintText: "Enter Product Name".tr,
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 10),
-                      Text("Category", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                      Text("Category".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
                    DropdownButtonFormField<String>(
                     value: ctr.selectedCategory.value,
-                    decoration: const InputDecoration(
-                      hintText: "Category",
+                    decoration: InputDecoration(
+                      hintText: "Select Category".tr,
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                     ),
@@ -93,13 +93,13 @@ class EditProductWidget extends StatelessWidget {
                   ),
                     const SizedBox(height: 10),
           
-                     Text("Supplier", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                     Text("Supplier".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
           
                    DropdownButtonFormField<String>(
                     value: ctr.selectedSupplier.value,
-                    decoration: const InputDecoration(
-                      hintText: "Supplier",
+                    decoration: InputDecoration(
+                      hintText: "Select Supplier".tr,
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                     ),
@@ -119,12 +119,12 @@ class EditProductWidget extends StatelessWidget {
                   ),
                       
                     const SizedBox(height: 10),
-                       Text("Bar Code", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                       Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
                 
-                    const TextField(
+                    TextField(
                       decoration: InputDecoration(
-                        hintText: "Bar Code",
+                        hintText: "Enter Barcode".tr,
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -137,12 +137,12 @@ class EditProductWidget extends StatelessWidget {
                           child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Cost Price", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                            Text("Cost Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                             const SizedBox(height: 5),
                                   
-                            const TextField(
+                            TextField(
                               decoration: InputDecoration(
-                                hintText: "Cost Price",
+                                hintText: "Enter Cost Price".tr,
                                 border: OutlineInputBorder(),
                               ),
                             ),
@@ -152,11 +152,11 @@ class EditProductWidget extends StatelessWidget {
                          Expanded(child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Sale Price", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                            Text("Sale Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                             const SizedBox(height: 5),
-                            const TextField(
+                            TextField(
                               decoration: InputDecoration(
-                                hintText: "Sale Price",
+                                hintText: "Enter Sale Price".tr,
                                 border: OutlineInputBorder(),
                               ),
                             ),
@@ -173,13 +173,13 @@ class EditProductWidget extends StatelessWidget {
                           child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                            Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                         
                             const SizedBox(height: 5),
                         
-                            const TextField(
+                            TextField(
                               decoration: InputDecoration(
-                                hintText: "Quantity",
+                                hintText: "Enter Quantity".tr,
                                 border: OutlineInputBorder(),
                               ),
                             ),
@@ -192,13 +192,13 @@ class EditProductWidget extends StatelessWidget {
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Unit", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                        Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
 
                          const SizedBox(height: 5),
                         DropdownButtonFormField<String>(
                         value: ctr.selectedUnit.value,
-                        decoration: const InputDecoration(
-                          hintText: "Unit",
+                        decoration: InputDecoration(
+                          hintText: "Select Unit".tr,
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         ),
@@ -222,13 +222,13 @@ class EditProductWidget extends StatelessWidget {
                         ),
                 
                     const SizedBox(height: 10),
-                    Text("Description", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
                        TextField(
                         minLines: 3,
                         maxLines: 8,
-                        decoration: const InputDecoration(
-                          hintText: "Description",
+                        decoration: InputDecoration(
+                          hintText: "Enter Description".tr,
                           border: OutlineInputBorder(),
                             alignLabelWithHint: true,
                         ),

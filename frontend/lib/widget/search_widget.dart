@@ -33,7 +33,7 @@ class SearchWidget extends StatelessWidget {
           fontSize: 13,
         ),
         decoration: InputDecoration(
-          hintText: title,
+          hintText: title.tr,
           hintStyle: TextStyle(
             color: darkColor.shade100,
             fontSize: 13,
