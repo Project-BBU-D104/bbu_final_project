@@ -228,4 +228,8 @@ class SaleController extends GetxController{
   void gotoSaleListDetail(){
     Get.toNamed(AppRoutes.saleListDetail);
   }
+
+  void onDeleteSale(){
+    print("Delete sale");
+  }
 }

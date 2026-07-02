@@ -24,8 +24,8 @@ class EditRoleWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Edit Role",
+              Text(
+                "Edit Role".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -43,23 +43,23 @@ class EditRoleWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Role Name", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Role Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Name",
+              hintText: "Enter Role Name".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-          Text("Description", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
           TextField(
             maxLines: 8,
             minLines: 3,
             decoration: InputDecoration(
-              hintText: "Description",
+              hintText: "Enter Description".tr,
               border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
@@ -77,13 +77,14 @@ class EditRoleWidget extends StatelessWidget {
                   ctr.isChecked.value = value!;
                 },
               ),
-              const Text("Status"),
+              Text("Status".tr),
             ],
           );
         }),
-const SizedBox(height: 15),
+        const SizedBox(height: 15),
           SizedBox(
             width: double.infinity,
+            height: 45,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: successColor,
@@ -92,7 +93,7 @@ const SizedBox(height: 15),
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Save"),
+              child: Text("Save".tr, style: TextStyle(fontSize: 18),),
             ),
           ),
         ],

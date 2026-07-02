@@ -24,8 +24,8 @@ class AddUserWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add User",
+              Text(
+                "Add User".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -42,12 +42,12 @@ class AddUserWidget extends StatelessWidget {
           ),
 
           
-          Text("Role", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Role".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
           DropdownButtonFormField<String>(
             value: ctr.selectedUser.value,
-            decoration: const InputDecoration(
-              hintText: "Select User Type",
+            decoration: InputDecoration(
+              hintText: "Select User Type".tr,
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
             ),
@@ -67,30 +67,30 @@ class AddUserWidget extends StatelessWidget {
           ),
           
           const SizedBox(height: 10),
-          Text("Username", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Username".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Username",
+              hintText: "Enter Username".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-          Text("Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Email",
+              hintText: "Enter Email".tr,
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          Text("Password", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Password".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Password",
+              hintText: "Enter Password".tr,
               border: OutlineInputBorder(),
             ),
           ),
@@ -107,7 +107,7 @@ class AddUserWidget extends StatelessWidget {
                   ctr.isChecked.value = value!;
                 },
               ),
-              const Text("Disable User"),
+              Text("Disable User".tr),
             ],
           );
         }),
@@ -116,6 +116,7 @@ class AddUserWidget extends StatelessWidget {
 
           SizedBox(
             width: double.infinity,
+            height: 45,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: successColor,
@@ -124,7 +125,7 @@ class AddUserWidget extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Save"),
+              child: Text("Save".tr, style: TextStyle(fontSize: 18),),
             ),
           ),
         ],

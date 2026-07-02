@@ -28,7 +28,7 @@ class StockDetailCardWidget extends StatelessWidget {
                     ctr.onDeleteStockTransfer(1);
                   },
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text("Delete"),
+                  label: Text("Delete".tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
                     minimumSize: const Size.fromHeight(52),
@@ -46,7 +46,7 @@ class StockDetailCardWidget extends StatelessWidget {
                     ctr.editStockTransfer(context, {});
                   },
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text("Edit"),
+                  label: Text("Edit".tr),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff1DB584),
                     foregroundColor: Colors.white,

@@ -21,7 +21,7 @@ class SettingWidget extends StatelessWidget {
               children: [
                 Icon(Icons.settings_outlined),
                 SizedBox(width: 10,),
-                Text("App Preferences", style: TextStyle(fontWeight: FontWeight.bold),),
+                Text("App Preferences".tr, style: TextStyle(fontWeight: FontWeight.bold),),
               ],
             ),
             Divider(),
@@ -29,7 +29,7 @@ class SettingWidget extends StatelessWidget {
               () => cardInfo(
                 active: themeController.isDark.value,
                 icon: Icons.dark_mode_outlined,
-                title: "Dark Mode",
+                title: "Dark Mode".tr,
                 onSwitch: (value) {
                   themeController.toggleTheme();
                 },
@@ -38,7 +38,7 @@ class SettingWidget extends StatelessWidget {
             SizedBox(height: 5,),
             cardInfo(
               icon: Icons.language_outlined,
-              title: "Language",
+              title: "Language".tr,
               onTap: () {
                 Get.dialog(
                   const DialogSelectLanguageWidget(),
@@ -49,7 +49,7 @@ class SettingWidget extends StatelessWidget {
             cardInfo(
               active: true,
               icon: Icons.lock_outlined,
-              title: "Push Notifications",
+              title: "Push Notifications".tr,
             ),
           ],
         ),

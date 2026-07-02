@@ -30,8 +30,8 @@ final ctr = Get.find<StockTransferController>();
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Add Stock Transfer",
+                Text(
+                  "Add Stock Transfer".tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -48,12 +48,12 @@ final ctr = Get.find<StockTransferController>();
             ),
         
             const SizedBox(height: 10),
-            Text("From Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("From Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
               value: selectedProduct,
-              decoration: const InputDecoration(
-                hintText: "From Warehouse",
+              decoration: InputDecoration(
+                hintText: "Select From Warehouse".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
@@ -78,12 +78,12 @@ final ctr = Get.find<StockTransferController>();
                      
             const SizedBox(height: 15),
         
-            Text("To Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("To Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
               value: selectedProduct,
-              decoration: const InputDecoration(
-                hintText: "To Warehouse",
+              decoration: InputDecoration(
+                hintText: "Select To Warehouse".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
@@ -107,12 +107,12 @@ final ctr = Get.find<StockTransferController>();
             ),
 
             const SizedBox(height: 15),
-            Text("Product", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("Product".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
               value: selectedProduct,
-              decoration: const InputDecoration(
-                hintText: "Select Product",
+              decoration: InputDecoration(
+                hintText: "Select Product".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
@@ -136,12 +136,12 @@ final ctr = Get.find<StockTransferController>();
             ),
 
             const SizedBox(height: 15),
-            Text("Quantity", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             TextFormField(
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: "Enter Quantity",
+              decoration: InputDecoration(
+                hintText: "Enter Quantity".tr,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
@@ -149,7 +149,7 @@ final ctr = Get.find<StockTransferController>();
  
 
             const SizedBox(height: 10),
-            const Text("Transfer Date", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+            Text("Transfer Date".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
             const SizedBox(height: 5),
 
             Obx(() => InkWell(
@@ -173,6 +173,7 @@ final ctr = Get.find<StockTransferController>();
         
             SizedBox(
               width: double.infinity,
+              height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: successColor,
@@ -181,7 +182,7 @@ final ctr = Get.find<StockTransferController>();
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text("Save"),
+                child: Text("Save".tr, style: const TextStyle(fontSize: 18),),
               ),
             ),
           ],

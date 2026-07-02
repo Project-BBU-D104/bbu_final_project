@@ -23,22 +23,22 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: titleColor,
           selectedIndex: controller.selectedIndex.value,
           onDestinationSelected: controller.onTabChanged,
-          destinations: const [
+          destinations: [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),
-              label: 'Home',
+              label: 'Home'.tr,
             ),
             NavigationDestination(
               icon: Icon(Icons.dashboard_customize_outlined),
-              label: 'Dashboard',
+              label: 'Dashboard'.tr,
             ),
             NavigationDestination(
               icon: Icon(Icons.shopping_bag_outlined),
-              label: 'Manage',
+              label: 'Manage'.tr,
             ),
             NavigationDestination(
               icon: Icon(Icons.person_2_outlined),
-              label: 'Profile',
+              label: 'Profile'.tr,
             ),
           ],
         );

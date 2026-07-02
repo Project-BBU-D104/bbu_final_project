@@ -40,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: (){
                       ctr.onLogoutPress();
                     },
-                    label: Text("Logout",),
+                    label: Text("Logout".tr),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 251, 158, 151),
                       foregroundColor: const Color.fromARGB(255, 112, 39, 39),

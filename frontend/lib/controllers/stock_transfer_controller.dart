@@ -158,7 +158,7 @@ class StockTransferController extends GetxController{
   }
 
   String get formattedDate {
-    if (selectedDate.value == null) return "Select Date";
+    if (selectedDate.value == null) return "Select Date".tr;
     return selectedDate.value!.toString().split(" ")[0];
   }
 

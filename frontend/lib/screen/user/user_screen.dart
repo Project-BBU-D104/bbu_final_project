@@ -22,7 +22,7 @@ class UserScreen extends StatelessWidget {
             children: [
           
               SizedBox(height: 8),
-              SearchWidget(title: "Search User..."),
+              SearchWidget(title: "Search User...".tr),
               SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
@@ -55,7 +55,7 @@ class UserScreen extends StatelessWidget {
                     onPressed: (){
                       ctr.addUser(context);
                     }, 
-                    child: Text("New User")
+                    child: Text("New User".tr)
                   )
                 ],
               ),

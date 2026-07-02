@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:get/get.dart';
 
 class CardPersonalInfoWidget extends StatelessWidget {
   const CardPersonalInfoWidget({super.key});
@@ -19,26 +20,26 @@ class CardPersonalInfoWidget extends StatelessWidget {
                 children: [
                   Icon(Icons.person_outline_outlined),
                   SizedBox(width: 10,),
-                  Text("Personal Info Widget", style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text("Personal Info Widget".tr, style: TextStyle(fontWeight: FontWeight.bold),),
                 ],
               ),
               Divider(),
               
-              Text("Full Name", style: TextStyle(fontWeight: FontWeight.w600),),
+              Text("Full Name".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
               cardInfo(
                 title: "Lim Sabrey",
               ),
               SizedBox(height: 10,),
 
-              Text("Email Address", style: TextStyle(fontWeight: FontWeight.w600),),
+              Text("Email Address".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
               cardInfo(
                 title: "2A2kW@example.com",
               ),
 
               SizedBox(height: 10,),
-              Text("Phone Number", style: TextStyle(fontWeight: FontWeight.w600),),
+              Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
               cardInfo(
                 title: "+60123456789",
