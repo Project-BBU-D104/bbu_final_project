@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/app_background.dart';
+import 'package:frontend/controllers/language_controller.dart';
 import 'package:frontend/locator.dart';
 import 'package:get/get.dart';
 import 'routes/app_pages.dart';
@@ -21,7 +22,9 @@ Future<void> main() async {
   _initStorage();
   
   await GetStorage.init();
- setupLocator();
+  setupLocator();
+
+  Get.put(LanguageController());
 
   runApp(const MyApp());
 
@@ -62,34 +65,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      // hide debug
-      debugShowCheckedModeBanner: false,
 
-      scrollBehavior: _CustomScrollBehavior(),
-      initialRoute: AppRoutes.landing,
-      getPages: AppPages.pages,
+    final languageController = Get.put(LanguageController());
 
-      // translate
-      translations: AppTranslation(),
-      locale: const Locale('km', 'KHM'), // default
-      fallbackLocale: const Locale('km', 'KHM'),
-
-      // theme
-      transitionDuration: const Duration(milliseconds: 0),
-      defaultTransition: Transition.noTransition,
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.transparent,
+    return Obx(
+      ()=> GetMaterialApp(
+        // hide debug
+        debugShowCheckedModeBanner: false,
+      
+        scrollBehavior: _CustomScrollBehavior(),
+        initialRoute: AppRoutes.landing,
+        getPages: AppPages.pages,
+      
+        // translate
+        translations: AppTranslation(),
+        locale: languageController.locale.value,
+        fallbackLocale: const Locale("km", "KH"),
+      
+        // theme
+        transitionDuration: const Duration(milliseconds: 0),
+        defaultTransition: Transition.noTransition,
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.transparent,
+        ),
+        builder: (context, child) {
+          return Stack(
+            children: [
+              const AppBackground(child: SizedBox.expand()),
+              child ?? const SizedBox(),
+            ],
+          );
+        },
+      
       ),
-      builder: (context, child) {
-        return Stack(
-          children: [
-            const AppBackground(child: SizedBox.expand()),
-            child ?? const SizedBox(),
-          ],
-        );
-      },
-
     );
   }
 }

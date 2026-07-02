@@ -1,57 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/routes/app_routes.dart';
+import 'package:get/get.dart';
 
 class RecentStockOutWidget extends StatelessWidget {
   const RecentStockOutWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 10,),
-          Text("Recent Sale Order",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          SizedBox(height: 10,),
-          Card(
-            color: titleColor,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Product')),
-                    DataColumn(label: Text('Qty')),
-                    DataColumn(label: Text('Price')),
-                    DataColumn(label: Text('Date')),
-                  ],
-                  rows: const [
-                    DataRow(
-                      cells: [
-                        DataCell(Text('Coffee')),
-                        DataCell(Text('2')),
-                        DataCell(Text('\$4.00')),
-                        DataCell(Text('7/1/2026')),
-                      ],
-                    ),
-                    DataRow(
-                      cells: [
-                        DataCell(Text('Tea')),
-                        DataCell(Text('1')),
-                        DataCell(Text('\$2.50')),
-                        DataCell(Text('7/1/2023')),
-                      ],
-                    ),
-                  ],
-                ),
+    final items = const [
+      {'product': 'Coffee', 'qty': '2', 'price': '\$4.00', 'date': '7/1/2026'},
+      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
+      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
+      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
+      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+
+        Row(
+          children: [
+            const Text(
+              "Recent Sale Order",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: () {
+                Get.toNamed(AppRoutes.saleList);
+              },
+              child: Text(
+                "View All",
+                style: TextStyle( fontWeight: FontWeight.bold),
               ),
             ),
-          )
-        ],
-      )
+          ],
+        ),
+
+        const SizedBox(height: 10),
+
+        SizedBox(
+          width: double.infinity,
+          child: Card(
+            color: titleColor,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header row
+                  const Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Product',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Qty',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Price',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Date',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 16),
+
+                  // Data rows
+                  for (int i = 0; i < items.length; i++) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(items[i]['product']!),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(items[i]['qty']!),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(items[i]['price']!),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            items[i]['date']!,
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (i != items.length - 1) const SizedBox(height: 10),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

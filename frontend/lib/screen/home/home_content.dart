@@ -44,7 +44,7 @@ class HomeContent extends StatelessWidget {
 
                 SizedBox(height: 15,),
                 QuickActionWidget(),
-               
+                SizedBox(height: 15,),
                 RecentStockInWidget(),
                 RecentStockOutWidget(),
               ]

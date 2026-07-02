@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/widget/dailog_select_language_widget.dart';
+import 'package:get/get.dart';
 
 class SettingWidget extends StatelessWidget {
   const SettingWidget({super.key});
@@ -29,6 +31,11 @@ class SettingWidget extends StatelessWidget {
             cardInfo(
               icon: Icons.language_outlined,
               title: "Language",
+              onTap: () {
+                Get.dialog(
+                  const DialogSelectLanguageWidget(),
+                );
+              },
             ),
             SizedBox(height: 5,),
             cardInfo(
@@ -46,42 +53,45 @@ class SettingWidget extends StatelessWidget {
 Widget cardInfo({
   required IconData icon,
   required String title,
-
   bool? active,
+  VoidCallback? onTap,
 }) {
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0xFFF8FAFC),
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(
-        color: Colors.grey.shade300,
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
       ),
-    ),
-    child: Row(
-      children: [
-        Icon(icon),
-        SizedBox(width: 10,),
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
+      child: Row(
+        children: [
+          Icon(icon),
+          SizedBox(width: 10,),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        ),
-        if (active != null)
-          Switch(
-            value: active,
-            onChanged: (value) {},
-          ),
-
-        // Show arrow when active is null
-        if (active == null)
-          const Icon(Icons.chevron_right),
-      ],
+          if (active != null)
+            Switch(
+              value: active,
+              onChanged: (value) {},
+            ),
+    
+          // Show arrow when active is null
+          if (active == null)
+            const Icon(Icons.chevron_right),
+        ],
+      ),
     ),
   );
 }

@@ -27,7 +27,7 @@ class QuickActionWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Quick Action",
+          Text("Quick Action".tr,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,

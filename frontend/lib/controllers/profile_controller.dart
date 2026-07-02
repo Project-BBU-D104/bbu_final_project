@@ -4,4 +4,9 @@ class ProfileController extends GetxController{
   void onLogoutPress(){
     Get.offAllNamed('/login');
   }
+
+
+  void onTranslate(){
+    
+  }
 }

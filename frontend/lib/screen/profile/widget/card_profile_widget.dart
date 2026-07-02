@@ -32,23 +32,6 @@ class CardProfileWidget extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     fontSize: 20,   
                   ),),
-                const SizedBox(height: 10,),
-                SizedBox(
-                  height: 40,
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: (){},
-                    label: Text("Edit Profile"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 68, 238, 193),
-                      foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    icon: Icon(Icons.edit)
-                  ),
-                )
               ],
             ),
           ),
