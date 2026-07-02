@@ -43,13 +43,13 @@ dependencies:
   # Config / Device
   flutter_dotenv: ^5.1.0
 
-
-
   # Camera Scanner
   mobile_scanner: ^7.0.1
 
-  
-  
+  #image
+  cached_network_image: ^3.2.3
+  image_picker: ^1.1.2
+  file_picker: ^8.0.0
 
   # chart
   syncfusion_flutter_charts: ^33.2.8

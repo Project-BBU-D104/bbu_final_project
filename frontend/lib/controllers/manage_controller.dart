@@ -30,7 +30,7 @@ class ManageController extends GetxController{
     },
 
     {
-      "title": "Supplier Management",
+      "title": "Supplier & Customer Management",
       "items": [
         {
           "title": "Supplier",

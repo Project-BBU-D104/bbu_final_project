@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/models/product_model.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
@@ -11,7 +12,7 @@ class ProductCardDetailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Product product = Get.arguments;
+    final ProductModel product = Get.arguments;
 
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FA),
@@ -69,28 +70,28 @@ class ProductCardDetailWidget extends StatelessWidget {
           children: [
 
             /// IMAGE
-            Container(
-              width: double.infinity,
-              height: 230,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  )
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: Image.asset(
-                  product.asset,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+            // Container(
+            //   width: double.infinity,
+            //   height: 230,
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     borderRadius: BorderRadius.circular(22),
+            //     boxShadow: [
+            //       BoxShadow(
+            //         color: Colors.black.withOpacity(.05),
+            //         blurRadius: 15,
+            //         offset: const Offset(0, 6),
+            //       )
+            //     ],
+            //   ),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(22),
+            //     child: Image.asset(
+            //       product.asset,
+            //       fit: BoxFit.cover,
+            //     ),
+            //   ),
+            // ),
 
             const SizedBox(height: 20),
 
@@ -112,14 +113,14 @@ class ProductCardDetailWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      StatusWidget(text: product.status),
+                      // StatusWidget(text: product.status),
                     ],
                   ),
 
                   const SizedBox(height: 18),
 
                   Text(
-                    "\$${product.price.toStringAsFixed(2)}",
+                    "\$${product.salePrice}",
                     style: const TextStyle(
                       color: Color(0xff1DB584),
                       fontSize: 34,
@@ -162,19 +163,19 @@ class ProductCardDetailWidget extends StatelessWidget {
                       _infoCard(
                         Icons.qr_code,
                         "SKU",
-                        product.sku,
+                        product.barcode ?? '',
                       ),
 
                       _infoCard(
                         Icons.inventory_2_outlined,
                         "Stock",
-                        "${product.stock} Units",
+                        "${product.qty} Units",
                       ),
 
                       _infoCard(
                         Icons.category_outlined,
                         "Category",
-                        product.category,
+                        product.categoryId,
                       ),
 
                       _infoCard(
@@ -189,11 +190,11 @@ class ProductCardDetailWidget extends StatelessWidget {
                         "ABC Supplier",
                       ),
 
-                      _infoCard(
-                        Icons.schedule,
-                        "Recency",
-                        product.recency,
-                      ),
+                      // _infoCard(
+                      //   Icons.schedule,
+                      //   "Recency",
+                      //   product.recency,
+                      // ),
                     ],
                   ),
                 ],
@@ -253,7 +254,7 @@ class ProductCardDetailWidget extends StatelessWidget {
 
   static Widget _infoCard(
     IconData icon,
-    String title,
+    String? title,
     String value,
   ) {
     return Container(
@@ -274,7 +275,7 @@ class ProductCardDetailWidget extends StatelessWidget {
           const Spacer(),
 
           Text(
-            title,
+            title ?? "",
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 12,

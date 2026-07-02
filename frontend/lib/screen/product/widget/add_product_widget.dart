@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/widget/image_upload_widget.dart';
 import 'package:get/get.dart';
 
 class AddProductWidget extends StatelessWidget {
@@ -40,6 +41,17 @@ class AddProductWidget extends StatelessWidget {
                           },
                         ),
                       ],
+                    ),
+
+                    const SizedBox(height: 10),
+        
+                    ImageUploadWidget(
+                      onUploaded: (url) {
+                        print("Image URL: $url");
+              
+                        // save to SQLite or form model
+                        // productController.image.value = url;
+                      },
                     ),
                       
                     const SizedBox(height: 10),

@@ -2,7 +2,7 @@ class ProductModel {
   final int? id;
   final String categoryId;
   final String supplierId;
-  final String? name;
+  final String name;
   final String? barcode;
   final String? description;
   final String? photo;
@@ -19,7 +19,7 @@ class ProductModel {
     this.id,
     required this.categoryId,
     required this.supplierId,
-    this.name,
+    required this.name,
     this.barcode,
     this.photo,
     this.description,
@@ -38,7 +38,7 @@ class ProductModel {
       id: json['id'] as int?,
       categoryId: json['category_id'] as String,
       supplierId: json['supplier_id'] as String,
-      name: json['name'] as String?,
+      name: json['name'] as String,
       barcode: json['barcode'] as String?,
       photo: json['photo'] as String?,
       description: json['description'] as String?,

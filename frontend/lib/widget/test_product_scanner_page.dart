@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:frontend/controllers/product_controller.dart';
 
 class TestProductScannerPage extends StatefulWidget {
   const TestProductScannerPage({super.key});
@@ -11,6 +13,8 @@ class TestProductScannerPage extends StatefulWidget {
 
 class _TestProductScannerPageState extends State<TestProductScannerPage> {
   late final MobileScannerController controller;
+
+  final productController = Get.put(ProductController());
 
   bool scanned = false;
 
@@ -32,45 +36,60 @@ class _TestProductScannerPageState extends State<TestProductScannerPage> {
   }
 
   void _onDetect(BarcodeCapture capture) {
-  if (scanned) return;
+    if (scanned) return;
+    if (capture.barcodes.isEmpty) return;
 
-  if (capture.barcodes.isEmpty) return;
+    final value = capture.barcodes.first.rawValue;
 
-  final value = capture.barcodes.first.rawValue;
+    if (value == null || value.isEmpty) return;
 
-  if (value == null || value.isEmpty) return;
+    scanned = true;
 
-  scanned = true;
+    final product = productController.findByBarcode(value);
 
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text("Scan Result"),
-        content: Text(value),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-
-              // Allow scanning again
-              scanned = false;
-            },
-            child: const Text("Scan Again"),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            product != null ? "Product Found" : "Not Found",
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context, value); // Return value and close scanner
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      );
-    },
-  );
-}
+          content: product != null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Name: ${product.name}"),
+                    Text("Barcode: ${product.barcode}"),
+                    Text("Price: ${product.salePrice}"),
+                    Text("Stock: ${product.qty}"),
+                  ],
+                )
+              : Text("No product found for:\n$value"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                scanned = false;
+              },
+              child: const Text("Scan Again"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context, value);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+
+    // also update controller state
+    productController.onBarcodeScanned(value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +99,11 @@ class _TestProductScannerPageState extends State<TestProductScannerPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
-            onPressed: () {
-              controller.toggleTorch();
-            },
+            onPressed: () => controller.toggleTorch(),
           ),
           IconButton(
             icon: const Icon(Icons.flip_camera_android),
-            onPressed: () {
-              controller.switchCamera();
-            },
+            onPressed: () => controller.switchCamera(),
           ),
         ],
       ),
@@ -99,16 +114,12 @@ class _TestProductScannerPageState extends State<TestProductScannerPage> {
             onDetect: _onDetect,
           ),
 
-          // Scanner overlay
           Center(
             child: Container(
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.green,
-                  width: 3,
-                ),
+                border: Border.all(color: Colors.green, width: 3),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -120,10 +131,9 @@ class _TestProductScannerPageState extends State<TestProductScannerPage> {
             right: 0,
             child: Center(
               child: Text(
-                "Place the QR code or barcode inside the box",
+                "Place barcode inside box",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
                   backgroundColor: Colors.black54,
                 ),
               ),
