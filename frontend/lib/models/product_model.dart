@@ -66,6 +66,7 @@ class ProductModel {
       'supplier_id': supplierId,
       'name': name,
       'barcode': barcode,
+      'photo': photo,
       'cost_price': costPrice,
       'description': description,
       'sale_price': salePrice,
@@ -84,6 +85,7 @@ class ProductModel {
     String? supplierId,
     String? name,
     String? barcode,
+    String? photo,
     String? costPrice,
     String? salePrice,
     bool? allowInsertQty,
@@ -98,6 +100,7 @@ class ProductModel {
       id: id ?? this.id,
       categoryId: categoryId ?? this.categoryId,
       supplierId: supplierId ?? this.supplierId,
+      photo: photo ?? this.photo,
       name: name ?? this.name,
       barcode: barcode ?? this.barcode,
       costPrice: costPrice ?? this.costPrice,
@@ -114,6 +117,6 @@ class ProductModel {
 
   @override
   String toString() {
-    return 'ProductModel(id: $id, description: $description,unit: $unit ,category_id: $categoryId, allow_insert_qty: $allowInsertQty, qty: $qty, supplier_id: $supplierId, name: $name, barcode: $barcode, cost_price: $costPrice, created_at: $createdAt, updated_at: $updatedAt, payment_date: $paymentDate, photo: $photo, sale_price: $salePrice)';
+    return 'ProductModel(id: $id, description: $description, photo: $photo ,unit: $unit ,category_id: $categoryId, allow_insert_qty: $allowInsertQty, qty: $qty, supplier_id: $supplierId, name: $name, barcode: $barcode, cost_price: $costPrice, created_at: $createdAt, updated_at: $updatedAt, payment_date: $paymentDate, sale_price: $salePrice)';
   }
 }

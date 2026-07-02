@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/models/product_model.dart';
-import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class ProductCardWidget extends StatelessWidget {
@@ -30,31 +29,31 @@ class ProductCardWidget extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Container(
-            //   width: 80,
-            //   height: 80,
-            //   decoration: BoxDecoration(
-            //     color: const Color(0xFFF5F5F5),
-            //     borderRadius: BorderRadius.circular(12),
-            //   ),
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.circular(12),
-            //     child: Image.asset(
-            //       product.asset,
-            //       fit: BoxFit.cover,
-            //       errorBuilder: (context, error, stackTrace) {
-            //         return Container(
-            //           color: Colors.grey[200],
-            //           child: Icon(
-            //             Icons.fastfood,
-            //             color: Colors.grey[400],
-            //             size: 32,
-            //           ),
-            //         );
-            //       },
-            //     ),
-            //   ),
-            // ),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  product.photo ?? '',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[200],
+                      child: Icon(
+                        Icons.fastfood,
+                        color: Colors.grey[400],
+                        size: 32,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
             const SizedBox(width: 16),
 
             Expanded(

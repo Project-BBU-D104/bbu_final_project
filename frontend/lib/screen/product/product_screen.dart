@@ -26,6 +26,7 @@ class ProductScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SearchWidget(title: 'Search Product'),
                   const SizedBox(height: 16),
@@ -60,21 +61,6 @@ class ProductScreen extends StatelessWidget {
                             onPressed: () => _openFilterBottomSheet(
                               context,
                               'status',
-                              productCtrl,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-
-                          FilterWidget(
-                            icon: Icons.list,
-                            label: productCtrl.selectedRecency.value == 'All'
-                                ? 'Recency'
-                                : productCtrl.selectedRecency.value,
-                            isSelected:
-                                productCtrl.selectedRecency.value != 'All',
-                            onPressed: () => _openFilterBottomSheet(
-                              context,
-                              'recency',
                               productCtrl,
                             ),
                           ),
@@ -155,9 +141,7 @@ class ProductScreen extends StatelessWidget {
     if (type == 'status') {
       options = ['All', 'IN STOCK', 'LOW STOCK', 'OUT OF STOCK'];
     }
-    if (type == 'recency') {
-      options = ['All', 'Newest', 'Oldest'];
-    }
+    
 
     Get.bottomSheet(
       Container(

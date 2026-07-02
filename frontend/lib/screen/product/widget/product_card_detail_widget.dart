@@ -189,12 +189,6 @@ class ProductCardDetailWidget extends StatelessWidget {
                         "Supplier",
                         "ABC Supplier",
                       ),
-
-                      // _infoCard(
-                      //   Icons.schedule,
-                      //   "Recency",
-                      //   product.recency,
-                      // ),
                     ],
                   ),
                 ],
