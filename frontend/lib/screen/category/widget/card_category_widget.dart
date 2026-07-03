@@ -121,7 +121,7 @@ class CardCategoryWidget extends StatelessWidget {
                   break;
 
                 case "delete":
-                  ctr.onDeleteCategory(category["id"]);
+                  ctr.onDeleteCategory(category["id"], context);
                   break;
               }
             },

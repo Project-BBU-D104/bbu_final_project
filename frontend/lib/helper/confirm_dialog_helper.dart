@@ -6,7 +6,7 @@ Future<void> showConfirmDialog({
   String title = "Confirm",
   required String message,
   String cancelText = "Cancel",
-  String confirmText = "Save",
+  String confirmText = "Ok",
   VoidCallback? onCancel,
   VoidCallback? onConfirm,
 }) {

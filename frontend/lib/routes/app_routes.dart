@@ -35,4 +35,5 @@ class AppRoutes {
   static const stockTransferDetail = '/stock-transfer-detail';
   static const saleListDetail = '/sale-list-detail';
   static const userDetail = '/user-detail';
+  static const auditLogDetail = '/audit-log-detail';
 }

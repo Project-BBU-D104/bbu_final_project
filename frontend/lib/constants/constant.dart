@@ -36,6 +36,26 @@ final Border bgBorder = Border.all(
   color: bgBorderColor,
 );
 
+Color primaryColorLight(BuildContext context) {
+  return Theme.of(context).colorScheme.primary;
+}
+
+Color textColor(BuildContext context) {
+  return Theme.of(context).colorScheme.onSurface;
+}
+
+Color subtitleColor(BuildContext context) {
+  return Theme.of(context).hintColor;
+}
+
+Color backgroundColor(BuildContext context) {
+  return Theme.of(context).scaffoldBackgroundColor;
+}
+
+Color iconColor(BuildContext context) {
+  return Theme.of(context).iconTheme.color!;
+}
+
 final Color skeletonizerContainerColor = Colors.grey.shade300;
 
 final double circularRadius = 8.0;

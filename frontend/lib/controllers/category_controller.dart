@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/category/widget/add_category_widget.dart';
 import 'package:frontend/screen/category/widget/edit_category_widget.dart';
 import 'package:frontend/services/api_service.dart';
@@ -64,7 +65,17 @@ class CategoryController extends GetxController {
     );
   }
 
-  void onDeleteCategory(int categoryId) async {
+  void onDeleteCategory(int categoryId, BuildContext context) async {
+    showConfirmDialog(
+      context: context,
+      message: "Do you want to delete this category?".tr,
+      onConfirm: () {
+        print("Saved!");
+      },
+      onCancel: () {
+        print("Cancelled!");
+      },
+    );
     print("Delete Category ID: $categoryId");
   }
 

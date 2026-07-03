@@ -14,6 +14,7 @@ import 'package:frontend/binding/supplier_binding.dart';
 import 'package:frontend/binding/user_binding.dart';
 import 'package:frontend/binding/warehouse_binding.dart';
 import 'package:frontend/screen/audit_logs/audit_logs_screen.dart';
+import 'package:frontend/screen/audit_logs/widget/audit_log_detail_widget.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
@@ -191,6 +192,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.userDetail,
       page: () => UserDetailCardWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.auditLogDetail,
+      page: () => AuditLogDetailWidget(),
     ),
   ];
 }

@@ -27,7 +27,7 @@ const Map<String, String> enUS = {
   'Customer':'Customer',
   'Audit Logs':'Audit Logs',
   'Stock Adjustment': 'Stock Adjustment',
-  'Stock Transfer': 'Stock Transfe',
+  'Stock Transfer': 'Stock Transfer',
   'Warehouse': 'Warehouse',
   'Sale List': 'Sale List',
   'Sale Payment': 'Sale Payment',
