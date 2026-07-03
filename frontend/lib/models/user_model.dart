@@ -3,8 +3,8 @@ class UserModel {
   final String username;
   final String password;
   final String? email;
-  final String? roleId;
-  final String? disable;
+  final int roleId;
+  final bool? disable;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -13,8 +13,8 @@ class UserModel {
     required this.username,
     required this.password,
     this.email,
-    this.roleId,
-    this.disable = 'Active',
+    required this.roleId,
+    this.disable = true,
     this.createdAt,
     this.updatedAt,
   });
@@ -25,8 +25,8 @@ class UserModel {
       username: json['username'] as String,
       password: json['password'] as String,
       email: json['email'] as String?,
-      roleId: json['role_id'] as String?,
-      disable: (json['disable'] as String?) ?? 'Active',
+      roleId: json['role_id'] as int,
+      disable: (json['disable'] as bool?) ?? true,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
@@ -54,8 +54,8 @@ class UserModel {
     String? username,
     String? password,
     String? email,
-    String? roleId,
-    String? disable,
+    int? roleId,
+    bool? disable,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -64,7 +64,7 @@ class UserModel {
       username: username ?? this.username,
       password: password ?? this.password,
       email: email ?? this.email,
-      roleId: roleId ?? this.roleId,
+      roleId:  this.roleId,
       disable: disable ?? this.disable,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

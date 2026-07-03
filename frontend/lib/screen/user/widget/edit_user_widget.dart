@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:get/get.dart';
 
@@ -23,8 +24,8 @@ class EditUserWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add User",
+              Text(
+                "Edit User".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -41,11 +42,12 @@ class EditUserWidget extends StatelessWidget {
           ),
 
           const SizedBox(height: 10),
-
+          Text("Role".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5),
           DropdownButtonFormField<String>(
             value: ctr.selectedUser.value,
-            decoration: const InputDecoration(
-              hintText: "Select User Type",
+            decoration: InputDecoration(
+              hintText: "Select User Type".tr,
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
             ),
@@ -63,31 +65,31 @@ class EditUserWidget extends StatelessWidget {
               ctr.selectedUser.value = value ?? '';
             },
           ),
-
-          Text("Username", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          const SizedBox(height: 10),
+          Text("Username".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Username",
+              hintText: "Enter Username".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-          Text("Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Email",
+              hintText: "Enter Email".tr,
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          Text("Password", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Password".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
-          const TextField(
+          TextField(
             decoration: InputDecoration(
-              hintText: "Password",
+              hintText: "Enter Password".tr,
               border: OutlineInputBorder(),
             ),
           ),
@@ -104,7 +106,7 @@ class EditUserWidget extends StatelessWidget {
                   ctr.isChecked.value = value!;
                 },
               ),
-              const Text("Disable User"),
+              Text("Disable User".tr),
             ],
           );
         }),
@@ -113,11 +115,18 @@ class EditUserWidget extends StatelessWidget {
 
           SizedBox(
             width: double.infinity,
+            height: 45,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: successColor,
+                foregroundColor: titleColor
+              ),
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Save"),
+              child: Text("Save".tr,
+              style: TextStyle(fontSize: 18),
+              ),
             ),
           ),
         ],

@@ -131,7 +131,7 @@ class CardFeatureWidget extends StatelessWidget {
             const SizedBox(height: 4),
 
             Text(
-              subtitle ?? ''.tr,
+              subtitle?.tr ?? '',
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

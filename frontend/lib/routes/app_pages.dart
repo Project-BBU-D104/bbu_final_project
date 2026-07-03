@@ -39,6 +39,7 @@ import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
+import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
 import 'package:get/get.dart';
 import 'app_routes.dart';
 
@@ -186,6 +187,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.saleListDetail,
       page: () => SaleListDetailWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.userDetail,
+      page: () => UserDetailCardWidget(),
     ),
   ];
 }

@@ -15,7 +15,7 @@ class EditCategoryWidget extends StatelessWidget {
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 100,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 50,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

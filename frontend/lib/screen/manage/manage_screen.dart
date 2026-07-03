@@ -23,7 +23,7 @@ class ManageScreen extends StatelessWidget {
 
                   for (var section in controller.sections) ...[
                     Text(
-                      section["title".tr],
+                      "${section["title".tr]}".tr,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

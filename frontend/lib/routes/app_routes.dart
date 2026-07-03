@@ -34,4 +34,5 @@ class AppRoutes {
   static const stockAdjustmentDetail = '/stock-adjustment-detail';
   static const stockTransferDetail = '/stock-transfer-detail';
   static const saleListDetail = '/sale-list-detail';
+  static const userDetail = '/user-detail';
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
+import 'package:frontend/widget/test_product_scanner_page.dart';
 import 'package:get/get.dart';
 
 class EditProductWidget extends StatelessWidget {
@@ -126,10 +127,23 @@ class EditProductWidget extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: "Enter Barcode".tr,
                         border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.qr_code_scanner),
+                          onPressed: () async {
+                            final code = await Navigator.push<String>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const TestProductScannerPage(),
+                              ),
+                            );
+                            if (code != null) {
+                              print(code);
+                            }
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
-          
 
                     Row(
                       children: [

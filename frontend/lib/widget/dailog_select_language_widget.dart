@@ -42,7 +42,7 @@ class DialogSelectLanguageWidget extends StatelessWidget {
               const SizedBox(height: 6),
 
               Text(
-                "Choose your preferred language",
+                "Choose your preferred language".tr,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
