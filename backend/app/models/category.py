@@ -1,5 +1,5 @@
-from sqlmodel import SQLModel, Field
-from typing import Optional
+from sqlmodel import SQLModel, Field,Relationship
+from typing import Optional,List
 from datetime import datetime
 
 class Category(SQLModel, table=True):
@@ -10,3 +10,5 @@ class Category(SQLModel, table=True):
     description: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    products: List["Product"] = Relationship(back_populates="category")

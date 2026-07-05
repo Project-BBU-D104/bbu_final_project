@@ -1,8 +1,8 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import create_tests_table_only
-from app.routes import users_router,category_router
+# from database import create_tests_table_only
+from app.routes import users_router,category_router,product_router,supplier_router
 
 app = FastAPI()
 
@@ -21,6 +21,8 @@ app.add_middleware(
 # Include routers
 app.include_router(users_router)
 app.include_router(category_router)
+app.include_router(product_router)
+app.include_router(supplier_router)
 
 @app.get("/")
 def root():
@@ -31,6 +33,6 @@ def health_check():
     return {"status": "healthy"}
 
 
-@app.on_event("startup")
-def startup():
-    create_tests_table_only()
+# @app.on_event("startup")
+# def startup():
+#     create_tests_table_only()

@@ -26,8 +26,39 @@ CREATE TABLE users (
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
+-- Products Table (Added SKU, min_qty, soft delete)
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL,
+    supplier_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    barcode TEXT UNIQUE,
+    photo TEXT,
+    cost_price REAL NOT NULL,
+    sale_price REAL NOT NULL,
+    qty INTEGER DEFAULT 0,
+    allow_insert_qty BOOLEAN 0,
+    unit TEXT,
+    description TEXT,
+    deleted_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+);
 
-
+-- Suppliers Table
+CREATE TABLE suppliers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    map Text,
+    address TEXT,
+    status BOOLEAN,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 //Can't use yet
 
@@ -53,20 +84,6 @@ CREATE TABLE customers (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Suppliers Table
-CREATE TABLE suppliers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    phone TEXT,
-    email TEXT,
-    map Text,
-    address TEXT,
-    status BOOLEAN,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
 -- Warehouses Table
 CREATE TABLE warehouses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,26 +102,6 @@ CREATE TABLE warehouse_stock (
     UNIQUE(product_id, warehouse_id)
 );
 
--- Products Table (Added SKU, min_qty, soft delete)
-CREATE TABLE products (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    category_id INTEGER NOT NULL,
-    supplier_id INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    barcode TEXT UNIQUE,
-    photo TEXT,
-    cost_price REAL NOT NULL,
-    sale_price REAL NOT NULL,
-    qty INTEGER DEFAULT 0,
-    allow_insert_qty BOOLEAN 0,
-    unit TEXT,
-    description TEXT,
-    deleted_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id),
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
-);
 
 -- Purchases Table (Added payment tracking, soft delete)
 CREATE TABLE purchases (
