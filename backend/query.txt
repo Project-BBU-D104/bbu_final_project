@@ -154,7 +154,6 @@ CREATE TABLE warehouse_stock (
     UNIQUE(product_id, warehouse_id)
 );
 
-//Can't use yet
 
 -- Purchases Table (Added payment tracking, soft delete)
 CREATE TABLE purchases (
@@ -189,6 +188,8 @@ CREATE TABLE purchase_items (
     FOREIGN KEY (purchase_id) REFERENCES purchases(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+//Can't use yet
 
 -- Sales Table (Added status, payment tracking, soft delete)
 CREATE TABLE sales (

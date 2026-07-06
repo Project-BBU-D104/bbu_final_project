@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # from database import create_tests_table_only
-from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router, stock_adjustment_router, product_transfer_router
+from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router, stock_adjustment_router, product_transfer_router, purchase_router
 
 app = FastAPI()
 
@@ -29,6 +29,7 @@ app.include_router(audit_logs_router)
 app.include_router(warehouse_router)
 app.include_router(stock_adjustment_router)
 app.include_router(product_transfer_router)
+app.include_router(purchase_router)
 
 @app.get("/")
 def root():

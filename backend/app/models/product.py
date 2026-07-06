@@ -1,8 +1,11 @@
-from sqlmodel import SQLModel, Field,Relationship
-from typing import Optional, List
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from app.models.category import Category
 from app.models.supplier import Supplier
+
+if TYPE_CHECKING:
+    from app.models.purchase_item import PurchaseItem
 
 
 class Product(SQLModel, table=True):
@@ -29,3 +32,4 @@ class Product(SQLModel, table=True):
     product_transfers: List["ProductTransfer"] = Relationship(back_populates="product")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")
     warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="product")
+    purchase_items: List["PurchaseItem"] = Relationship(back_populates="product")
