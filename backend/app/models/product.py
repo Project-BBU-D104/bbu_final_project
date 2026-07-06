@@ -4,6 +4,7 @@ from datetime import datetime
 from app.models.category import Category
 from app.models.supplier import Supplier
 
+
 class Product(SQLModel, table=True):
     __tablename__ = "product"
 
@@ -25,4 +26,5 @@ class Product(SQLModel, table=True):
 
     category: Optional["Category"] = Relationship(back_populates="products")
     supplier: Optional["Supplier"] = Relationship(back_populates="products")
+    product_transfers: List["ProductTransfer"] = Relationship(back_populates="product")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")

@@ -2,6 +2,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 from datetime import datetime
 
+
 class Warehouse(SQLModel, table=True):
     __tablename__ = "warehouses"
 
@@ -11,4 +12,19 @@ class Warehouse(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="warehouse")
+    stock_adjustments: List["StockAdjustment"] = Relationship(
+        back_populates="warehouse"
+    )
+    outgoing_transfers: List["ProductTransfer"] = Relationship(
+    back_populates="from_warehouse",
+    sa_relationship_kwargs={
+        "foreign_keys": "ProductTransfer.from_warehouse_id"
+    },
+)
+
+    incoming_transfers: List["ProductTransfer"] = Relationship(
+        back_populates="to_warehouse",
+        sa_relationship_kwargs={
+            "foreign_keys": "ProductTransfer.to_warehouse_id"
+        },
+    )
