@@ -28,3 +28,4 @@ class Product(SQLModel, table=True):
     supplier: Optional["Supplier"] = Relationship(back_populates="products")
     product_transfers: List["ProductTransfer"] = Relationship(back_populates="product")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")
+    warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="product")

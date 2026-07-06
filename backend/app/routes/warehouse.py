@@ -22,6 +22,6 @@ def read_warehouse(warehouse_id: int, session: Session = Depends(get_session)):
 def update_warehouse_route(warehouse_id: int, warehouse: WarehouseUpdate, session: Session = Depends(get_session)):
     return update_warehouse(session, warehouse_id, warehouse)
 
-@router.delete("/{category_id}")
+@router.delete("/{warehouse_id}")
 def delete_warehouse_route(warehouse_id: int, session: Session = Depends(get_session)):
     return delete_warehouse(session, warehouse_id)

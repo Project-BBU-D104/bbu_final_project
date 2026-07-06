@@ -28,3 +28,5 @@ class Warehouse(SQLModel, table=True):
             "foreign_keys": "ProductTransfer.to_warehouse_id"
         },
     )
+
+    warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="warehouse")

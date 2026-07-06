@@ -143,8 +143,6 @@ CREATE TABLE product_transfers (
     FOREIGN KEY (to_warehouse_id) REFERENCES warehouses(id)
 );
 
-//Can't use yet
-
 -- Warehouse Stock Table (Multi-location support)
 CREATE TABLE warehouse_stock (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -156,6 +154,7 @@ CREATE TABLE warehouse_stock (
     UNIQUE(product_id, warehouse_id)
 );
 
+//Can't use yet
 
 -- Purchases Table (Added payment tracking, soft delete)
 CREATE TABLE purchases (

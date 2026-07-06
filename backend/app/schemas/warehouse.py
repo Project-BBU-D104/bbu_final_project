@@ -6,8 +6,6 @@ from typing import Optional
 class WarehouseCreate(SQLModel):
     name: str
     location: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
 
 
 class WarehouseUpdate(SQLModel):
