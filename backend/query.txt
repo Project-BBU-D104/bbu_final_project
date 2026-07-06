@@ -97,14 +97,39 @@ CREATE TABLE audit_logs (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-//Can't use yet
-
 -- Warehouses Table
 CREATE TABLE warehouses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     location TEXT
 );
+
+-- Stock Adjustments Table
+CREATE TABLE stock_adjustments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    warehouse_id INTEGER,
+    user_id INTEGER NOT NULL,
+
+    adjustment_type TEXT CHECK(adjustment_type IN ('increase', 'decrease')) NOT NULL,
+
+    qty INTEGER NOT NULL,
+    previous_qty INTEGER NOT NULL,
+    new_qty INTEGER NOT NULL,
+
+    reason TEXT,
+
+    reference_no TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+//Can't use yet
 
 -- Warehouse Stock Table (Multi-location support)
 CREATE TABLE warehouse_stock (
@@ -215,29 +240,4 @@ CREATE TABLE product_transfers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (from_warehouse_id) REFERENCES warehouses(id),
     FOREIGN KEY (to_warehouse_id) REFERENCES warehouses(id)
-);
-
--- Stock Adjustments Table
-CREATE TABLE stock_adjustments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_id INTEGER NOT NULL,
-    warehouse_id INTEGER,
-    user_id INTEGER NOT NULL,
-
-    adjustment_type TEXT CHECK(adjustment_type IN ('increase', 'decrease')) NOT NULL,
-
-    qty INTEGER NOT NULL,
-    previous_qty INTEGER NOT NULL,
-    new_qty INTEGER NOT NULL,
-
-    reason TEXT,
-
-    reference_no TEXT,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (product_id) REFERENCES products(id),
-    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
 );

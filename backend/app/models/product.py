@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field,Relationship
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from app.models.category import Category
 from app.models.supplier import Supplier
@@ -25,3 +25,4 @@ class Product(SQLModel, table=True):
 
     category: Optional["Category"] = Relationship(back_populates="products")
     supplier: Optional["Supplier"] = Relationship(back_populates="products")
+    stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")

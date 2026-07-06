@@ -1,38 +1,38 @@
 from sqlmodel import Session, select
-from app.models.category import Category
-from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.models.warehouse import Warehouse
+from app.schemas.warehouse import WarehouseCreate, WarehouseUpdate
 from datetime import datetime
 
-def create_category(session: Session, category: CategoryCreate):
-    db_category = Category.from_orm(category)
-    session.add(db_category)
+def create_warehouse(session: Session, warehouse: WarehouseCreate):
+    db_warehouse = Warehouse.from_orm(warehouse)
+    session.add(db_warehouse)
     session.commit()
-    session.refresh(db_category)
-    return db_category
+    session.refresh(db_warehouse)
+    return db_warehouse
 
-def get_all_category(session: Session):
-    return session.exec(select(Category)).all()
+def get_all_warehouse(session: Session):
+    return session.exec(select(Warehouse)).all()
 
-def get_category(session: Session, category_id: int):
-    return session.get(Category, category_id)
+def get_warehouse(session: Session, warehouse_id: int):
+    return session.get(Warehouse, warehouse_id)
 
-def update_category(session: Session, category_id: int, category: CategoryUpdate):
-    db_category = session.get(Category, category_id)
-    if db_category:
-        if category.name is not None:
-            db_category.name = category.name
-        if category.description is not None:
-            db_category.description = category.description
+def update_warehouse(session: Session, warehouse_id: int, warehouse: WarehouseUpdate):
+    db_warehouse = session.get(Warehouse, warehouse_id)
+    if db_warehouse:
+        if warehouse.name is not None:
+            db_warehouse.name = warehouse.name
+        if warehouse.location is not None:
+            db_warehouse.location = warehouse.location
 
-        db_category.updated_at = category.updated_at or datetime.utcnow()
-        session.add(db_category)
+        db_warehouse.updated_at = warehouse.updated_at or datetime.utcnow()
+        session.add(db_warehouse)
         session.commit()
-        session.refresh(db_category)
-    return db_category
+        session.refresh(db_warehouse)
+    return db_warehouse
 
-def delete_category(session: Session, category_id: int):
-    category = session.get(Category, category_id)
-    if category:
-        session.delete(category)
+def delete_warehouse(session: Session, warehouse_id: int):
+    warehouse = session.get(Warehouse, warehouse_id)
+    if warehouse:
+        session.delete(warehouse)
         session.commit()
-    return category
+    return warehouse
