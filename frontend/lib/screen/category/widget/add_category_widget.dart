@@ -46,22 +46,23 @@ class AddCategoryWidget extends StatelessWidget {
           Text("Category Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
           TextField(
+            controller: ctr.nameController,
             decoration: InputDecoration(
               hintText: "Enter Category Name".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
-          const SizedBox(height: 10),
+          // const SizedBox(height: 10),
 
-          Text("Icon".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            decoration: InputDecoration(
-              hintText: "Enter Icon".tr,
-              border: OutlineInputBorder(),
-            ),
-          ),
+          // Text("Icon".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          // SizedBox(height: 5,),
+          // TextField(
+          //   decoration: InputDecoration(
+          //     hintText: "Enter Icon".tr,
+          //     border: OutlineInputBorder(),
+          //   ),
+          // ),
 
           const SizedBox(height: 10),
 
@@ -70,6 +71,7 @@ class AddCategoryWidget extends StatelessWidget {
           TextField(
             maxLines: 8,
             minLines: 3,
+            controller: ctr.descriptionController,
             decoration: InputDecoration(
               hintText: "Enter Description".tr,
               border: OutlineInputBorder(),
@@ -90,9 +92,12 @@ class AddCategoryWidget extends StatelessWidget {
                  
               ),
               onPressed: () {
-                ctr.onSaveCategory();
+                ctr.onSaveCategory(context);
               },
-              child: Text("Save".tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),)
+              child: Text(
+                "Save".tr,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
+              )
             ),
           ),
         ],

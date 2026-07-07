@@ -66,6 +66,10 @@ class ConfirmDialogWidget extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: titleColor,
+                    ),
                     onPressed: onConfirm,
                     child: Text(confirmText),
                   ),

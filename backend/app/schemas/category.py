@@ -1,13 +1,19 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
+from pydantic import field_validator
 
 
 class CategoryCreate(SQLModel):
     name: str
     description: Optional[str] = None
-    created_at: datetime
-    updated_at: Optional[datetime] = None
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v):
+        if not v.strip():
+            raise ValueError("Name cannot be empty")
+        return v
 
 
 class CategoryUpdate(SQLModel):

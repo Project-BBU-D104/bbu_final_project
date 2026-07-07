@@ -39,7 +39,7 @@ class ApiService {
     Map<String, dynamic> data,
   ) async {
     final response = await http.post(
-      Uri.parse("$baseUrl$endpoint"),
+      Uri.parse("$baseUrl$endpoint/"),
       headers: headers,
       body: jsonEncode(data),
     );

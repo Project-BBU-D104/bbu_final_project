@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
+import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/models/supplier_model.dart';
 
 class SupplierDetailCardWidget extends StatelessWidget {
   SupplierDetailCardWidget({super.key});
@@ -11,7 +13,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final supplier = Get.arguments as Map<String, String>?;
+    final supplier = Get.arguments as SupplierModel?;
 
     if (supplier == null) {
       return  Scaffold(
@@ -43,7 +45,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                         radius: 28,
                         backgroundColor: const Color(0xff1DB584),
                         child: Text(
-                          (supplier['name'] ?? 'U')[0].toUpperCase(),
+                          (supplier.name)[0].toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -59,7 +61,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              supplier['name'] ?? '-',
+                              supplier.name,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -67,7 +69,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              supplier['email'] ?? '-',
+                              supplier.email ?? '-',
                               style: const TextStyle(
                                 color: Colors.grey,
                               ),
@@ -76,7 +78,11 @@ class SupplierDetailCardWidget extends StatelessWidget {
                         ),
                       ),
 
-                      _statusBadge(supplier['status'] ?? 'Unknown'),
+                      StatusWidget(
+                        text: supplier.status == true
+                            ? "Active"
+                            : "Inactive",
+                      )
                     ],
                   ),
 
@@ -85,7 +91,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                   /// QUICK INFO GRID
                   Row(
                     children: [
-                      _miniBox(Icons.phone, supplier['phone'] ?? '-'),
+                      _miniBox(Icons.phone, supplier.phone),
                       const SizedBox(width: 10),
                       _miniBox(Icons.location_on, "Map"),
                     ],
@@ -113,8 +119,10 @@ class SupplierDetailCardWidget extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  _row("Address", supplier['address'] ?? '-'),
-                  _row("Created", supplier['created_at'] ?? '-'),
+                  _row("Address", supplier.address ?? '-'),
+                  _row("Created", supplier.createdAt != null
+                    ? supplier.createdAt!.toString().substring(0, 10)
+                    : "",),
                 ],
               ),
             ),

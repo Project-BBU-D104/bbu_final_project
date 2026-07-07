@@ -1,9 +1,20 @@
+from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
 from datetime import datetime
 
 def create_category(session: Session, category: CategoryCreate):
+    existing = session.exec(
+        select(Category).where(Category.name == category.name)
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Category name already exists."
+        )
+    
     db_category = Category.from_orm(category)
     session.add(db_category)
     session.commit()
@@ -17,6 +28,12 @@ def get_category(session: Session, category_id: int):
     return session.get(Category, category_id)
 
 def update_category(session: Session, category_id: int, category: CategoryUpdate):
+    if not session.get(Category, category_id):
+        raise HTTPException(
+            status_code=404,
+            detail="Category not found."
+        )
+    
     db_category = session.get(Category, category_id)
     if db_category:
         if category.name is not None:
@@ -31,8 +48,18 @@ def update_category(session: Session, category_id: int, category: CategoryUpdate
     return db_category
 
 def delete_category(session: Session, category_id: int):
+    if not session.get(Category, category_id):
+        raise HTTPException(
+            status_code=404,
+            detail="Category not found."
+        )
+    
     category = session.get(Category, category_id)
+
     if category:
         session.delete(category)
         session.commit()
-    return category
+    return {
+        "message": "Category deleted successfully",
+        "category": category
+    }
