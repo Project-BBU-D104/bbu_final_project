@@ -1,47 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/role/widget/add_role_widget.dart';
 import 'package:frontend/screen/role/widget/edit_role_widget.dart';
+import 'package:frontend/services/main_service/role_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class RoleController extends GetxController{
+  final RoleService service = RoleService();
 
-var isChecked = false.obs;
+  var isChecked = false.obs;
+  var isLoading = false.obs;
 
-  final List<Map<String, dynamic>> roleList = [
-  {
-    "id": 1,
-    "name": "Super Admin",
-    "description": "Has full access to all modules and system settings.",
-    "is_active": true,
-    "created_at": "2026-07-01 08:00:00",
-    "updated_at": "2026-07-01 08:00:00",
-  },
-  {
-    "id": 2,
-    "name": "Administrator",
-    "description": "Manages users, inventory, and business operations.",
-    "is_active": true,
-    "created_at": "2026-07-01 08:05:00",
-    "updated_at": "2026-07-01 08:05:00",
-  },
-  {
-    "id": 3,
-    "name": "Manager",
-    "description": "Oversees daily operations and approves transactions.",
-    "is_active": true,
-    "created_at": "2026-07-01 08:10:00",
-    "updated_at": "2026-07-01 08:10:00",
-  },
-  {
-    "id": 4,
-    "name": "Cashier",
-    "description": "Handles sales, payments, and customer transactions.",
-    "is_active": true,
-    "created_at": "2026-07-01 08:15:00",
-    "updated_at": "2026-07-01 08:15:00",
+  final roleList = <Map<String, dynamic>> [].obs;
+
+  
+
+  @override
+  void onInit() {
+    super.onInit();
+    getRoles();
   }
-];
+
+  Future<void> getRoles() async {
+    try {
+      isLoading.value = true;
+
+      final resp = await service.getRoles();
+
+      if (resp is List) {
+        roleList.value = List<Map<String, dynamic>>.from(resp);
+      }
+    } catch (e) {
+        ToastWidget.show(
+          message: e.toString(),
+          type: ToastType.error,
+        );
+    } finally {
+        isLoading.value = false;
+    }
+  }
 
   void addRole(BuildContext context){
     AppBottomSheets.show(

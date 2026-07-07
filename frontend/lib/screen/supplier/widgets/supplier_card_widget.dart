@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/global.dart';
+import 'package:frontend/models/supplier_model.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class SupplierCardWidget extends StatelessWidget {
 
-   final Map<String,String> item;
+final SupplierModel item;
 
   const SupplierCardWidget({
     super.key,
@@ -47,10 +48,14 @@ class SupplierCardWidget extends StatelessWidget {
                       BorderRadius.circular(14)
                     ),
       
-                    child:Center(
-                      child:Text(
-                        item["icon"]!
-                      ),
+                    child: Center(
+                      child: item.name.isNotEmpty
+                        ? Text(
+                            item.name[0].toUpperCase(),
+                          )
+                        : const Icon(
+                            Icons.business,
+                          ),
                     ),
                   ),
       
@@ -61,7 +66,7 @@ class SupplierCardWidget extends StatelessWidget {
                       CrossAxisAlignment.start,
                       children:[
                         Text(
-                          item["name"]!,
+                          item.name,
                           style:const TextStyle(
                             fontSize:18,
                             fontWeight:
@@ -70,13 +75,13 @@ class SupplierCardWidget extends StatelessWidget {
                         ),
                        InkWell(
                           onTap: () {
-                            final email = (item["email"] ?? "").toString();
+                            final email = (item.email ?? "").toString();
                             if (email.isNotEmpty) {
                               openEmail(email);
                             }
                           },
                           child: Text(
-                            (item["email"] ?? "").toString(),
+                            (item.email ?? "").toString(),
                             style: TextStyle(
                             
                             
@@ -86,7 +91,11 @@ class SupplierCardWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  StatusWidget( text:item["status"]!)
+                  StatusWidget(
+                    text: item.status == true
+                        ? "Active"
+                        : "Inactive",
+                  )
                 ],
               ),
             ),
@@ -102,7 +111,7 @@ class SupplierCardWidget extends StatelessWidget {
                   iconBox(Icons.phone,
                    onTap:(){
                     callPhone(
-                      item["phone"] ?? ""
+                      item.phone
                     );
                   }),
                   const SizedBox(width:10),
@@ -110,20 +119,20 @@ class SupplierCardWidget extends StatelessWidget {
                   iconBox(Icons.location_on,
                     onTap:(){
                        openGoogleMap(
-                        item["map"] ?? ""
+                        item.map ?? "",
                       );
                     }
                   ),
                   const Spacer(),
                     Text(
-                    item["created_at"] ?? "",
-                    style:TextStyle(
-                      color:
-                      Color(0xff00a884),
-                      fontWeight:
-                      FontWeight.bold
-                    ),
-                  )
+                      item.createdAt != null
+                          ? item.createdAt!.toString().substring(0, 10)
+                          : "",
+                      style: const TextStyle(
+                        color: Color(0xff00a884),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
                 ],
               ),
             )

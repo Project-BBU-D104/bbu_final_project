@@ -19,16 +19,45 @@ class RoleScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+
+              
               SizedBox(height: 8,),
               SearchWidget(title: "Search Role"),
                SizedBox(height: 8,),
               
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctr.roleList.length,
-                itemBuilder: (context, index) => RoleCardWidget( role: ctr.roleList[index],),
-              ),
+              Obx(() {
+
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (ctr.roleList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No roles found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                 return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: ctr.roleList.length,
+                  itemBuilder: (context, index) => RoleCardWidget( role: ctr.roleList[index],),
+                );
+                }),
               SizedBox(height: 80,)
             ]
           ),

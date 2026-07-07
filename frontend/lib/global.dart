@@ -147,13 +147,47 @@ Future<void> callPhone(String phone) async {
   }
 }
 
-Future<void> openGoogleMap(String url) async {
-  final Uri uri = Uri.parse(url);
+// Future<void> openGoogleMap(String url) async {
+//   final Uri uri = Uri.parse(url);
 
-  await launchUrl(
-    uri,
-    mode: LaunchMode.externalApplication,
-  );
+//   await launchUrl(
+//     uri,
+//     mode: LaunchMode.externalApplication,
+//   );
+// }
+
+Future<void> openGoogleMap(String value) async {
+  try {
+    String url = value;
+
+    // Check if value is latitude,longitude
+    final coordinate = RegExp(
+      r'^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$',
+    );
+
+    if (coordinate.hasMatch(value)) {
+      url = "https://www.google.com/maps/search/?api=1&query=$value";
+    }
+
+    final Uri uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      showError(
+        "Error",
+        "Cannot open map",
+      );
+    }
+  } catch (e) {
+    showError(
+      "Error",
+      e.toString(),
+    );
+  }
 }
 
 Future<void> openEmail(String email) async {

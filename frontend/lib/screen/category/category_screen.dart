@@ -29,8 +29,13 @@ class CategoryScreen extends StatelessWidget {
               ),
 
               /// Search Bar
-              SliverToBoxAdapter(
-                child: SearchWidget(
+              SliverAppBar(
+                pinned: true,
+                elevation: 0,
+                floating: false,
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                flexibleSpace: SearchWidget(
                   title: "Search Category",
                 )
               ),

@@ -5,7 +5,7 @@ class SupplierModel {
   final String? email;
   final String? map;
   final String? address;
-  final String? status;
+  final bool? status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -16,7 +16,7 @@ class SupplierModel {
     this.email,
     this.map,
     this.address,
-    this.status = 'Active',
+    this.status = true,
     this.createdAt,
     this.updatedAt,
   });
@@ -29,7 +29,7 @@ class SupplierModel {
       email: json['email'] as String?,
       map: json['map'] as String?,
       address: (json['address'] as String?),
-      status: (json['status'] as String?) ?? 'Active',
+      status: (json['status'] as bool?) ?? true,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
@@ -60,7 +60,7 @@ class SupplierModel {
     String? email,
     String? map,
     String? address,
-    String? status,
+    bool? status,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -79,6 +79,6 @@ class SupplierModel {
 
   @override
   String toString() {
-    return 'SupplierModel(id: $id, name: $name, email: $email, map: $map, phone: $phone, address: $address, status: $status)';
+    return 'SupplierModel(id: $id, name: $name, email: $email, map: $map, phone: $phone, address: $address, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
