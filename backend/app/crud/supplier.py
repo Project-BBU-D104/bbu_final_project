@@ -1,9 +1,26 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, or_
 from app.models.supplier import Supplier
 from app.schemas.supplier import SupplierCreate, SupplierUpdate
 from datetime import datetime
+from fastapi import HTTPException
 
 def create_supplier(session: Session, supplier: SupplierCreate):
+
+    existing = session.exec(
+        select(Supplier).where(
+            or_(
+                Supplier.phone == supplier.phone,
+                Supplier.email == supplier.email
+            )
+        )
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Phone number or email already exists."
+        )
+
     db_supplier = Supplier.from_orm(supplier)
     session.add(db_supplier)
     session.commit()
@@ -39,6 +56,11 @@ def update_supplier(session: Session, supplier_id: int, supplier: SupplierUpdate
     return db_supplier
 
 def delete_supplier(session: Session, supplier_id: int):
+    if not session.get(Supplier, supplier_id):
+        raise HTTPException(
+            status_code=404,
+            detail="Supplier not found."
+        )
     supplier = session.get(Supplier, supplier_id)
     if supplier:
         session.delete(supplier)

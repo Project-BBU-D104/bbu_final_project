@@ -1,17 +1,23 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
+from pydantic import field_validator
 
 
 class SupplierCreate(SQLModel):
     name: str
     phone: str
     email: str
-    map: str
-    address: str
+    map: Optional[str] = None
+    address: Optional[str] = None
     status: bool
-    created_at: datetime
-    updated_at: Optional[datetime] = None
+
+    @field_validator("name", "phone", "email")
+    @classmethod
+    def validate_required_fields(cls, v):
+        if not v or not str(v).strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
 
 
 class SupplierUpdate(SQLModel):
@@ -26,6 +32,7 @@ class SupplierUpdate(SQLModel):
 
 
 class SupplierRead(SQLModel):
+    id: Optional[int] = None
     name: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None

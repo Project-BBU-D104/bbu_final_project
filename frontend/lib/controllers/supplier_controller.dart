@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/models/supplier_model.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_add_widget.dart';
@@ -11,16 +12,33 @@ import 'package:get/get.dart';
 class SupplierController extends GetxController {
 
   var isLoading = false.obs;
-  var isActive = false.obs;
   final selectedTab = "All".obs;
 
   final SupplierService service = SupplierService();
   final suppliers = <SupplierModel>[].obs;
 
+  final supplierNameController = TextEditingController();
+  final supplierPhoneNumberController = TextEditingController();
+  final supplierEmailController = TextEditingController();
+  final supplierMapController = TextEditingController();
+  final supplierAddressController = TextEditingController();
+
+  final status = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     getSuppliers();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    supplierNameController.dispose();
+    supplierPhoneNumberController.dispose();
+    supplierEmailController.dispose();
+    supplierMapController.dispose();
+    supplierAddressController.dispose();
   }
 
   void getSuppliers() async {
@@ -67,12 +85,75 @@ class SupplierController extends GetxController {
     );
   }
 
-  void saveSupplier(){
-    // Implement save supplier logic here
+  void saveSupplier(BuildContext context){
+    try{
+      final data = {
+        "name": supplierNameController.text.trim(),
+        "phone": supplierPhoneNumberController.text.trim(),
+        "email": supplierEmailController.text.trim(),
+        "map": supplierMapController.text.trim(),
+        "address": supplierAddressController.text.trim(),
+        "status": status.value
+      };
+
+      service.createSupplier(data);
+
+      // Reload Supplier
+      getSuppliers();
+
+      ToastWidget.show(
+        message: "Supplier created successfully",
+        type: ToastType.success,
+      );
+
+    // Clear textfields
+    supplierNameController.clear();
+    supplierPhoneNumberController.clear();
+    supplierEmailController.clear();
+    supplierMapController.clear();
+    supplierAddressController.clear();
+    status.value = false;
+
+    // Close BottomSheet
+    Navigator.pop(context);
+
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }
   }
 
-  void deleteSupplier({required int supplierId}){
-    print("Delete supplier with ID: $supplierId");
+  Future<void> deleteSupplier({required int supplierId, required BuildContext context}) async {
+    showConfirmDialog(
+      context: context,
+      message: "Do you want to delete this category?".tr,
+      onConfirm: () async {
+        try{
+          await service.deleteSupplier(supplierId);
+
+          Get.back();
+
+          // Refresh supplier list
+          getSuppliers();
+
+          ToastWidget.show(
+            message: "Supplier deleted successfully".tr,
+            type: ToastType.success,
+          );
+
+        }catch(e){
+          ToastWidget.show(
+            message: e.toString(),
+            type: ToastType.error,
+          );
+        }
+      },
+      onCancel: () {
+        // Do nothing
+      },
+    );
   }
 
 }

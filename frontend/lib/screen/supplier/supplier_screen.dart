@@ -16,9 +16,7 @@ class SupplierScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: "Suppliers"),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+        child:   Column(
             children: [
               SearchWidget(
                 title: "Search Suppliers",
@@ -46,17 +44,25 @@ class SupplierScreen extends StatelessWidget {
                 child: Obx(
                   ()=>ListView.builder(
                     itemCount: controller.suppliers.length,
+                    padding: const EdgeInsets.only(bottom: 70),
                     itemBuilder:(context,index){
-                      return SupplierCardWidget(
-                       item: controller.suppliers[index]
+                      return Padding(
+                        padding: const EdgeInsetsGeometry.only(
+                          left: 10,
+                          right: 10,
+                          bottom: 0,
+                          top: 0,
+                        ),
+                        child: SupplierCardWidget(
+                         item: controller.suppliers[index]
+                        ),
                       );
                     },
                   ),
                 ),
-              )
+              ),
             ],
           ),
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => controller.addSupplier(context),

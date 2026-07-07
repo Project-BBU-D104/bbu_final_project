@@ -126,11 +126,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
                 ],
               ),
             ),
-
-            const SizedBox(height: 16),
-
-            
-            const SizedBox(height: 90),
           ],
         ),
       ),
@@ -141,11 +136,10 @@ class SupplierDetailCardWidget extends StatelessWidget {
           color: Colors.white,
           child: Row(
             children: [
-
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ctr.deleteSupplier(supplierId: 1);
+                    ctr.deleteSupplier(supplierId: supplier.id!, context: context);
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: Text("Delete".tr),
@@ -218,28 +212,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _statusBadge(String status) {
-    final isVerified = status == "Verified";
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: isVerified
-            ? const Color(0xff1DB584).withOpacity(0.1)
-            : Colors.orange.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          color: isVerified ? const Color(0xff1DB584) : Colors.orange,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
       ),
     );
   }
