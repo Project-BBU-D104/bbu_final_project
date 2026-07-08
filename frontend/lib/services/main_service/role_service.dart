@@ -3,7 +3,7 @@ import 'package:frontend/services/api_service.dart';
 class RoleService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "role/";
+  static const String endpoint = "role";
 
   /// GET ALL Role
   Future<dynamic> getRoles() async {

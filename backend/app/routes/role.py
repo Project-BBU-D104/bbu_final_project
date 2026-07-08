@@ -22,6 +22,6 @@ def read_role(role_id: int, session: Session = Depends(get_session)):
 def update_role_route(role_id: int, role: RoleUpdate, session: Session = Depends(get_session)):
     return update_role(session, role_id, role)
 
-@router.delete("/{category_id}")
+@router.delete("/{role_id}")
 def delete_role_route(role_id: int, session: Session = Depends(get_session)):
     return delete_role(session, role_id)

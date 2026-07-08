@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/role/widget/add_role_widget.dart';
 import 'package:frontend/screen/role/widget/edit_role_widget.dart';
 import 'package:frontend/services/main_service/role_service.dart';
@@ -9,10 +10,14 @@ import 'package:get/get.dart';
 class RoleController extends GetxController{
   final RoleService service = RoleService();
 
-  var isChecked = false.obs;
   var isLoading = false.obs;
 
   final roleList = <Map<String, dynamic>> [].obs;
+
+  final roleNameController = TextEditingController();
+  final roleDescriptionController = TextEditingController();
+
+  final isActive = false.obs;
 
   @override
   void onInit() {
@@ -46,22 +51,76 @@ class RoleController extends GetxController{
 
   Future<void> onSaveRole() async {
     try{
-      isLoading.value = true;
-        
+      final data = {
+        "name": roleNameController.text.trim(),
+        "description": roleDescriptionController.text.trim(),
+        "is_active": isActive.value
+      };
+
+      await service.createRole(data);
+
+      // Reload Category
+      await getRoles();
+
+      ToastWidget.show(
+        message: "Role created successfully",
+        type: ToastType.success,
+      );
+
+      // Clear textfields
+      roleNameController.clear();
+      roleDescriptionController.clear();
+      isActive.value = false;
+
+      // Close BottomSheet
+      Navigator.pop(Get.context!);
 
     }catch(e){
-      // do here
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
   }
 
-  void editRole(BuildContext context, Map<String, dynamic> role){
+  void editRole(BuildContext context, int roleId){
+    try{
+
+    }catch(e){
+      // Do nothing
+    }
     AppBottomSheets.show(
       context,
       child: EditRoleWidget()
     );
   }
 
-  void onDeleteRole(int roleId) {
-    print("Delete role with ID: $roleId");
+  void onDeleteRole(int roleId, BuildContext context) async {
+      showConfirmDialog(
+      context: context,
+      message: "Do you want to delete this role?".tr,
+      onConfirm: () async {
+        try{
+          await service.deleteRole(roleId);
+
+          // Refresh category list
+          await getRoles();
+
+          ToastWidget.show(
+            message: "Role deleted successfully".tr,
+            type: ToastType.success,
+          );
+
+        }catch(e){
+          ToastWidget.show(
+            message: e.toString(),
+            type: ToastType.error,
+          );
+        }
+      },
+      onCancel: () {
+        // Do nothing
+      },
+    );
   }
 }

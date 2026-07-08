@@ -76,11 +76,11 @@ class RoleCardWidget extends StatelessWidget {
                   onSelected: (value) {
                     switch (value) {
                       case "edit":
-                        ctr.editRole(context, role);
+                        ctr.editRole(context, role["id"]);
                         break;
 
                       case "delete":
-                        ctr.onDeleteRole(role["id"]);
+                        ctr.onDeleteRole(role["id"], context);
                         break;
                     }
                   },

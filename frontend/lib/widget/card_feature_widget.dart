@@ -54,6 +54,7 @@ class CardFeatureWidget extends StatelessWidget {
 
             const SizedBox(height: 4),
 
+            if(subtitle != null && subtitle!.isNotEmpty)
             Text(
               subtitle?.tr ?? '',
               textAlign: TextAlign.center,

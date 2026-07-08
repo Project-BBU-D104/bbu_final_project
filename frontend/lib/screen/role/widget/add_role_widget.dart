@@ -46,6 +46,7 @@ class AddRoleWidget extends StatelessWidget {
           Text("Role Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
           TextField(
+            controller: ctr.roleNameController,
             decoration: InputDecoration(
               hintText: "Enter Role Name".tr,
               border: OutlineInputBorder(),
@@ -58,6 +59,7 @@ class AddRoleWidget extends StatelessWidget {
           TextField(
             maxLines: 8,
             minLines: 3,
+            controller: ctr.roleDescriptionController,
             decoration: InputDecoration(
               hintText: "Enter Description".tr,
               border: OutlineInputBorder(),
@@ -72,9 +74,9 @@ class AddRoleWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Checkbox(
-                value: ctr.isChecked.value,
+                value: ctr.isActive.value,
                 onChanged: (value) {
-                  ctr.isChecked.value = value!;
+                  ctr.isActive.value = value!;
                 },
               ),
               Text("Status".tr),
@@ -91,7 +93,7 @@ class AddRoleWidget extends StatelessWidget {
                 foregroundColor: titleColor,
               ),
               onPressed: () {
-                Navigator.pop(context);
+                ctr.onSaveRole();
               },
               child: Text("Save".tr,
               style: TextStyle(fontSize: 18),

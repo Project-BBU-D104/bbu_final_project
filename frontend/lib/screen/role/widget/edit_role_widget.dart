@@ -72,9 +72,9 @@ class EditRoleWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Checkbox(
-                value: ctr.isChecked.value,
+                value: ctr.isActive.value,
                 onChanged: (value) {
-                  ctr.isChecked.value = value!;
+                  ctr.isActive.value = value!;
                 },
               ),
               Text("Status".tr),

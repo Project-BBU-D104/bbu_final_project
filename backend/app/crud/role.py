@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 from app.models.role import Role
 from app.schemas.role import RoleCreate, RoleUpdate
 from datetime import datetime
+from fastapi import HTTPException
 
 def create_role(session: Session, role: RoleCreate):
     db_role = Role.from_orm(role)
@@ -33,6 +34,8 @@ def update_role(session: Session, role_id: int, role: RoleUpdate):
     return db_role
 
 def delete_role(session: Session, role_id: int):
+    if(not session.get(Role, role_id)):
+        raise HTTPException(status_code=404, detail="Role not found")
     role = session.get(Role, role_id)
     if role:
         session.delete(role)
