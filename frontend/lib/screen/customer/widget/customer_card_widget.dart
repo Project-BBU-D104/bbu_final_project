@@ -91,11 +91,11 @@ class CustomerCardWidget extends StatelessWidget {
                             onSelected: (value) {
                               switch (value) {
                                 case "edit":
-                                  ctr.editCustomer(context, customer);
+                                  ctr.editCustomer(context, customer["id"]);
                                   break;
 
                                 case "delete":
-                                  ctr.onDeleteCustomer(customer["id"]);
+                                  ctr.onDeleteCustomer(customer["id"], context);
                                   break;
                               }
                             },

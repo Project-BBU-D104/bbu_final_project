@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
 import 'package:get/get.dart';
 
 class EditCustomerWidget extends StatelessWidget {
-  const EditCustomerWidget({super.key});
+  final int customerId;
+  EditCustomerWidget({super.key, required this.customerId});
+
+  final ctr = Get.find<CustomerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +48,7 @@ class EditCustomerWidget extends StatelessWidget {
         
             ImageUploadWidget(
               onUploaded: (url) {
-                print("Image URL: $url");
-      
-                // save to SQLite or form model
-                // productController.image.value = url;
+                ctr.customerPhotoController.text = url;
               },
             ),
       
@@ -56,6 +57,7 @@ class EditCustomerWidget extends StatelessWidget {
             Text("Customer Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
+              controller: ctr.customerNameController,
               decoration: InputDecoration(
                 hintText: "Enter Customer Name".tr,
                 border: OutlineInputBorder(),
@@ -66,6 +68,7 @@ class EditCustomerWidget extends StatelessWidget {
             Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
+              controller: ctr.customerPhoneNumberController,
               decoration: InputDecoration(
                 hintText: "Enter Phone Number".tr,
                 border: OutlineInputBorder(),
@@ -78,6 +81,7 @@ class EditCustomerWidget extends StatelessWidget {
              TextField(
                 maxLines: 8,
                 minLines: 3,
+                controller: ctr.customerAddressController,
                 decoration: InputDecoration(
                   hintText: "Enter Address".tr,
                   border: OutlineInputBorder(),
@@ -96,9 +100,9 @@ class EditCustomerWidget extends StatelessWidget {
                   foregroundColor: titleColor,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  ctr.onUpdateCustomer(customerId, context);
                 },
-                child: Text("Save".tr, style: TextStyle(fontSize: 18),),
+                child: Text("Update".tr, style: TextStyle(fontSize: 18),),
               ),
             ),
           ],
