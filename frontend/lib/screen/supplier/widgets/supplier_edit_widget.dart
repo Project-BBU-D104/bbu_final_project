@@ -4,7 +4,8 @@ import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:get/get.dart';
 
 class SupplierEditWidget extends StatelessWidget {
-  SupplierEditWidget({super.key});
+  final int supplierId;
+  SupplierEditWidget({super.key, required this.supplierId});
 
   final ctr = Get.find<SupplierController>();
 
@@ -47,6 +48,7 @@ class SupplierEditWidget extends StatelessWidget {
             Text("Supplier Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5,),
             TextField(
+              controller: ctr.supplierNameController,
               decoration: InputDecoration(
                 hintText: "Enter Supplier Name".tr,
                 border: OutlineInputBorder(),
@@ -58,6 +60,7 @@ class SupplierEditWidget extends StatelessWidget {
             Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5,),
             TextField(
+              controller: ctr.supplierPhoneNumberController,
               decoration: InputDecoration(
                 hintText: "Enter Phone Number".tr,
                 border: OutlineInputBorder(),
@@ -69,6 +72,7 @@ class SupplierEditWidget extends StatelessWidget {
             Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5,),
             TextField(
+              controller: ctr.supplierEmailController,
               decoration: InputDecoration(
                 hintText: "Enter Email".tr,
                 border: OutlineInputBorder(),
@@ -80,6 +84,7 @@ class SupplierEditWidget extends StatelessWidget {
             TextField(
               maxLines: 8,
               minLines: 3,
+              controller: ctr.supplierMapController,
               decoration: InputDecoration(
                 hintText: "Enter Map".tr,
                 border: OutlineInputBorder(),
@@ -91,6 +96,7 @@ class SupplierEditWidget extends StatelessWidget {
             TextField(
               maxLines: 8,
               minLines: 3,
+              controller: ctr.supplierAddressController,
               decoration: InputDecoration(
                 hintText: "Enter Address".tr,
                 border: OutlineInputBorder(),
@@ -124,7 +130,7 @@ class SupplierEditWidget extends StatelessWidget {
                   foregroundColor: titleColor,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  ctr.updateSupplier(supplierId, context);
                 },
                 child: Text("Save".tr, 
                   style: TextStyle(fontSize: 18)

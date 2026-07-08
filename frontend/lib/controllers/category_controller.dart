@@ -23,11 +23,11 @@ class CategoryController extends GetxController {
   }
 
   @override
-  void onClose() {
-  nameController.dispose();
-  descriptionController.dispose();
-  super.onClose();
-}
+    void onClose() {
+    nameController.dispose();
+    descriptionController.dispose();
+    super.onClose();
+  }
 
   Future<void> getCategory() async {
     try {
@@ -65,9 +65,9 @@ class CategoryController extends GetxController {
        await service.createCategory(data);
 
       ToastWidget.show(
-      message: "Category created successfully",
-      type: ToastType.success,
-    );
+        message: "Category created successfully",
+        type: ToastType.success,
+      );
 
     // Reload Category
     await getCategory();

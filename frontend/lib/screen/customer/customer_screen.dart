@@ -48,14 +48,16 @@ class CustomerScreen extends StatelessWidget {
               ),
               SizedBox(height: 8,),
 
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctr.customerList.length,
-                itemBuilder: (context, index){
-                  final customer = ctr.customerList[index];
-                  return CustomerCardWidget(customer: customer);
-                },
+              Obx(()
+                => ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: ctr.customerList.length,
+                  itemBuilder: (context, index){
+                    final customer = ctr.customerList[index];
+                    return CustomerCardWidget(customer: customer);
+                  },
+                ),
               ),
               SizedBox(height: 70,),
             ],

@@ -32,41 +32,22 @@ class CustomerCardWidget extends StatelessWidget {
             // TOP USER INFO
             Row(
               children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: 65,
-                      height: 65,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            customer['photo'] ?? "https://i.pravatar.cc/150?img=12",
-                          ),
-                          fit: BoxFit.cover,
-                        ),
+                Container(
+                  width: 65,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        customer['photo'] != null && customer['photo'].toString().isNotEmpty
+                        ? customer['photo']
+                        : "https://i.pravatar.cc/150?img=12",
                       ),
+                      fit: BoxFit.cover,
                     ),
-
-                    Positioned(
-                      bottom: -2,
-                      right: -2,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: successColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.check,
-                          size: 12,
-                          color: darkColor,
-                        ),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-
+                  
                 const SizedBox(width: 15),
 
                 Expanded(
@@ -87,6 +68,11 @@ class CustomerCardWidget extends StatelessWidget {
                           ),
 
                           StatusWidget(text: "Active", color: successColor,)
+                          // StatusWidget(
+                          //   text: customer.status == true
+                          //       ? "Active"
+                          //       : "Inactive",
+                          // )
                         ],
                       ),
 

@@ -1,9 +1,9 @@
 import 'package:frontend/services/api_service.dart';
 
-class UserService {
+class CustomerService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "/customers";
+  static const String endpoint = "customer";
 
   /// GET ALL Customer
   Future<dynamic> getCustomers() async {

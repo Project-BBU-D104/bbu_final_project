@@ -6,7 +6,7 @@ class ImageUploadWidget extends StatelessWidget {
   ImageUploadWidget({super.key, required this.onUploaded});
 
   final Function(String url) onUploaded;
-  final ctr = Get.put(ImageUploadController());
+  final ctr = Get.find<ImageUploadController>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +31,16 @@ class ImageUploadWidget extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: ctr.pickImage,
+                onPressed: () async {
+                  await ctr.pickImage();
+                  final url = await ctr.uploadImage();
+                  if(url != null){
+                    onUploaded(url);
+                  }
+                },
                 icon: const Icon(Icons.photo),
-                label: Text("Pick Image".tr),
-              ),
+                label: Text("Upload Image".tr),
+              )
             ),
           ],
         ),

@@ -159,7 +159,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ctr.editSupplier(context);
+                    ctr.editSupplier(supplier.id!,context);
                   },
                   icon: const Icon(Icons.edit),
                   label: Text("Edit".tr),

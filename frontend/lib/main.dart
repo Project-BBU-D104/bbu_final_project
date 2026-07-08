@@ -14,8 +14,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/gestures.dart'; 
 import 'package:get_storage/get_storage.dart';
 
-Future<void> main() async {
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
   await _initConfig();
 
@@ -26,6 +28,11 @@ Future<void> main() async {
   setupLocator();
 
   Get.put(LanguageController());
+
+   await Supabase.initialize(
+    url: 'https://qyiedqysfsrywlmuzvst.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5aWVkcXlzZnNyeXdsbXV6dnN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0Nzk2MzEsImV4cCI6MjA5OTA1NTYzMX0.I0CAB-6hJQH_tTYz2H38uUDL0OdxtvAF7hw-dw9GgCY',
+  );
 
   runApp(const MyApp());
 

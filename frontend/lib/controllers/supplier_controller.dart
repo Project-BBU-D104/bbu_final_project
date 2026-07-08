@@ -41,7 +41,7 @@ class SupplierController extends GetxController {
     supplierAddressController.dispose();
   }
 
-  void getSuppliers() async {
+  Future<void> getSuppliers() async {
     try{
       isLoading.value = true;
 
@@ -63,9 +63,6 @@ class SupplierController extends GetxController {
       isLoading.value = false;
     }
   }
-  void changeTab(String value){
-    selectedTab.value = value;
-  }
 
   void gotoSupplierDetail(SupplierModel supplier){
     Get.toNamed(AppRoutes.supplierDetail, arguments: supplier);
@@ -78,11 +75,66 @@ class SupplierController extends GetxController {
     );
   }
 
-  void editSupplier(BuildContext context){
-    AppBottomSheets.show(
-      context,
-      child: SupplierEditWidget()
-    );
+  Future<void> editSupplier(int supplierId,BuildContext context) async {
+    try{
+      final supplier = await service.getSupplierById(supplierId);
+
+      supplierNameController.text = supplier["name"] ?? "";
+      supplierPhoneNumberController.text = supplier["phone"] ?? "";
+      supplierEmailController.text = supplier["email"] ?? "";
+      supplierMapController.text = supplier["map"] ?? "";
+      supplierAddressController.text = supplier["address"] ?? "";
+      status.value = supplier["status"] ?? false;
+
+      AppBottomSheets.show(
+        context,
+        child: SupplierEditWidget(
+          supplierId: supplierId
+        )
+      );
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }
+    
+  }
+
+  Future<void> updateSupplier(int supplierId, BuildContext context) async {
+    try{
+      final data = {
+        "name": supplierNameController.text.trim(),
+        "phone": supplierPhoneNumberController.text.trim(),
+        "email": supplierEmailController.text.trim(),
+        "map": supplierMapController.text.trim(),
+        "address": supplierAddressController.text.trim(),
+        "status": status.value
+      };
+
+      await service.updateSupplier(supplierId, data);
+
+      // Reload Category
+      await getSuppliers();
+
+      // Clear textfields
+    supplierNameController.clear();
+    supplierPhoneNumberController.clear();
+    supplierEmailController.clear();
+    supplierMapController.clear();
+    supplierAddressController.clear();
+    status.value = false;
+
+      Get.offNamed(AppRoutes.supplier);
+
+      ToastWidget.show(
+        message: "Supplier updated successfully",
+        type: ToastType.success,
+      );
+
+    }catch(e){
+      // Do nothing
+    }
   }
 
   void saveSupplier(BuildContext context){

@@ -8,9 +8,6 @@ class CustomerCreate(SQLModel):
     photo: str
     phone: str
     address: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
 
 class CustomerUpdate(SQLModel):
     name: Optional[str] = None

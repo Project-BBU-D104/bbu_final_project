@@ -33,6 +33,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # supabase
+  supabase_flutter: ^2.9.0
+
   # State management
   get: ^4.6.6
   get_it: ^9.2.0
