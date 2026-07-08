@@ -4,6 +4,8 @@ from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
 from datetime import datetime
 
+from app.services.telegram_service import send_message
+
 def create_category(session: Session, category: CategoryCreate):
     existing = session.exec(
         select(Category).where(Category.name == category.name)
@@ -19,6 +21,31 @@ def create_category(session: Session, category: CategoryCreate):
     session.add(db_category)
     session.commit()
     session.refresh(db_category)
+
+    # Send Telegram Notification
+    message = f"""
+        <b>🛒 INVENTORY SYSTEM</b>
+
+        <b>━━━━━━━━━━━━━━━━</b>
+
+        📌 <b>Action:</b> New Category
+
+        🆔 <b>ID:</b> {db_category.id}
+
+        🏷 <b>Name:</b> {db_category.name}
+
+        📝 <b>Description:</b>
+        {db_category.description or "None"}
+
+        📆 <b>Date:</b>
+        {db_category.created_at.strftime("%d/%m/%Y %H:%M")}
+
+        <b>━━━━━━━━━━━━━━━━</b>
+
+        🤖 Sent by Inventory Bot
+        """
+    send_message(message)
+
     return db_category
 
 def get_all_category(session: Session):

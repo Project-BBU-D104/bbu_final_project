@@ -12,4 +12,6 @@ from .purchase import router as purchase_router
 from .sale import router as sale_router
 from .sale_payment import router as sale_payment_router
 
-__all__ = ["users_router",category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router,warehouse_router, stock_adjustment_router, product_transfer_router,purchase_router, sale_router, sale_payment_router]
+from .telegram_router import router as telegram_router
+
+__all__ = ["users_router",category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router,warehouse_router, stock_adjustment_router, product_transfer_router,purchase_router, sale_router, sale_payment_router,telegram_router]
