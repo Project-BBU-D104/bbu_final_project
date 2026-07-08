@@ -6,6 +6,8 @@ if TYPE_CHECKING:
     from app.models.audit_logs import AuditLogs
     from app.models.stock_adjustment import StockAdjustment
     from app.models.purchase import Purchase
+    from app.models.sale import Sale
+    from app.models.sale_payment import SalePayment
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -16,3 +18,5 @@ class User(SQLModel, table=True):
     audit_logs: List["AuditLogs"] = Relationship(back_populates="user")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="user")
     purchases: List["Purchase"] = Relationship(back_populates="user")
+    sales: List["Sale"] = Relationship(back_populates="user")
+    sale_payments: List["SalePayment"] = Relationship(back_populates="user")

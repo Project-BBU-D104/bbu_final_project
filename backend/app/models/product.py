@@ -6,6 +6,12 @@ from app.models.supplier import Supplier
 
 if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
+    from app.models.purchase_item import PurchaseItem
+    from app.models.stock_adjustment import StockAdjustment
+    from app.models.warehouse_stock import WarehouseStock
+    from app.models.product_transfer import ProductTransfer
+    from app.models.sale_items import SaleItems
+
 
 
 class Product(SQLModel, table=True):
@@ -33,3 +39,4 @@ class Product(SQLModel, table=True):
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")
     warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="product")
     purchase_items: List["PurchaseItem"] = Relationship(back_populates="product")
+    sale_items: List["SaleItems"] = Relationship(back_populates="product")

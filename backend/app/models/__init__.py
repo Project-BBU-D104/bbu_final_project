@@ -11,9 +11,9 @@ from .stock_adjustment import StockAdjustment
 from .product_transfer import ProductTransfer
 from .purchase import Purchase
 from .purchase_item import PurchaseItem
-
-
-
+from .sale import Sale
+from .sale_items import SaleItems
+from .sale_payment import SalePayment
 
 # __all__ = ["User", "Employee", "Overtime"]
-__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem"]
+__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment"]

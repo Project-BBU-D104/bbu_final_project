@@ -2,6 +2,7 @@ from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,List
 from datetime import datetime
 
+
 class Supplier(SQLModel, table=True):
     __tablename__ = "supplier"
 
