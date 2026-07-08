@@ -47,6 +47,7 @@ class EditCustomerWidget extends StatelessWidget {
             const SizedBox(height: 10),
         
             ImageUploadWidget(
+              imageUrl: ctr.customerPhotoController.text,
               onUploaded: (url) {
                 ctr.customerPhotoController.text = url;
               },

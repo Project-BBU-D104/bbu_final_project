@@ -3,9 +3,15 @@ import 'package:frontend/controllers/image_upload_controller.dart';
 import 'package:get/get.dart';
 
 class ImageUploadWidget extends StatelessWidget {
-  ImageUploadWidget({super.key, required this.onUploaded});
+  ImageUploadWidget({
+    super.key,
+    this.imageUrl,
+    required this.onUploaded,
+  });
 
+  final String? imageUrl;
   final Function(String url) onUploaded;
+
   final ctr = Get.find<ImageUploadController>();
 
   @override
@@ -21,26 +27,43 @@ class ImageUploadWidget extends StatelessWidget {
           children: [
 
             /// PREVIEW IMAGE
-            ctr.file.value != null
-                ? Image.file(ctr.file.value!, height: 120)
-                : const Icon(Icons.image, size: 80),
+            if (ctr.file.value != null)
+              Image.file(
+                ctr.file.value!,
+                height: 120,
+                fit: BoxFit.cover,
+              )
+            else if (imageUrl != null && imageUrl!.isNotEmpty)
+              Image.network(
+                imageUrl!,
+                height: 120,
+                fit: BoxFit.cover,
+              )
+            else
+              const Icon(
+                Icons.image,
+                size: 80,
+              ),
 
             const SizedBox(height: 10),
 
-            /// PICK BUTTON ONLY
+            /// PICK BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () async {
+
                   await ctr.pickImage();
+
                   final url = await ctr.uploadImage();
-                  if(url != null){
+
+                  if (url != null) {
                     onUploaded(url);
                   }
                 },
                 icon: const Icon(Icons.photo),
                 label: Text("Upload Image".tr),
-              )
+              ),
             ),
           ],
         ),

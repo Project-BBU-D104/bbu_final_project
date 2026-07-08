@@ -50,7 +50,6 @@ class RoleScreen extends StatelessWidget {
                     ),
                   );
                 }
-
                  return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

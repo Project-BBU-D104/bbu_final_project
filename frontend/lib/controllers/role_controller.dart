@@ -14,8 +14,6 @@ class RoleController extends GetxController{
 
   final roleList = <Map<String, dynamic>> [].obs;
 
-  
-
   @override
   void onInit() {
     super.onInit();
@@ -25,9 +23,7 @@ class RoleController extends GetxController{
   Future<void> getRoles() async {
     try {
       isLoading.value = true;
-
       final resp = await service.getRoles();
-
       if (resp is List) {
         roleList.value = List<Map<String, dynamic>>.from(resp);
       }
@@ -46,6 +42,16 @@ class RoleController extends GetxController{
       context,
       child: AddRoleWidget()
     );
+  }
+
+  Future<void> onSaveRole() async {
+    try{
+      isLoading.value = true;
+        
+
+    }catch(e){
+      // do here
+    }
   }
 
   void editRole(BuildContext context, Map<String, dynamic> role){
