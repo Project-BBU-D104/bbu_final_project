@@ -4,7 +4,8 @@ import 'package:frontend/controllers/role_controller.dart';
 import 'package:get/get.dart';
 
 class EditRoleWidget extends StatelessWidget {
-  EditRoleWidget({super.key});
+  final int roleId;
+  EditRoleWidget({super.key, required this.roleId});
 
   final ctr = Get.find<RoleController>();
 
@@ -46,6 +47,7 @@ class EditRoleWidget extends StatelessWidget {
           Text("Role Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5),
           TextField(
+            controller: ctr.roleNameController,
             decoration: InputDecoration(
               hintText: "Enter Role Name".tr,
               border: OutlineInputBorder(),
@@ -58,6 +60,7 @@ class EditRoleWidget extends StatelessWidget {
           TextField(
             maxLines: 8,
             minLines: 3,
+            controller: ctr.roleDescriptionController,
             decoration: InputDecoration(
               hintText: "Enter Description".tr,
               border: OutlineInputBorder(),
@@ -91,9 +94,9 @@ class EditRoleWidget extends StatelessWidget {
                 foregroundColor: titleColor,
               ),
               onPressed: () {
-                Navigator.pop(context);
+                ctr.updateRole(roleId, context);
               },
-              child: Text("Save".tr, style: TextStyle(fontSize: 18),),
+              child: Text("Update".tr, style: TextStyle(fontSize: 18),),
             ),
           ),
         ],

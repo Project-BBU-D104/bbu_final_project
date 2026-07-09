@@ -1,32 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/global.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+  final usernameController = TextEditingController(text: "sabrey");
+  final passwordController = TextEditingController(text:"123456");
 
-  final rememberMe = false.obs;
+  final authService = AuthService();
+
   final obscurePassword = true.obs;
-  
-    void togglePassword() {
+  final isLoading = false.obs;
+
+  void togglePassword() {
     obscurePassword.toggle();
   }
 
-  void toggleRemember(bool? value) {
-    rememberMe.value = value ?? false;
-  }
+  Future<void> onLogin() async {
+    if (usernameController.text.trim().isEmpty ||
+        passwordController.text.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Username and password are required",
+      );
+      return;
+    }
 
+    try {
+      isLoading.value = true;
 
-  Future<void> onLogin() async{
-    await storage.lastUserLoginWrite(
-      data: {
-         "": "",
-      },
-    );
+      final response = await authService.login(
+        name: usernameController.text.trim(),
+        password: passwordController.text,
+      );
 
-     
-    Get.offAllNamed('/home');
+      await storage.lastUserLoginWrite(
+        data: {
+          "token": response["access_token"],
+          "user": response["user"],
+        },
+      );
+
+      Get.offAllNamed("/home");
+    } catch (e) {
+      Get.snackbar(
+        "Login Failed",
+        e.toString(),
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
@@ -35,6 +58,4 @@ class LoginController extends GetxController {
     passwordController.dispose();
     super.onClose();
   }
-
-  
 }

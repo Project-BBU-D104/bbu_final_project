@@ -2,8 +2,14 @@ from sqlmodel import Session, select
 from app.models.user import User
 from app.schemas.user import UserCreate
 
+from app.security import hash_password
+
 def create_user(session: Session, user: UserCreate):
-    db_user = User.from_orm(user)
+    db_user = User(
+        name=user.name,
+        email=user.email,
+        password=hash_password(user.password)
+    )
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -20,7 +26,8 @@ def update_user(session: Session, user_id: int, user: UserCreate):
     if db_user:
         db_user.name = user.name
         db_user.email = user.email
-        db_user.password = user.password
+        db_user.password = hash_password(user.password)
+        
         session.add(db_user)
         session.commit()
         session.refresh(db_user)

@@ -12,7 +12,25 @@ starlette==1.0.1
 typing_extensions==4.15.0
 typing-inspection==0.4.2
 uvicorn==0.47.0
+
+# Database
 sqlmodel
-requests
-python-dotenv==1.1.1
 alembic==1.16.4
+PyMySQL==1.1.1
+
+# http
+requests
+
+# ENV
+python-dotenv==1.1.1
+
+# Authentication
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==4.0.1
+
+# Validation
+email-validator
+
+# Multipart (for file uploads)
+python-multipart

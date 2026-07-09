@@ -83,16 +83,55 @@ class RoleController extends GetxController{
     }
   }
 
-  void editRole(BuildContext context, int roleId){
-    try{
+  Future<void> editRole(BuildContext context, int roleId) async {
 
-    }catch(e){
-      // Do nothing
-    }
+    final role = await service.getRoleById(roleId);
+
+    roleNameController.text = role["name"] ?? "";
+    roleDescriptionController.text = role["description"] ?? "";
+    isActive.value = role["is_active"] ?? false;
+    
     AppBottomSheets.show(
       context,
-      child: EditRoleWidget()
+      child: EditRoleWidget(
+        roleId: roleId
+      )
     );
+
+  }
+
+  Future<void> updateRole(int RoleId, BuildContext context) async {
+    try{
+      final data = {
+        "name": roleNameController.text.trim(),
+        "description": roleDescriptionController.text.trim(),
+        "is_active": isActive.value
+      };
+
+      await service.updateRole(RoleId, data);
+
+      // Reload Category
+      await getRoles();
+
+      // Close BottomSheet
+      Navigator.pop(context);
+
+      ToastWidget.show(
+        message: "Role updated successfully",
+        type: ToastType.success,
+      );
+
+      // clear
+      roleNameController.clear();
+      roleDescriptionController.clear();
+      isActive.value = false;
+      
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }
   }
 
   void onDeleteRole(int roleId, BuildContext context) async {

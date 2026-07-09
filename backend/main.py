@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # from database import create_tests_table_only
-from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router, stock_adjustment_router, product_transfer_router, purchase_router, sale_router, sale_payment_router, telegram_router
+from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router, stock_adjustment_router, product_transfer_router, purchase_router, sale_router, sale_payment_router, telegram_router,auth_router
 
 app = FastAPI()
 
@@ -19,6 +19,7 @@ app.add_middleware(
 
 
 # Include routers
+app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(category_router)
 app.include_router(product_router)
@@ -33,6 +34,7 @@ app.include_router(purchase_router)
 app.include_router(sale_router)
 app.include_router(sale_payment_router)
 app.include_router(telegram_router)
+
 
 @app.get("/")
 def root():
