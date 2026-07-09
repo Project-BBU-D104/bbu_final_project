@@ -41,6 +41,8 @@ class LoginController extends GetxController {
         },
       );
 
+      // print(storage.lastUserLoginRead);
+
       Get.offAllNamed("/home");
     } catch (e) {
       Get.snackbar(
