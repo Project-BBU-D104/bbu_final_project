@@ -60,10 +60,10 @@ class _TestProductScannerPageState extends State<TestProductScannerPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Name: ${product.name}"),
-                    Text("Barcode: ${product.barcode}"),
-                    Text("Price: ${product.salePrice}"),
-                    Text("Stock: ${product.qty}"),
+                    Text("Name: ${product['name']}"),
+                    Text("Barcode: ${product['barcode']}"),
+                    Text("Price: ${product['salePrice']}"),
+                    Text("Stock: ${product['qty']}"),
                   ],
                 )
               : Text("No product found for:\n$value"),

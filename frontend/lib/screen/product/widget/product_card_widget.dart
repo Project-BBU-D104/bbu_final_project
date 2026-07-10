@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
-import 'package:frontend/models/product_model.dart';
 import 'package:get/get.dart';
 
 class ProductCardWidget extends StatelessWidget {
-  final ProductModel product;
+ final Map<String, dynamic> product;
 
   const ProductCardWidget({super.key, required this.product});
 
@@ -39,7 +38,7 @@ class ProductCardWidget extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
-                  product.photo ?? '',
+                  product['photo'] ?? '',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
@@ -65,7 +64,7 @@ class ProductCardWidget extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          product.name,
+                          product['name'],
                           style: const TextStyle(
                             color: Color(0xFF333333),
                             fontSize: 16,
@@ -79,14 +78,14 @@ class ProductCardWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'SKU: ${product.barcode}',
+                    'Barcode: ${product['barcode']}',
                     style: const TextStyle(
                       color: Color(0xFF999999),
                       fontSize: 12,
                     ),
                   ),
                   Text(
-                    'Stock: ${product.qty} units',
+                    'Stock: ${product['qty']} units',
                     style: const TextStyle(
                       color: Color(0xFF666666),
                       fontSize: 12,
@@ -94,7 +93,7 @@ class ProductCardWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '\$${product.salePrice}',
+                    '\$${product['sale_price']}',
                     style: const TextStyle(
                       color: Color(0xFF1DB584),
                       fontSize: 16,

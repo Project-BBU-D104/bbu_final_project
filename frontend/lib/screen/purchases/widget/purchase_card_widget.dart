@@ -62,8 +62,8 @@ class PurchaseCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
-                    'NL',
+                  child: Text(
+                     purchase['supplier']['name'].toString().substring(0, 1).toUpperCase(),
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -73,7 +73,7 @@ class PurchaseCardWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  purchase['supplier_name'] ?? 'Unknown Supplier',
+                  purchase['supplier']['name'],
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -117,16 +117,6 @@ class PurchaseCardWidget extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      'STATUS',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade500,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(

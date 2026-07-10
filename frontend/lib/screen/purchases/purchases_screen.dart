@@ -47,17 +47,18 @@ class PurchasesScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             // LIST (ONLY SCROLL AREA)
-            Expanded(
-              child: ListView.builder(
-                itemCount: ctr.purchaseList.length,
-                itemBuilder: (context, index) {
-                  final purchase = ctr.purchaseList[index];
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: PurchaseCardWidget(purchase: purchase),
-                  );
-                },
+            Obx(() => Expanded(
+                child: ListView.builder(
+                  itemCount: ctr.purchaseList.length,
+                  padding: const EdgeInsets.only(bottom: 70),
+                  itemBuilder: (context, index) {
+                    final purchase = ctr.purchaseList[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: PurchaseCardWidget(purchase: purchase),
+                    );
+                  },
+                ),
               ),
             ),            
           ],

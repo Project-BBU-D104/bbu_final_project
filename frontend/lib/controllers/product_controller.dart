@@ -1,8 +1,13 @@
-import 'package:frontend/models/product_model.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/services/main_service/product_service.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class ProductController extends GetxController {
+
+  final ProductService service = ProductService();
+
+  var isLoading = false.obs;
   var searchQuery = ''.obs;
   var filterCategory = 'All'.obs;
   var selectedStatus = 'All'.obs;
@@ -12,113 +17,128 @@ class ProductController extends GetxController {
   var selectedSupplier = RxnString();
   var selectedUnit = RxnString();
 
-  var scannedProduct = Rxn<ProductModel>();
+  var scannedProduct = Rxn<Map<String, dynamic>>();
   var scanResultText = ''.obs;
 
-  final List<ProductModel> _masterList = [
-    ProductModel(
-      id: 1,
-      categoryId: "1",
-      supplierId: "1",
-      name: "Energy Drink",
-      photo: "assets/icon/EnergyDrink.jpg",
-      barcode: "123456789",
-      unit: "pcs",
-      qty: 45,
-      costPrice: "2.00",
-      salePrice: "3.00",
-    ),
-    ProductModel(
-      id: 2,
-      categoryId: "2",
-      supplierId: "1",
-      name: "Sting",
-      photo: "assets/icon/Sting.jpg",
-      barcode: "2456789",
-      unit: "pcs",
-      qty: 3,
-      costPrice: "1.50",
-      salePrice: "2.00",
-    ),
-    ProductModel(
-      id: 3,
-      categoryId: "3",
-      supplierId: "1",
-      name: "CocaCola",
-      photo: "assets/icon/Cocacola.jpg",
-      barcode: "6789",
-      unit: "pcs",
-      qty: 12,
-      costPrice: "2.50",
-      salePrice: "3.00",
-    ),
-  ];
+  final RxList<Map<String, dynamic>> _masterList =
+      <Map<String, dynamic>>[].obs;
 
-  List<ProductModel> get filteredItems {
+    
+    @override
+    void onInit() {
+      super.onInit();
+      getProducts();
+    }
+
+    Future<void> getProducts() async {
+      try {
+        isLoading.value = true;
+        final resp = await service.getProducts();
+        if (resp is List) {
+          _masterList.value = List<Map<String, dynamic>>.from(resp);
+        }
+
+        print(_masterList);
+      } catch (e) {
+        ToastWidget.show(
+          message: e.toString(),
+          type: ToastType.error,
+        );
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+  
+
+  List<Map<String, dynamic>> get products => _masterList;
+
+  /// Set data from API
+  void setProducts(List<Map<String, dynamic>> data) {
+    _masterList.assignAll(data);
+
+      print(_masterList);
+  }
+
+  List<Map<String, dynamic>> get filteredItems {
     return _masterList.where((item) {
-      final queryMatch = item.name.toLowerCase().contains(
-        searchQuery.value.toLowerCase(),
-      );
+      final queryMatch =
+          (item['name'] ?? '')
+              .toString()
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase());
 
       final catMatch =
           filterCategory.value == 'All' ||
-          filterCategory.value == 'All' ||
-          item.categoryId == filterCategory.value;
-          item.categoryId == filterCategory.value;
-
-      // final statusMatch =
-      //     selectedStatus.value == 'All' || item.status == selectedStatus.value;
-
-      // final recencyMatch =
-      //     selectedRecency.value == 'All' ||
-      //     item.recency == selectedRecency.value;
+          (item['category']?['name'] ?? '') == filterCategory.value;
 
       return queryMatch && catMatch;
-      // return queryMatch && catMatch && statusMatch && recencyMatch;
     }).toList();
   }
 
-  void gotoAddProduct(){
+  void gotoAddProduct() {
     Get.toNamed(AppRoutes.addProduct);
   }
 
-  void gotoProductDetail(ProductModel product) {
-    Get.toNamed(AppRoutes.productCardDetail, arguments: product);
-  }
-
-  void onEditProduct(ProductModel product) {
-    Get.toNamed(AppRoutes.editProduct, arguments: product);
-  }
-
-  void onDeleteProduct(ProductModel product) {
-    print('Delete product: ${product.name}');
-  }
-
-  ProductModel? findByBarcode(String code) {
-  try {
-    return _masterList.firstWhere(
-      (p) => p.barcode == code,
+  void gotoProductDetail(Map<String, dynamic> product) {
+    Get.toNamed(
+      AppRoutes.productCardDetail,
+      arguments: product,
     );
-  } catch (e) {
-    return null;
   }
-}
 
-void onBarcodeScanned(String code) {
-  final product = findByBarcode(code);
-
-  if (product != null) {
-    scannedProduct.value = product;
-    scanResultText.value = product.name;
-
-    Get.snackbar("Found", product.name);
-
-    gotoProductDetail(product);
-  } else {
-    scannedProduct.value = null;
-    scanResultText.value = "Not Found";
-
-    Get.snackbar("Error", "Product not found");
+  void onEditProduct(Map<String, dynamic> product) {
+    Get.toNamed(
+      AppRoutes.editProduct,
+      arguments: product,
+    );
   }
-}
+
+  void onDeleteProduct(Map<String, dynamic> product) {
+    print('Delete product: ${product['name']}');
+  }
+
+  Map<String, dynamic>? findByBarcode(String code) {
+    try {
+      return _masterList.firstWhere(
+        (p) => (p['barcode'] ?? '').toString() == code,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void onBarcodeScanned(String code) {
+    final product = findByBarcode(code);
+
+    if (product != null) {
+      scannedProduct.value = product;
+      scanResultText.value = product['name'] ?? '';
+
+      Get.snackbar(
+        'Found',
+        product['name'] ?? '',
+      );
+
+      gotoProductDetail(product);
+    } else {
+      scannedProduct.value = null;
+      scanResultText.value = 'Not Found';
+
+      Get.snackbar(
+        'Error',
+        'Product not found',
+      );
+    }
+  }
+
+  void clearFilters() {
+    searchQuery.value = '';
+    filterCategory.value = 'All';
+    selectedStatus.value = 'All';
+    selectedRecency.value = 'All';
+    selectedCategory.value = null;
+    selectedSupplier.value = null;
+    selectedUnit.value = null;
+  }
 }

@@ -1,9 +1,9 @@
 import 'package:frontend/services/api_service.dart';
 
-class UserService {
+class PurchaseService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "/purchase";
+  static const String endpoint = "purchase";
 
   /// GET ALL Purchase
   Future<dynamic> getPurchases() async {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
-import 'package:frontend/models/product_model.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
-import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class ProductCardDetailWidget extends StatelessWidget {
@@ -12,7 +10,9 @@ class ProductCardDetailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProductModel product = Get.arguments;
+    final product = Get.arguments as Map<String, dynamic>;
+
+    final String photo = product['photo']?.toString() ?? "";
 
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FA),
@@ -26,11 +26,9 @@ class ProductCardDetailWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ctr.onDeleteProduct(product);
-                  },
+                  onPressed: () => ctr.onDeleteProduct(product),
                   icon: const Icon(Icons.delete_outline),
-                  label: Text("Delete".tr),
+                  label: const Text("Delete"),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
                     minimumSize: const Size.fromHeight(52),
@@ -44,11 +42,9 @@ class ProductCardDetailWidget extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    ctr.onEditProduct(product);
-                  },
+                  onPressed: () => ctr.onEditProduct(product),
                   icon: const Icon(Icons.edit_outlined),
-                  label: Text("Edit".tr),
+                  label: const Text("Edit"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff1DB584),
                     foregroundColor: Colors.white,
@@ -69,58 +65,69 @@ class ProductCardDetailWidget extends StatelessWidget {
         child: Column(
           children: [
 
-            /// IMAGE
+            /// PRODUCT IMAGE
             Container(
               width: double.infinity,
               height: 230,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  )
-                ],
-              ),
+              decoration: _cardDecoration(),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(22),
-                child: Image.asset(
-                  product.photo ?? "",
-                  fit: BoxFit.cover,
-                ),
+                child: photo.isEmpty
+                    ? Container(
+                        color: Colors.grey.shade100,
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            size: 80,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    : Image.asset(
+                        "assets/images/products/$photo",
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          return Container(
+                            color: Colors.grey.shade100,
+                            child: const Center(
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                size: 80,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            /// PRODUCT HEADER
+            /// HEADER
             Container(
               padding: const EdgeInsets.all(20),
               decoration: _cardDecoration(),
               child: Column(
                 children: [
-
                   Row(
                     children: [
                       Expanded(
                         child: Text(
-                          product.name,
+                          product['name'] ?? "-",
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      // StatusWidget(text: product.status),
                     ],
                   ),
 
                   const SizedBox(height: 18),
 
                   Text(
-                    "\$${product.salePrice}",
+                    "\$${product['sale_price'] ?? 0}",
                     style: const TextStyle(
                       color: Color(0xff1DB584),
                       fontSize: 34,
@@ -133,7 +140,7 @@ class ProductCardDetailWidget extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// INFORMATION
+            /// PRODUCT INFORMATION
             Container(
               padding: const EdgeInsets.all(18),
               decoration: _cardDecoration(),
@@ -155,39 +162,59 @@ class ProductCardDetailWidget extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
-                    mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
                     childAspectRatio: 1.5,
                     children: [
 
                       _infoCard(
                         Icons.qr_code,
-                        "SKU",
-                        product.barcode ?? '',
+                        "Barcode",
+                        product['barcode']?.toString() ?? "-",
                       ),
 
                       _infoCard(
                         Icons.inventory_2_outlined,
                         "Stock",
-                        "${product.qty} Units",
+                        "${product['qty'] ?? 0} Units",
                       ),
 
                       _infoCard(
-                        Icons.category_outlined,
-                        "Category",
-                        product.categoryId,
+                        Icons.attach_money,
+                        "Cost Price",
+                        "\$${product['cost_price'] ?? 0}",
+                      ),
+
+                      _infoCard(
+                        Icons.sell,
+                        "Sale Price",
+                        "\$${product['sale_price'] ?? 0}",
                       ),
 
                       _infoCard(
                         Icons.straighten,
                         "Unit",
-                        "Bottle",
+                        product['unit'] ?? "-",
+                      ),
+
+                      _infoCard(
+                        Icons.category_outlined,
+                        "Category",
+                        product['category']?['name'] ?? "-",
                       ),
 
                       _infoCard(
                         Icons.local_shipping_outlined,
                         "Supplier",
-                        "ABC Supplier",
+                        product['supplier']?['name'] ?? "-",
+                      ),
+
+                      _infoCard(
+                        Icons.check_circle_outline,
+                        "Insert Qty",
+                        (product['allow_insert_qty'] ?? false)
+                            ? "Allowed"
+                            : "Not Allowed",
                       ),
                     ],
                   ),
@@ -204,9 +231,9 @@ class ProductCardDetailWidget extends StatelessWidget {
               decoration: _cardDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
 
-                  Text(
+                  const Text(
                     "Description",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -214,18 +241,20 @@ class ProductCardDetailWidget extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   Text(
-                    "Fresh product with premium quality. Suitable for retail stores, supermarkets and wholesale businesses.",
-                    style: TextStyle(
-                      height: 1.6,
+                    (product['description']?.toString().isNotEmpty ?? false)
+                        ? product['description']
+                        : "No description available.",
+                    style: const TextStyle(
                       color: Colors.grey,
+                      height: 1.6,
                     ),
                   ),
                 ],
               ),
-            ), 
+            ),
           ],
         ),
       ),
@@ -238,9 +267,9 @@ class ProductCardDetailWidget extends StatelessWidget {
       borderRadius: BorderRadius.circular(22),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(.04),
+          color: Colors.black.withOpacity(.05),
           blurRadius: 15,
-          offset: const Offset(0, 5),
+          offset: const Offset(0, 6),
         ),
       ],
     );
@@ -248,7 +277,7 @@ class ProductCardDetailWidget extends StatelessWidget {
 
   static Widget _infoCard(
     IconData icon,
-    String? title,
+    String title,
     String value,
   ) {
     return Container(
@@ -269,7 +298,7 @@ class ProductCardDetailWidget extends StatelessWidget {
           const Spacer(),
 
           Text(
-            title ?? "",
+            title,
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 12,

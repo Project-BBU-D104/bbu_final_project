@@ -3,23 +3,23 @@ import 'package:frontend/services/api_service.dart';
 class ProductService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "/audit-logs";
+  static const String endpoint = "product";
 
-  /// GET ALL Audit Log
-  Future<dynamic> getAuditLogs() async {
+  /// GET ALL product
+  Future<dynamic> getProducts() async {
     return await _api.get(endpoint);
   }
 
-  /// GET Audit Log BY ID
-  Future<dynamic> getAuditLogById(int id) async {
+  /// GET product BY ID
+  Future<dynamic> getProductById(int id) async {
     return await _api.getById(
       endpoint,
       id.toString(),
     );
   }
 
-  /// CREATE Audit Log
-  Future<dynamic> createAuditLog(
+  /// CREATE Product
+  Future<dynamic> createProduct(
     Map<String, dynamic> data,
   ) async {
     return await _api.post(
@@ -28,8 +28,8 @@ class ProductService {
     );
   }
 
-  /// UPDATE Audit Log
-  Future<dynamic> updateAuditLog(
+  /// UPDATE Product
+  Future<dynamic> updateProduct(
     int id,
     Map<String, dynamic> data,
   ) async {
@@ -40,8 +40,8 @@ class ProductService {
     );
   }
 
-  /// DELETE Audit Log
-  Future<dynamic> deleteAuditLog(int id) async {
+  /// DELETE Product
+  Future<dynamic> deleteProduct(int id) async {
     return await _api.delete(
       endpoint,
       id.toString(),
