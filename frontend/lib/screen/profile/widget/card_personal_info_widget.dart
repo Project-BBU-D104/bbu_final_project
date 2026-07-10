@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/profile_controller.dart';
 import 'package:get/get.dart';
 
 class CardPersonalInfoWidget extends StatelessWidget {
-  const CardPersonalInfoWidget({super.key});
+  CardPersonalInfoWidget({super.key});
+
+  final ctr = Get.find<ProfileController>(); 
+  
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +31,25 @@ class CardPersonalInfoWidget extends StatelessWidget {
               
               Text("Full Name".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
-              cardInfo(
-                title: "Lim Sabrey",
+              Obx(() => cardInfo(
+                  title: ctr.username.value,
+                ),
               ),
               SizedBox(height: 10,),
 
               Text("Email Address".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
-              cardInfo(
-                title: "2A2kW@example.com",
+              Obx(()=> cardInfo(
+                  title: ctr.email.value,
+                ),
               ),
 
-              SizedBox(height: 10,),
-              Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
-              SizedBox(height: 5,),
-              cardInfo(
-                title: "+60123456789",
-              ),
+              // SizedBox(height: 10,),
+              // Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
+              // SizedBox(height: 5,),
+              // cardInfo(
+              //   title: "+60123456789",
+              // ),
             ],
           ),
         ),
@@ -59,7 +65,7 @@ Widget cardInfo({
     width: double.infinity,
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: const Color(0xFFF8FAFC), // soft background
+      color: const Color(0xFFF8FAFC),
       borderRadius: BorderRadius.circular(12),
       border: Border.all(
         color: Colors.grey.shade300,

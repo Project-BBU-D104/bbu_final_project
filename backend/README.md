@@ -86,3 +86,12 @@ uvicorn main:app --port 8001 --reload
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [Uvicorn Documentation](https://www.uvicorn.org/)
 - [Pydantic Documentation](https://docs.pydantic.dev/)
+
+
+## run migrate backend database
+## create migrate
+
+alembic revision --autogenerate -m "create categories table"
+
+## commit migrate
+alembic upgrade head

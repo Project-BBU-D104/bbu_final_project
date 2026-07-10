@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/profile_controller.dart';
+import 'package:get/get.dart';
 
 class CardProfileWidget extends StatelessWidget {
-  const CardProfileWidget({super.key});
+
+  CardProfileWidget({super.key});
+    final ctr = Get.find<ProfileController>(); 
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +26,12 @@ class CardProfileWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 5,),
-                Text("Lim Sabrey",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 23,   
+                Obx(()=> Text(
+                    ctr.username.value,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 23,   
+                    ),
                   ),
                 ),
                 Text("Admin", style: TextStyle(
