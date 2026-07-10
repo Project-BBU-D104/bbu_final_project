@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/stock_transfer_controller.dart';
+import 'package:frontend/controllers/product_transfer_controller.dart';
 import 'package:get/get.dart';
 
 class StockTransferCardWidget extends StatelessWidget {
@@ -10,7 +10,7 @@ class StockTransferCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.find<StockTransferController>().gotoStockTransferDetail(stockTransfer ?? {}),
+      onTap: () => Get.find<ProductTransferController>().gotoStockTransferDetail(stockTransfer ?? {}),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -62,7 +62,7 @@ class StockTransferCardWidget extends StatelessWidget {
       
             /// TITLE
             Text(
-              stockTransfer['product_name'] ?? "Product Name",
+              stockTransfer['product']?['name'] ?? '',
               style: TextStyle(
                 color: Colors.black87,
                 fontSize: 18,
@@ -95,7 +95,7 @@ class StockTransferCardWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        stockTransfer['from_warehouse_name'] ?? "Warehouse 1",
+                        stockTransfer['from_warehouse']?['name'] ?? '',
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w600,
@@ -121,7 +121,7 @@ class StockTransferCardWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        stockTransfer['to_warehouse_name'] ?? "Warehouse 2",
+                        stockTransfer['to_warehouse']?['name'] ?? '',
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w600,
@@ -145,7 +145,7 @@ class StockTransferCardWidget extends StatelessWidget {
                         size: 16, color: Colors.grey),
                     SizedBox(width: 6),
                     Text(
-                      stockTransfer['created_at'] ?? "2023-06-26",
+                      stockTransfer['created_at'],
                       style: TextStyle(color: Colors.grey),
                     ),
                   ],

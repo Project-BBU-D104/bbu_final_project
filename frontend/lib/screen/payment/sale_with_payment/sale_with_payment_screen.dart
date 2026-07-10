@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
-import 'package:frontend/screen/payment/widget/input_amount_widget.dart';
-import 'package:frontend/screen/payment/widget/payment_card_summary_widget.dart';
-import 'package:frontend/screen/payment/widget/payment_method_card_widget.dart';
+import 'package:frontend/screen/payment/sale_with_payment/widget/input_amount_widget.dart';
+import 'package:frontend/screen/payment/sale_with_payment/widget/payment_card_summary_widget.dart';
+import 'package:frontend/screen/payment/sale_with_payment/widget/payment_method_card_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 

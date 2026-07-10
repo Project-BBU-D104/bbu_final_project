@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
-import 'package:frontend/controllers/stock_transfer_controller.dart';
+import 'package:frontend/controllers/product_transfer_controller.dart';
 import 'package:get/get.dart';
 
 class EditStockTransferWidget extends StatelessWidget {
@@ -11,7 +11,7 @@ class EditStockTransferWidget extends StatelessWidget {
 
   EditStockTransferWidget({super.key, this.selectedAdjustmentType, this.selectedProduct, this.selectedWarehouse});
 
-final ctr = Get.find<StockTransferController>();
+final ctr = Get.find<ProductTransferController>();
 
   @override
   Widget build(BuildContext context) {

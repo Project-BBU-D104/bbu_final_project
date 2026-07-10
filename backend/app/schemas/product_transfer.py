@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
 
-from app.schemas.warehouse import WarehouseRead
+from app.schemas.warehouse import WarehouseSimple
 from app.schemas.product import ProductRead
 
 
@@ -27,8 +27,8 @@ class ProductTransferUpdate(SQLModel):
 
 class ProductTransferRead(SQLModel):
     id: Optional[int] = None
-    from_warehouse: WarehouseRead
-    to_warehouse: WarehouseRead
+    from_warehouse: WarehouseSimple
+    to_warehouse: WarehouseSimple
     product: ProductRead
     qty: int
     transfer_date: datetime

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/stock_transfer_controller.dart';
+import 'package:frontend/controllers/product_transfer_controller.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class StockDetailCardWidget extends StatelessWidget {
   StockDetailCardWidget({super.key});
 
-  final ctr = Get.find<StockTransferController>();
+  final ctr = Get.find<ProductTransferController>();
 
   @override
   Widget build(BuildContext context) {

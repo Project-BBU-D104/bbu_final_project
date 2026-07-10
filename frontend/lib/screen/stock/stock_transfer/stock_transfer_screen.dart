@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/stock_transfer_controller.dart';
+import 'package:frontend/controllers/product_transfer_controller.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 class StockTransferScreen extends StatelessWidget {
   StockTransferScreen({super.key});
 
-  final ctr = Get.find<StockTransferController>();
+  final ctr = Get.find<ProductTransferController>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +33,20 @@ class StockTransferScreen extends StatelessWidget {
               
               SizedBox(height: 8,),
         
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctr.stockTransfer.length,
-                padding: const EdgeInsets.only(bottom: 100), 
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: StockTransferCardWidget( 
-                      stockTransfer: ctr.stockTransfer[index],
-                    ),
-                  );
-                },
+              Obx(()=> ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: ctr.stockTransfer.length,
+                  padding: const EdgeInsets.only(bottom: 100), 
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: StockTransferCardWidget( 
+                        stockTransfer: ctr.stockTransfer[index],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
               ),

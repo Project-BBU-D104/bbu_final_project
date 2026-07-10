@@ -18,7 +18,7 @@ import 'package:frontend/screen/audit_logs/widget/audit_log_detail_widget.dart';
 import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
-import 'package:frontend/screen/payment/sale_with_payment_screen.dart';
+import 'package:frontend/screen/payment/sale_with_payment/sale_with_payment_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/add_product_widget.dart';
 import 'package:frontend/screen/product/widget/edit_product_widget.dart';
