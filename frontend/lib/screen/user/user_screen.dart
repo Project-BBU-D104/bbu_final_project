@@ -62,11 +62,15 @@ class UserScreen extends StatelessWidget {
 
               SizedBox(height: 15),
               
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctr.userList.length,
-                itemBuilder: (context, index) => UserCardListWidget( userList: ctr.userList[index],),
+              Obx(()=> ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: ctr.userList.length,
+                  itemBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: UserCardListWidget(user: ctr.userList[index],),
+                  ),
+                ),
               )
           
             ],

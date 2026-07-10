@@ -7,7 +7,6 @@ from app.schemas.sale import SaleRead
 class SalePaymentCreate(SQLModel):
     user_id: int
     sale_id: int
-    invoice_no: str
     amount: int
     payment_method: str
     reference_no: str
@@ -19,7 +18,6 @@ class SalePaymentCreate(SQLModel):
 class SalePaymentUpdate(SQLModel):
     user_id: Optional[int] = None
     sale_id: Optional[int] = None
-    invoice_no: Optional[str] = None
     amount: Optional[int] = None
     payment_method: Optional[str] = None
     reference_no: Optional[str] = None
@@ -30,7 +28,6 @@ class SalePaymentUpdate(SQLModel):
 class SalePaymentRead(SQLModel):
     user: UserRead
     sale: SaleRead
-    invoice_no: str
     amount: int
     payment_method: str
     reference_no: str

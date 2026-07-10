@@ -1,7 +1,7 @@
 class UserModel {
   final int? id;
   final String username;
-  final String password;
+  final String ?password;
   final String? email;
   final int roleId;
   final bool? disable;

@@ -16,7 +16,7 @@ def get_all_sale_payments(session: Session):
         select(SalePayment)
         .options(
             selectinload(SalePayment.user),
-            selectinload(SalePayment.sales)
+            selectinload(SalePayment.sale)
         )
     )
     return session.exec(statement).all()

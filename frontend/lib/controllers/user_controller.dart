@@ -3,72 +3,45 @@ import 'package:frontend/models/user_model.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/user/widget/add_user_widget.dart';
 import 'package:frontend/screen/user/widget/edit_user_widget.dart';
+import 'package:frontend/services/main_service/user_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController{
-
+  final UserService service = UserService();
   var selectedUser = RxnString();
   var isChecked = false.obs;
+  final isLoading = false.obs;
 
-  final List<UserModel> userList = [
-  UserModel(
-    id: 1,
-    roleId: 1,
-    username: "superadmin",
-    email: "superadmin@example.com",
-    password: "\$2b\$12\$abcdefghijklmnopqrstuv1234567890abcdefg",
-    disable: false,
-    createdAt: DateTime.parse("2026-07-01 08:00:00"),
-    updatedAt: DateTime.parse("2026-07-01 08:00:00"),
-  ),
+  final  userList = <Map<String, dynamic>>[].obs;
 
-  UserModel(
-    id: 2,
-    roleId: 2,
-    
-    username: "admin",
-    email: "admin@example.com",
-    password: "\$2b\$12\$hijklmnopqrstuvabcdef1234567890abcdefghij",
-    disable: false,
-    createdAt: DateTime.parse("2026-07-01 08:10:00"),
-    updatedAt: DateTime.parse("2026-07-01 08:10:00"),
-  ),
+  @override
+  void onInit() {
+    super.onInit();
 
-  UserModel(
-    id: 3,
-    roleId: 3,
-    
-    username: "manager",
-    email: "manager@example.com",
-    password: "\$2b\$12\$mnopqrstuvwxyz1234567890abcdefghijklmnop",
-    disable: false,
-    createdAt: DateTime.parse("2026-07-01 08:20:00"),
-    updatedAt: DateTime.parse("2026-07-01 08:20:00"),
-  ),
+    getUserList();
+  }
 
-  UserModel(
-    id: 4,
-    roleId: 4,
-    username: "cashier",
-    email: "cashier@example.com",
-    password: "\$2b\$12\$1234567890abcdefghijklmnopqrstuvabcdefghi",
-    disable: false,
-    createdAt: DateTime.parse("2026-07-01 08:30:00"),
-    updatedAt: DateTime.parse("2026-07-01 08:30:00"),
-  ),
+  Future<void> getUserList() async {
+    try{
+      isLoading.value = true;
 
-  UserModel(
-    id: 5,
-    roleId: 8,
-    username: "accountant",
-    email: "accountant@example.com",
-    password: "\$2b\$12\$uvwxyzabcdefghijk1234567890mnopqrstuvwxy",
-    disable: true,
-    createdAt: DateTime.parse("2026-07-01 08:40:00"),
-    updatedAt: DateTime.parse("2026-07-01 08:40:00"),
-  ),
-];
+      final resp = await service.getUsers();
+
+      if(resp is List){
+        userList.value = List<Map<String, dynamic>>.from(resp);
+      }
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }
+    finally{
+      isLoading.value = false;
+    }
+  }
 
   void addUser(BuildContext context){
     AppBottomSheets.show(
@@ -77,7 +50,7 @@ class UserController extends GetxController{
     );
   }
 
-  void gotoUserDetail(UserModel user){
+  void gotoUserDetail(Map<String, dynamic> user) {
     Get.toNamed(
       AppRoutes.userDetail,
       arguments: user,

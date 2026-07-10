@@ -3,7 +3,7 @@ import 'package:frontend/services/api_service.dart';
 class UserService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "/users";
+  static const String endpoint = "users";
 
   /// GET ALL USERS
   Future<dynamic> getUsers() async {

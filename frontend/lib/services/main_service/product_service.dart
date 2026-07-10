@@ -1,6 +1,6 @@
 import 'package:frontend/services/api_service.dart';
 
-class UserService {
+class ProductService {
   final ApiService _api = ApiService();
 
   static const String endpoint = "/audit-logs";

@@ -32,4 +32,4 @@ class Sale(SQLModel, table=True):
     user: Optional[User] = Relationship(back_populates="sales")
     customer: Optional[Customer] = Relationship(back_populates="sales")
     sale_items: List["SaleItems"] = Relationship(back_populates="sales")
-    sale_payments: List["SalePayment"] = Relationship(back_populates="sales")
+    sale_payments: List["SalePayment"] = Relationship(back_populates="sale")

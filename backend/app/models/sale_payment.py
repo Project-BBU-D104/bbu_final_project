@@ -22,4 +22,4 @@ class SalePayment(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     user: Optional[User] = Relationship(back_populates="sale_payments")
-    sales: Optional[Sale] = Relationship(back_populates="sale_payments")
+    sale: Optional[Sale] = Relationship(back_populates="sale_payments")

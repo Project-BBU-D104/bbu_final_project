@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/user_controller.dart';
-import 'package:frontend/models/user_model.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +8,8 @@ import 'package:intl/intl.dart';
 class UserDetailCardWidget extends StatelessWidget {
   UserDetailCardWidget({super.key});
 
-  final UserModel user = Get.arguments as UserModel;
+  final Map<String, dynamic> user =
+      Get.arguments as Map<String, dynamic>;
 
   final ctr = Get.find<UserController>();
 
@@ -32,7 +32,7 @@ class UserDetailCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final active = !(user.disable ?? false);
+    final active = !(user["disable"] ?? false);
 
     return Scaffold(
       backgroundColor: const Color(0xffF4F6FB),
@@ -56,8 +56,6 @@ class UserDetailCardWidget extends StatelessWidget {
               ),
               child: Column(
                 children: [
-
-                  // Avatar
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
@@ -78,7 +76,7 @@ class UserDetailCardWidget extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   Text(
-                    user.username,
+                    user["name"] ?? "",
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -89,7 +87,7 @@ class UserDetailCardWidget extends StatelessWidget {
                   const SizedBox(height: 4),
 
                   Text(
-                    user.email ?? "-",
+                    user["email"] ?? "-",
                     style: const TextStyle(
                       color: Colors.white70,
                     ),
@@ -97,7 +95,6 @@ class UserDetailCardWidget extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // STATUS PILL
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
@@ -127,29 +124,17 @@ class UserDetailCardWidget extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // ================= INFO CARDS ================= //
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-
                   _card(
                     title: "Account Info",
                     children: [
-                      _row("ID", user.id.toString()),
-                      _row("Username", user.username),
-                      _row("Email", user.email ?? "-"),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  _card(
-                    title: "Role Info".tr,
-                    children: [
-                      _row("Role ID", user.roleId.toString()),
-                      _row("Role Name", getRoleName(user.roleId)),
+                      _row("ID", "${user["id"] ?? ""}"),
+                      _row("Username", user["name"] ?? ""),
+                      _row("Email", user["email"] ?? "-"),
+                      _row("Role",getRoleName(user["role_id"] ?? 0),),
                     ],
                   ),
 
@@ -160,17 +145,19 @@ class UserDetailCardWidget extends StatelessWidget {
                     children: [
                       _row(
                         "Created",
-                        user.createdAt == null
+                        user["created_at"] == null
                             ? "-"
-                            : DateFormat("dd MMM yyyy")
-                                .format(user.createdAt!),
+                            : DateFormat("dd MMM yyyy").format(
+                                DateTime.parse(user["created_at"]),
+                              ),
                       ),
                       _row(
                         "Updated",
-                        user.updatedAt == null
+                        user["updated_at"] == null
                             ? "-"
-                            : DateFormat("dd MMM yyyy")
-                                .format(user.updatedAt!),
+                            : DateFormat("dd MMM yyyy").format(
+                                DateTime.parse(user["updated_at"]),
+                              ),
                       ),
                     ],
                   ),
@@ -182,17 +169,17 @@ class UserDetailCardWidget extends StatelessWidget {
           ],
         ),
       ),
+
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16),
           color: Colors.white,
           child: Row(
             children: [
-
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ctr.gotoUserDetail(user);
+                    ctr.deleteUser(context, user);
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: Text("Delete".tr),
@@ -212,7 +199,7 @@ class UserDetailCardWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ctr.editUser(context, {});
+                    ctr.editUser(context, user);
                   },
                   icon: const Icon(Icons.edit),
                   label: Text("Edit".tr),
@@ -233,7 +220,6 @@ class UserDetailCardWidget extends StatelessWidget {
     );
   }
 
-  // ================= CARD ================= //
   Widget _card({
     required String title,
     required List<Widget> children,
@@ -255,7 +241,6 @@ class UserDetailCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Text(
             title.tr,
             style: const TextStyle(
@@ -264,16 +249,13 @@ class UserDetailCardWidget extends StatelessWidget {
               color: Color(0xFF1E3C72),
             ),
           ),
-
           const SizedBox(height: 10),
-
           ...children,
         ],
       ),
     );
   }
 
-  // ================= ROW ================= //
   Widget _row(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
