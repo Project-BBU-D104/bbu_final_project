@@ -42,3 +42,8 @@ class SupplierRead(SQLModel):
     description: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+class SupplierSimple(SQLModel):
+    id: int
+    name: str

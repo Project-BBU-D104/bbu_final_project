@@ -2,9 +2,8 @@ from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
 
-from app.schemas.category import CategoryRead
-from app.schemas.supplier import SupplierRead
-
+from app.schemas.category import CategorySimple
+from app.schemas.supplier import SupplierSimple
 
 class ProductCreate(SQLModel):
     category_id: int
@@ -39,8 +38,8 @@ class ProductUpdate(SQLModel):
 
 
 class ProductRead(SQLModel):
-    category: CategoryRead
-    supplier: SupplierRead
+    category: CategorySimple
+    supplier: SupplierSimple
     name: str
     barcode: str
     photo: Optional[str] = None

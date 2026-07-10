@@ -1,213 +1,22 @@
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class SaleController extends GetxController{
 
-  final List<Map<String, dynamic>> saleList = [
-    {
-      "id": 1,
-      "customer_id": 1,
-      "user_id": 1,
-      "invoice_no": "INV-20260701-0001",
-      "sale_date": "2026-07-01",
-      "subtotal": 120.00,
-      "tax_amount": 12.00,
-      "discount_amount": 5.00,
-      "total_amount": 127.00,
-      "paid_amount": 127.00,
-      "due_amount": 0.00,
-      "payment_status": "Paid",
-      "status": "Completed",
-      "payment_method": "Cash",
-      "deleted_at": null,
-      "created_at": "2026-07-01 09:00:00",
-      "updated_at": "2026-07-01 09:00:00",
-    },
-    {
-      "id": 2,
-      "customer_id": 2,
-      "user_id": 1,
-      "invoice_no": "INV-20260701-0002",
-      "sale_date": "2026-07-01",
-      "subtotal": 80.00,
-      "tax_amount": 8.00,
-      "discount_amount": 0.00,
-      "total_amount": 88.00,
-      "paid_amount": 50.00,
-      "due_amount": 38.00,
-      "payment_status": "Partial",
-      "status": "Completed",
-      "payment_method": "ABA",
-      "deleted_at": null,
-      "created_at": "2026-07-01 10:15:00",
-      "updated_at": "2026-07-01 10:15:00",
-    },
-    {
-      "id": 3,
-      "customer_id": 3,
-      "user_id": 2,
-      "invoice_no": "INV-20260701-0003",
-      "sale_date": "2026-07-01",
-      "subtotal": 150.00,
-      "tax_amount": 15.00,
-      "discount_amount": 10.00,
-      "total_amount": 155.00,
-      "paid_amount": 0.00,
-      "due_amount": 155.00,
-      "payment_status": "Unpaid",
-      "status": "Pending",
-      "payment_method": "Credit",
-      "deleted_at": null,
-      "created_at": "2026-07-01 11:30:00",
-      "updated_at": "2026-07-01 11:30:00",
-    },
-    {
-      "id": 4,
-      "customer_id": 4,
-      "user_id": 2,
-      "invoice_no": "INV-20260701-0004",
-      "sale_date": "2026-07-02",
-      "subtotal": 200,
-      "tax_amount": 20,
-      "discount_amount": 20,
-      "total_amount": 200,
-      "paid_amount": 200,
-      "due_amount": 0,
-      "payment_status": "Paid",
-      "status": "Completed",
-      "payment_method": "Card",
-      "deleted_at": null,
-      "created_at": "2026-07-02 09:20:00",
-      "updated_at": "2026-07-02 09:20:00",
-    },
-    {
-      "id": 5,
-      "customer_id": 5,
-      "user_id": 1,
-      "invoice_no": "INV-20260702-0005",
-      "sale_date": "2026-07-02",
-      "subtotal": 60,
-      "tax_amount": 6,
-      "discount_amount": 0,
-      "total_amount": 66,
-      "paid_amount": 66,
-      "due_amount": 0,
-      "payment_status": "Paid",
-      "status": "Completed",
-      "payment_method": "Cash",
-      "deleted_at": null,
-      "created_at": "2026-07-02 11:10:00",
-      "updated_at": "2026-07-02 11:10:00",
-    },
-    {
-      "id": 6,
-      "customer_id": 6,
-      "user_id": 2,
-      "invoice_no": "INV-20260702-0006",
-      "sale_date": "2026-07-02",
-      "subtotal": 95,
-      "tax_amount": 9.5,
-      "discount_amount": 4.5,
-      "total_amount": 100,
-      "paid_amount": 80,
-      "due_amount": 20,
-      "payment_status": "Partial",
-      "status": "Completed",
-      "payment_method": "ABA",
-      "deleted_at": null,
-      "created_at": "2026-07-02 14:45:00",
-      "updated_at": "2026-07-02 14:45:00",
-    },
-    {
-      "id": 7,
-      "customer_id": 7,
-      "user_id": 1,
-      "invoice_no": "INV-20260703-0007",
-      "sale_date": "2026-07-03",
-      "subtotal": 170,
-      "tax_amount": 17,
-      "discount_amount": 7,
-      "total_amount": 180,
-      "paid_amount": 180,
-      "due_amount": 0,
-      "payment_status": "Paid",
-      "status": "Completed",
-      "payment_method": "Cash",
-      "deleted_at": null,
-      "created_at": "2026-07-03 09:15:00",
-      "updated_at": "2026-07-03 09:15:00",
-    },
-    {
-      "id": 8,
-      "customer_id": 8,
-      "user_id": 1,
-      "invoice_no": "INV-20260703-0008",
-      "sale_date": "2026-07-03",
-      "subtotal": 45,
-      "tax_amount": 4.5,
-      "discount_amount": 0,
-      "total_amount": 49.5,
-      "paid_amount": 0,
-      "due_amount": 49.5,
-      "payment_status": "Unpaid",
-      "status": "Pending",
-      "payment_method": "Credit",
-      "deleted_at": null,
-      "created_at": "2026-07-03 13:00:00",
-      "updated_at": "2026-07-03 13:00:00",
-    },
-    {
-      "id": 9,
-      "customer_id": 9,
-      "user_id": 2,
-      "invoice_no": "INV-20260704-0009",
-      "sale_date": "2026-07-04",
-      "subtotal": 320,
-      "tax_amount": 32,
-      "discount_amount": 12,
-      "total_amount": 340,
-      "paid_amount": 340,
-      "due_amount": 0,
-      "payment_status": "Paid",
-      "status": "Completed",
-      "payment_method": "Card",
-      "deleted_at": null,
-      "created_at": "2026-07-04 10:40:00",
-      "updated_at": "2026-07-04 10:40:00",
-    },
-    {
-      "id": 10,
-      "customer_id": 10,
-      "user_id": 1,
-      "invoice_no": "INV-20260704-0010",
-      "sale_date": "2026-07-04",
-      "subtotal": 110,
-      "tax_amount": 11,
-      "discount_amount": 1,
-      "total_amount": 120,
-      "paid_amount": 120,
-      "due_amount": 0,
-      "payment_status": "Paid",
-      "status": "Completed",
-      "payment_method": "ABA",
-      "deleted_at": null,
-      "created_at": "2026-07-04 16:30:00",
-      "updated_at": "2026-07-04 16:30:00",
-    },
-  ];
-  final List<Map<String, dynamic>> saleItemList = [
-    {"id": 1, "sale_id": 1, "product_id": 1, "qty": 2, "sale_price": 60.0, "subtotal": 120.0},
-    {"id": 2, "sale_id": 2, "product_id": 2, "qty": 4, "sale_price": 20.0, "subtotal": 80.0},
-    {"id": 3, "sale_id": 3, "product_id": 3, "qty": 3, "sale_price": 50.0, "subtotal": 150.0},
-    {"id": 4, "sale_id": 4, "product_id": 4, "qty": 5, "sale_price": 40.0, "subtotal": 200.0},
-    {"id": 5, "sale_id": 5, "product_id": 5, "qty": 2, "sale_price": 30.0, "subtotal": 60.0},
-    {"id": 6, "sale_id": 6, "product_id": 6, "qty": 5, "sale_price": 19.0, "subtotal": 95.0},
-    {"id": 7, "sale_id": 7, "product_id": 7, "qty": 2, "sale_price": 85.0, "subtotal": 170.0},
-    {"id": 8, "sale_id": 8, "product_id": 8, "qty": 3, "sale_price": 15.0, "subtotal": 45.0},
-    {"id": 9, "sale_id": 9, "product_id": 9, "qty": 4, "sale_price": 80.0, "subtotal": 320.0},
-    {"id": 10, "sale_id": 10, "product_id": 10, "qty": 2, "sale_price": 55.0, "subtotal": 110.0},
-  ];
-  
+  var isLoading = false.obs;
+  final saleList = <Map<String, dynamic>> [].obs;
+
+  final SaleService service = SaleService();
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    onGetSaleList();
+  }
+
   void onNewSale(){
     Get.toNamed(AppRoutes.sale);
   }
@@ -224,11 +33,30 @@ class SaleController extends GetxController{
     Get.offNamed(AppRoutes.paymentSuccess);
   }
 
-
   void gotoSaleListDetail(){
     Get.toNamed(AppRoutes.saleListDetail);
   }
 
+  Future <void> onGetSaleList() async{
+    try{
+      isLoading.value = true;
+
+    final resp =  await service.getSales();
+
+      if(resp is List){
+        saleList.value = List<Map<String, dynamic>>.from(resp);
+      }
+      print(saleList);
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }finally{
+      isLoading.value = false;
+    }
+  }  
+  
   void onDeleteSale(){
     print("Delete sale");
   }

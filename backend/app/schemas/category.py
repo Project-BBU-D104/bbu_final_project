@@ -28,3 +28,7 @@ class CategoryRead(SQLModel):
     description: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+class CategorySimple(SQLModel):
+    id: int
+    name: str

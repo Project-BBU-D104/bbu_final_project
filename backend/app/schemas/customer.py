@@ -25,3 +25,8 @@ class CustomerRead(SQLModel):
     address: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+class CustomerSimple(SQLModel):
+    id: Optional[int] = None
+    name: str
+    phone: str

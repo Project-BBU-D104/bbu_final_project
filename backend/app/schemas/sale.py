@@ -3,8 +3,7 @@ from sqlmodel import SQLModel
 from typing import Optional
 
 from app.schemas.user import UserRead
-from app.schemas.customer import CustomerRead
-
+from app.schemas.customer import CustomerSimple
 
 class SaleCreate(SQLModel):
     user_id: int
@@ -42,7 +41,7 @@ class SaleUpdate(SQLModel):
 
 class SaleRead(SQLModel):
     user: UserRead
-    customer: CustomerRead
+    customer: CustomerSimple
     invoice_no: str
     sale_date: datetime
     subtotal: int
