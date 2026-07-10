@@ -7,9 +7,10 @@ from app.security import verify_password, create_access_token
 
 
 def login(request: LoginRequest, session: Session):
+
     user = session.exec(
         select(User).where(
-            User.name == request.name
+            User.name.collate("utf8mb4_bin") == request.name
         )
     ).first()
 
