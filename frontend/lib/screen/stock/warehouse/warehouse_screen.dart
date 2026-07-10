@@ -30,7 +30,19 @@ class WarehouseScreen extends StatelessWidget {
                 ],
               ),
            SizedBox(height: 15,),
-              WarehouseCardWidget(),
+
+              Obx(() => ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ctr.warehouseList.length,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsetsGeometry.only(
+                    bottom: 8.0
+                  ),
+                  child: WarehouseCardWidget( warehouse: ctr.warehouseList[index],),
+                ),
+              ),),
+              SizedBox(height: 70,)
             ],
           ),
         )

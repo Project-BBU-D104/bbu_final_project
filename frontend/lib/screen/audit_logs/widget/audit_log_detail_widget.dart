@@ -1,17 +1,18 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/audit_log_controller.dart';
-import 'package:frontend/models/audit_logs_model.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class AuditLogDetailWidget extends StatelessWidget {
   AuditLogDetailWidget({super.key});
 
-
   final ctr = Get.find<AuditLogController>();
-  final AuditLogsModel log = Get.arguments as AuditLogsModel;
+
+  final Map<String, dynamic> auditLog =
+      Map<String, dynamic>.from(Get.arguments);
 
   Color getActionColor(String action) {
     switch (action.toUpperCase()) {
@@ -47,22 +48,31 @@ class AuditLogDetailWidget extends StatelessWidget {
     }
   }
 
-  /// SAFE JSON
-  Map<String, dynamic> _decode(String value) {
-    if (value.trim().isEmpty) return {};
-    try {
-      final data = jsonDecode(value);
-      return data is Map<String, dynamic> ? data : {};
-    } catch (_) {
-      return {};
+  Map<String, dynamic> _decode(dynamic value) {
+    if (value == null) return {};
+
+    if (value is Map<String, dynamic>) {
+      return value;
     }
+
+    if (value is String && value.trim().isNotEmpty) {
+      try {
+        final data = jsonDecode(value);
+        if (data is Map<String, dynamic>) {
+          return data;
+        }
+      } catch (_) {}
+    }
+
+    return {};
   }
 
-  /// FORMAT LIST UI
   Widget _buildMap(Map<String, dynamic> map, Color color) {
     if (map.isEmpty) {
-      return const Text("No data",
-          style: TextStyle(color: Colors.grey));
+      return const Text(
+        "No data",
+        style: TextStyle(color: Colors.grey),
+      );
     }
 
     return Column(
@@ -71,7 +81,7 @@ class AuditLogDetailWidget extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withOpacity(.08),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -79,13 +89,15 @@ class AuditLogDetailWidget extends StatelessWidget {
               Expanded(
                 child: Text(
                   e.key,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               Expanded(
                 child: Text(
                   "${e.value}",
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.end,
                 ),
               ),
             ],
@@ -95,8 +107,7 @@ class AuditLogDetailWidget extends StatelessWidget {
     );
   }
 
-  /// CARD
-  Widget _card(String title, String value, Color color) {
+  Widget _card(String title, dynamic value, Color color) {
     final map = _decode(value);
 
     return Container(
@@ -107,34 +118,21 @@ class AuditLogDetailWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 8,
           )
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 12),
           _buildMap(map, color),
@@ -143,17 +141,18 @@ class AuditLogDetailWidget extends StatelessWidget {
     );
   }
 
-  /// SPECIAL DELETE UI (IMPORTANT)
   Widget _deleteCard() {
-    final oldMap = _decode(log.oldValue);
+    final oldMap = _decode(auditLog["old_value"]);
 
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.05),
+        color: Colors.red.withOpacity(.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.withOpacity(0.2)),
+        border: Border.all(
+          color: Colors.red.withOpacity(.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,19 +165,31 @@ class AuditLogDetailWidget extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           _buildMap(oldMap, Colors.red),
         ],
       ),
     );
   }
 
+  Widget _infoTile(
+      IconData icon,
+      String title,
+      String value,
+      ) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon),
+      title: Text(title),
+      subtitle: Text(value),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final color = getActionColor(log.action);
+    final action = (auditLog["action"] ?? "").toString();
 
-    final oldMap = _decode(log.oldValue);
-    final newMap = _decode(log.newValue);
+    final color = getActionColor(action);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -187,52 +198,114 @@ class AuditLogDetailWidget extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// HEADER
+
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [color, color.withOpacity(0.7)],
+                  colors: [
+                    color,
+                    color.withOpacity(.7),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 children: [
+
                   CircleAvatar(
-                    radius: 35,
+                    radius: 34,
                     backgroundColor: Colors.white,
-                    child: Icon(getActionIcon(log.action),
-                        color: color, size: 35),
+                    child: Icon(
+                      getActionIcon(action),
+                      size: 34,
+                      color: color,
+                    ),
                   ),
+
                   const SizedBox(height: 12),
+
                   Text(
-                    log.title ?? "",
+                    auditLog["title"] ?? "",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   const SizedBox(height: 6),
+
                   Text(
-                    log.action,
-                    style: const TextStyle(color: Colors.white70),
+                    action,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                    ),
                   ),
                 ],
               ),
             ),
 
-            /// BODY
-            if (log.action.toUpperCase() == "DELETE")
+            const SizedBox(height: 20),
+
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+
+                    _infoTile(
+                      Icons.person,
+                      "User",
+                      auditLog["user"]?["name"] ?? "",
+                    ),
+
+                    _infoTile(
+                      Icons.table_chart,
+                      "Table",
+                      auditLog["table_name"]?.toString() ?? "",
+                    ),
+
+                    _infoTile(
+                      Icons.tag,
+                      "Record ID",
+                      auditLog["record_id"]?.toString() ?? "",
+                    ),
+
+                    _infoTile(
+                      Icons.schedule,
+                      "Created At",
+                      auditLog["created_at"]?.toString() ?? "",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            if (action.toUpperCase() == "DELETE")
               _deleteCard()
             else ...[
-              _card("Old Value", log.oldValue, Colors.red),
-              _card("New Value", log.newValue, Colors.green),
+              _card(
+                "Old Value",
+                auditLog["old_value"],
+                Colors.red,
+              ),
+              _card(
+                "New Value",
+                auditLog["new_value"],
+                Colors.green,
+              ),
             ],
+
+            const SizedBox(height: 100),
           ],
         ),
       ),
+
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -251,9 +324,6 @@ class AuditLogDetailWidget extends StatelessWidget {
                     foregroundColor: Colors.red,
                     side: const BorderSide(color: Colors.red),
                     minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                 ),
               ),
@@ -265,15 +335,12 @@ class AuditLogDetailWidget extends StatelessWidget {
                   onPressed: () {
                     ctr.onEditAuditLog(context);
                   },
-                  icon: const Icon(Icons.edit_outlined),
+                  icon: const Icon(Icons.edit),
                   label: Text("Edit".tr),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: successColor,
                     foregroundColor: titleColor,
                     minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                 ),
               ),
@@ -281,8 +348,6 @@ class AuditLogDetailWidget extends StatelessWidget {
           ),
         ),
       ),
-
-
     );
   }
 }

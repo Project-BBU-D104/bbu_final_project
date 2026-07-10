@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class WarehouseCardWidget extends StatelessWidget {
-  const WarehouseCardWidget({super.key});
+  final Map<String, dynamic> warehouse;
+  const WarehouseCardWidget({super.key, required this.warehouse});
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +43,8 @@ class WarehouseCardWidget extends StatelessWidget {
           const SizedBox(height: 10),
 
           /// TITLE
-          const Text(
-            "Central Logistics Hub",
+          Text(
+            warehouse['name'],
             style: TextStyle(
               color: Colors.black, // changed
               fontSize: 20,
@@ -54,12 +55,12 @@ class WarehouseCardWidget extends StatelessWidget {
           const SizedBox(height: 6),
 
           /// LOCATION
-          const Row(
+          Row(
             children: [
               Icon(Icons.location_on, size: 16, color: Colors.grey),
               SizedBox(width: 4),
               Text(
-                "Chicago, IL • Sector 4B",
+                warehouse['location'],
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 12,

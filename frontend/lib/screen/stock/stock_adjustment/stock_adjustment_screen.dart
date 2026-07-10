@@ -38,14 +38,15 @@ StockAdjustmentScreen({super.key});
         
               SizedBox(height: 10,),
               
-               ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: ctr.stockAdjustmentList.length,
-                  itemBuilder: (context, index){
-                    return StockAdjustmentCardWidget(stockAdjustment: ctr.stockAdjustmentList[index]);
-                  }
-                ),
+               Obx(()=> ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: ctr.stockAdjustmentList.length,
+                    itemBuilder: (context, index){
+                      return StockAdjustmentCardWidget(stockAdjustment: ctr.stockAdjustmentList[index]);
+                    }
+                  ),
+               ),
 
               SizedBox(height: 80,),
 

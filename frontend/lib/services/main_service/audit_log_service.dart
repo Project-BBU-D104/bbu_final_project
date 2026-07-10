@@ -3,7 +3,7 @@ import 'package:frontend/services/api_service.dart';
 class AuditLogService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "/audit_logs";
+  static const String endpoint = "audit_logs";
 
   /// GET ALL Audit Log
   Future<dynamic> getAuditLogs() async {

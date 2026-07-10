@@ -62,7 +62,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                           ),
       
                           Text(
-                            stockAdjustment["id"] ?? "N/A",
+                            stockAdjustment["id"].toString(),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                         SizedBox(height: 4),
       
                         Text(
-                          stockAdjustment["product_name"] ?? "N/A",
+                          stockAdjustment["product"]["name"],
                           style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        "${stockAdjustment['adjustment_type'] == 'increase' ? '+' : '-'}${stockAdjustment['qty'] ?? '0'}",
+                        "${stockAdjustment['adjustment_type'] == 'IN' ? '+' : '-'}${stockAdjustment['qty'] ?? '0'}",
                         style: TextStyle(
                           color: successColor,
                           fontSize: 18,
@@ -159,7 +159,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                       const SizedBox(width: 8),
       
                       Text(
-                        "Oct 24, 2023 • 10:00 AM",
+                        stockAdjustment["created_at"],
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.w600,
