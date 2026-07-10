@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/sale_controller.dart';
+import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/screen/sale/sale_list/widget/sale_card_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 class SaleListScreen extends StatelessWidget {
   SaleListScreen({super.key});
 
-  final ctr = Get.put(SaleController());
+  final ctr = Get.put(SaleListController());
 
   @override
   Widget build(BuildContext context) {
@@ -38,17 +38,18 @@ class SaleListScreen extends StatelessWidget {
 
               SizedBox(height: 10,),
 
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctr.saleList.length,
-                itemBuilder: (context, index) {
-                  final sale = ctr.saleList[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SaleCardWidget(sale: sale),
-                  );
-                },
+              Obx(()=> ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: ctr.saleList.length,
+                  itemBuilder: (context, index) {
+                    final sale = ctr.saleList[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SaleCardWidget(sale: sale),
+                    );
+                  },
+                ),
               ),
               SizedBox(height: 80,)
             ]

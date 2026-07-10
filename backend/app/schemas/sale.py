@@ -5,6 +5,10 @@ from typing import Optional
 from app.schemas.user import UserRead
 from app.schemas.customer import CustomerSimple
 
+from app.schemas.sale_item import SaleItemRead
+
+from typing import List
+
 class SaleCreate(SQLModel):
     user_id: int
     customer_id: int
@@ -40,8 +44,10 @@ class SaleUpdate(SQLModel):
     updated_at: Optional[datetime] = None
 
 class SaleRead(SQLModel):
+    id: Optional[int] = None
     user: UserRead
     customer: CustomerSimple
+    sale_items: List[SaleItemRead] = []
     invoice_no: str
     sale_date: datetime
     subtotal: int

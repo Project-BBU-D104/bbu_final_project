@@ -1,8 +1,11 @@
+from http.client import HTTPException
+
 from sqlmodel import Session, select
 from app.models.sale import Sale
 from app.schemas.sale import SaleCreate, SaleUpdate
 from datetime import datetime
 from sqlalchemy.orm import selectinload
+from app.models.sale_items import SaleItems
 
 def create_sale(session: Session, sale: SaleCreate):
     db_sale = sale.model_validate(sale)
@@ -16,7 +19,9 @@ def get_all_sales(session: Session):
         select(Sale)
         .options(
             selectinload(Sale.user),
-            selectinload(Sale.customer)
+            selectinload(Sale.customer),
+            selectinload(Sale.sale_items)
+            .selectinload(SaleItems.product)
         )
     )
     return session.exec(statement).all()
@@ -69,8 +74,21 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
     return db_sale
 
 def delete_sale(session: Session, sale_id: int):
+
     sale = session.get(Sale, sale_id)
-    if sale:
-        session.delete(sale)
-        session.commit()
+
+    if not sale:
+        return None
+
+    # delete sale items first
+    for item in sale.sale_items:
+        session.delete(item)
+
+    # delete payments if exists
+    for payment in sale.sale_payments:
+        session.delete(payment)
+
+    # delete sale
+    session.delete(sale)
+    session.commit()
     return sale

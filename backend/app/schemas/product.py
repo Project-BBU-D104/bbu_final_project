@@ -52,3 +52,8 @@ class ProductRead(SQLModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at : Optional[datetime] = None
+
+
+class ProductSimple(SQLModel):
+    id: int
+    name: str

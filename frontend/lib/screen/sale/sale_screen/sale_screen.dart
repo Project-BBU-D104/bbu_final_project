@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/sale_controller.dart';
+import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/screen/sale/widget/card_item_widget.dart';
 import 'package:frontend/screen/sale/widget/payment_footer_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
