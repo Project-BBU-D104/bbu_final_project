@@ -23,6 +23,8 @@ def update_customer(session: Session, customer_id: int, customer: CustomerUpdate
             db_customer.name = customer.name
         if customer.photo is not None:
             db_customer.photo = customer.photo
+        if customer.is_active is not None:
+            db_customer.is_active = customer.is_active
         if customer.phone is not None:
             db_customer.phone = customer.phone
         if customer.address is not None:

@@ -8,6 +8,7 @@ class SupplierCreate(SQLModel):
     name: str
     phone: str
     email: str
+    photo: Optional[str] = None
     map: Optional[str] = None
     address: Optional[str] = None
     status: bool
@@ -24,6 +25,7 @@ class SupplierUpdate(SQLModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
+    photo: Optional[str] = None
     map: Optional[str] = None
     address: Optional[str] = None
     status: Optional[bool] = None
@@ -36,6 +38,7 @@ class SupplierRead(SQLModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
+    photo: Optional[str] = None
     map: Optional[str] = None
     address: Optional[str] = None
     status: Optional[bool] = None

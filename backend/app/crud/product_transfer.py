@@ -43,6 +43,8 @@ def update_product_transfer(session: Session, product_transfer_id: int, product_
             db_product_transfer.to_warehouse_id = product_transfer.to_warehouse_id
         if product_transfer.product_id is not None:
             db_product_transfer.product_id = product_transfer.product_id
+        if product_transfer.reference_no is not None:
+            db_product_transfer.reference_no = product_transfer.reference_no
         if product_transfer.qty is not None:
             db_product_transfer.qty = product_transfer.qty
         if product_transfer.transfer_date is not None:

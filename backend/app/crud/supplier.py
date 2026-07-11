@@ -42,6 +42,8 @@ def update_supplier(session: Session, supplier_id: int, supplier: SupplierUpdate
             db_supplier.phone = supplier.phone
         if supplier.email is not None:
             db_supplier.email = supplier.email
+        if supplier.photo is not None:
+            db_supplier.photo = supplier.photo
         if supplier.map is not None:
             db_supplier.map = supplier.map
         if supplier.address is not None:

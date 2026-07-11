@@ -23,6 +23,10 @@ def update_warehouse(session: Session, warehouse_id: int, warehouse: WarehouseUp
             db_warehouse.name = warehouse.name
         if warehouse.location is not None:
             db_warehouse.location = warehouse.location
+        if warehouse.note is not None:
+            db_warehouse.note = warehouse.note
+        if warehouse.reference_no is not None:
+            db_warehouse.reference_no = warehouse.reference_no
 
         db_warehouse.updated_at = warehouse.updated_at or datetime.utcnow()
         session.add(db_warehouse)

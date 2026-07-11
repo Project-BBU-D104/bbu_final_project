@@ -27,7 +27,10 @@ def update_user(session: Session, user_id: int, user: UserCreate):
         db_user.name = user.name
         db_user.email = user.email
         db_user.password = hash_password(user.password)
-        
+        db_user.phone = user.phone
+        db_user.photo = user.photo
+        db_user.role_id = user.role_id
+
         session.add(db_user)
         session.commit()
         session.refresh(db_user)

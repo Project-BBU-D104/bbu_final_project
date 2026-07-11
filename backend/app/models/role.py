@@ -1,6 +1,9 @@
 from sqlmodel import SQLModel, Field,Relationship
-from typing import Optional,List
+from typing import TYPE_CHECKING, Optional,List
 from datetime import datetime
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 class Role(SQLModel, table=True):
     __tablename__ = "role"
@@ -11,3 +14,5 @@ class Role(SQLModel, table=True):
     is_active: Optional[bool] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    users: List["User"] = Relationship(back_populates="role")

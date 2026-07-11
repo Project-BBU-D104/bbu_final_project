@@ -14,6 +14,7 @@ class Customer(SQLModel, table=True):
     phone: Optional[str] = None
     address: Optional[str] = None
     description: Optional[str] = None
+    is_active: Optional[bool] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
