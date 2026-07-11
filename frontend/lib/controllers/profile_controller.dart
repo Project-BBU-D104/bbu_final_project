@@ -5,6 +5,8 @@ class ProfileController extends GetxController{
 
   final username = "".obs;
   final email = "".obs;
+  final phone = "".obs;
+  final photo = "".obs;
 
   @override
   void onInit() {
@@ -21,6 +23,9 @@ class ProfileController extends GetxController{
       if(user !=null){
         username.value = data["user"]["name"] ?? "";
         email.value = data["user"]["email"] ?? "";
+        phone.value = data["user"]["phone"] ?? "";
+        photo.value = data["user"]["photo"] ?? "";
+
       }
     }
   }

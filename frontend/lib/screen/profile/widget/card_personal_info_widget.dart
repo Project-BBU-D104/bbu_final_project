@@ -44,12 +44,12 @@ class CardPersonalInfoWidget extends StatelessWidget {
                 ),
               ),
 
-              // SizedBox(height: 10,),
-              // Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
-              // SizedBox(height: 5,),
-              // cardInfo(
-              //   title: "+60123456789",
-              // ),
+              SizedBox(height: 10,),
+              Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
+              SizedBox(height: 5,),
+              cardInfo(
+                title: ctr.phone.value,
+              ),
             ],
           ),
         ),

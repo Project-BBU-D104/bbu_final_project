@@ -23,9 +23,14 @@ class UserCardListWidget extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 30,
-                child: Icon(Icons.person),
+                backgroundImage: user["photo"] != null &&
+                        user["photo"].toString().isNotEmpty
+                    ? NetworkImage(user["photo"])
+                    : const AssetImage(
+                        "assets/images/default_avatar.png",
+                      ),
               ),
 
               const SizedBox(width: 15),

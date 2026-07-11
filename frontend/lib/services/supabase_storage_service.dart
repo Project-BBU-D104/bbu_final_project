@@ -1,51 +1,54 @@
+
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseStorageService {
-
   SupabaseClient get supabase =>
       Supabase.instance.client;
 
-
-  Future<String?> uploadImage(File file) async {
-
+  Future<String?> uploadImage({
+    required File file,
+    required String bucket,
+    String folder = "",
+  }) async {
     try {
-
       final filename =
           "${DateTime.now().millisecondsSinceEpoch}.jpg";
-
-
-      final path =
-          "customers/$filename";
-
-
+      final path = folder.isNotEmpty
+          ? "$folder/$filename"
+          : filename;
       await supabase.storage
-          .from("customer")
+          .from(bucket)
           .upload(
             path,
             file,
+            fileOptions: const FileOptions(
+              cacheControl: '3600',
+              upsert: false,
+            ),
           );
-
-
       final url =
           supabase.storage
-          .from("customer")
-          .getPublicUrl(path);
-
-
+              .from(bucket)
+              .getPublicUrl(path);
       return url;
-
-
-    } catch(e) {
-
-      print(
-        "Supabase upload error: $e"
-      );
-
+    } catch (e) {
+      print("Supabase upload error: $e");
       return null;
-
     }
-
   }
-
+  Future<bool> deleteImage({
+    required String bucket,
+    required String path,
+  }) async {
+    try {
+      await supabase.storage
+          .from(bucket)
+          .remove([path]);
+      return true;
+    } catch(e) {
+      print("Delete image error: $e");
+      return false;
+    }
+  }
 }

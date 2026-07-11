@@ -14,6 +14,9 @@ class UserController extends GetxController{
   var isChecked = false.obs;
   final isLoading = false.obs;
 
+  // final selectedRole = ''.obs;
+  final selectedRole = RxnString();
+
   final  userList = <Map<String, dynamic>>[].obs;
 
   @override

@@ -6,45 +6,40 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageUploadController extends GetxController {
-  final picker = ImagePicker();
-  final storage =
-      SupabaseStorageService();
 
+  final picker = ImagePicker();
+  final storage = SupabaseStorageService();
   var file = Rxn<File>();
   var imageUrl = "".obs;
   var loading = false.obs;
 
   Future<void> pickImage() async {
-
-    if(kIsWeb){
+    if (kIsWeb) {
       return;
     }
 
-    if(Platform.isAndroid || Platform.isIOS){
+    if (Platform.isAndroid || Platform.isIOS) {
+      final picked = await picker.pickImage(
+        source: ImageSource.gallery,
+      );
 
-      final picked =
-          await picker.pickImage(
-            source: ImageSource.gallery,
-          );
-      if(picked != null){
-
-        file.value =
-            File(picked.path);
+      if (picked != null) {
+        file.value = File(
+          picked.path,
+        );
       }
 
-    }else{
-
+    } else {
       FilePickerResult? result =
           await FilePicker.platform.pickFiles(
             type: FileType.image,
           );
 
-      if(result != null){
-
-        file.value =
-            File(
-              result.files.single.path!,
-            );
+      if (result != null &&
+          result.files.single.path != null) {
+        file.value = File(
+          result.files.single.path!,
+        );
       }
     }
   }
@@ -54,22 +49,31 @@ class ImageUploadController extends GetxController {
     imageUrl.value = "";
   }
 
-  Future<String?> uploadImage() async {
-    if(file.value == null){
+  Future<String?> uploadImage({
+    required String bucket,
+    String folder = "",
+  }) async {
+    if (file.value == null) {
       return null;
     }
+
     loading.value = true;
-    try{
+
+    try {
+
       final url =
           await storage.uploadImage(
-            file.value!,
+            file: file.value!,
+            bucket: bucket,
+            folder: folder,
           );
-      if(url != null){
+
+      if (url != null) {
         imageUrl.value = url;
         return url;
       }
       return null;
-    }finally{
+    } finally {
       loading.value = false;
     }
   }

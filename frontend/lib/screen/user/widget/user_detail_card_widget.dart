@@ -13,23 +13,6 @@ class UserDetailCardWidget extends StatelessWidget {
 
   final ctr = Get.find<UserController>();
 
-  String getRoleName(int roleId) {
-    switch (roleId) {
-      case 1:
-        return "Super Admin";
-      case 2:
-        return "Admin";
-      case 3:
-        return "Manager";
-      case 4:
-        return "Cashier";
-      case 8:
-        return "Accountant";
-      default:
-        return "Unknown";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final active = !(user["disable"] ?? false);
@@ -62,13 +45,14 @@ class UserDetailCardWidget extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 3),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 45,
                       backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.person,
-                        size: 55,
-                        color: Colors.blue,
+                      backgroundImage: user["photo"] != null &&
+                        user["photo"].toString().isNotEmpty
+                    ? NetworkImage(user["photo"])
+                    : const AssetImage(
+                        "assets/images/default_avatar.png",
                       ),
                     ),
                   ),
@@ -134,7 +118,7 @@ class UserDetailCardWidget extends StatelessWidget {
                       _row("ID", "${user["id"] ?? ""}"),
                       _row("Username", user["name"] ?? ""),
                       _row("Email", user["email"] ?? "-"),
-                      _row("Role",getRoleName(user["role_id"] ?? 0),),
+                      _row("Role", user["role"]["name"]),
                     ],
                   ),
 
@@ -151,14 +135,7 @@ class UserDetailCardWidget extends StatelessWidget {
                                 DateTime.parse(user["created_at"]),
                               ),
                       ),
-                      _row(
-                        "Updated",
-                        user["updated_at"] == null
-                            ? "-"
-                            : DateFormat("dd MMM yyyy").format(
-                                DateTime.parse(user["updated_at"]),
-                              ),
-                      ),
+                      
                     ],
                   ),
                 ],

@@ -12,13 +12,14 @@ class CustomerController extends GetxController{
   final customerList = <Map<String, dynamic>>[].obs;
 
   final CustomerService service = CustomerService();
-
+  
   var isLoading = false.obs;
 
   final customerPhotoController = TextEditingController();
   final customerNameController = TextEditingController();
   final customerPhoneNumberController = TextEditingController();
   final customerAddressController = TextEditingController();
+  final isActive = false.obs;
 
   @override
   void onInit() {
@@ -65,6 +66,7 @@ class CustomerController extends GetxController{
         "name": customerNameController.text.trim(),
         "phone": customerPhoneNumberController.text.trim(),
         "address": customerAddressController.text.trim(),
+        "is_active": isActive.value
       };
 
       await service.createCustomer(data);
@@ -82,6 +84,8 @@ class CustomerController extends GetxController{
     customerNameController.clear();
     customerPhoneNumberController.clear();
     customerAddressController.clear();
+
+    isActive.value = false;
 
     Get.find<ImageUploadController>()
     .clearImage();

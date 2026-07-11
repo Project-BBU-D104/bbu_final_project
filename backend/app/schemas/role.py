@@ -21,3 +21,7 @@ class RoleRead(SQLModel):
     is_active: Optional[bool] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+class RoleSimple(SQLModel):
+    id: Optional[int] = None
+    name: str

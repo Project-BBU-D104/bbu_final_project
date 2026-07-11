@@ -46,6 +46,8 @@ class AddCustomerWidget extends StatelessWidget {
             const SizedBox(height: 10),
       
             ImageUploadWidget(
+              bucket: "customer",
+              folder: "customers",
               onUploaded: (url) {
                 ctr.customerPhotoController.text = url;
               },
@@ -87,6 +89,21 @@ class AddCustomerWidget extends StatelessWidget {
                   alignLabelWithHint: true,
                 ),
               ),
+
+              Obx(() {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Checkbox(
+                  value: ctr.isActive.value,
+                  onChanged: (value) {
+                    ctr.isActive.value = value!;
+                  },
+                ),
+                Text("Disable User".tr),
+              ],
+            );
+          }),
       
             const SizedBox(height: 15),
       
