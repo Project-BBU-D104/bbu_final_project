@@ -47,7 +47,7 @@ class PurchaseController extends GetxController{
   }
 
   void gotoPurchaseDetail(Map<String, dynamic> purchase){
-    Get.toNamed(AppRoutes.purchaseDetail);
+    Get.toNamed(AppRoutes.purchaseDetail, arguments: purchase);
   }
 
   void editPurchase(BuildContext context, Map<String, dynamic> purchase){

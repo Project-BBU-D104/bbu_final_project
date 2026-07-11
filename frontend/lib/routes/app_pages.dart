@@ -150,7 +150,9 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.editProduct,
-      page: () => EditProductWidget(),
+      page: () => EditProductWidget(
+        productId: Get.arguments as int,
+      ),
     ),
     GetPage(
       name: AppRoutes.currentSale,

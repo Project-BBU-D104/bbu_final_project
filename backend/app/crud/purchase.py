@@ -4,6 +4,8 @@ from app.schemas.purchase import PurchaseCreate, PurchaseUpdate
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 
+from app.models.purchase_item import PurchaseItem
+
 def create_purchase(session: Session, purchase: PurchaseCreate):
     db_purchase = Purchase.model_validate(purchase)
     session.add(db_purchase)
@@ -16,7 +18,9 @@ def get_all_purchases(session: Session):
         select(Purchase)
         .options(
             selectinload(Purchase.user),
-            selectinload(Purchase.supplier)
+            selectinload(Purchase.supplier),
+            selectinload(Purchase.purchase_items)
+            .selectinload(PurchaseItem.product)
         )
     )
     return session.exec(statement).all()

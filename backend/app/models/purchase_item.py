@@ -16,7 +16,6 @@ class PurchaseItem(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id")
     cost_price: int
     qty: int
-    cost_price: int
     subtotal: int
     deleted_at: datetime = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)

@@ -26,7 +26,7 @@ class ProductCardDetailWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => ctr.onDeleteProduct(product),
+                  onPressed: () => ctr.onDeleteProduct(product['id'], context),
                   icon: const Icon(Icons.delete_outline),
                   label: const Text("Delete"),
                   style: OutlinedButton.styleFrom(
@@ -42,7 +42,7 @@ class ProductCardDetailWidget extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => ctr.onEditProduct(product),
+                  onPressed: () => ctr.onEditProduct(product['id'], context),
                   icon: const Icon(Icons.edit_outlined),
                   label: const Text("Edit"),
                   style: ElevatedButton.styleFrom(
@@ -83,8 +83,8 @@ class ProductCardDetailWidget extends StatelessWidget {
                           ),
                         ),
                       )
-                    : Image.asset(
-                        "assets/images/products/$photo",
+                    : Image.network(
+                        photo,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) {
                           return Container(

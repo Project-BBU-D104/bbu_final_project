@@ -17,9 +17,6 @@ class ProductCreate(SQLModel):
     allow_insert_qty: bool
     unit: str
     description: Optional[str] = None
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    deleted_at : Optional[datetime] = None
 
 
 class ProductUpdate(SQLModel):
@@ -38,6 +35,7 @@ class ProductUpdate(SQLModel):
 
 
 class ProductRead(SQLModel):
+    id: int
     category: CategorySimple
     supplier: SupplierSimple
     name: str

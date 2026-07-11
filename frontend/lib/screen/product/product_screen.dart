@@ -112,6 +112,7 @@ class ProductScreen extends StatelessWidget {
               ),
             );
           }),
+           const SliverToBoxAdapter(child: SizedBox(height: 70)),
         ],
       ),
 

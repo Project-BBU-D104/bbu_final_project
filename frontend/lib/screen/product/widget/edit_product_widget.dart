@@ -6,8 +6,8 @@ import 'package:frontend/widget/test_product_scanner_page.dart';
 import 'package:get/get.dart';
 
 class EditProductWidget extends StatelessWidget {
-  EditProductWidget({super.key});
-
+  final int productId;
+  EditProductWidget({super.key, required this.productId});
   final ctr = Get.find<ProductController>();
 
   @override
@@ -49,11 +49,9 @@ class EditProductWidget extends StatelessWidget {
                     ImageUploadWidget(
                       bucket: "product",
                       folder: "products",
+                      imageUrl: ctr.productPhotoController.text,
                       onUploaded: (url) {
-                        print("Image URL: $url");
-              
-                        // save to SQLite or form model
-                        // productController.image.value = url;
+                        ctr.productPhotoController.text = url;
                       },
                     ),
                       
@@ -61,6 +59,7 @@ class EditProductWidget extends StatelessWidget {
                     Text("Product Name".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     const SizedBox(height: 5),
                      TextField(
+                      controller: ctr.productNameController,
                       decoration: InputDecoration(
                         hintText: "Enter Product Name".tr,
                         border: OutlineInputBorder(),
@@ -69,63 +68,54 @@ class EditProductWidget extends StatelessWidget {
                     const SizedBox(height: 10),
                       Text("Category".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
-                   DropdownButtonFormField<String>(
-                    value: ctr.selectedCategory.value,
-                    decoration: InputDecoration(
-                      hintText: "Select Category".tr,
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "food",
-                        child: Text("Food"),
-                      ),
-                      DropdownMenuItem(
-                        value: "drink",
-                        child: Text("Drink"),
-                      ),
-                      DropdownMenuItem(
-                        value: "snack",
-                        child: Text("Snack"),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      ctr.selectedCategory.value = value ?? '';
-                    },
-                  ),
+                    Obx(() {
+                      return DropdownButtonFormField<String>(
+                        value: ctr.selectedCategory.value,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        ),
+                        items: ctr.categoryCtr.categoryList.map((category) {
+                          return DropdownMenuItem<String>(
+                            value: category["id"].toString(),
+                            child: Text(category["name"]),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          ctr.selectedCategory.value = value;
+                        },
+                      );
+                    }),
                     const SizedBox(height: 10),
           
                      Text("Supplier".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
           
-                   DropdownButtonFormField<String>(
-                    value: ctr.selectedSupplier.value,
-                    decoration: InputDecoration(
-                      hintText: "Select Supplier".tr,
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "Sabrey",
-                        child: Text("sabrey"),
+                  Obx(() {
+                    return DropdownButtonFormField<String>(
+                      value: ctr.selectedSupplier.value,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                       ),
-                      DropdownMenuItem(
-                        value: "test",
-                        child: Text("Test"),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      ctr.selectedSupplier.value = value ?? '';
-                    },
-                  ),
+                      items: ctr.supplierCtr.suppliers.map((supplier) {
+                        return DropdownMenuItem<String>(
+                          value: supplier.id.toString(),
+                          child: Text(supplier.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        ctr.selectedSupplier.value = value;
+                      },
+                    );
+                  }),
                       
                     const SizedBox(height: 10),
                        Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
                 
                     TextField(
+                      controller: ctr.productBarcodeController,
                       decoration: InputDecoration(
                         hintText: "Enter Barcode".tr,
                         border: OutlineInputBorder(),
@@ -157,6 +147,7 @@ class EditProductWidget extends StatelessWidget {
                             const SizedBox(height: 5),
                                   
                             TextField(
+                              controller: ctr.productCostPriceController,
                               decoration: InputDecoration(
                                 hintText: "Enter Cost Price".tr,
                                 border: OutlineInputBorder(),
@@ -171,6 +162,7 @@ class EditProductWidget extends StatelessWidget {
                             Text("Sale Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                             const SizedBox(height: 5),
                             TextField(
+                              controller: ctr.productSalePriceController,
                               decoration: InputDecoration(
                                 hintText: "Enter Sale Price".tr,
                                 border: OutlineInputBorder(),
@@ -194,6 +186,7 @@ class EditProductWidget extends StatelessWidget {
                             const SizedBox(height: 5),
                         
                             TextField(
+                              controller: ctr.productQuantityController,
                               decoration: InputDecoration(
                                 hintText: "Enter Quantity".tr,
                                 border: OutlineInputBorder(),
@@ -243,6 +236,7 @@ class EditProductWidget extends StatelessWidget {
                        TextField(
                         minLines: 3,
                         maxLines: 8,
+                        controller: ctr.productDescriptionController,
                         decoration: InputDecoration(
                           hintText: "Enter Description".tr,
                           border: OutlineInputBorder(),
@@ -262,9 +256,11 @@ class EditProductWidget extends StatelessWidget {
                           foregroundColor: titleColor
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          ctr.onUpdateProduct(
+                            productId, context
+                          );
                         },
-                        child: const Text("Save",
+                        child: const Text("Update",
                           style: TextStyle(
                             fontSize: 18,
                             

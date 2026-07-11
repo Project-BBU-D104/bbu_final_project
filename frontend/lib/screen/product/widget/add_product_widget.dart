@@ -50,10 +50,7 @@ class AddProductWidget extends StatelessWidget {
                       bucket: "product",
                       folder: "products",
                       onUploaded: (url) {
-                        print("Image URL: $url");
-              
-                        // save to SQLite or form model
-                        // productController.image.value = url;
+                        ctr.productPhotoController.text = url;
                       },
                     ),
                       
@@ -61,71 +58,104 @@ class AddProductWidget extends StatelessWidget {
                     Text("Product Name".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     const SizedBox(height: 5),
                      TextField(
+                      controller: ctr.productNameController,
                       decoration: InputDecoration(
                         hintText: "Enter Product Name".tr,
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 10),
-                      Text("Category".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
-                   DropdownButtonFormField<String>(
-                    value: ctr.selectedCategory.value,
-                    decoration: InputDecoration(
-                      hintText: "Select Category".tr,
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    
+                     Text(
+                      "Category".tr,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                      ),
                     ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "food",
-                        child: Text("Food"),
-                      ),
-                      DropdownMenuItem(
-                        value: "drink",
-                        child: Text("Drink"),
-                      ),
-                      DropdownMenuItem(
-                        value: "snack",
-                        child: Text("Snack"),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      ctr.selectedCategory.value = value ?? '';
-                    },
-                  ),
+                    const SizedBox(height: 5),
+
+                    Obx(() {
+
+                      if (ctr.categoryCtr.isLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      return DropdownButtonFormField<String>(
+                        value: ctr.selectedCategory.value,
+
+                        decoration: InputDecoration(
+                          hintText: "Select Category".tr,
+                          border: const OutlineInputBorder(),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
+                        ),
+
+                        items: ctr.categoryCtr.categoryList.map((category) {
+                          return DropdownMenuItem<String>(
+                            value: category["id"].toString(),
+                            child: Text(category["name"]),
+                          );
+                        }).toList(),
+
+                        onChanged: (value) {
+                          ctr.selectedCategory.value = value;
+                        },
+                      );
+                    }),
                     const SizedBox(height: 10),
           
-                     Text("Supplier".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
-          
-                   DropdownButtonFormField<String>(
-                    value: ctr.selectedSupplier.value,
-                    decoration: InputDecoration(
-                      hintText: "Select Supplier".tr,
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    Text(
+                      "Supplier".tr,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                      ),
                     ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "Sabrey",
-                        child: Text("sabrey"),
-                      ),
-                      DropdownMenuItem(
-                        value: "test",
-                        child: Text("Test"),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      ctr.selectedSupplier.value = value ?? '';
-                    },
-                  ),
+                    const SizedBox(height: 5),
+
+                      Obx(() {
+
+                        if (ctr.supplierCtr.isLoading.value) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        return DropdownButtonFormField<String>(
+                          value: ctr.selectedSupplier.value,
+
+                          decoration: InputDecoration(
+                            hintText: "Select Supplier".tr,
+                            border: const OutlineInputBorder(),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 16,
+                            ),
+                          ),
+
+                          items: ctr.supplierCtr.suppliers.map((supplier) {
+                            return DropdownMenuItem<String>(
+                              value: supplier.id.toString(),
+                              child: Text(supplier.name),
+                            );
+                          }).toList(),
+
+                          onChanged: (value) {
+                            ctr.selectedSupplier.value = value;
+                          },
+                        );
+                      }),
                       
                     const SizedBox(height: 10),
                        Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
-                
                     TextField(
+                      controller: ctr.productBarcodeController,
                       decoration: InputDecoration(
                         hintText: "Enter Barcode".tr,
                         border: OutlineInputBorder(),
@@ -161,6 +191,7 @@ class AddProductWidget extends StatelessWidget {
                             const SizedBox(height: 5),
                                   
                             TextField(
+                              controller: ctr.productCostPriceController,
                               decoration: InputDecoration(
                                 hintText: "Enter Cost Price".tr,
                                 border: OutlineInputBorder(),
@@ -175,6 +206,7 @@ class AddProductWidget extends StatelessWidget {
                             Text("Sale Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                             const SizedBox(height: 5),
                             TextField(
+                              controller: ctr.productSalePriceController,
                               decoration: InputDecoration(
                                 hintText: "Enter Sale Price".tr,
                                 border: OutlineInputBorder(),
@@ -198,6 +230,7 @@ class AddProductWidget extends StatelessWidget {
                             const SizedBox(height: 5),
                         
                             TextField(
+                              controller: ctr.productQuantityController,
                               decoration: InputDecoration(
                                 hintText: "Enter Quantity".tr,
                                 border: OutlineInputBorder(),
@@ -247,6 +280,7 @@ class AddProductWidget extends StatelessWidget {
                        TextField(
                         minLines: 3,
                         maxLines: 8,
+                        controller: ctr.productDescriptionController,
                         decoration: InputDecoration(
                           hintText: "Enter Description".tr,
                           border: OutlineInputBorder(),
@@ -266,7 +300,7 @@ class AddProductWidget extends StatelessWidget {
                           foregroundColor: titleColor
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          ctr.onSaveProduct(context);
                         },
                         child: Text("Save".tr,
                           style: TextStyle(

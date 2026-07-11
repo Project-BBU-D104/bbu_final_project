@@ -21,3 +21,7 @@ class UserRead(SQLModel):
     phone: Optional[str]
     photo: Optional[str]
     created_at: Optional[datetime] = None
+
+class UserSimple(SQLModel):
+    id: Optional[int] = None
+    name: str

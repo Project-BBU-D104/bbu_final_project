@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from sqlmodel import Session, select
 from app.models.product import Product
 from app.schemas.product import ProductCreate, ProductUpdate
@@ -65,8 +67,18 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
     return db_product
 
 def delete_product(session: Session, product_id: int):
+
+    if not session.get(Product, product_id):
+        raise HTTPException(
+            status_code=404,
+            detail=" Product not found."
+        )
+    
     product = session.get(Product, product_id)
     if product:
         session.delete(product)
         session.commit()
-    return product
+    return {
+            "message": "Product deleted successfully",
+            "product": product
+        }

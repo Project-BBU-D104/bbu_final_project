@@ -1,9 +1,10 @@
 from datetime import datetime
 from sqlmodel import SQLModel
-from typing import Optional
+from typing import List, Optional
 
-from app.schemas.user import UserRead
-from app.schemas.supplier import SupplierRead
+from app.schemas.user import UserSimple
+from app.schemas.supplier import SupplierSimple
+from app.schemas.purchase_item import PurchaseItemRead
 
 
 class PurchaseCreate(SQLModel):
@@ -43,8 +44,9 @@ class PurchaseUpdate(SQLModel):
 
 
 class PurchaseRead(SQLModel):
-    user: UserRead
-    supplier: SupplierRead
+    user: UserSimple
+    supplier: SupplierSimple
+    purchase_items: List[PurchaseItemRead] = []
     invoice_no: str
     purchase_date: datetime
     subtotal: int
