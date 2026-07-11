@@ -46,14 +46,16 @@ class AddProductWidget extends StatelessWidget {
 
                     const SizedBox(height: 10),
         
-                    // ImageUploadWidget(
-                    //   onUploaded: (url) {
-                    //     print("Image URL: $url");
+                    ImageUploadWidget(
+                      bucket: "product",
+                      folder: "products",
+                      onUploaded: (url) {
+                        print("Image URL: $url");
               
-                    //     // save to SQLite or form model
-                    //     // productController.image.value = url;
-                    //   },
-                    // ),
+                        // save to SQLite or form model
+                        // productController.image.value = url;
+                      },
+                    ),
                       
                     const SizedBox(height: 10),
                     Text("Product Name".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),

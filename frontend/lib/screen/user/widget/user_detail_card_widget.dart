@@ -156,7 +156,7 @@ class UserDetailCardWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ctr.deleteUser(context, user);
+                    ctr.deleteUser(user["id"], context);
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: Text("Delete".tr),
@@ -176,7 +176,7 @@ class UserDetailCardWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ctr.editUser(context, user);
+                    ctr.editUser(context, user["id"]);
                   },
                   icon: const Icon(Icons.edit),
                   label: Text("Edit".tr),

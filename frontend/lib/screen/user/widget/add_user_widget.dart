@@ -48,11 +48,13 @@ class AddUserWidget extends StatelessWidget {
         
             const SizedBox(height: 10),
         
-            // ImageUploadWidget(
-            //     onUploaded: (url) {
-            //       // ctr.customerPhotoController.text = url;
-            //     },
-            // ),
+            ImageUploadWidget(
+              bucket: "user",
+              folder: "users",
+                onUploaded: (url) {
+                  ctr.userPhotoController.text = url;
+                },
+            ),
         
             const SizedBox(height: 10),
         
@@ -60,42 +62,49 @@ class AddUserWidget extends StatelessWidget {
             Text("Role".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             Obx(() {
-        
-                if(roleCtr.isLoading.value){
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-        
-                return DropdownButtonFormField<String>(
-                  value: ctr.selectedRole.value,
-                  decoration: InputDecoration(
-                    hintText: "Select Role".tr,
-                    border: const OutlineInputBorder(),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
-                    ),
-                  ),
-        
-                  items: roleCtr.roleList.map((role){
-                    return DropdownMenuItem<String>(
-                      value: role["id"].toString(),
-                      child: Text(
-                        role["name"] ?? "",
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value){
-                    ctr.selectedRole.value = value;
-                  },
+
+              if(roleCtr.isLoading.value){
+
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
+
+              }
+              return DropdownButtonFormField<String>(
+                value: roleCtr.roleList.any(
+                  (role) =>
+                      role["id"].toString() == ctr.selectedRole.value,
+                )
+                    ? ctr.selectedRole.value
+                    : null,
+                decoration: InputDecoration(
+                  hintText: "Select Role".tr,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                ),
+                items: roleCtr.roleList.map((role){
+                  return DropdownMenuItem<String>(
+                    value: role["id"].toString(),
+                    child: Text(
+                      role["name"] ?? "",
+                    ),
+                  );
+                }).toList(),
+
+                onChanged: (value){
+                  ctr.selectedRole.value = value;
+                },
+              );
             }),
             
             const SizedBox(height: 10),
             Text("Username".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
+              controller: ctr.userNameController,
               decoration: InputDecoration(
                 hintText: "Enter Username".tr,
                 border: OutlineInputBorder(),
@@ -106,6 +115,7 @@ class AddUserWidget extends StatelessWidget {
             Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
+              controller: ctr.userEmailController,
               decoration: InputDecoration(
                 hintText: "Enter Email".tr,
                 border: OutlineInputBorder(),
@@ -115,6 +125,7 @@ class AddUserWidget extends StatelessWidget {
             Text("Password".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
+              controller: ctr.userPasswordController,
               decoration: InputDecoration(
                 hintText: "Enter Password".tr,
                 border: OutlineInputBorder(),
@@ -124,6 +135,7 @@ class AddUserWidget extends StatelessWidget {
             Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
+              controller: ctr.userPhoneController,
               decoration: InputDecoration(
                 hintText: "Enter Phone Number".tr,
                 border: OutlineInputBorder(),
@@ -158,7 +170,7 @@ class AddUserWidget extends StatelessWidget {
                   foregroundColor: titleColor,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  ctr.onSaveUser(context);
                 },
                 child: Text("Save".tr, style: TextStyle(fontSize: 18),),
               ),

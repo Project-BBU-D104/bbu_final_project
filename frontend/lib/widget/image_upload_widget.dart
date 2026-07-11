@@ -22,7 +22,7 @@ class ImageUploadWidget extends StatelessWidget {
   /// Optional folder inside bucket
   final String folder;
 
-  final ctr = Get.find<ImageUploadController>();
+  final ctr = Get.put(ImageUploadController());
 
   @override
   Widget build(BuildContext context) {
