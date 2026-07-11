@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/stock/warehouse/widget/add_warehouse_widget.dart';
 import 'package:frontend/services/main_service/warehouse_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
@@ -10,7 +11,6 @@ class WarehouseController extends GetxController{
   final WarehouseService service = WarehouseService();
   var isLoading = false.obs;
   
-
   final warehouseList = <Map<String, dynamic>>  [].obs;
 
   @override
@@ -29,7 +29,6 @@ class WarehouseController extends GetxController{
         warehouseList.value = List<Map<String, dynamic>>.from(resp);
       }
 
-      print(warehouseList);
     }catch(e){
       ToastWidget.show(
         message: e.toString(),
@@ -40,10 +39,36 @@ class WarehouseController extends GetxController{
     }
   }
 
+  void gotoWarehouseDetail(Map<String, dynamic> warehouse){
+    Get.toNamed(
+      AppRoutes.warehouseDetail,
+      arguments: warehouse,
+    );
+  }
+
   void addWarehouse(BuildContext context){
     AppBottomSheets.show(
       context,
       child: AddWarehouseWidget()
     ); 
+  }
+
+  Future<void> onSaveWarehouse() async{
+    // logic
+  }
+
+  void editWarehouse(BuildContext context){
+    AppBottomSheets.show(
+      context,
+      child: AddWarehouseWidget()
+    ); 
+  }
+
+  Future<void> onUpdateWarehouse() async{
+    // logic
+  }
+
+  Future<void> deleteWarehouse(int warehouseId) async{
+    // logic
   }
 }

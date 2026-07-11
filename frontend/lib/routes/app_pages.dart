@@ -37,6 +37,7 @@ import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
 import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_detail_card_widget.dart';
 import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
+import 'package:frontend/screen/stock/warehouse/widget/ware_house_detail_widget.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
@@ -138,6 +139,10 @@ class AppPages {
       name: AppRoutes.warehouse,
       page: () => WarehouseScreen(),
       binding: WarehouseBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.warehouseDetail,
+      page: () => WareHouseDetailWidget(),
     ),
     GetPage(
       name: AppRoutes.auditLogs,
