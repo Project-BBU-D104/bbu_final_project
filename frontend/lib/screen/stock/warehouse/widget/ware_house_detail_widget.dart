@@ -11,7 +11,7 @@ class WareHouseDetailWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final warehouse = Get.arguments as Map<String, dynamic>;
 
-    
+    print(warehouse);
     return Scaffold(
       appBar: CustomAppBar(title: "WareHouse Detail"),
       body: Text("WareHouse Detail Widget"),
