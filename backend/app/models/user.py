@@ -28,4 +28,4 @@ class User(SQLModel, table=True):
     purchases: List["Purchase"] = Relationship(back_populates="user")
     sales: List["Sale"] = Relationship(back_populates="user")
     sale_payments: List["SalePayment"] = Relationship(back_populates="user")
-    role: List["Role"] = Relationship(back_populates="users")
+    role: Optional["Role"] = Relationship(back_populates="users")

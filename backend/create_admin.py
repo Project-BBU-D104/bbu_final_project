@@ -8,6 +8,8 @@ with Session(engine) as session:
     user = User(
         name="admin",
         password=hash_password("123456"),
+        email="admin",
+        role_id=1
     )
 
     session.add(user)

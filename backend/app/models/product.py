@@ -25,8 +25,6 @@ class Product(SQLModel, table=True):
     photo: str
     cost_price: int
     sale_price: int
-    qty: int
-    allow_insert_qty: bool
     unit: str
     description: Optional[str] = None
     deleted_at: datetime = Field(default_factory=datetime.utcnow)

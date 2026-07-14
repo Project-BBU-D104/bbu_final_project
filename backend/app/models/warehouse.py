@@ -32,3 +32,5 @@ class Warehouse(SQLModel, table=True):
     )
 
     warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="warehouse")
+
+    purchases: List["Purchase"] = Relationship(back_populates="warehouse")

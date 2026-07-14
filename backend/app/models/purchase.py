@@ -6,6 +6,7 @@ from app.models.supplier import Supplier
 
 if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
+    from app.models.warehouse import Warehouse
 
 
 class Purchase(SQLModel, table=True):
@@ -14,6 +15,7 @@ class Purchase(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     supplier_id: int = Field(foreign_key="supplier.id")
+    warehouse_id: int = Field(foreign_key="warehouses.id")
     invoice_no: str
     purchase_date: datetime
     subtotal: int
@@ -31,3 +33,4 @@ class Purchase(SQLModel, table=True):
     user: Optional[User] = Relationship(back_populates="purchases")
     supplier: Optional[Supplier] = Relationship(back_populates="purchases")
     purchase_items: List["PurchaseItem"] = Relationship(back_populates="purchase")
+    warehouse: Optional["Warehouse"] = Relationship(back_populates="purchases")
