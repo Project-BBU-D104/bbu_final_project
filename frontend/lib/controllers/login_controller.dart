@@ -41,6 +41,8 @@ class LoginController extends GetxController {
         },
       );
 
+      await storage.appStartUpWrite(route: "/home");
+
       // print(storage.lastUserLoginRead);
 
       Get.offAllNamed("/home");

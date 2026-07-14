@@ -80,6 +80,12 @@ class ManageController extends GetxController{
           "icon": Icons.warehouse_outlined,
           "route": AppRoutes.warehouse,
         },
+        {
+          "title": "Warehouse Stock",
+          "subtitle": "Warehouse Stock",
+          "icon": Icons.warehouse_outlined,
+          "route": AppRoutes.warehouseStock,
+        },
       ]
     },
 

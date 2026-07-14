@@ -13,6 +13,7 @@ import 'package:frontend/binding/stock_transfer_binding.dart';
 import 'package:frontend/binding/supplier_binding.dart';
 import 'package:frontend/binding/user_binding.dart';
 import 'package:frontend/binding/warehouse_binding.dart';
+import 'package:frontend/binding/warehouse_stock_binding.dart';
 import 'package:frontend/screen/audit_logs/audit_logs_screen.dart';
 import 'package:frontend/screen/audit_logs/widget/audit_log_detail_widget.dart';
 import 'package:frontend/screen/category/category_screen.dart';
@@ -38,6 +39,7 @@ import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart'
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_detail_card_widget.dart';
 import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
 import 'package:frontend/screen/stock/warehouse/widget/ware_house_detail_widget.dart';
+import 'package:frontend/screen/stock/warehouse_stock/warehouse_stock_screen.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
@@ -143,6 +145,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.warehouseDetail,
       page: () => WareHouseDetailWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.warehouseStock,
+      page: () => WarehouseStockScreen(),
+      binding: WarehouseStockBinding(),
     ),
     GetPage(
       name: AppRoutes.auditLogs,
