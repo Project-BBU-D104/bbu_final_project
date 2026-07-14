@@ -6,11 +6,35 @@ from sqlalchemy.orm import selectinload
 
 from app.models.purchase_item import PurchaseItem
 
+def generate_invoice_no(session: Session) -> str:
+    # Get the latest purchase
+    last_purchase = session.exec(
+        select(Purchase).order_by(Purchase.id.desc())
+    ).first()
+
+    if last_purchase is None:
+        return "INV001"
+
+    # If previous invoice is INV001 -> number = 1
+    try:
+        last_number = int(last_purchase.invoice_no.replace("INV", ""))
+    except:
+        last_number = last_purchase.id
+
+    return f"INV{last_number + 1:04d}"
+
 def create_purchase(session: Session, purchase: PurchaseCreate):
-    db_purchase = Purchase.model_validate(purchase)
+    purchase_data = purchase.model_dump()
+
+    if not purchase_data.get("invoice_no"):
+        purchase_data["invoice_no"] = generate_invoice_no(session)
+
+    db_purchase = Purchase(**purchase_data)
+
     session.add(db_purchase)
     session.commit()
     session.refresh(db_purchase)
+
     return db_purchase
 
 def get_all_purchases(session: Session):

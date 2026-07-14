@@ -10,7 +10,7 @@ from app.schemas.purchase_item import PurchaseItemRead
 class PurchaseCreate(SQLModel):
     user_id: int
     supplier_id: int
-    invoice_no: str
+    invoice_no: Optional[str] = None
     purchase_date: datetime
     subtotal: int
     tax_amount: int
@@ -44,6 +44,7 @@ class PurchaseUpdate(SQLModel):
 
 
 class PurchaseRead(SQLModel):
+    id: Optional[int] = None
     user: UserSimple
     supplier: SupplierSimple
     purchase_items: List[PurchaseItemRead] = []
