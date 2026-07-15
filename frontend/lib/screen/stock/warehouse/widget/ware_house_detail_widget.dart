@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class WareHouseDetailWidget extends StatelessWidget {
-  const WareHouseDetailWidget({super.key});
+  WareHouseDetailWidget({super.key});
+
+  final ctr = Get.put(WarehouseController());
 
   @override
   Widget build(BuildContext context) {
@@ -312,7 +315,9 @@ class WareHouseDetailWidget extends StatelessWidget {
 
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    ctr.editWarehouse(context);
+                  },
                   icon: const Icon(Icons.edit),
                   label: const Text("Edit"),
                   style: ElevatedButton.styleFrom(

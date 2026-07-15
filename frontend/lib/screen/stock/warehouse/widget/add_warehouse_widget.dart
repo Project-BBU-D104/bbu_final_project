@@ -3,12 +3,8 @@ import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
 
 class AddWarehouseWidget extends StatelessWidget {
-  
-  String? selectedProduct;
-  String? selectedWarehouse;
-  String? selectedAdjustmentType;
-
-  AddWarehouseWidget({super.key, this.selectedAdjustmentType, this.selectedProduct, this.selectedWarehouse});
+ 
+  AddWarehouseWidget({super.key});
 
 final ctr = Get.find<WarehouseController>();
 
@@ -45,65 +41,56 @@ final ctr = Get.find<WarehouseController>();
                 ),
               ],
             ),
-        
-            const SizedBox(height: 10),
-            Text("From Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+
+            Text("Warehouse Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5,),
-            DropdownButtonFormField<String>(
-                      value: selectedProduct,
-                      decoration: const InputDecoration(
-                        hintText: "From Warehouse",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "warehouse1",
-                          child: Text("Warehouse 1"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse2",
-                          child: Text("Warehouse 2"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse3",
-                          child: Text("Warehouse 3"),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        selectedProduct = value;
-                      },
-                    ),
-                     
-            const SizedBox(height: 15),
+            TextField(
+              // controller: ctr.nameController,
+              decoration: InputDecoration(
+                hintText: "Enter Warehouse Name".tr,
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 10),
+
+            Text("Reference No".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            SizedBox(height: 5),
+            TextField(
+              // controller: ctr.nameController,
+              decoration: InputDecoration(
+                hintText: "Enter Reference No".tr,
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 10),
+
+            Text("Location".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            SizedBox(height: 5),
+            TextField(
+              // controller: ctr.nameController,
+              decoration: InputDecoration(
+                hintText: "Enter Location".tr,
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 10),
+
+            Text("Note".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            SizedBox(height: 5),
+            TextField(
+              // controller: ctr.nameController,
+              maxLines: 5,
+              minLines: 2,
+              decoration: InputDecoration(
+                hintText: "Enter Note".tr,
+                border: OutlineInputBorder(),
+              ),
+            ),
         
-            Text("To Warehouse", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-            SizedBox(height: 5,),
-            DropdownButtonFormField<String>(
-                      value: selectedProduct,
-                      decoration: const InputDecoration(
-                        hintText: "To Warehouse",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "warehouse1",
-                          child: Text("Warehouse 1"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse2",
-                          child: Text("Warehouse 2"),
-                        ),
-                        DropdownMenuItem(
-                          value: "warehouse3",
-                          child: Text("Warehouse 3"),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        selectedProduct = value;
-                      },
-                    ),
+            
 
             const SizedBox(height: 15),
         
