@@ -11,8 +11,8 @@ class ProductController extends GetxController {
 
   final ProductService service = ProductService();
 
-    final CategoryController categoryCtr = Get.find<CategoryController>();
-    final SupplierController supplierCtr = Get.find<SupplierController>();
+  final CategoryController categoryCtr = Get.find<CategoryController>();
+  final SupplierController supplierCtr = Get.find<SupplierController>();
 
 @override
     void onInit() {
@@ -36,13 +36,11 @@ class ProductController extends GetxController {
   var scannedProduct = Rxn<Map<String, dynamic>>();
   var scanResultText = ''.obs;
 
-
   final productPhotoController = TextEditingController();
   final productNameController = TextEditingController();
   final productBarcodeController = TextEditingController();
   final productCostPriceController = TextEditingController();
   final productSalePriceController = TextEditingController();
-  final productQuantityController = TextEditingController();
   final productDescriptionController = TextEditingController();
 
   final RxList<Map<String, dynamic>> _masterList =
@@ -108,7 +106,6 @@ class ProductController extends GetxController {
         'barcode': productBarcodeController.text,
         'cost_price': productCostPriceController.text,
         'sale_price': productSalePriceController.text,
-        'qty': productQuantityController.text,
         'description': productDescriptionController.text,
         'photo': productPhotoController.text,
         'allow_insert_qty': true
@@ -129,9 +126,7 @@ class ProductController extends GetxController {
       productBarcodeController.clear();
       productCostPriceController.clear();
       productSalePriceController.clear();
-      productQuantityController.clear();
       productDescriptionController.clear();
-
       selectedCategory.value = null;
       selectedSupplier.value = null;
       selectedUnit.value = null;
@@ -152,44 +147,47 @@ class ProductController extends GetxController {
   }
 
   Future<void> onEditProduct(int productId, BuildContext context) async {
-  try {
-    final product = await service.getProductById(productId);
+    try {
+      final product = await service.getProductById(productId);
+      productPhotoController.text = product["photo"] ?? "";
+      productNameController.text = product["name"] ?? "";
+      productDescriptionController.text = product["description"] ?? "";
+      productBarcodeController.text = product["barcode"] ?? "";
+      productCostPriceController.text = product["cost_price"].toString();
+      productSalePriceController.text = product["sale_price"].toString();
 
-    // print(product);
+      selectedCategory.value =
+          product["category"] is Map
+              ? product["category"]["id"].toString()
+              : product["category"].toString();
 
-    productPhotoController.text = product["photo"] ?? "";
-    productNameController.text = product["name"] ?? "";
-    productDescriptionController.text = product["description"] ?? "";
-    productBarcodeController.text = product["barcode"] ?? "";
-    productCostPriceController.text = product["cost_price"].toString();
-    productSalePriceController.text = product["sale_price"].toString();
-    productQuantityController.text = product["qty"].toString();
+      selectedSupplier.value =
+          product["supplier"] is Map
+              ? product["supplier"]["id"].toString()
+              : product["supplier"].toString();
+          selectedUnit.value = product["unit"];
 
-    selectedCategory.value =
-        product["category"] is Map
-            ? product["category"]["id"].toString()
-            : product["category"].toString();
-
-    selectedSupplier.value =
-        product["supplier"] is Map
-            ? product["supplier"]["id"].toString()
-            : product["supplier"].toString();
-        selectedUnit.value = product["unit"];
-
-    Get.toNamed(
-      AppRoutes.editProduct,
-      arguments: productId,
-    );
-  } catch (e) {
-    print(e);
+      Get.toNamed(
+        AppRoutes.editProduct,
+        arguments: productId,
+      );
+    } catch (e) {
+      print(e);
+    }
   }
-}
 
   Future<void> onUpdateProduct(int productId, BuildContext context) async {
     try{
       final data = {
         "name": productNameController.text.trim(),
+        "category_id": selectedCategory.value,
+        "supplier_id": selectedSupplier.value,
+        "barcode": productBarcodeController.text.trim(),
+        "cost_price": double.tryParse(productCostPriceController.text) ?? 0,
+        "sale_price": double.tryParse(productSalePriceController.text) ?? 0,
+        "unit": selectedUnit.value,
         "description": productDescriptionController.text.trim(),
+        "photo": productPhotoController.text,
       };
 
       await service.updateProduct(productId, data);

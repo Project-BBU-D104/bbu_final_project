@@ -221,58 +221,41 @@ class AddProductWidget extends StatelessWidget {
 
                     Row(
                       children: [
-                        Expanded(
-                          child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                        
-                            const SizedBox(height: 5),
-                        
-                            TextField(
-                              controller: ctr.productQuantityController,
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+
+                              const SizedBox(height: 5),
+                              DropdownButtonFormField<String>(
+                              value: ctr.selectedUnit.value,
                               decoration: InputDecoration(
-                                hintText: "Enter Quantity".tr,
+                                hintText: "Select Unit".tr,
                                 border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                               ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: "kg",
+                                  child: Text("Kg"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "Unit",
+                                  child: Text("Unit"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "Bottle",
+                                  child: Text("Bottle"),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                ctr.selectedUnit.value = value ?? '';
+                              },
                             ),
-                            ],
-                          )
-                        ),
-
-                        const SizedBox(width: 10),
-
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-
-                         const SizedBox(height: 5),
-                        DropdownButtonFormField<String>(
-                        value: ctr.selectedUnit.value,
-                        decoration: InputDecoration(
-                          hintText: "Select Unit".tr,
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: "kg",
-                            child: Text("Kg"),
-                          ),
-                          DropdownMenuItem(
-                            value: "unit",
-                            child: Text("Unit"),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          ctr.selectedUnit.value = value ?? '';
-                        },
-                      ),
                           ],
                         )),
-                          ],
-                        ),
+                      ],
+                    ),
                 
                     const SizedBox(height: 10),
                     Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),

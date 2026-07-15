@@ -186,7 +186,7 @@ class EditProductWidget extends StatelessWidget {
                             const SizedBox(height: 5),
                         
                             TextField(
-                              controller: ctr.productQuantityController,
+                              // controller: ctr.productQuantityController,
                               decoration: InputDecoration(
                                 hintText: "Enter Quantity".tr,
                                 border: OutlineInputBorder(),
@@ -217,8 +217,12 @@ class EditProductWidget extends StatelessWidget {
                             child: Text("Kg"),
                           ),
                           DropdownMenuItem(
-                            value: "unit",
+                            value: "Unit",
                             child: Text("Unit"),
+                          ),
+                          DropdownMenuItem(
+                            value: "Bottle",
+                            child: Text("Bottle"),
                           ),
                         ],
                         onChanged: (value) {

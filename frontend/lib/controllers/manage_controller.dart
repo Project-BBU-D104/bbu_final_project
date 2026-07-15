@@ -20,12 +20,6 @@ class ManageController extends GetxController{
           "icon": Icons.inventory_2_outlined,
           "route": AppRoutes.product,
         },
-        {
-          "title": "Purchase",
-          "subtitle": "Purchase Management",
-          "icon": Icons.shopping_cart_outlined,
-          "route": AppRoutes.purchase,
-        },
       ]
     },
 
@@ -50,12 +44,24 @@ class ManageController extends GetxController{
     {
       "title": "Stock Management",
       "items": [
-        // {
-        //   "title": "Stock Movement",
-        //   "subtitle": "Stock Movement",
-        //   "icon": Icons.swap_horiz,
-        //   "route": AppRoutes.stockMovement,
-        // },
+        {
+          "title": "Warehouse",
+          "subtitle": "Warehouse",
+          "icon": Icons.warehouse_outlined,
+          "route": AppRoutes.warehouse,
+        },
+        {
+          "title": "Warehouse Stock",
+          "subtitle": "Warehouse Stock",
+          "icon": Icons.warehouse_outlined,
+          "route": AppRoutes.warehouseStock,
+        },
+        {
+          "title": "Purchase",
+          "subtitle": "Purchase Management",
+          "icon": Icons.shopping_cart_outlined,
+          "route": AppRoutes.purchase,
+        },
         {
           "title": "Audit Logs",
           "subtitle": "Audit Logs",
@@ -73,18 +79,6 @@ class ManageController extends GetxController{
           "subtitle": "Stock Transfer",
           "icon": Icons.compare_arrows,
           "route": AppRoutes.stockTransfer,
-        },
-        {
-          "title": "Warehouse",
-          "subtitle": "Warehouse",
-          "icon": Icons.warehouse_outlined,
-          "route": AppRoutes.warehouse,
-        },
-        {
-          "title": "Warehouse Stock",
-          "subtitle": "Warehouse Stock",
-          "icon": Icons.warehouse_outlined,
-          "route": AppRoutes.warehouseStock,
         },
       ]
     },
