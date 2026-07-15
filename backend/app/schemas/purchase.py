@@ -5,11 +5,13 @@ from typing import List, Optional
 from app.schemas.user import UserSimple
 from app.schemas.supplier import SupplierSimple
 from app.schemas.purchase_item import PurchaseItemRead
+from app.schemas.warehouse import WarehouseSimple
 
 
 class PurchaseCreate(SQLModel):
     user_id: int
     supplier_id: int
+    warehouse_id: int
     invoice_no: Optional[str] = None
     purchase_date: datetime
     subtotal: int
@@ -47,6 +49,7 @@ class PurchaseRead(SQLModel):
     id: Optional[int] = None
     user: UserSimple
     supplier: SupplierSimple
+    warehouse: WarehouseSimple
     purchase_items: List[PurchaseItemRead] = []
     invoice_no: str
     purchase_date: datetime

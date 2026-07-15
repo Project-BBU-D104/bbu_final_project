@@ -4,7 +4,7 @@ from app.schemas.warehouse_stock import WarehouseStockCreate, WarehouseStockUpda
 from datetime import datetime
 
 def create_warehouse_stock(session: Session, warehouse_stock: WarehouseStockCreate):
-    db_warehouse_stock = WarehouseStock.from_orm(warehouse_stock)
+    db_warehouse_stock = WarehouseStock.model_validate(warehouse_stock)
     session.add(db_warehouse_stock)
     session.commit()
     session.refresh(db_warehouse_stock)
@@ -37,3 +37,65 @@ def delete_warehouse_stock(session: Session, warehouse_stock_id: int):
         session.delete(warehouse_stock)
         session.commit()
     return warehouse_stock
+
+
+# -----------------------------------------
+# Inventory Helper Functions
+# -----------------------------------------
+
+def increase_stock(
+    session: Session,
+    product_id: int,
+    warehouse_id: int,
+    qty: int,
+):
+    """
+    Increase warehouse stock after purchase.
+    """
+
+    stock = session.exec(
+        select(WarehouseStock).where(
+            WarehouseStock.product_id == product_id,
+            WarehouseStock.warehouse_id == warehouse_id,
+        )
+    ).first()
+
+    if stock:
+        stock.qty += qty
+    else:
+        stock = WarehouseStock(
+            product_id=product_id,
+            warehouse_id=warehouse_id,
+            qty=qty,
+        )
+        session.add(stock)
+
+    return stock
+
+
+def decrease_stock(
+    session: Session,
+    product_id: int,
+    warehouse_id: int,
+    qty: int,
+):
+    """
+    Decrease warehouse stock after sale.
+    """
+
+    stock = session.exec(
+        select(WarehouseStock).where(
+            WarehouseStock.product_id == product_id,
+            WarehouseStock.warehouse_id == warehouse_id,
+        )
+    ).first()
+
+    if stock is None:
+        raise ValueError("Stock not found.")
+
+    if stock.qty < qty:
+        raise ValueError("Insufficient stock.")
+
+    stock.qty -= qty
+
+    return stock

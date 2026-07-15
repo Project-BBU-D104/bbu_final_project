@@ -3,11 +3,35 @@ from app.models.warehouse import Warehouse
 from app.schemas.warehouse import WarehouseCreate, WarehouseUpdate
 from datetime import datetime
 
+def generate_reference_no(session: Session) -> str:
+    # Get the latest warehouse
+    last_warehouse = session.exec(
+        select(Warehouse).order_by(Warehouse.id.desc())
+    ).first()
+
+    if last_warehouse is None:
+        return "WH001"
+
+    # If previous invoice is WH001 -> number = 1
+    try:
+        last_number = int(last_warehouse.reference_no.replace("WH", ""))
+    except:
+        last_number = last_warehouse.id
+
+    return f"WH{last_number + 1:04d}"
+
 def create_warehouse(session: Session, warehouse: WarehouseCreate):
-    db_warehouse = Warehouse.from_orm(warehouse)
+    warehouse_data = warehouse.model_dump()
+
+    if not warehouse_data.get("reference_no"):
+        warehouse_data["reference_no"] = generate_reference_no(session)
+
+    db_warehouse = Warehouse(**warehouse_data)
+
     session.add(db_warehouse)
     session.commit()
     session.refresh(db_warehouse)
+
     return db_warehouse
 
 def get_all_warehouse(session: Session):

@@ -4,8 +4,8 @@ import 'package:frontend/services/auth_service.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
-  final usernameController = TextEditingController(text: "sabrey");
-  final passwordController = TextEditingController(text:"sabrey@123");
+  final usernameController = TextEditingController(text: "admin");
+  final passwordController = TextEditingController(text:"123456");
 
   final authService = AuthService();
 

@@ -13,8 +13,6 @@ class ProductCreate(SQLModel):
     photo: str
     cost_price: int
     sale_price: int
-    qty: int
-    allow_insert_qty: bool
     unit: str
     description: Optional[str] = None
 
@@ -43,8 +41,6 @@ class ProductRead(SQLModel):
     photo: Optional[str] = None
     cost_price: Optional[int] = None
     sale_price: Optional[int] = None
-    qty: Optional[int] = None
-    allow_insert_qty: Optional[bool] = None
     unit: Optional[str] = None
     description: Optional[str] = None
     created_at: Optional[datetime] = None
