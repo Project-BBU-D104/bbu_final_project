@@ -48,6 +48,9 @@ class CustomerController extends GetxController{
     }catch(e){
       // 
     }
+    finally{
+      isLoading.value = false;
+    }
   }
 
   void addCustomer(BuildContext context){

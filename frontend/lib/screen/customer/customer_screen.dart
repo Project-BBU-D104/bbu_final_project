@@ -26,6 +26,8 @@ class CustomerScreen extends StatelessWidget {
               SearchWidget(title: "Search Customers by name or ID".tr),
 
               SizedBox(height: 8,),
+
+              if(ctr.customerList.isNotEmpty)
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -49,15 +51,40 @@ class CustomerScreen extends StatelessWidget {
               SizedBox(height: 8,),
 
               Obx(()
-                => ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.customerList.length,
-                  itemBuilder: (context, index){
-                    final customer = ctr.customerList[index];
-                    return CustomerCardWidget(customer: customer);
-                  },
-                ),
+                { 
+                  if (ctr.isLoading.value) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  if (ctr.customerList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text(
+                          "No customers found",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: ctr.customerList.length,
+                    itemBuilder: (context, index){
+                      final customer = ctr.customerList[index];
+                      return CustomerCardWidget(customer: customer);
+                    },
+                  );
+                }
               ),
               SizedBox(height: 70,),
             ],

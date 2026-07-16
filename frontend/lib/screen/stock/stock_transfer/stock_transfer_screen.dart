@@ -33,20 +33,45 @@ class StockTransferScreen extends StatelessWidget {
               
               SizedBox(height: 8,),
         
-              Obx(()=> ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.stockTransfer.length,
-                  padding: const EdgeInsets.only(bottom: 100), 
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: StockTransferCardWidget( 
-                        stockTransfer: ctr.stockTransfer[index],
+              Obx((){ 
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (ctr.stockTransfer.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No data found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: ctr.stockTransfer.length,
+                    padding: const EdgeInsets.only(bottom: 100), 
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: StockTransferCardWidget( 
+                          stockTransfer: ctr.stockTransfer[index],
+                        ),
+                      );
+                    },
+                  );
+                }
               ),
             ],
               ),

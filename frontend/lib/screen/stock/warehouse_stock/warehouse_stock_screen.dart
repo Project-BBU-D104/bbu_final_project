@@ -34,19 +34,37 @@ class WarehouseStockScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
               
-                  Obx(() => ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.warehouseStockList.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsetsGeometry.only(
-                        bottom: 8.0
+                  Obx((){ 
+                    if (ctr.isLoading.value) {
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (ctr.warehouseStockList.isEmpty) {
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: Center(
+                          child: Text("No Data Found".tr),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: ctr.warehouseStockList.length,
+                      padding: const EdgeInsets.only(bottom: 70),
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsetsGeometry.only(
+                          bottom: 8.0
+                        ),
+                        child: WarehouseStockCardWidget(warehouseStock: ctr.warehouseStockList[index],),
                       ),
-                      child: WarehouseStockCardWidget(warehouseStock: ctr.warehouseStockList[index],),
-                    ),
-                  ),),
-              
-              
+                    );
+                  })
                 ],
               ),
             ),

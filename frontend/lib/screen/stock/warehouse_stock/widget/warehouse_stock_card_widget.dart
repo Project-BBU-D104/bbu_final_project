@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/warehouse_stock_controller.dart';
+import 'package:get/get.dart';
 
 class WarehouseStockCardWidget extends StatelessWidget {
   final Map<String, dynamic> warehouseStock;
 
-  const WarehouseStockCardWidget({
+  WarehouseStockCardWidget({
     super.key,
     required this.warehouseStock,
   });
+
+  final ctr = Get.find<WarehouseStockController>();
 
   @override
   Widget build(BuildContext context) {
@@ -75,15 +79,6 @@ class WarehouseStockCardWidget extends StatelessWidget {
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
                 itemBuilder: (context) => [
-
-                  PopupMenuItem(
-                    onTap: (){
-                      print("View");
-                    },
-                    value: "view",
-                    child: Text("View"),
-                  ),
-
                   PopupMenuItem(
                     onTap: (){
                       print("View");
@@ -94,7 +89,7 @@ class WarehouseStockCardWidget extends StatelessWidget {
 
                   PopupMenuItem(
                     onTap: (){
-                      print("View");
+                      ctr.onDeleteWarehouseStock(warehouseStock["id"], context);
                     },
                     value: "delete",
                     child: Text(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
 
@@ -94,11 +95,17 @@ final ctr = Get.find<WarehouseController>();
         
             SizedBox(
               width: double.infinity,
+              height: 45,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: successColor,
+                ),
                 onPressed: () {
                   ctr.onSaveWarehouse();
                 },
-                child: const Text("Save"),
+                child: Text("Save",
+                 style: TextStyle(fontSize: 18, color: titleColor),
+                ),
               ),
             ),
           ],

@@ -31,17 +31,38 @@ class WarehouseScreen extends StatelessWidget {
               ),
            SizedBox(height: 15,),
 
-              Obx(() => ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctr.warehouseList.length,
-                itemBuilder: (context, index) => Padding(
-                  padding: const EdgeInsetsGeometry.only(
-                    bottom: 8.0
+              Obx(() {
+                if (ctr.isLoading.value) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                if (ctr.warehouseList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text("No Warehouse Found".tr),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: ctr.warehouseList.length,
+                  itemBuilder: (context, index) => Padding(
+                    padding: const EdgeInsetsGeometry.only(
+                      bottom: 8.0
+                    ),
+                    child: WarehouseCardWidget( warehouse: ctr.warehouseList[index],),
                   ),
-                  child: WarehouseCardWidget( warehouse: ctr.warehouseList[index],),
-                ),
-              ),),
+                );
+              }),
+              
               SizedBox(height: 70,)
             ],
           ),

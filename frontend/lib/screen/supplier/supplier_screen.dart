@@ -42,7 +42,27 @@ class SupplierScreen extends StatelessWidget {
               const SizedBox(height:16),
               Expanded(
                 child: Obx(
-                  ()=>ListView.builder(
+                  () { 
+                    
+                    if (controller.isLoading.value) {
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (controller.suppliers.isEmpty) {
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: Center(
+                          child: Text("No Suppliers Found".tr),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
                     itemCount: controller.suppliers.length,
                     padding: const EdgeInsets.only(bottom: 70),
                     itemBuilder:(context,index){
@@ -58,8 +78,8 @@ class SupplierScreen extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
-                ),
+                  );
+                })
               ),
             ],
           ),

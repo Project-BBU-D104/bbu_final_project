@@ -38,14 +38,40 @@ StockAdjustmentScreen({super.key});
         
               SizedBox(height: 10,),
               
-               Obx(()=> ListView.builder(
+               Obx(() {
+
+                  if (ctr.isLoading.value) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  if (ctr.stockAdjustmentList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text(
+                          "No stock adjustment found",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: ctr.stockAdjustmentList.length,
                     itemBuilder: (context, index){
                       return StockAdjustmentCardWidget(stockAdjustment: ctr.stockAdjustmentList[index]);
                     }
-                  ),
+                  );
+                }
                ),
 
               SizedBox(height: 80,),

@@ -31,7 +31,31 @@ class AuditLogsScreen extends StatelessWidget {
                 ChipWidget(title: "Canceled"),
               ],),
 
-              Obx(()=> ListView.builder(
+              Obx(() { 
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (ctr.auditLogs.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No audit logs found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: ctr.auditLogs.length,
@@ -39,7 +63,7 @@ class AuditLogsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: AuditCardWidget(auditLog: ctr.auditLogs[index],),
                   ),
-                ),
+                );}
               ),
               SizedBox(height: 70)
             ],

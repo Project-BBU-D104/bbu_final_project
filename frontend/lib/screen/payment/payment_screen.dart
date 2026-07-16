@@ -32,14 +32,43 @@ class PaymentScreen extends StatelessWidget {
                 ]
               ),
               SizedBox(height: 10,),
+
+              
         
-              Obx(() => ListView.builder(
+              Obx(() {
+
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (ctr.paymentList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No payment found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: ctr.paymentList.length,
                   itemBuilder: (context, index) => 
                      PaymentCardListWidget(payment: ctr.paymentList[index],),
-                  ),
+                  );
+                  }
                 ),
               SizedBox(height: 70,)
             ]

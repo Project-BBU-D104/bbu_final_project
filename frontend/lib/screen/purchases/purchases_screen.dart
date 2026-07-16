@@ -22,6 +22,7 @@ class PurchasesScreen extends StatelessWidget {
           children: [
 
             // KPI ROW
+            if(ctr.purchaseList.isNotEmpty)
             Row(
               children: [
                 Expanded(
@@ -47,7 +48,31 @@ class PurchasesScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             // LIST (ONLY SCROLL AREA)
-            Obx(() => Expanded(
+            Obx(() { 
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (ctr.purchaseList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No purchase found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              return Expanded(
                 child: ListView.builder(
                   itemCount: ctr.purchaseList.length,
                   padding: const EdgeInsets.only(bottom: 70),
@@ -59,7 +84,8 @@ class PurchasesScreen extends StatelessWidget {
                     );
                   },
                 ),
-              ),
+              );
+              }
             ),            
           ],
         ),

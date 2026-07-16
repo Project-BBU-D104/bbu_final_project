@@ -38,18 +38,38 @@ class SaleListScreen extends StatelessWidget {
 
               SizedBox(height: 10,),
 
-              Obx(()=> ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.saleList.length,
-                  itemBuilder: (context, index) {
-                    final sale = ctr.saleList[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SaleCardWidget(sale: sale),
+              Obx((){ 
+                  if (ctr.isLoading.value) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     );
-                  },
-                ),
+                  }
+
+                  if (ctr.saleList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text("No Sale Found".tr),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: ctr.saleList.length,
+                    itemBuilder: (context, index) {
+                      final sale = ctr.saleList[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SaleCardWidget(sale: sale),
+                      );
+                    },
+                  );
+                }
               ),
               SizedBox(height: 80,)
             ]
