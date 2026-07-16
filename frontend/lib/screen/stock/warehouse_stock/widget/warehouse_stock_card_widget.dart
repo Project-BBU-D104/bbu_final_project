@@ -67,7 +67,7 @@ class WarehouseStockCardWidget extends StatelessWidget {
                     const SizedBox(height: 6),
 
                     Text(
-                      "Barcode: ${product["barcode"] ?? "-"}",
+                      "${warehouseStock["warehouse"]['name'] ?? "-"}",
                       style: TextStyle(
                         color: Colors.grey.shade600,
                       ),

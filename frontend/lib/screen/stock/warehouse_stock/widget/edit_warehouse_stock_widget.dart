@@ -32,7 +32,7 @@ class EditWarehouseStockWidget extends StatelessWidget {
               children: [
                 const Expanded(
                   child: Text(
-                    "Add Warehouse Stock",
+                    "Edit Warehouse Stock",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -217,11 +217,14 @@ class EditWarehouseStockWidget extends StatelessWidget {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  ctr.onSaveWarehouseStock();
+                  ctr.onUpdateWarehouseStock(
+                   warehouseStockId,
+                   context
+                  );
                 },
                 icon: const Icon(Icons.save),
                 label: const Text(
-                  "Save",
+                  "Update",
                   style: TextStyle(fontSize: 16),
                 ),
               ),

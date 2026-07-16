@@ -29,20 +29,28 @@ def get_all_warehouse_stock(session: Session):
 def get_warehouse_stock(session: Session, warehouse_stock_id: int):
     return session.get(WarehouseStock, warehouse_stock_id)
 
-def update_warehouse_stock(session: Session, warehouse_stock_id: int, warehouse_stock: WarehouseStockUpdate):
-    db_warehouse_stock = session.get(WarehouseStock, warehouse_stock_id)
-    if db_warehouse_stock:
-        if warehouse_stock.product_id is not None:
-            db_warehouse_stock.product_id = warehouse_stock.product_id
-        if warehouse_stock.warehouse_id is not None:
-            db_warehouse_stock.warehouse_id = warehouse_stock.warehouse_id
-        if warehouse_stock.qty is not None:
-            db_warehouse_stock.qty = warehouse_stock.qty
-         
-        session.add(db_warehouse_stock)
-        session.commit()
-        session.refresh(db_warehouse_stock)
-    return db_warehouse_stock
+def update_warehouse_stock(
+    session: Session,
+    warehouse_stock_id: int,
+    warehouse_stock: WarehouseStockUpdate,
+):
+    db_stock = session.get(WarehouseStock, warehouse_stock_id)
+
+    if not db_stock:
+        return None
+
+    db_stock.warehouse_id = warehouse_stock.warehouse_id
+
+    item = warehouse_stock.items[0]
+
+    db_stock.product_id = item.product_id
+    db_stock.qty = item.qty
+
+    session.add(db_stock)
+    session.commit()
+    session.refresh(db_stock)
+
+    return db_stock
 
 def delete_warehouse_stock(session: Session, warehouse_stock_id: int):
     warehouse_stock = session.get(WarehouseStock, warehouse_stock_id)

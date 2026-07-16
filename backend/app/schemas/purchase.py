@@ -5,8 +5,7 @@ from typing import List, Optional
 from app.schemas.user import UserSimple
 from app.schemas.supplier import SupplierSimple
 from app.schemas.purchase_item import PurchaseItemRead
-from app.schemas.warehouse import WarehouseSimple
-
+from app.schemas.warehouse_base import WarehouseSimple
 
 class PurchaseCreate(SQLModel):
     user_id: int

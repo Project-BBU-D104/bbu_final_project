@@ -49,10 +49,7 @@ class WarehouseStockController extends GetxController{
 
       if(resp is List){
         warehouseStockList.value = List<Map<String, dynamic>>.from(resp);
-      }
-
-      print(warehouseStockList);
-      
+      }      
     }catch(e){
       ToastWidget.show(
         message: e.toString(),
@@ -130,13 +127,9 @@ class WarehouseStockController extends GetxController{
       warehouseStockId,
     );
 
-    print("EDIT RESPONSE:");
-    print(stock);
-
+    selectedWarehouse.value = stock["warehouse_id"].toString();
 
     productRows.clear();
-
-  
 
    productRows.add({
   "product": RxnString(
@@ -148,29 +141,79 @@ class WarehouseStockController extends GetxController{
   ),
 });
 
-
     AppBottomSheets.show(
       context,
       child: EditWarehouseStockWidget(
         warehouseStockId: warehouseStockId,
       ),
     );
-
-
   } catch(e){
-
     ToastWidget.show(
       message: e.toString(),
       type: ToastType.error,
     );
-
   }
 }
 
-  void onUpdateWarehouseStock() async{
-    // 
-  }
+  Future<void> onUpdateWarehouseStock(
+  int warehouseStockId,
+  BuildContext context,
+) async {
+  try {
+    isLoading.value = true;
 
+    if (selectedWarehouse.value == null) {
+      throw Exception("Please select a warehouse.");
+    }
+
+    final data = {
+      "warehouse_id": int.parse(selectedWarehouse.value!),
+      "items": productRows.map((row) {
+        return {
+          "product_id": int.parse(
+            (row["product"] as RxnString).value!,
+          ),
+          "qty": int.parse(
+            (row["qty"] as TextEditingController).text,
+          ),
+        };
+      }).toList(),
+    };
+
+    await service.updateWarehouseStock(
+      warehouseStockId,
+      data,
+    );
+
+    ToastWidget.show(
+      message: "Warehouse stock updated successfully".tr,
+      type: ToastType.success,
+    );
+
+    await getWarehouseStock();
+
+    Navigator.pop(context);
+
+    // Reset form
+    selectedWarehouse.value = null;
+    selectedProduct.value = null;
+
+    for (final row in productRows) {
+      (row["qty"] as TextEditingController).dispose();
+    }
+
+    productRows.clear();
+    warehouseStockQtyController.clear();
+    addProductRow();
+  } catch (e) {
+    ToastWidget.show(
+      message: e.toString(),
+      type: ToastType.error,
+    );
+  } finally {
+    isLoading.value = false;
+  }
+}
 
   Future<void> onDeleteWarehouseStock(int warehouseStockId, BuildContext context) async{
     showConfirmDialog(

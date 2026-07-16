@@ -1,7 +1,12 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 
+if TYPE_CHECKING:
+    from app.models.stock_adjustment import StockAdjustment
+    from app.models.product_transfer import ProductTransfer
+    from app.models.warehouse_stock import WarehouseStock
+    from app.models.purchase import Purchase
 
 class Warehouse(SQLModel, table=True):
     __tablename__ = "warehouses"

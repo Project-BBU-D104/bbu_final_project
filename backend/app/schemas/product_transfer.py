@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
 
-from app.schemas.warehouse import WarehouseSimple
+from app.schemas.warehouse_base import WarehouseSimple
 from app.schemas.product import ProductRead
 
 

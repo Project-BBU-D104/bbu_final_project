@@ -4,6 +4,7 @@ from datetime import datetime
 
 if TYPE_CHECKING:
     from app.models.audit_logs import AuditLogs
+    from app.models.product import Product
     from app.models.warehouse import Warehouse
 
 class WarehouseStock(SQLModel, table=True):
