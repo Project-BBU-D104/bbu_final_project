@@ -18,34 +18,37 @@ class WarehouseStockScreen extends StatelessWidget {
       body: SafeArea(
         child: 
           SingleChildScrollView(
-            child: Column(
-              children: [
-            
-                SearchWidget(title: "Search Warehouse Stock"),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    ChipWidget(title: "All"),
-                    ChipWidget(title: "Active"),
-                    ChipWidget(title: "Inactive"),
-                  ]
-                ),
-                SizedBox(height: 10),
-            
-                Obx(() => ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.warehouseStockList.length,
-                  itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsetsGeometry.only(
-                      bottom: 8.0
-                    ),
-                    child: WarehouseStockCardWidget(warehouseStock: ctr.warehouseStockList[index],),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  SearchWidget(title: "Search Warehouse Stock"),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      ChipWidget(title: "All"),
+                      ChipWidget(title: "Active"),
+                      ChipWidget(title: "Inactive"),
+                    ]
                   ),
-                ),),
-            
-            
-              ],
+                  SizedBox(height: 10),
+              
+                  Obx(() => ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: ctr.warehouseStockList.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsetsGeometry.only(
+                        bottom: 8.0
+                      ),
+                      child: WarehouseStockCardWidget(warehouseStock: ctr.warehouseStockList[index],),
+                    ),
+                  ),),
+              
+              
+                ],
+              ),
             ),
           )
       ),

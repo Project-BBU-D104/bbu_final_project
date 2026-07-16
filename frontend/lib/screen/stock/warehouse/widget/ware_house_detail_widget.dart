@@ -91,6 +91,7 @@ class WareHouseDetailWidget extends StatelessWidget {
             const SizedBox(height: 18),
 
             /// Statistics
+            if(totalProducts > 0)
             Row(
               children: [
 
@@ -109,6 +110,7 @@ class WareHouseDetailWidget extends StatelessWidget {
 
             const SizedBox(height: 20),
 
+            if(stocks.isNotEmpty)
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -128,42 +130,42 @@ class WareHouseDetailWidget extends StatelessWidget {
                 final product = stock["product"];
 
                 return Card(
-  margin: const EdgeInsets.only(bottom: 16),
-  elevation: 0,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(18),
-    side: BorderSide(
-      color: Colors.grey.shade200,
-    ),
-  ),
-  child: Padding(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.network(
-                product["photo"] ?? "",
-                width: 90,
-                height: 90,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
-                  return Container(
-                    width: 90,
-                    height: 90,
+                margin: const EdgeInsets.only(bottom: 16),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(
                     color: Colors.grey.shade200,
-                    child: const Icon(
-                      Icons.inventory_2,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-              ),
-            ),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Image.network(
+                              product["photo"] ?? "",
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) {
+                                return Container(
+                                  width: 90,
+                                  height: 90,
+                                  color: Colors.grey.shade200,
+                                  child: const Icon(
+                                    Icons.inventory_2,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
 
             const SizedBox(width: 16),
 
@@ -297,7 +299,12 @@ class WareHouseDetailWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    ctr.deleteWarehouse(
+                      context,
+                      warehouse["id"]
+                    );
+                  },
                   icon: const Icon(Icons.delete_outline),
                   label: const Text("Delete"),
                   style: OutlinedButton.styleFrom(
@@ -316,7 +323,7 @@ class WareHouseDetailWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ctr.editWarehouse(context);
+                    ctr.editWarehouse(context, warehouse["id"]);
                   },
                   icon: const Icon(Icons.edit),
                   label: const Text("Edit"),

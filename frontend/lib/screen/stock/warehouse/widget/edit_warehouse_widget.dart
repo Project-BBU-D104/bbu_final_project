@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
 
-class AddWarehouseWidget extends StatelessWidget {
- 
-  AddWarehouseWidget({super.key});
+class EditWarehouseWidget extends StatelessWidget {
+ final int warehouseId;
+  EditWarehouseWidget({super.key, required this.warehouseId});
 
 final ctr = Get.find<WarehouseController>();
 
@@ -45,7 +45,7 @@ final ctr = Get.find<WarehouseController>();
             Text("Warehouse Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5,),
             TextField(
-              // controller: ctr.nameController,
+              controller: ctr.warehouseNameController,
               decoration: InputDecoration(
                 hintText: "Enter Warehouse Name".tr,
                 border: OutlineInputBorder(),
@@ -57,7 +57,7 @@ final ctr = Get.find<WarehouseController>();
             Text("Reference No".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
-              // controller: ctr.nameController,
+              controller: ctr.warehouseReferenceNoController,
               decoration: InputDecoration(
                 hintText: "Enter Reference No".tr,
                 border: OutlineInputBorder(),
@@ -69,7 +69,7 @@ final ctr = Get.find<WarehouseController>();
             Text("Location".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
-              // controller: ctr.nameController,
+              controller: ctr.warehouseLocationController,
               decoration: InputDecoration(
                 hintText: "Enter Location".tr,
                 border: OutlineInputBorder(),
@@ -81,7 +81,7 @@ final ctr = Get.find<WarehouseController>();
             Text("Note".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5),
             TextField(
-              // controller: ctr.nameController,
+              controller: ctr.warehouseNoteController,
               maxLines: 5,
               minLines: 2,
               decoration: InputDecoration(
@@ -98,7 +98,11 @@ final ctr = Get.find<WarehouseController>();
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  ctr.onUpdateWarehouse(
+                    context,
+                    warehouseId,
+                    
+                  );
                 },
                 child: const Text("Save"),
               ),

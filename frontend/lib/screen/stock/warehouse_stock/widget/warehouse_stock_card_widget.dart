@@ -13,44 +13,37 @@ class WarehouseStockCardWidget extends StatelessWidget {
     final product = warehouseStock["product"];
 
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 10,
-      ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(.15),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Colors.grey.shade200,
+        ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          /// Product Header
+          /// HEADER
           Row(
             children: [
 
               Container(
-                width: 70,
-                height: 70,
+                width: 62,
+                height: 62,
                 decoration: BoxDecoration(
                   color: Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Icon(
-                  Icons.inventory_2_rounded,
-                  size: 38,
+                  Icons.inventory_2,
                   color: Colors.blue,
+                  size: 32,
                 ),
               ),
 
-              const SizedBox(width: 15),
+              const SizedBox(width: 14),
 
               Expanded(
                 child: Column(
@@ -73,214 +66,229 @@ class WarehouseStockCardWidget extends StatelessWidget {
                       "Barcode: ${product["barcode"] ?? "-"}",
                       style: TextStyle(
                         color: Colors.grey.shade600,
-                        fontSize: 13,
                       ),
                     ),
-
                   ],
                 ),
               ),
 
-              _stockBadge(
-                "${warehouseStock["qty"]}",
-                product["unit"],
-              ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) => [
 
+                  PopupMenuItem(
+                    onTap: (){
+                      print("View");
+                    },
+                    value: "view",
+                    child: Text("View"),
+                  ),
+
+                  PopupMenuItem(
+                    onTap: (){
+                      print("View");
+                    },
+                    value: "edit",
+                    child: Text("Edit"),
+                  ),
+
+                  PopupMenuItem(
+                    onTap: (){
+                      print("View");
+                    },
+                    value: "delete",
+                    child: Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
 
-
           const SizedBox(height: 18),
 
-
-          /// Product Detail
-          Row(
-            children: [
-
-              Expanded(
-                child: _detailItem(
-                  Icons.category,
-                  "Category",
-                  product["category"]["name"],
-                ),
-              ),
-
-              Expanded(
-                child: _detailItem(
-                  Icons.local_shipping,
-                  "Supplier",
-                  product["supplier"]["name"],
-                ),
-              ),
-
-            ],
-          ),
-
-
-          const SizedBox(height: 18),
-
-
-          /// Price Section
+          /// STOCK CARD
           Container(
-            padding: const EdgeInsets.all(14),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 18),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(16),
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(18),
             ),
-            child: Row(
+            child: Column(
               children: [
 
-                Expanded(
-                  child: _priceItem(
-                    "Cost Price",
-                    "\$${product["cost_price"]}",
-                    Colors.orange,
+                Text(
+                  "Available Stock",
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
 
+                const SizedBox(height: 8),
 
-                Container(
-                  width: 1,
-                  height: 40,
-                  color: Colors.grey.shade300,
-                ),
-
-
-                Expanded(
-                  child: _priceItem(
-                    "Sale Price",
-                    "\$${product["sale_price"] ?? 0}",
-                    Colors.green,
+                Text(
+                  "${warehouseStock["qty"]}",
+                  style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 34,
                   ),
                 ),
 
+                Text(
+                  product["unit"] ?? "",
+                  style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),
 
+          const SizedBox(height: 18),
+
+          /// CATEGORY + SUPPLIER
+          Row(
+            children: [
+              Expanded(
+                child: _infoCard(
+                  icon: Icons.category_rounded,
+                  title: "Category",
+                  value: product["category"]["name"] ?? "-",
+                  color: Colors.orange,
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              Expanded(
+                child: _infoCard(
+                  icon: Icons.local_shipping_rounded,
+                  title: "Supplier",
+                  value: product["supplier"]["name"] ?? "-",
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          /// PRICE
+          Row(
+            children: [
+
+              Expanded(
+                child: _priceCard(
+                  "Cost Price",
+                  "\$${product["cost_price"]}",
+                  Colors.orange,
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              Expanded(
+                child: _priceCard(
+                  "Sale Price",
+                  "\$${product["sale_price"]}",
+                  Colors.green,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-
-  Widget _stockBadge(String qty, String unit) {
-
+  Widget _priceCard(String title, String price, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        borderRadius: BorderRadius.circular(30),
+        color: color.withOpacity(.08),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         children: [
 
           Text(
-            qty,
+            title,
             style: TextStyle(
-              color: Colors.green.shade700,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+              color: Colors.grey.shade600,
             ),
           ),
+
+          const SizedBox(height: 8),
 
           Text(
-            unit,
+            price,
             style: TextStyle(
-              color: Colors.green.shade600,
-              fontSize: 11,
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
             ),
           ),
-
         ],
       ),
     );
   }
+}
 
-
-
-  Widget _detailItem(
-    IconData icon,
-    String title,
-    String value,
-  ) {
-
-    return Row(
+Widget _infoCard({
+  required IconData icon,
+  required String title,
+  required String value,
+  required Color color,
+}) {
+  return Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: color.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: color.withOpacity(0.2),
+      ),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        Icon(
-          icon,
-          size: 20,
-          color: Colors.blue,
+        Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: color,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
 
-        const SizedBox(width: 8),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
-
-            ],
-          ),
-        )
-
-      ],
-    );
-  }
-
-
-
-  Widget _priceItem(
-    String title,
-    String value,
-    Color color,
-  ) {
-
-    return Column(
-      children: [
-
-        Text(
-          title,
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 12,
-          ),
-        ),
-
-        const SizedBox(height: 5),
+        const SizedBox(height: 10),
 
         Text(
           value,
-          style: TextStyle(
-            color: color,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 15,
           ),
         ),
-
       ],
-    );
-  }
+    ),
+  );
 }

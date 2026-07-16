@@ -25,10 +25,7 @@ class WarehouseStockController extends GetxController{
       if(resp is List){
         warehouseStockList.value = List<Map<String, dynamic>>.from(resp);
       }
-
-      print(warehouseStockList);
-
-
+      
     }catch(e){
       // 
     }
