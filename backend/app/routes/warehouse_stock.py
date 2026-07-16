@@ -6,7 +6,7 @@ from app.crud.warehouse_stock import  create_warehouse_stock, get_all_warehouse_
 
 router = APIRouter(prefix="/warehouse_stock", tags=["warehouse_stock"])
 
-@router.post("/", response_model=WarehouseStockRead)
+@router.post("/", response_model=list[WarehouseStockRead])
 def create_new_warehouse_stock(warehouse_stock: WarehouseStockCreate, session: Session = Depends(get_session)):
     return create_warehouse_stock(session, warehouse_stock)
 

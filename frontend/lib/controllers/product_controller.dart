@@ -14,14 +14,14 @@ class ProductController extends GetxController {
   final CategoryController categoryCtr = Get.find<CategoryController>();
   final SupplierController supplierCtr = Get.find<SupplierController>();
 
-@override
-    void onInit() {
-      super.onInit();
-      getProducts();
+  @override
+  void onInit() {
+    super.onInit();
+    getProducts();
 
-      categoryCtr.getCategory();
-      supplierCtr.getSuppliers();
-    }
+    categoryCtr.getCategory();
+    supplierCtr.getSuppliers();
+  }
 
   var isLoading = false.obs;
   var searchQuery = ''.obs;
@@ -44,9 +44,7 @@ class ProductController extends GetxController {
   final productDescriptionController = TextEditingController();
 
   final RxList<Map<String, dynamic>> _masterList =
-      <Map<String, dynamic>>[].obs;
-
-    
+    <Map<String, dynamic>>[].obs;
 
     Future<void> getProducts() async {
       try {

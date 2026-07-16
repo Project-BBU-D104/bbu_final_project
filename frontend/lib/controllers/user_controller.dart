@@ -16,7 +16,7 @@ class UserController extends GetxController{
   final isLoading = false.obs;
 
   // final selectedRole = ''.obs;
-final selectedRole = RxnString(null);
+  final selectedRole = RxnString(null);
 
   final  userList = <Map<String, dynamic>>[].obs;
 
@@ -138,7 +138,10 @@ final selectedRole = RxnString(null);
       )
     );
     }catch(e){
-      // 
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      ) ;
     }
   }
 
@@ -168,17 +171,16 @@ final selectedRole = RxnString(null);
       type: ToastType.success,
     );
 
- Navigator.pop(context);
-    await getUserList();
-  } catch(e){
-    ToastWidget.show(
-      message: e.toString(),
-      type: ToastType.error,
-    );
-  } finally {
-    isLoading.value = false;
-  }
-
+  Navigator.pop(context);
+      await getUserList();
+    } catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    } finally {
+      isLoading.value = false;
+    }
 }
 
   Future<void> deleteUser(int userId, BuildContext context) async{

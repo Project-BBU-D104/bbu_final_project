@@ -3,10 +3,14 @@ from sqlmodel import SQLModel
 from typing import Optional
 from app.schemas.product import ProductRead
 
-class WarehouseStockCreate(SQLModel):
-    warehouse_id: int
+class WarehouseStockItem(SQLModel):
     product_id: int
     qty: int
+
+
+class WarehouseStockCreate(SQLModel):
+    warehouse_id: int
+    items: list[WarehouseStockItem] 
 
 class WarehouseStockUpdate(SQLModel):
     warehouse_id: Optional[int] = None

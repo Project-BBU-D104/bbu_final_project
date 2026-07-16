@@ -14,8 +14,11 @@ class WarehouseStockController extends GetxController{
   final warehouseStockList = [].obs;
 
   final selectedWarehouse = RxnString();
-  
+  final selectedProduct = RxnString();
+
   final productRows = <Map<String, dynamic>>[].obs;
+
+  final warehouseStockQtyController = TextEditingController();
 
   @override
   void onInit(){
@@ -47,9 +50,14 @@ class WarehouseStockController extends GetxController{
       if(resp is List){
         warehouseStockList.value = List<Map<String, dynamic>>.from(resp);
       }
+
+      print(warehouseStockList);
       
     }catch(e){
-      // 
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
     finally{
       isLoading.value = false;
@@ -64,15 +72,100 @@ class WarehouseStockController extends GetxController{
   }
 
   Future<void> onSaveWarehouseStock() async{
-    // 
+    try{
+      isLoading.value = true;
+
+      final data = {
+
+      "warehouse_id":
+          int.parse(selectedWarehouse.value!),
+
+      "items": productRows.map((row){
+        return {
+          "product_id":
+            int.parse(
+              (row["product"] as RxnString).value!
+            ),
+          "qty":
+            int.parse(
+              (row["qty"] as TextEditingController).text
+            ),
+        };
+      }).toList(),
+    };
+      await service.createWarehouseStock(data);
+
+      ToastWidget.show(
+        message: "Warehouse stock created successfully".tr,
+        type: ToastType.success,
+      );
+
+      // Reload Category
+      await getWarehouseStock();
+
+      // Close BottomSheet
+      Navigator.pop(Get.context!);
+
+      // clear
+      selectedWarehouse.value = null;
+      selectedProduct.value = null;
+      productRows.clear();
+      warehouseStockQtyController.clear();
+      addProductRow();
+
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }finally{
+      isLoading.value = false;
+    }
   }
 
-  void editWarehouseStock(BuildContext context){
+  void editWarehouseStock(BuildContext context, int warehouseStockId) async {
+  try {
+
+    final stock = await service.getWarehouseStockById(
+      warehouseStockId,
+    );
+
+    print("EDIT RESPONSE:");
+    print(stock);
+
+
+    productRows.clear();
+
+  
+
+   productRows.add({
+  "product": RxnString(
+    stock["product"]["id"].toString(),
+  ),
+
+  "qty": TextEditingController(
+    text: stock["qty"].toString(),
+  ),
+});
+
+
     AppBottomSheets.show(
       context,
-      child: EditWarehouseStockWidget()
-    ); 
+      child: EditWarehouseStockWidget(
+        warehouseStockId: warehouseStockId,
+      ),
+    );
+
+
+  } catch(e){
+
+    ToastWidget.show(
+      message: e.toString(),
+      type: ToastType.error,
+    );
+
   }
+}
 
   void onUpdateWarehouseStock() async{
     // 

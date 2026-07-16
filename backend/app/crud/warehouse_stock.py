@@ -3,12 +3,25 @@ from app.models.warehouse_stock import WarehouseStock
 from app.schemas.warehouse_stock import WarehouseStockCreate, WarehouseStockUpdate
 from datetime import datetime
 
-def create_warehouse_stock(session: Session, warehouse_stock: WarehouseStockCreate):
-    db_warehouse_stock = WarehouseStock.model_validate(warehouse_stock)
-    session.add(db_warehouse_stock)
+def create_warehouse_stock(
+    session: Session,
+    warehouse_stock: WarehouseStockCreate
+):
+    stocks = []
+    for item in warehouse_stock.items:
+        stock = WarehouseStock(
+            warehouse_id=warehouse_stock.warehouse_id,
+            product_id=item.product_id,
+            qty=item.qty
+        )
+        session.add(stock)
+        stocks.append(stock)
     session.commit()
-    session.refresh(db_warehouse_stock)
-    return db_warehouse_stock
+    
+    for stock in stocks:
+        session.refresh(stock)
+
+    return stocks
 
 def get_all_warehouse_stock(session: Session):
     return session.exec(select(WarehouseStock)).all()

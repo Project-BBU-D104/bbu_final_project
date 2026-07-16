@@ -81,7 +81,10 @@ class WarehouseStockCardWidget extends StatelessWidget {
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     onTap: (){
-                      print("View");
+                      ctr.editWarehouseStock(
+                        context,
+                        warehouseStock["id"],
+                      );
                     },
                     value: "edit",
                     child: Text("Edit"),

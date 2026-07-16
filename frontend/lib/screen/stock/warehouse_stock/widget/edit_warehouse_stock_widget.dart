@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/controllers/warehouse_stock_controller.dart';
+import 'package:frontend/controllers/product_controller.dart';
 import 'package:get/get.dart';
 
 class EditWarehouseStockWidget extends StatelessWidget {
-  EditWarehouseStockWidget({super.key});
+  final int warehouseStockId;
+  EditWarehouseStockWidget({super.key, required this.warehouseStockId});
 
   final ctr = Get.find<WarehouseStockController>();
+
+  final warehouseCtr = Get.find<WarehouseController>();
+  final productCtr = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +32,7 @@ class EditWarehouseStockWidget extends StatelessWidget {
               children: [
                 const Expanded(
                   child: Text(
-                    "Edit Warehouse Stock",
+                    "Add Warehouse Stock",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -53,35 +59,44 @@ class EditWarehouseStockWidget extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            Obx(
-              () => DropdownButtonFormField<String>(
-                value: ctr.selectedWarehouse.value,
+            Obx(() {
+
+              if(warehouseCtr.isLoading.value){
+
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+
+              }
+              return DropdownButtonFormField<String>(
+                value: warehouseCtr.warehouseList.any(
+                  (role) =>
+                      role["id"].toString() == ctr.selectedWarehouse.value,
+                )
+                    ? ctr.selectedWarehouse.value
+                    : null,
                 decoration: InputDecoration(
-                  hintText: "Select Warehouse",
-                  prefixIcon: const Icon(Icons.warehouse_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  hintText: "Select Warehouse".tr,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
                   ),
                 ),
-                items: const [
-                  DropdownMenuItem(
-                    value: "warehouse1",
-                    child: Text("Warehouse 1"),
-                  ),
-                  DropdownMenuItem(
-                    value: "warehouse2",
-                    child: Text("Warehouse 2"),
-                  ),
-                  DropdownMenuItem(
-                    value: "warehouse3",
-                    child: Text("Warehouse 3"),
-                  ),
-                ],
-                onChanged: (value) {
+                items: warehouseCtr.warehouseList.map((warehouse) {
+                  return DropdownMenuItem<String>(
+                    value: warehouse["id"].toString(),
+                    child: Text(
+                      warehouse["name"] ?? "",
+                    ),
+                  );
+                }).toList(),
+
+                onChanged: (value){
                   ctr.selectedWarehouse.value = value;
                 },
-              ),
-            ),
+              );
+            }),
 
             const SizedBox(height: 24),
 
@@ -115,6 +130,7 @@ class EditWarehouseStockWidget extends StatelessWidget {
                           children: [
                             DropdownButtonFormField<String>(
                               value: (row["product"] as RxnString).value,
+
                               decoration: InputDecoration(
                                 labelText: "Product",
                                 prefixIcon: const Icon(Icons.inventory_2),
@@ -122,23 +138,25 @@ class EditWarehouseStockWidget extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              items: const [
-                                DropdownMenuItem(
-                                  value: "product1",
-                                  child: Text("Product 1"),
-                                ),
-                                DropdownMenuItem(
-                                  value: "product2",
-                                  child: Text("Product 2"),
-                                ),
-                                DropdownMenuItem(
-                                  value: "product3",
-                                  child: Text("Product 3"),
-                                ),
-                              ],
-                              onChanged: (value) {
+
+                              items: productCtr.products.map((product) {
+
+                                return DropdownMenuItem<String>(
+                                  value: product["id"].toString(),
+
+                                  child: Text(
+                                    product["name"] ?? "",
+                                  ),
+                                );
+
+                              }).toList(),
+
+                              onChanged: (value){
+
                                 (row["product"] as RxnString).value = value;
+
                               },
+
                             ),
 
                             const SizedBox(height: 12),
