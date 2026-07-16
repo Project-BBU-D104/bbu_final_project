@@ -27,7 +27,6 @@ class StockAdjustmentCardWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-      
               // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +61,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                           ),
       
                           Text(
-                            stockAdjustment["id"].toString(),
+                            stockAdjustment["reference_no"].toString(),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -75,9 +74,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                 ],
               ),
       
-      
               const SizedBox(height: 20),
-      
       
               // Product section
               Container(
@@ -93,7 +90,6 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-      
                         Text(
                           "Product",
                           style: TextStyle(
@@ -138,18 +134,14 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                 ),
               ),
       
-      
               const SizedBox(height: 16),
-      
       
               // Footer
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-      
+                children: [      
                   Row(
-                    children: [
-      
+                    children: [      
                       Icon(
                         Icons.calendar_month_outlined,
                         size: 20,
@@ -165,11 +157,9 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
-                      ),
-      
+                      )      
                     ],
                   ),
-      
       
                   Container(
                     height: 35,
@@ -183,11 +173,9 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                       size: 16,
                       color: primaryColor,
                     ),
-                  )
-      
+                  )      
                 ],
-              )
-      
+              )      
             ],
           ),
         ),

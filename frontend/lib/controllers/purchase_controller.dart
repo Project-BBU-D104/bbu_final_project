@@ -1,70 +1,7 @@
-// import 'package:flutter/material.dart';
-// import 'package:frontend/routes/app_routes.dart';
-// import 'package:frontend/screen/purchases/widget/add_purchase_widget.dart';
-// import 'package:frontend/services/main_service/purchase_service.dart';
-// import 'package:frontend/widget/bottom_sheets.dart';
-// import 'package:frontend/widget/toast_widget.dart';
-// import 'package:get/get.dart';
-
-// class PurchaseController extends GetxController{
-//   final PurchaseService service = PurchaseService();
-//   var isLoading = false.obs;
-//   final purchaseList = <Map<String, dynamic>> [].obs;
-
-//   @override
-//   void onInit() {
-//     super.onInit();
-//     onGetPurchaseList();
-//   }
-  
-//   Future<void> onGetPurchaseList() async{
-//     try{
-//       isLoading.value = true;
-
-//       final resp = await service.getPurchases();
-
-//       if(resp is List){
-//         purchaseList.value = List<Map<String, dynamic>>.from(resp);
-//       }
-
-//       print(purchaseList);
-//     }catch(e){
-//       ToastWidget.show(
-//         message: e.toString(),
-//         type: ToastType.error,
-//       );
-//     }finally{
-//       isLoading.value = false;
-//     }
-//   }
-
-
-//   void addPurchase(BuildContext context){
-//     AppBottomSheets.show(
-//       context,
-//       child: AddPurchaseWidget()
-//     );
-//   }
-
-//   void gotoPurchaseDetail(Map<String, dynamic> purchase){
-//     Get.toNamed(AppRoutes.purchaseDetail, arguments: purchase);
-//   }
-
-//   void editPurchase(BuildContext context, Map<String, dynamic> purchase){
-//     // AppBottomSheets.show(
-//     //   context,
-//     //   child: EditPurchaseWidget(purchase: purchase)
-//     // );
-//   }
-
-//   void deletePurchase(int purchaseId){
-//     // Implement the logic to delete the purchase with the given purchaseId
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/purchases/widget/add_purchase_widget.dart';
+import 'package:frontend/screen/purchases/widget/edit_purchase_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_form.dart';
 import 'package:frontend/services/main_service/purchase_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
@@ -76,65 +13,12 @@ class PurchaseController extends GetxController {
   var isLoading = false.obs;
   final purchaseList = <Map<String, dynamic>>[].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    onGetPurchaseList();
-  }
-
-  Future<void> onGetPurchaseList() async {
-    try {
-      isLoading.value = true;
-
-      final resp = await service.getPurchases();
-
-      if (resp is List) {
-        purchaseList.value = List<Map<String, dynamic>>.from(resp);
-      }
-
-      print(purchaseList);
-    } catch (e) {
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void addPurchase(BuildContext context) {
-    resetForm();
-    AppBottomSheets.show(
-      context,
-      child: AddPurchaseWidget(),
-    );
-  }
-
-  void gotoPurchaseDetail(Map<String, dynamic> purchase) {
-    Get.toNamed(AppRoutes.purchaseDetail, arguments: purchase);
-  }
-
-  void editPurchase(BuildContext context, Map<String, dynamic> purchase) {
-    // AppBottomSheets.show(
-    //   context,
-    //   child: EditPurchaseWidget(purchase: purchase)
-    // );
-  }
-
-  void deletePurchase(int purchaseId) {
-    // Implement the logic to delete the purchase with the given purchaseId
-  }
-
-  // ================= Add Purchase Form State =================
-
   final formKey = GlobalKey<FormState>();
   final invoiceCtrl = TextEditingController();
   final taxCtrl = TextEditingController(text: '0');
   final discountCtrl = TextEditingController(text: '0');
   final paidCtrl = TextEditingController(text: '0');
 
-  // Adjust to your Supplier model — assumed Map<String,dynamic> like purchaseList.
   final Rxn<Map<String, dynamic>> selectedSupplier = Rxn<Map<String, dynamic>>();
   final Rx<DateTime> purchaseDate = DateTime.now().obs;
 
@@ -189,11 +73,59 @@ class PurchaseController extends GetxController {
   }
 
   void removeItemRow(PurchaseItemForm item) {
-    if (items.length == 1) return; // keep at least one row
+    if (items.length == 1) return;
     item.dispose();
     items.remove(item);
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    onGetPurchaseList();
+  }
+
+  Future<void> onGetPurchaseList() async {
+    try {
+      isLoading.value = true;
+
+      final resp = await service.getPurchases();
+
+      if (resp is List) {
+        purchaseList.value = List<Map<String, dynamic>>.from(resp);
+      }
+    } catch (e) {
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void addPurchase(BuildContext context) {
+    resetForm();
+    AppBottomSheets.show(
+      context,
+      child: AddPurchaseWidget(),
+    );
+  }
+
+  void gotoPurchaseDetail(Map<String, dynamic> purchase) {
+    Get.toNamed(AppRoutes.purchaseDetail, arguments: purchase);
+  }
+
+  void editPurchase(BuildContext context, Map<String, dynamic> purchase) {
+    AppBottomSheets.show(
+      context,
+      child: EditPurchaseWidget()
+    );
+  }
+
+  void deletePurchase(int purchaseId) {
+    // Implement the logic to delete the purchase with the given purchaseId
+  }
+  
   Future<void> createPurchase(BuildContext context) async {
     if (!formKey.currentState!.validate()) return;
 

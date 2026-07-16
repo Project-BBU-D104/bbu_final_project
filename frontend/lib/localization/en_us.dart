@@ -172,4 +172,11 @@ const Map<String, String> enUS = {
   'ID':'ID',
   'Edit User': 'Edit User',
   'Password': 'Password',
+  'From Warehouse':'From Warehouse',
+  'Select From Warehouse':'Select From Warehouse',
+  'To Warehouse':'To Warehouse',
+  'Select To Warehouse':'Select To Warehouse',
+  'Transfer Date':'Transfer Date',
+  'Select Transfer Date':'Select Transfer Date',
+  'Select Date':'Select Date'
 };

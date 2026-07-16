@@ -39,7 +39,6 @@ class PurchaseDetailWidget extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final supplier = purchase['supplier'] as Map<String, dynamic>?;

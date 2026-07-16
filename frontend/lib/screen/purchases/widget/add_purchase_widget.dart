@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/purchase_controller.dart';
-import 'package:frontend/screen/purchases/widget/purchase_item_form.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_row_widget.dart';
-import 'package:frontend/screen/purchases/widget/summary_row_widget.dart';
 // import 'package:frontend/controllers/product_controller.dart';
 // import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:get/get.dart';
@@ -72,9 +71,6 @@ class AddPurchaseWidget extends StatelessWidget {
               Obx(() => DropdownButtonFormField<Map<String, dynamic>>(
                     value: ctr.selectedSupplier.value,
                     items: const [
-                      // supplierCtr.suppliers
-                      //   .map((s) => DropdownMenuItem(value: s, child: Text(s['name'])))
-                      //   .toList(),
                     ],
                     onChanged: (v) => ctr.selectedSupplier.value = v,
                     decoration: const InputDecoration(
@@ -165,35 +161,13 @@ class AddPurchaseWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // --- Totals summary ---
-              Obx(() => Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        SummaryRowWidget( label: "Subtotal", value:ctr.itemsSubtotal),
-                        SummaryRowWidget(label:"Tax", value:ctr.tax.value),
-                        SummaryRowWidget(label:"Discount", value:-ctr.discount.value),
-                        const Divider(),
-                        SummaryRowWidget(label:"Total", value:ctr.total, bold: true),
-                        SummaryRowWidget(label:"Paid", value:ctr.paid.value),
-                        SummaryRowWidget(
-                          label: "Due",
-                          value:ctr.due,
-                          bold: true,
-                          color: ctr.due > 0 ? Colors.red : Colors.green,
-                        ),
-                      ],
-                    ),
-                  )),
-              const SizedBox(height: 16),
-
               Obx(() => SizedBox(
                     width: double.infinity,
+                    height: 45,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: successColor
+                      ),
                       onPressed: ctr.isSaving.value
                           ? null
                           : () => ctr.createPurchase(context),
@@ -203,7 +177,9 @@ class AddPurchaseWidget extends StatelessWidget {
                               width: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text("Save"),
+                          : Text("Save", style: TextStyle(
+                              fontSize: 18,color: titleColor
+                            )),
                     ),
                   )),
             ],
