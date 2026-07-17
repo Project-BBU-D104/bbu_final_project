@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class CardCategoryWidget extends StatelessWidget {
   final Map<String, dynamic> category;
@@ -13,18 +13,6 @@ class CardCategoryWidget extends StatelessWidget {
   });
 
   final ctr = Get.find<CategoryController>();
-
-  String formatDate(String? value) {
-    if (value == null || value.isEmpty) return "-";
-
-    try {
-      final date = DateTime.parse(value).toLocal();
-      return DateFormat("dd MMM yyyy • hh:mm a").format(date);
-    } catch (e) {
-      return "-";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -99,12 +87,14 @@ class CardCategoryWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      "Created: ${formatDate(category["created_at"]?.toString())}",
+                      "Created: ${DateFormatter.formatDate(
+                        DateTime.parse(category["created_at"]),
+                      )}",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade500,
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],

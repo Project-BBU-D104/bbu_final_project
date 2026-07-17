@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/controllers/purchase_controller.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_row_widget.dart';
-// import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:get/get.dart';
 
 class EditPurchaseWidget extends StatelessWidget {
   EditPurchaseWidget({super.key});
   final ctr = Get.find<PurchaseController>();
-  // final productCtr = Get.find<ProductController>();
+  final productCtr = Get.find<ProductController>();
   final supplierCtr = Get.find<SupplierController>();
+  final warehouseCtr = Get.find<WarehouseController>();
 
   Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(
@@ -42,7 +44,7 @@ class EditPurchaseWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Add Purchase",
+                    "Edit Purchase",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -53,57 +55,93 @@ class EditPurchaseWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
+              // --- Warehouse ---
+              _label("Warehouse"),
+               Obx(() {
+                if (warehouseCtr.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                return DropdownButtonFormField<int>(
+                  value: ctr.selectedWarehouse.value,
+                  decoration: const InputDecoration(
+                    hintText: "Select Warehouse",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                  ),
+                  items: warehouseCtr.warehouseList.map((warehouse) {
+                    return DropdownMenuItem<int>(
+                      value: warehouse["id"] as int,
+                      child: Text(warehouse["name"] ?? ""),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ctr.selectedWarehouse.value = value;
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Please select a warehouse";
+                    }
+                    return null;
+                  },
+                );
+              }),
+
+              const SizedBox(height: 12),
+              _label("Supplier"),
+               Obx(() {
+                if (supplierCtr.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                return DropdownButtonFormField<int>(
+                  value: ctr.selectedSupplier.value,
+                  decoration: const InputDecoration(
+                    hintText: "Select Supplier",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                  ),
+                  items: supplierCtr.suppliers.map((supplier) {
+                    return DropdownMenuItem<int>(
+                      value: supplier.id,
+                      child: Text(supplier.name),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ctr.selectedSupplier.value = value;
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Please select a supplier";
+                    }
+                    return null;
+                  },
+                );
+              }),
+
+              const SizedBox(height: 12),
+
               // --- Invoice No ---
               _label("Invoice Number"),
-              TextFormField(
+              TextField(
                 controller: ctr.invoiceCtrl,
                 decoration: const InputDecoration(
                   hintText: "e.g. INV-0001",
                   border: OutlineInputBorder(),
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               const SizedBox(height: 12),
-
-              // --- Supplier ---
-              _label("Supplier"),
-              Obx(() {
-  if (supplierCtr.isLoading.value) {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
-  return DropdownButtonFormField<int>(
-    value: ctr.selectedSupplier.value,
-    decoration: const InputDecoration(
-      hintText: "Select Supplier",
-      border: OutlineInputBorder(),
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 16,
-      ),
-    ),
-    items: supplierCtr.suppliers.map((supplier) {
-      return DropdownMenuItem<int>(
-        value: supplier.id,
-        child: Text(supplier.name),
-      );
-    }).toList(),
-    onChanged: (value) {
-      ctr.selectedSupplier.value = value;
-    },
-    validator: (value) {
-      if (value == null) {
-        return "Please select a supplier";
-      }
-      return null;
-    },
-  );
-}),
-              const SizedBox(height: 12),
-
+              
               // --- Purchase Date ---
               _label("Purchase Date"),
               Obx(() => InkWell(
@@ -194,14 +232,14 @@ class EditPurchaseWidget extends StatelessWidget {
                       ),
                       onPressed: ctr.isSaving.value
                           ? null
-                          : () => ctr.createPurchase(context),
+                          : () => ctr.onUpdatePurchase(context),
                       child: ctr.isSaving.value
                           ? const SizedBox(
                               height: 18,
                               width: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Text("Save", style: TextStyle(
+                          : Text("Update", style: TextStyle(
                               fontSize: 18,color: titleColor
                             )),
                     ),
@@ -214,7 +252,7 @@ class EditPurchaseWidget extends StatelessWidget {
   }
 
   Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 5, top: 4),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-      );
+    padding: const EdgeInsets.only(bottom: 5, top: 4),
+    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+  );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class ProductCardWidget extends StatelessWidget {
@@ -61,10 +62,11 @@ class ProductCardWidget extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Text(
-                          product['name'],
+                          product['name'] ?? '',
                           style: const TextStyle(
                             color: Color(0xFF333333),
                             fontSize: 16,
@@ -73,7 +75,17 @@ class ProductCardWidget extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // StatusWidget(text: product.status),
+
+                      const SizedBox(width: 8),
+
+                      Text(
+                        '\$${product['sale_price']}',
+                        style: const TextStyle(
+                          color: Color(0xFF1DB584),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -84,21 +96,25 @@ class ProductCardWidget extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  Text(
-                    'Stock: ${product['qty']} units',
-                    style: const TextStyle(
-                      color: Color(0xFF666666),
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '\$${product['sale_price']}',
-                    style: const TextStyle(
-                      color: Color(0xFF1DB584),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                   
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 14,
+                        color: Colors.grey.shade400,
+                      ),
+                      Text(
+                        " ${DateFormatter.formatDate(
+                            DateTime.parse(product["created_at"]),
+                        )}",
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

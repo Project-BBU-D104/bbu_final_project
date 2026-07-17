@@ -55,19 +55,6 @@ class AddPurchaseWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // --- Invoice No ---
-              _label("Invoice Number"),
-              TextFormField(
-                controller: ctr.invoiceCtrl,
-                decoration: const InputDecoration(
-                  hintText: "e.g. INV-0001",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
-              ),
-              const SizedBox(height: 12),
-
               // --- Warehouse ---
               _label("Warehouse"),
                Obx(() {
@@ -144,6 +131,17 @@ class AddPurchaseWidget extends StatelessWidget {
 
               const SizedBox(height: 12),
 
+              // --- Invoice No ---
+              _label("Invoice Number"),
+              TextField(
+                controller: ctr.invoiceCtrl,
+                decoration: const InputDecoration(
+                  hintText: "e.g. INV-0001",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              
               // --- Purchase Date ---
               _label("Purchase Date"),
               Obx(() => InkWell(

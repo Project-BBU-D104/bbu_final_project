@@ -245,7 +245,7 @@ class PurchaseDetailWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // ctr.editPurchase(purchase['id'], context);
+                    ctr.editPurchase(context, purchase['id']);
                   },
                   icon: const Icon(Icons.edit),
                   label: Text("Edit".tr),

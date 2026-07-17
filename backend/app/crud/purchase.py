@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from app.models.purchase_item import PurchaseItem
 from app.models.warehouse_stock import WarehouseStock
 from app.crud.warehouse_stock import increase_stock
+from sqlalchemy import text
 
 def generate_invoice_no(session: Session) -> str:
     # Get the latest purchase
@@ -86,38 +87,107 @@ def get_purchase(session: Session, purchase_id: int):
     )
     return session.exec(statement).first()
 
-def update_purchase(session: Session, purchase_id: int, purchase: PurchaseUpdate):
-    db_purchase = session.get(Purchase, purchase_id)
-    if db_purchase:
-        if purchase.supplier_id is not None:
-            db_purchase.supplier_id = purchase.supplier_id
-        if purchase.user_id is not None:
-            db_purchase.user_id = purchase.user_id
-        if purchase.invoice_no is not None:
-            db_purchase.invoice_no = purchase.invoice_no
-        if purchase.purchase_date is not None:
-            db_purchase.purchase_date = purchase.purchase_date
-        if purchase.subtotal is not None:
-            db_purchase.subtotal = purchase.subtotal
-        if purchase.tax_amount is not None:
-            db_purchase.tax_amount = purchase.tax_amount
-        if purchase.discount_amount is not None:
-            db_purchase.discount_amount = purchase.discount_amount
-        if purchase.total_amount is not None:
-            db_purchase.total_amount = purchase.total_amount
-        if purchase.paid_amount is not None:
-            db_purchase.paid_amount = purchase.paid_amount
-        if purchase.due_amount is not None:
-            db_purchase.due_amount = purchase.due_amount
-        if purchase.payment_status is not None:
-            db_purchase.payment_status = purchase.payment_status
-        if purchase.status is not None:
-            db_purchase.status = purchase.status
+def get_recent_purchases(session: Session):
+    statement = (
+        select(Purchase)
+        .order_by(Purchase.created_at.desc())
+        .limit(10)
+    )
 
-        db_purchase.updated_at = purchase.updated_at or datetime.utcnow()
-        session.add(db_purchase)
-        session.commit()
-        session.refresh(db_purchase)
+    return session.exec(statement).all()
+
+def update_purchase(
+    session: Session,
+    purchase_id: int,
+    purchase: PurchaseUpdate
+):
+    db_purchase = session.get(Purchase, purchase_id)
+    if not db_purchase:
+        raise HTTPException(
+            status_code=404,
+            detail="Purchase not found"
+        )
+
+    if purchase.supplier_id is not None:
+        db_purchase.supplier_id = purchase.supplier_id
+
+    if purchase.warehouse_id is not None:
+        db_purchase.warehouse_id = purchase.warehouse_id
+
+    if purchase.invoice_no is not None:
+        db_purchase.invoice_no = purchase.invoice_no
+
+    if purchase.purchase_date is not None:
+        db_purchase.purchase_date = purchase.purchase_date
+
+    if purchase.subtotal is not None:
+        db_purchase.subtotal = purchase.subtotal
+
+    if purchase.tax_amount is not None:
+        db_purchase.tax_amount = purchase.tax_amount
+
+    if purchase.discount_amount is not None:
+        db_purchase.discount_amount = purchase.discount_amount
+
+    if purchase.total_amount is not None:
+        db_purchase.total_amount = purchase.total_amount
+
+    if purchase.paid_amount is not None:
+        db_purchase.paid_amount = purchase.paid_amount
+
+    if purchase.due_amount is not None:
+        db_purchase.due_amount = purchase.due_amount
+
+    if purchase.payment_status is not None:
+        db_purchase.payment_status = purchase.payment_status
+
+    if purchase.items is not None:
+
+        # Delete old items
+        old_items = session.exec(
+            select(PurchaseItem)
+            .where(
+                PurchaseItem.purchase_id == purchase_id
+            )
+        ).all()
+
+        for old in old_items:
+            # rollback old stock
+            stock = session.exec(
+                select(WarehouseStock)
+                .where(
+                    WarehouseStock.warehouse_id ==
+                    db_purchase.warehouse_id,
+
+                    WarehouseStock.product_id ==
+                    old.product_id
+                )
+            ).first()
+            if stock:
+                stock.qty -= old.qty
+            session.delete(old)
+        session.flush()
+        # Create new items
+        for item in purchase.items:
+            new_item = PurchaseItem(
+                purchase_id=db_purchase.id,
+                product_id=item.product_id,
+                qty=item.qty,
+                cost_price=item.cost_price,
+                subtotal=item.subtotal
+            )
+            session.add(new_item)
+            # add new stock
+            increase_stock(
+                session=session,
+                warehouse_id=db_purchase.warehouse_id,
+                product_id=item.product_id,
+                qty=item.qty
+            )
+    db_purchase.updated_at = datetime.utcnow()
+    session.add(db_purchase)
+    session.commit()
+    session.refresh(db_purchase)
     return db_purchase
 
 def delete_purchase(session: Session, purchase_id: int):
@@ -138,16 +208,12 @@ def delete_purchase(session: Session, purchase_id: int):
                 WarehouseStock.product_id == item.product_id
             )
         ).first()
-
         if stock:
             stock.qty -= item.qty
-
         # Delete purchase item
         session.delete(item)
-
     # Delete purchase
     session.delete(purchase)
-
     session.commit()
 
     return {"message": "Purchase deleted successfully"}

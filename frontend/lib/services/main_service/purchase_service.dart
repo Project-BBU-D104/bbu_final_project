@@ -28,6 +28,13 @@ class PurchaseService {
     );
   }
 
+  /// GET Recent Purchases
+  Future<dynamic> getRecentPurchases() async {
+    return await _api.get(
+      "$endpoint/recent",
+    );
+  }
+
   /// UPDATE Purchase
   Future<dynamic> updatePurchase(
     int id,

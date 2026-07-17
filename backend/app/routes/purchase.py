@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from database import get_session
-from app.schemas.purchase import PurchaseCreate,PurchaseRead,PurchaseUpdate
-from app.crud.purchase import  create_purchase, get_all_purchases, get_purchase, update_purchase, delete_purchase
+from app.schemas.purchase import PurchaseCreate,PurchaseRead,PurchaseUpdate,PurchaseSimple
+from app.crud.purchase import  create_purchase, get_all_purchases,get_recent_purchases, get_purchase, update_purchase, delete_purchase
 
 router = APIRouter(prefix="/purchase", tags=["purchase"])
 
@@ -13,6 +13,10 @@ def create_new_purchase(purchase: PurchaseCreate, session: Session = Depends(get
 @router.get("/", response_model=list[PurchaseRead])
 def read_purchases(session: Session = Depends(get_session)):
     return get_all_purchases(session)
+
+@router.get("/recent", response_model=list[PurchaseRead])
+def read_recent_purchases(session: Session = Depends(get_session)):
+    return get_recent_purchases(session)
 
 @router.get("/{purchase_id}", response_model=PurchaseRead)
 def read_purchase(purchase_id: int, session: Session = Depends(get_session)):

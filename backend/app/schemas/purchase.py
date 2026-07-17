@@ -29,6 +29,7 @@ class PurchaseCreate(SQLModel):
 class PurchaseUpdate(SQLModel):
     user_id: Optional[int] = None
     supplier_id: Optional[int] = None
+    warehouse_id: Optional[int] = None
     invoice_no: Optional[str] = None
     purchase_date: Optional[datetime] = None
     subtotal: Optional[int] = None
@@ -36,10 +37,11 @@ class PurchaseUpdate(SQLModel):
     discount_amount: Optional[int] = None
     total_amount: Optional[int] = None
     paid_amount: Optional[int] = None
-    due_amount: Optional[str] = None
+    due_amount: Optional[int] = None
     payment_status: Optional[str] = None
     status: Optional[str] = None
     description: Optional[str] = None
+    items: Optional[List[PurchaseItemCreate]] = None
     updated_at: Optional[datetime] = None
 
 
@@ -63,3 +65,7 @@ class PurchaseRead(SQLModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at : Optional[datetime] = None
+
+class PurchaseSimple(SQLModel):
+    id: Optional[int] = None
+    invoice_no: str

@@ -3,12 +3,29 @@ from app.models.warehouse_stock import WarehouseStock
 from app.schemas.warehouse_stock import WarehouseStockCreate, WarehouseStockUpdate
 from datetime import datetime
 
+from fastapi import HTTPException
+
 def create_warehouse_stock(
     session: Session,
     warehouse_stock: WarehouseStockCreate
 ):
     stocks = []
+
     for item in warehouse_stock.items:
+        # Check duplicate product in same warehouse
+        existing_stock = session.exec(
+            select(WarehouseStock).where(
+                WarehouseStock.warehouse_id == warehouse_stock.warehouse_id,
+                WarehouseStock.product_id == item.product_id
+            )
+        ).first()
+
+        if existing_stock:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Product ID {item.product_id} already exists in this warehouse"
+            )
+        
         stock = WarehouseStock(
             warehouse_id=warehouse_stock.warehouse_id,
             product_id=item.product_id,
@@ -16,6 +33,7 @@ def create_warehouse_stock(
         )
         session.add(stock)
         stocks.append(stock)
+
     session.commit()
     
     for stock in stocks:

@@ -25,9 +25,11 @@ class PurchaseController extends GetxController {
   final taxCtrl = TextEditingController(text: '0');
   final discountCtrl = TextEditingController(text: '0');
   final paidCtrl = TextEditingController(text: '0');
-
-  // final Rxn<Map<String, dynamic>> selectedSupplier = Rxn<Map<String, dynamic>>();
   final Rx<DateTime> purchaseDate = DateTime.now().obs;
+
+  final Rxn<Map<String, dynamic>> editingPurchase = Rxn<Map<String, dynamic>>();
+
+  final RxInt editingPurchaseId = 0.obs;
 
   final RxList<PurchaseItemForm> items = <PurchaseItemForm>[].obs;
 
@@ -91,15 +93,12 @@ class PurchaseController extends GetxController {
     onGetPurchaseList();
     Get.find<ProductController>().getProducts();
     Get.find<WarehouseController>().getWarehouses();
-
   }
 
   Future<void> onGetPurchaseList() async {
     try {
       isLoading.value = true;
-
       final resp = await service.getPurchases();
-
       if (resp is List) {
         purchaseList.value = List<Map<String, dynamic>>.from(resp);
       }
@@ -125,12 +124,207 @@ class PurchaseController extends GetxController {
     Get.toNamed(AppRoutes.purchaseDetail, arguments: purchase);
   }
 
-  void editPurchase(BuildContext context, Map<String, dynamic> purchase) {
+  Future<void> editPurchase(BuildContext context, int purchaseId) async {
+  try {
+    isLoading.value = true;
+    // Get purchase detail
+    final purchase = await service.getPurchaseById(purchaseId);
+    if (purchase == null) {
+      ToastWidget.show(
+        message: "Purchase not found",
+        type: ToastType.error,
+      );
+      return;
+    }
+    editingPurchaseId.value = purchaseId;
+    editingPurchase.value = purchase;
+    // =========================
+    // Basic Information
+    // =========================
+    invoiceCtrl.text =
+        purchase["invoice_no"] ?? "";
+    taxCtrl.text =
+        (purchase["tax_amount"] ?? 0).toString();
+    discountCtrl.text =
+        (purchase["discount_amount"] ?? 0).toString();
+
+    paidCtrl.text =
+        (purchase["paid_amount"] ?? 0).toString();
+    // =========================
+    // Supplier
+    // =========================
+    selectedSupplier.value =
+        purchase["supplier"]?["id"];
+    // =========================
+    // Warehouse
+    // =========================
+    selectedWarehouse.value =
+        purchase["warehouse"]?["id"];
+    // =========================
+    // Date
+    // ========================
+    if (purchase["purchase_date"] != null) {
+      purchaseDate.value =
+          DateTime.parse(
+            purchase["purchase_date"].toString(),
+          );
+    }
+    // =========================
+    // Clear old items
+    // =========================
+    for (final item in items) {
+      item.dispose();
+    }
+    items.clear();
+    // =========================
+    // Load Purchase Items
+    // =========================
+    final purchaseItems =
+        purchase["purchase_items"] ?? [];
+    for (final data in purchaseItems) {
+      final row = PurchaseItemForm();
+      // -------- Product --------
+      final productId =
+          data["product"]?["id"];
+      final product =
+          Get.find<ProductController>()
+              .products
+              .firstWhere(
+                (p) =>
+                    p["id"] == productId,
+                orElse: () => {},
+              );
+      row.product.value = product;
+      // -------- Qty --------
+      final qty =
+          double.tryParse(
+            data["qty"].toString(),
+          ) ??
+          0;
+      row.qty.value = qty;
+      // IMPORTANT
+      row.qtyCtrl.text =
+          qty.toString();
+      // -------- Cost Price --------
+      final cost =
+          double.tryParse(
+            data["cost_price"].toString(),
+          ) ??
+          0;
+      row.cost.value = cost;
+      // IMPORTANT
+      row.costCtrl.text =
+          cost.toString();
+      items.add(row);
+    }
+    // If empty purchase item
+    if (items.isEmpty) {
+
+      items.add(
+        PurchaseItemForm(),
+      );
+    }
+    // Open edit form
     AppBottomSheets.show(
       context,
-      child: EditPurchaseWidget()
+      child: EditPurchaseWidget(),
     );
+  } catch (e) {
+    ToastWidget.show(
+      message: e.toString(),
+      type: ToastType.error,
+    );
+  } finally {
+    isLoading.value = false;
   }
+}
+
+Future<void> onUpdatePurchase(BuildContext context) async {
+
+  if (!formKey.currentState!.validate()) return;
+
+  if(editingPurchaseId.value == 0){
+    ToastWidget.show(
+      message: "Invalid purchase",
+      type: ToastType.error,
+    );
+    return;
+  }
+  final invalidRow = items.any(
+    (i) =>
+      i.product.value == null ||
+      i.qty.value <= 0 ||
+      i.cost.value <= 0
+  );
+
+  if(invalidRow){
+    ToastWidget.show(
+      message: "Fill product, qty and cost",
+      type: ToastType.error,
+    );
+    return;
+  }
+  final payload = {
+    "supplier_id": selectedSupplier.value,
+    "warehouse_id": selectedWarehouse.value,
+    "invoice_no": invoiceCtrl.text.trim(),
+    "purchase_date":
+        purchaseDate.value.toIso8601String(),
+    "subtotal":
+        itemsSubtotal,
+    "tax_amount":
+        tax.value,
+    "discount_amount":
+        discount.value,
+    "total_amount":
+        total,
+    "paid_amount":
+        paid.value,
+    "due_amount":
+        due,
+    "payment_status":
+      due <= 0
+      ? "paid"
+      : paid.value > 0
+          ? "partial"
+          : "unpaid",
+    "items":
+      items.map((i){
+        return {
+          "product_id":
+            i.product.value!["id"],
+          "qty":
+            i.qty.value,
+          "cost_price":
+            i.cost.value,
+          "subtotal":
+            i.subtotal,
+        };
+      }).toList(),
+  };
+  try {
+    isSaving.value = true;
+    await service.updatePurchase(
+      editingPurchaseId.value,
+      payload,
+    );
+
+    await onGetPurchaseList();
+
+    ToastWidget.show(
+      message: "Purchase updated successfully",
+      type: ToastType.success,
+    );
+    Navigator.pop(context);
+  }catch(e){
+    ToastWidget.show(
+      message:e.toString(),
+      type:ToastType.error,
+    );
+  }finally{
+    isSaving.value=false;
+  }
+}
 
   void deletePurchase(int purchaseId, BuildContext context) {
     showConfirmDialog(
