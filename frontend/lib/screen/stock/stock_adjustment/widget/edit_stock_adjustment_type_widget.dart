@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/stock_adjustment_controller.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
 
 class EditStockAdjustmentTypeWidget extends StatelessWidget {
-  
-  String? selectedProduct;
-  String? selectedWarehouse;
-  String? selectedAdjustmentType;
+  EditStockAdjustmentTypeWidget({super.key});
 
-  EditStockAdjustmentTypeWidget({super.key, this.selectedAdjustmentType, this.selectedProduct, this.selectedWarehouse});
+  final ctr = Get.find<StockAdjustmentController>();
+  final warehouseCtr = Get.find<WarehouseController>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Edit Stock Adjustment".tr,
+                  "Add Stock Adjustment".tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -45,67 +45,104 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
             ),
         
             const SizedBox(height: 10),
-            Text("Product".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-            SizedBox(height: 5,),
-            DropdownButtonFormField<String>(
-              value: selectedProduct,
-              decoration: InputDecoration(
-                hintText: "Select Product".tr,
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+
+            const Text(
+              "Warehouse",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
-              items: const [
-                DropdownMenuItem(
-                  value: "apple",
-                  child: Text("Apple"),
-                ),
-                DropdownMenuItem(
-                  value: "orange",
-                  child: Text("Orange"),
-                ),
-                DropdownMenuItem(
-                  value: "snack",
-                  child: Text("Snack"),
-                ),
-              ],
-              onChanged: (value) {
-                selectedProduct = value;
-              },
             ),
-            const SizedBox(height: 10),
-            Text("Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-            SizedBox(height: 5,),
-            DropdownButtonFormField<String>(
-              value: selectedWarehouse,
-              decoration: InputDecoration(
-                hintText: "Select Warehouse".tr,
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              ),
-              items: const [
-                DropdownMenuItem(
-                  value: "warehouse1",
-                  child: Text("Warehouse 1"),
+
+            const SizedBox(height: 8),
+
+            Obx(() {
+
+              if(warehouseCtr.isLoading.value){
+
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+
+              }
+              return DropdownButtonFormField<String>(
+                value: warehouseCtr.warehouseList.any(
+                  (role) =>
+                      role["id"].toString() == ctr.selectedWarehouse.value,
+                )
+                    ? ctr.selectedWarehouse.value
+                    : null,
+                decoration: InputDecoration(
+                  hintText: "Select Warehouse".tr,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
                 ),
-                DropdownMenuItem(
-                  value: "warehouse2",
-                  child: Text("Warehouse 2"),
-                ),
-                DropdownMenuItem(
-                  value: "warehouse3",
-                  child: Text("Warehouse 3"),
-                ),
-              ],
-              onChanged: (value) {
-                selectedWarehouse = value;
-              },
-            ),
+                items: warehouseCtr.warehouseList.map((warehouse) {
+                  return DropdownMenuItem<String>(
+                    value: warehouse["id"].toString(),
+                    child: Text(
+                      warehouse["name"] ?? "",
+                    ),
+                  );
+                }).toList(),
+
+                onChanged: (value){
+                  ctr.selectedWarehouse.value = value;
+                },
+              );
+            }),
         
             const SizedBox(height: 10),
+            
+            Text("Product".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            SizedBox(height: 5,),
+            Obx(() {
+
+              if(warehouseCtr.isLoading.value){
+
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+
+              }
+              return DropdownButtonFormField<String>(
+                value: warehouseCtr.warehouseList.any(
+                  (role) =>
+                      role["id"].toString() == ctr.selectedWarehouse.value,
+                )
+                    ? ctr.selectedWarehouse.value
+                    : null,
+                decoration: InputDecoration(
+                  hintText: "Select Warehouse".tr,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                ),
+                items: warehouseCtr.warehouseList.map((warehouse) {
+                  return DropdownMenuItem<String>(
+                    value: warehouse["id"].toString(),
+                    child: Text(
+                      warehouse["name"] ?? "",
+                    ),
+                  );
+                }).toList(),
+
+                onChanged: (value){
+                  ctr.selectedWarehouse.value = value;
+                },
+              );
+            }),
+            const SizedBox(height: 10),
+            
              Text("Adjustment Type".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
             SizedBox(height: 5,),
             DropdownButtonFormField<String>(
-              value: selectedAdjustmentType,
+              value: ctr.selectedAdjustmentType.value,
               decoration: InputDecoration(
                 hintText: "Select Adjustment Type".tr,
                 border: OutlineInputBorder(),
@@ -122,7 +159,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                 ),
               ],
               onChanged: (value) {
-                selectedAdjustmentType = value;
+                ctr.selectedAdjustmentType.value = value;
               },
             ),
         
@@ -143,21 +180,23 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                     ),
                   ],
                 )),
-                 const SizedBox(width: 10),
-
-             Expanded(child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-               children: [
-                 Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                  SizedBox(height: 5,),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: "Enter Quantity".tr,
-                      border: OutlineInputBorder(),
+                const SizedBox(width: 10),
+                  Expanded(
+                  child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Previous Stock".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    SizedBox(height: 5,),
+                    TextField(
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        hintText: "Previous Stock".tr,
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-               ],
-             )),
+                  ],
+                  )
+                ),
               ],
             ),
 
@@ -165,22 +204,20 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
 
             Row(
               children: [
-            Expanded(
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Previous Stock".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                SizedBox(height: 5,),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Enter Previous Stock".tr,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-              )
-            ),
-                 const SizedBox(width: 10),
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Adjusted Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                      SizedBox(height: 5,),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Quantity".tr,
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                  ],
+                )),
+                const SizedBox(width: 10),
                 Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -188,8 +225,9 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                     
                     SizedBox(height: 5,),
                     TextField(
+                      readOnly: true,
                       decoration: InputDecoration(
-                        hintText: "Enter New Quantity".tr,
+                        hintText: "New Quantity".tr,
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -223,7 +261,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text("Save".tr,
+                child: Text("Update".tr,
                   style: TextStyle(
                     fontSize: 18,
                   ),

@@ -13,14 +13,26 @@ class StockAdjustmentController extends GetxController{
 
   var isLoading = false.obs;
 
+  final selectedProduct = RxnString();
+  final selectedAdjustmentType = RxnString();
+  final selectedWarehouse = RxnString();
+
+  final stockAdjustmentList = <Map<String, dynamic>> [].obs;
+
   @override
   void onInit() async{
     await getStockAdjustments();
     super.onInit();
   }
-  
-  final stockAdjustmentList = <Map<String, dynamic>> [].obs;
+  void clearForm(){
 
+  selectedProduct.value = null;
+
+  selectedWarehouse.value = null;
+
+  selectedAdjustmentType.value = null;
+
+}
   Future<void> getStockAdjustments() async{
     try{
       isLoading.value = true;
@@ -40,6 +52,7 @@ class StockAdjustmentController extends GetxController{
   }
 
   void addStockAdjustment(BuildContext context){
+    clearForm();
     AppBottomSheets.show(
       context,
       child: AddStockAdjustmentWidget()
