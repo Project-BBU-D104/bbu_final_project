@@ -6,7 +6,10 @@ from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from app.models.purchase_item import PurchaseItem
 from app.models.warehouse_stock import WarehouseStock
-from app.crud.warehouse_stock import increase_stock
+from app.crud.warehouse_stock import (
+    increase_stock,
+    check_product_in_warehouse,
+)
 from sqlalchemy import text
 
 def generate_invoice_no(session: Session) -> str:
@@ -41,6 +44,13 @@ def create_purchase(session: Session, purchase: PurchaseCreate):
 
     # Create purchase items
     for item in purchase.items:
+
+        check_product_in_warehouse(
+            session=session,
+            warehouse_id=db_purchase.warehouse_id,
+            product_id=item.product_id,
+        )
+        
         db_item = PurchaseItem(
             purchase_id=db_purchase.id,
             product_id=item.product_id,
@@ -102,17 +112,23 @@ def update_purchase(
     purchase: PurchaseUpdate
 ):
     db_purchase = session.get(Purchase, purchase_id)
+
     if not db_purchase:
         raise HTTPException(
             status_code=404,
             detail="Purchase not found"
         )
 
+    # Save old warehouse before updating
+    old_warehouse_id = db_purchase.warehouse_id
+
     if purchase.supplier_id is not None:
         db_purchase.supplier_id = purchase.supplier_id
 
     if purchase.warehouse_id is not None:
         db_purchase.warehouse_id = purchase.warehouse_id
+
+    new_warehouse_id = db_purchase.warehouse_id
 
     if purchase.invoice_no is not None:
         db_purchase.invoice_no = purchase.invoice_no
@@ -143,51 +159,61 @@ def update_purchase(
 
     if purchase.items is not None:
 
-        # Delete old items
         old_items = session.exec(
-            select(PurchaseItem)
-            .where(
+            select(PurchaseItem).where(
                 PurchaseItem.purchase_id == purchase_id
             )
         ).all()
 
+        # Remove stock from old warehouse
         for old in old_items:
-            # rollback old stock
-            stock = session.exec(
-                select(WarehouseStock)
-                .where(
-                    WarehouseStock.warehouse_id ==
-                    db_purchase.warehouse_id,
 
-                    WarehouseStock.product_id ==
-                    old.product_id
+            stock = session.exec(
+                select(WarehouseStock).where(
+                    WarehouseStock.warehouse_id == old_warehouse_id,
+                    WarehouseStock.product_id == old.product_id
                 )
             ).first()
+
             if stock:
                 stock.qty -= old.qty
+
             session.delete(old)
+
         session.flush()
-        # Create new items
+
+        # Add new items and stock to new warehouse
         for item in purchase.items:
+
+            check_product_in_warehouse(
+                session=session,
+                warehouse_id=new_warehouse_id,
+                product_id=item.product_id,
+            )
+
             new_item = PurchaseItem(
                 purchase_id=db_purchase.id,
                 product_id=item.product_id,
                 qty=item.qty,
                 cost_price=item.cost_price,
-                subtotal=item.subtotal
+                subtotal=item.subtotal,
             )
+
             session.add(new_item)
-            # add new stock
+
             increase_stock(
                 session=session,
-                warehouse_id=db_purchase.warehouse_id,
+                warehouse_id=new_warehouse_id,
                 product_id=item.product_id,
-                qty=item.qty
+                qty=item.qty,
             )
+
     db_purchase.updated_at = datetime.utcnow()
+
     session.add(db_purchase)
     session.commit()
     session.refresh(db_purchase)
+
     return db_purchase
 
 def delete_purchase(session: Session, purchase_id: int):

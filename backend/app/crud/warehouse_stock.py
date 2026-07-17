@@ -5,6 +5,27 @@ from datetime import datetime
 
 from fastapi import HTTPException
 
+def check_product_in_warehouse(
+    session: Session,
+    warehouse_id: int,
+    product_id: int,
+):
+    stock = session.exec(
+        select(WarehouseStock).where(
+            WarehouseStock.warehouse_id == warehouse_id,
+            WarehouseStock.product_id == product_id,
+        )
+    ).first()
+
+    if stock is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Product is not assigned to this warehouse."
+        )
+
+    return stock
+
+
 def create_warehouse_stock(
     session: Session,
     warehouse_stock: WarehouseStockCreate
