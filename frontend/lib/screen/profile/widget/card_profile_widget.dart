@@ -35,10 +35,39 @@ class CardProfileWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text("Admin", style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 20,   
-                  ),),
+                // Text(ctr.role.value, style: TextStyle(
+                //     fontWeight: FontWeight.w500,
+                //     fontSize: 20,   
+                //   ),),
+
+                Obx(
+                  () => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor.shade100,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.admin_panel_settings_rounded,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          ctr.role.value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

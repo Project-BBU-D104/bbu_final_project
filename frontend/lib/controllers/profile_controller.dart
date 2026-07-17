@@ -7,6 +7,7 @@ class ProfileController extends GetxController{
   final email = "".obs;
   final phone = "".obs;
   final photo = "".obs;
+  final role = "".obs;
 
   @override
   void onInit() {
@@ -25,13 +26,15 @@ class ProfileController extends GetxController{
         email.value = data["user"]["email"] ?? "";
         phone.value = data["user"]["phone"] ?? "";
         photo.value = data["user"]["photo"] ?? "";
-
+        role.value = data["user"]["role"]["name"] ?? "";
       }
     }
   }
 
   void onLogoutPress(){
     Get.offAllNamed('/login');
-  }
-  
+
+    storage.lastUserLoginRemove();
+    storage.appStartUpWrite(route: '/login');
+  } 
 }
