@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/purchase_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
@@ -8,6 +9,8 @@ class PurchaseDetailWidget extends StatelessWidget {
   PurchaseDetailWidget({super.key});
 
   final Map<String, dynamic> purchase = Get.arguments as Map<String, dynamic>;
+
+  final ctr = Get.put(PurchaseController());
 
   String _formatCurrency(dynamic value) {
     final number = double.tryParse(value?.toString() ?? '0') ?? 0;
@@ -224,7 +227,7 @@ class PurchaseDetailWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // ctr.deletePurchase(purchaseId: purchase['id'], context: context);
+                    ctr.deletePurchase(purchase['id'], context);
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: Text("Delete".tr),

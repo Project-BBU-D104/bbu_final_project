@@ -21,5 +21,7 @@ class PurchaseItem(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    purchase: Optional["Purchase"] = Relationship(back_populates="purchase_items")
+    purchase: Optional["Purchase"] = Relationship(
+        back_populates="purchase_items"
+    )
     product: Optional["Product"] = Relationship(back_populates="purchase_items")

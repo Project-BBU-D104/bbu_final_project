@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_form.dart';
 import 'package:get/get.dart';
 
 class PurchaseItemRowWidget extends StatelessWidget {
+  PurchaseItemRowWidget({
+    super.key,
+    required this.item,
+    required this.onRemove,
+    this.canRemove = true,
+  });
+
   final PurchaseItemForm item;
   final VoidCallback onRemove;
   final bool canRemove;
-  const PurchaseItemRowWidget({super.key, required this.item, required this.onRemove, this.canRemove = true});
+
+  final productCtr = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
@@ -19,30 +28,52 @@ class PurchaseItemRowWidget extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  flex: 3,
-                  child: Obx(() => DropdownButtonFormField<Map<String, dynamic>>(
-                        value: item.product.value,
-                        items: const [
-                          // productCtr.products
-                          //   .map((p) => DropdownMenuItem(value: p, child: Text(p['name'])))
-                          //   .toList(),
-                        ],
-                        onChanged: (v) => item.product.value = v,
-                        decoration: const InputDecoration(
-                          labelText: 'Product',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                      )),
+                  child: Obx(() {
+                    return DropdownButtonFormField<Map<String, dynamic>>(
+                      value: item.product.value,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: "Product",
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: productCtr.products.map((product) {
+                        return DropdownMenuItem<Map<String, dynamic>>(
+                          value: product,
+                          child: Text(product["name"]),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        item.product.value = value;
+
+                        // Optional: autofill cost price from product
+                        if (value != null) {
+                          item.costCtrl.text =
+                              (value["cost_price"] ?? 0).toString();
+                        }
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return "Please select a product";
+                        }
+                        return null;
+                      },
+                    );
+                  }),
                 ),
                 if (canRemove)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                    ),
                     onPressed: onRemove,
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 10),
+
             Row(
               children: [
                 Expanded(
@@ -50,33 +81,41 @@ class PurchaseItemRowWidget extends StatelessWidget {
                     controller: item.qtyCtrl,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: 'Qty',
+                      labelText: "Qty",
                       border: OutlineInputBorder(),
                       isDense: true,
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 8),
+
                 Expanded(
                   child: TextFormField(
                     controller: item.costCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     decoration: const InputDecoration(
-                      labelText: 'Cost Price',
+                      labelText: "Cost Price",
                       border: OutlineInputBorder(),
                       isDense: true,
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 8),
+
                 Expanded(
-                  child: Obx(() => Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          item.subtotal.toStringAsFixed(2),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      )),
+                  child: Obx(() {
+                    return Text(
+                      item.subtotal.toStringAsFixed(2),
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    );
+                  }),
                 ),
               ],
             ),

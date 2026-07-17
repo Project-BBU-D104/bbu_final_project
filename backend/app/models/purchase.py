@@ -32,5 +32,10 @@ class Purchase(SQLModel, table=True):
 
     user: Optional[User] = Relationship(back_populates="purchases")
     supplier: Optional[Supplier] = Relationship(back_populates="purchases")
-    purchase_items: List["PurchaseItem"] = Relationship(back_populates="purchase")
+    purchase_items: list["PurchaseItem"] = Relationship(
+        back_populates="purchase",
+        sa_relationship_kwargs={
+            "cascade": "all, delete-orphan"
+        }
+    )
     warehouse: Optional["Warehouse"] = Relationship(back_populates="purchases")

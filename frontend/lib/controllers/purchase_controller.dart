@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
+import 'package:frontend/global.dart';
+import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/purchases/widget/add_purchase_widget.dart';
 import 'package:frontend/screen/purchases/widget/edit_purchase_widget.dart';
@@ -13,13 +17,16 @@ class PurchaseController extends GetxController {
   var isLoading = false.obs;
   final purchaseList = <Map<String, dynamic>>[].obs;
 
+  final RxnInt selectedSupplier = RxnInt();
+  final RxnInt selectedProduct = RxnInt();
+  final RxnInt selectedWarehouse = RxnInt();
   final formKey = GlobalKey<FormState>();
   final invoiceCtrl = TextEditingController();
   final taxCtrl = TextEditingController(text: '0');
   final discountCtrl = TextEditingController(text: '0');
   final paidCtrl = TextEditingController(text: '0');
 
-  final Rxn<Map<String, dynamic>> selectedSupplier = Rxn<Map<String, dynamic>>();
+  // final Rxn<Map<String, dynamic>> selectedSupplier = Rxn<Map<String, dynamic>>();
   final Rx<DateTime> purchaseDate = DateTime.now().obs;
 
   final RxList<PurchaseItemForm> items = <PurchaseItemForm>[].obs;
@@ -82,6 +89,9 @@ class PurchaseController extends GetxController {
   void onInit() {
     super.onInit();
     onGetPurchaseList();
+    Get.find<ProductController>().getProducts();
+    Get.find<WarehouseController>().getWarehouses();
+
   }
 
   Future<void> onGetPurchaseList() async {
@@ -122,66 +132,106 @@ class PurchaseController extends GetxController {
     );
   }
 
-  void deletePurchase(int purchaseId) {
-    // Implement the logic to delete the purchase with the given purchaseId
+  void deletePurchase(int purchaseId, BuildContext context) {
+    showConfirmDialog(
+      context: context,
+      message: "Do you want to delete this purchase?".tr,
+      onConfirm: () async {
+        try{
+          await service.deletePurchase(purchaseId);
+
+          // Refresh category list
+          await onGetPurchaseList();
+
+          ToastWidget.show(
+            message: "Purchase deleted successfully".tr,
+            type: ToastType.success,
+          );
+
+        }catch(e){
+          ToastWidget.show(
+            message: e.toString(),
+            type: ToastType.error,
+          );
+        }
+      },
+      onCancel: () {
+        // Do nothing
+      },
+    );
   }
   
   Future<void> createPurchase(BuildContext context) async {
-    if (!formKey.currentState!.validate()) return;
+  if (!formKey.currentState!.validate()) return;
 
-    if (selectedSupplier.value == null) {
-      ToastWidget.show(message: 'Please select a supplier', type: ToastType.error);
-      return;
-    }
-
-    final invalidRow = items.any(
-      (i) => i.product.value == null || i.qty.value <= 0 || i.cost.value <= 0,
+  if (selectedSupplier.value == null) {
+    ToastWidget.show(
+      message: "Please select a supplier",
+      type: ToastType.error,
     );
-    if (invalidRow) {
-      ToastWidget.show(
-        message: 'Fill in product, qty and cost for every item',
-        type: ToastType.error,
-      );
-      return;
-    }
-
-    final payload = {
-      'supplier_id': selectedSupplier.value!['id'],
-      'invoice_no': invoiceCtrl.text.trim(),
-      'purchase_date': purchaseDate.value.toIso8601String(),
-      'subtotal': itemsSubtotal,
-      'tax_amount': tax.value,
-      'discount_amount': discount.value,
-      'total_amount': total,
-      'paid_amount': paid.value,
-      'due_amount': due,
-      'payment_status':
-          due <= 0 ? 'paid' : (paid.value > 0 ? 'partial' : 'unpaid'),
-      'items': items
-          .map((i) => {
-                'product_id': i.product.value!['id'],
-                'qty': i.qty.value,
-                'cost_price': i.cost.value,
-                'subtotal': i.subtotal,
-              })
-          .toList(),
-    };
-
-    try {
-      isSaving.value = true;
-      // Add `createPurchase` to PurchaseService, e.g.:
-      // Future<dynamic> createPurchase(Map<String, dynamic> data) => post('/purchases', data);
-      await service.createPurchase(payload);
-
-      await onGetPurchaseList();
-      ToastWidget.show(message: 'Purchase added', type: ToastType.success);
-      Navigator.pop(context);
-    } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
-    } finally {
-      isSaving.value = false;
-    }
+    return;
   }
+
+  final invalidRow = items.any(
+    (i) => i.product.value == null || i.qty.value <= 0 || i.cost.value <= 0,
+  );
+
+  if (invalidRow) {
+    ToastWidget.show(
+      message: "Fill in product, qty and cost for every item",
+      type: ToastType.error,
+    );
+    return;
+  }
+
+  final payload = {
+    "supplier_id": selectedSupplier.value,
+    "warehouse_id": selectedWarehouse.value,
+    "invoice_no": invoiceCtrl.text.trim(),
+    "user_id": storage.lastUserLoginRead["user"]["id"],
+    "purchase_date": purchaseDate.value.toIso8601String(),
+    "subtotal": itemsSubtotal,
+    "tax_amount": tax.value,
+    "discount_amount": discount.value,
+    "total_amount": total,
+    "paid_amount": paid.value,
+    "due_amount": due,
+    "payment_status":
+        due <= 0 ? "paid" : (paid.value > 0 ? "partial" : "unpaid"),
+    "items": items
+        .map(
+          (i) => {
+            "product_id": i.product.value!["id"],
+            "qty": i.qty.value,
+            "cost_price": i.cost.value,
+            "subtotal": i.subtotal,
+          },
+        )
+        .toList(),
+  };
+
+  try {
+    isSaving.value = true;
+
+    await service.createPurchase(payload);
+
+    await onGetPurchaseList();
+
+    ToastWidget.show(
+      message: "Purchase added successfully",
+      type: ToastType.success,
+    );
+
+    Navigator.pop(context);
+  } catch (e) {
+    ToastWidget.show(
+      message: e.toString(),
+      type: ToastType.error,
+    );
+  } finally {
+    isSaving.value = false;
+  }
+}
 
   @override
   void onClose() {

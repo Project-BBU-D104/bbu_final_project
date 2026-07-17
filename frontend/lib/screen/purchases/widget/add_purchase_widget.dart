@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/controllers/purchase_controller.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_row_widget.dart';
-// import 'package:frontend/controllers/product_controller.dart';
-// import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:get/get.dart';
 
 class AddPurchaseWidget extends StatelessWidget {
   AddPurchaseWidget({super.key});
   final ctr = Get.find<PurchaseController>();
-  // final productCtr = Get.find<ProductController>();
-  // final supplierCtr = Get.find<SupplierController>();
+  final productCtr = Get.find<ProductController>();
+  final supplierCtr = Get.find<SupplierController>();
+  final warehouseCtr = Get.find<WarehouseController>();
 
   Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(
@@ -66,18 +68,80 @@ class AddPurchaseWidget extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // --- Supplier ---
-              _label("Supplier"),
-              Obx(() => DropdownButtonFormField<Map<String, dynamic>>(
-                    value: ctr.selectedSupplier.value,
-                    items: const [
-                    ],
-                    onChanged: (v) => ctr.selectedSupplier.value = v,
-                    decoration: const InputDecoration(
-                      hintText: "Select supplier",
-                      border: OutlineInputBorder(),
+              // --- Warehouse ---
+              _label("Warehouse"),
+               Obx(() {
+                if (warehouseCtr.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                return DropdownButtonFormField<int>(
+                  value: ctr.selectedWarehouse.value,
+                  decoration: const InputDecoration(
+                    hintText: "Select Warehouse",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
                     ),
-                  )),
+                  ),
+                  items: warehouseCtr.warehouseList.map((warehouse) {
+                    return DropdownMenuItem<int>(
+                      value: warehouse["id"] as int,
+                      child: Text(warehouse["name"] ?? ""),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ctr.selectedWarehouse.value = value;
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Please select a warehouse";
+                    }
+                    return null;
+                  },
+                );
+              }),
+
+              const SizedBox(height: 12),
+              _label("Supplier"),
+               Obx(() {
+                if (supplierCtr.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                return DropdownButtonFormField<int>(
+                  value: ctr.selectedSupplier.value,
+                  decoration: const InputDecoration(
+                    hintText: "Select Supplier",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                  ),
+                  items: supplierCtr.suppliers.map((supplier) {
+                    return DropdownMenuItem<int>(
+                      value: supplier.id,
+                      child: Text(supplier.name),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    ctr.selectedSupplier.value = value;
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Please select a supplier";
+                    }
+                    return null;
+                  },
+                );
+              }),
+
               const SizedBox(height: 12),
 
               // --- Purchase Date ---
@@ -190,7 +254,7 @@ class AddPurchaseWidget extends StatelessWidget {
   }
 
   Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 5, top: 4),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-      );
+    padding: const EdgeInsets.only(bottom: 5, top: 4),
+    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+  );
 }

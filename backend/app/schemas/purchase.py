@@ -6,6 +6,8 @@ from app.schemas.user import UserSimple
 from app.schemas.supplier import SupplierSimple
 from app.schemas.purchase_item import PurchaseItemRead
 from app.schemas.warehouse_base import WarehouseSimple
+from app.schemas.purchase_item import PurchaseItemCreate
+
 
 class PurchaseCreate(SQLModel):
     user_id: int
@@ -19,13 +21,10 @@ class PurchaseCreate(SQLModel):
     total_amount: int
     paid_amount: int
     due_amount: int
-    payment_status: str
-    status: str
+    items: List[PurchaseItemCreate]
+    payment_status: str = "unpaid"
+    status: str = "completed"
     description: Optional[str] = None
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    deleted_at : Optional[datetime] = None
-
 
 class PurchaseUpdate(SQLModel):
     user_id: Optional[int] = None

@@ -3,7 +3,6 @@ from typing import Optional
 from app.schemas.product import ProductSimple
 
 class PurchaseItemCreate(SQLModel):
-    purchase_id: int
     product_id: int
     cost_price: int
     qty: int

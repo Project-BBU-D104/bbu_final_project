@@ -3,8 +3,10 @@ from app.models.purchase import Purchase
 from app.schemas.purchase import PurchaseCreate, PurchaseUpdate
 from datetime import datetime
 from sqlalchemy.orm import selectinload
-
+from fastapi import HTTPException
 from app.models.purchase_item import PurchaseItem
+from app.models.warehouse_stock import WarehouseStock
+from app.crud.warehouse_stock import increase_stock
 
 def generate_invoice_no(session: Session) -> str:
     # Get the latest purchase
@@ -24,7 +26,7 @@ def generate_invoice_no(session: Session) -> str:
     return f"INV{last_number + 1:04d}"
 
 def create_purchase(session: Session, purchase: PurchaseCreate):
-    purchase_data = purchase.model_dump()
+    purchase_data = purchase.model_dump(exclude={"items"})
 
     if not purchase_data.get("invoice_no"):
         purchase_data["invoice_no"] = generate_invoice_no(session)
@@ -32,7 +34,31 @@ def create_purchase(session: Session, purchase: PurchaseCreate):
     db_purchase = Purchase(**purchase_data)
 
     session.add(db_purchase)
+
+    # Insert purchase and get its ID
+    session.flush()
+
+    # Create purchase items
+    for item in purchase.items:
+        db_item = PurchaseItem(
+            purchase_id=db_purchase.id,
+            product_id=item.product_id,
+            qty=item.qty,
+            cost_price=item.cost_price,
+            subtotal=item.subtotal,
+        )
+
+        session.add(db_item)
+
+        increase_stock(
+            session=session,
+            warehouse_id=db_purchase.warehouse_id,
+            product_id=item.product_id,
+            qty=item.qty,
+        )
+
     session.commit()
+
     session.refresh(db_purchase)
 
     return db_purchase
@@ -96,7 +122,32 @@ def update_purchase(session: Session, purchase_id: int, purchase: PurchaseUpdate
 
 def delete_purchase(session: Session, purchase_id: int):
     purchase = session.get(Purchase, purchase_id)
-    if purchase:
-        session.delete(purchase)
-        session.commit()
-    return purchase
+
+    if not purchase:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    
+    # Reverse stock
+    items = session.exec(
+        select(PurchaseItem).where(PurchaseItem.purchase_id == purchase.id)
+    ).all()
+
+    for item in items:
+        stock = session.exec(
+            select(WarehouseStock).where(
+                WarehouseStock.warehouse_id == purchase.warehouse_id,
+                WarehouseStock.product_id == item.product_id
+            )
+        ).first()
+
+        if stock:
+            stock.qty -= item.qty
+
+        # Delete purchase item
+        session.delete(item)
+
+    # Delete purchase
+    session.delete(purchase)
+
+    session.commit()
+
+    return {"message": "Purchase deleted successfully"}

@@ -3,14 +3,14 @@ import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/purchase_controller.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_row_widget.dart';
 // import 'package:frontend/controllers/product_controller.dart';
-// import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:get/get.dart';
 
 class EditPurchaseWidget extends StatelessWidget {
   EditPurchaseWidget({super.key});
   final ctr = Get.find<PurchaseController>();
   // final productCtr = Get.find<ProductController>();
-  // final supplierCtr = Get.find<SupplierController>();
+  final supplierCtr = Get.find<SupplierController>();
 
   Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(
@@ -68,16 +68,40 @@ class EditPurchaseWidget extends StatelessWidget {
 
               // --- Supplier ---
               _label("Supplier"),
-              Obx(() => DropdownButtonFormField<Map<String, dynamic>>(
-                    value: ctr.selectedSupplier.value,
-                    items: const [
-                    ],
-                    onChanged: (v) => ctr.selectedSupplier.value = v,
-                    decoration: const InputDecoration(
-                      hintText: "Select supplier",
-                      border: OutlineInputBorder(),
-                    ),
-                  )),
+              Obx(() {
+  if (supplierCtr.isLoading.value) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  return DropdownButtonFormField<int>(
+    value: ctr.selectedSupplier.value,
+    decoration: const InputDecoration(
+      hintText: "Select Supplier",
+      border: OutlineInputBorder(),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 16,
+      ),
+    ),
+    items: supplierCtr.suppliers.map((supplier) {
+      return DropdownMenuItem<int>(
+        value: supplier.id,
+        child: Text(supplier.name),
+      );
+    }).toList(),
+    onChanged: (value) {
+      ctr.selectedSupplier.value = value;
+    },
+    validator: (value) {
+      if (value == null) {
+        return "Please select a supplier";
+      }
+      return null;
+    },
+  );
+}),
               const SizedBox(height: 12),
 
               // --- Purchase Date ---

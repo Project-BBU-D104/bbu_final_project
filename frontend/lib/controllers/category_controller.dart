@@ -150,6 +150,8 @@ class CategoryController extends GetxController {
             type: ToastType.success,
           );
 
+          Get.back();
+
         }catch(e){
           ToastWidget.show(
             message: e.toString(),
