@@ -37,12 +37,16 @@ class StockAdjustmentController extends GetxController{
     super.onInit();
   }
   void clearForm(){
+    selectedProduct.value = null;
+    selectedWarehouse.value = null;
+    selectedAdjustmentType.value = null;
 
-  selectedProduct.value = null;
-  selectedWarehouse.value = null;
-  selectedAdjustmentType.value = null;
-
-}
+    referenceController.clear();
+    adjustmentQtyController.clear();
+    reasonController.clear();
+    currentQtyController.clear();
+    newQtyController.clear();
+  }
 
 Future<void> loadCurrentQty() async {
   if (selectedWarehouse.value == null ||
@@ -137,13 +141,7 @@ void calculateNewQty() {
       Navigator.pop(Get.context!);
 
       // clearForm();
-      selectedProduct.value = null;
-      selectedWarehouse.value = null;
-      selectedAdjustmentType.value = null;
-
-      adjustmentQtyController.clear();
-      reasonController.clear();
-      referenceController.clear();
+      clearForm();
 
     }catch(e){
       ToastWidget.show(
@@ -156,20 +154,31 @@ void calculateNewQty() {
     }
   }
 
-  void editStockAdjustment(BuildContext context, int stockAdjustmentId){
+  void editStockAdjustment(BuildContext context, int stockAdjustmentId) async{
     try{
 
-      final data = {
-        "stock_adjustment_id": stockAdjustmentId,
-        "": "",
-      };
-      
+      final stockAdjustment = await service.getStockAdjustmentById(stockAdjustmentId); 
+      selectedProduct.value = stockAdjustment["product"]["id"].toString();
+      selectedWarehouse.value = stockAdjustment["warehouse"]["id"].toString();
+      selectedAdjustmentType.value = stockAdjustment["adjustment_type"];
+      adjustmentQtyController.text = stockAdjustment["qty"].toString();
+      currentQtyController.text =
+      stockAdjustment["previous_qty"].toString();
+      newQtyController.text = stockAdjustment["new_qty"].toString();
+      reasonController.text = stockAdjustment["reason"];
+      referenceController.text = stockAdjustment["reference_no"];
+
       AppBottomSheets.show(
         context,
-        child: EditStockAdjustmentTypeWidget()
+        child: EditStockAdjustmentTypeWidget(
+          stockAdjustmentId: stockAdjustment["id"],
+        )
       );
     }catch(e){
-      // 
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
   }
 
@@ -214,13 +223,11 @@ void calculateNewQty() {
   @override
 void onClose() {
   adjustmentQtyController.removeListener(calculateNewQty);
-
   adjustmentQtyController.dispose();
   currentQtyController.dispose();
   newQtyController.dispose();
   referenceController.dispose();
   reasonController.dispose();
-
   super.onClose();
 }
 

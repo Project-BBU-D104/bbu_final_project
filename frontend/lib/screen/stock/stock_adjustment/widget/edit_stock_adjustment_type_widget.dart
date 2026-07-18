@@ -7,7 +7,8 @@ import 'package:get/get.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class EditStockAdjustmentTypeWidget extends StatelessWidget {
-  EditStockAdjustmentTypeWidget({super.key});
+  final int stockAdjustmentId;
+  EditStockAdjustmentTypeWidget({super.key, required this.stockAdjustmentId});
 
   final ctr = Get.find<StockAdjustmentController>();
   final warehouseCtr = Get.put(WarehouseController());
