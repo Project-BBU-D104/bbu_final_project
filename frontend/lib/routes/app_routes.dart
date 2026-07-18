@@ -38,4 +38,6 @@ class AppRoutes {
   static const saleListDetail = '/sale-list-detail';
   static const userDetail = '/user-detail';
   static const auditLogDetail = '/audit-log-detail';
+  static const purchaseReqest = '/purchase-request';
+  static const purchasePayment = '/purchase-payment';
 }

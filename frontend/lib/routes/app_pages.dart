@@ -24,6 +24,8 @@ import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/add_product_widget.dart';
 import 'package:frontend/screen/product/widget/edit_product_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_detail_widget.dart';
+import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
+import 'package:frontend/screen/purchase_request/purchase_request_screen.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
 import 'package:frontend/screen/role/role_screen.dart';
@@ -210,6 +212,14 @@ class AppPages {
     GetPage(
       name: AppRoutes.auditLogDetail,
       page: () => AuditLogDetailWidget(),
+    ),
+    GetPage(
+      name: AppRoutes.purchaseReqest,
+      page: () => PurchaseRequestScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.purchasePayment,
+      page: () => PurchasePaymentScreen(),
     ),
   ];
 }

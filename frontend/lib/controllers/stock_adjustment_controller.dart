@@ -27,9 +27,7 @@ class StockAdjustmentController extends GetxController{
   void clearForm(){
 
   selectedProduct.value = null;
-
   selectedWarehouse.value = null;
-
   selectedAdjustmentType.value = null;
 
 }

@@ -63,6 +63,18 @@ class ManageController extends GetxController{
           "route": AppRoutes.purchase,
         },
         {
+          "title": "Purchase Request",
+          "subtitle": "Purchase Request",
+          "icon": Icons.shopping_cart_outlined,
+          "route": AppRoutes.purchaseReqest,
+        },
+        {
+          "title": "Purchase Payment",
+          "subtitle": "Purchase Payment Management",
+          "icon": Icons.shopping_cart_outlined,
+          "route": AppRoutes.purchasePayment,
+        },
+        {
           "title": "Audit Logs",
           "subtitle": "Audit Logs",
           "icon": Icons.history_outlined,
