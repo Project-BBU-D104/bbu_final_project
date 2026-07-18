@@ -1,6 +1,6 @@
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/controllers/product_controller.dart';
-import 'package:frontend/controllers/purchase_controller.dart';
+import 'package:frontend/controllers/purchase/purchase_controller.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';

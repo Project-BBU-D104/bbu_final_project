@@ -7,7 +7,7 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/purchases/widget/add_purchase_widget.dart';
 import 'package:frontend/screen/purchases/widget/edit_purchase_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_form.dart';
-import 'package:frontend/services/main_service/purchase_service.dart';
+import 'package:frontend/services/main_service/purchase/purchase_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';

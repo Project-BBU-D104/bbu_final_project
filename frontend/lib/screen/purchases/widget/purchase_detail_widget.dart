@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/purchase_controller.dart';
+import 'package:frontend/controllers/purchase/purchase_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/widget/custom_app_bar.dart';

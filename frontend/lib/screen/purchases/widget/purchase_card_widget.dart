@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/purchase_controller.dart';
+import 'package:frontend/controllers/purchase/purchase_controller.dart';
 import 'package:get/get.dart';
 
 class PurchaseCardWidget extends StatelessWidget {
