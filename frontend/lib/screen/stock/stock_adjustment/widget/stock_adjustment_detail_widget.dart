@@ -5,13 +5,18 @@ import 'package:get/get.dart';
 
 class StockAdjustmentDetailWidget extends StatelessWidget {
   StockAdjustmentDetailWidget({super.key});
+
   final ctr = Get.find<StockAdjustmentController>();
+
   @override
   Widget build(BuildContext context) {
+
     final Map<String, dynamic> data =
     Get.arguments as Map<String, dynamic>;
+    
     final product = data["product"];
     final warehouse = data["warehouse"];
+
     return Scaffold(
       appBar: CustomAppBar(
         title: "Stock Adjustment Detail".tr,
@@ -47,7 +52,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
   }
 
   Widget _buildHeader(Map data){
-    bool increase = data["adjustment_type"] == "Increase";
+    bool increase = data["adjustment_type"] == "increase";
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -363,7 +368,7 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
                 onPressed:(){
                   ctr.editStockAdjustment(
                     context,
-                    {},
+                    data["id"],
                   );
                 },
                 icon:

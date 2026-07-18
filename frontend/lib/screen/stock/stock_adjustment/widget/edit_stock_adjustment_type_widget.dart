@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/controllers/stock_adjustment_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class EditStockAdjustmentTypeWidget extends StatelessWidget {
   EditStockAdjustmentTypeWidget({super.key});
 
   final ctr = Get.find<StockAdjustmentController>();
-  final warehouseCtr = Get.find<WarehouseController>();
+  final warehouseCtr = Get.put(WarehouseController());
+  final productCtr = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Add Stock Adjustment".tr,
+                  "Edit Stock Adjustment".tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -89,54 +92,102 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                   );
                 }).toList(),
 
-                onChanged: (value){
+                onChanged: (value) async {
                   ctr.selectedWarehouse.value = value;
+
+                  if (ctr.selectedProduct.value != null) {
+                    await ctr.loadCurrentQty();
+                  }
                 },
               );
             }),
         
             const SizedBox(height: 10),
-            
-            Text("Product".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-            SizedBox(height: 5,),
+            Text(
+              "Product".tr,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18,
+              ),
+            ),
+
+            const SizedBox(height: 5),
+
             Obx(() {
-
-              if(warehouseCtr.isLoading.value){
-
+              if (productCtr.isLoading.value) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
-
               }
-              return DropdownButtonFormField<String>(
-                value: warehouseCtr.warehouseList.any(
-                  (role) =>
-                      role["id"].toString() == ctr.selectedWarehouse.value,
-                )
-                    ? ctr.selectedWarehouse.value
-                    : null,
-                decoration: InputDecoration(
-                  hintText: "Select Warehouse".tr,
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
+              return DropdownSearch<Map<String, dynamic>>(
+                // Load product list
+                items: (filter, loadProps) async {
+                  return productCtr.products
+                      .where((product) {
+                        final name = (product["name"] ?? "")
+                            .toString()
+                            .toLowerCase();
+                        return name.contains(
+                          filter.toLowerCase(),
+                        );
+                      })
+                      .toList();
+                },
+                // Display name
+                itemAsString: (product) {
+                  return product["name"]?.toString() ?? "";
+                },
+                // IMPORTANT:
+                // Required because using Map<String,dynamic>
+                compareFn: (item1, item2) {
+                  return item1["id"].toString() ==
+                      item2["id"].toString();
+                },
+                // Selected value
+                selectedItem: productCtr.products.firstWhereOrNull(
+                  (product) =>
+                      product["id"].toString() ==
+                      ctr.selectedProduct.value,
+                ),
+                // Search popup
+                popupProps: PopupProps.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    decoration: InputDecoration(
+                      hintText: "Search Product".tr,
+                      border: const OutlineInputBorder(),
+                    ),
                   ),
                 ),
-                items: warehouseCtr.warehouseList.map((warehouse) {
-                  return DropdownMenuItem<String>(
-                    value: warehouse["id"].toString(),
-                    child: Text(
-                      warehouse["name"] ?? "",
+                // Dropdown design (dropdown_search v6)
+                decoratorProps: DropDownDecoratorProps(
+                  decoration: InputDecoration(
+                    hintText: "Select Product".tr,
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
+                // When select product
+                onChanged: (value) async {
+                  if (value != null) {
+                    ctr.selectedProduct.value =
+                        value["id"].toString();
 
-                onChanged: (value){
-                  ctr.selectedWarehouse.value = value;
+                    if (ctr.selectedWarehouse.value != null) {
+                      await ctr.loadCurrentQty();
+                    }
+                  } else {
+                    ctr.selectedProduct.value = null;
+                    ctr.currentQtyController.clear();
+                  }
                 },
               );
+
             }),
+
             const SizedBox(height: 10),
             
              Text("Adjustment Type".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
@@ -160,6 +211,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
               ],
               onChanged: (value) {
                 ctr.selectedAdjustmentType.value = value;
+                ctr.calculateNewQty();
               },
             ),
         
@@ -173,6 +225,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                     Text("Reference NO".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     SizedBox(height: 5,),
                     TextField(
+                      controller: ctr.referenceController,
                       decoration: InputDecoration(
                         hintText: "Enter Reference Number".tr,
                         border: OutlineInputBorder(),
@@ -189,6 +242,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                     SizedBox(height: 5,),
                     TextField(
                       readOnly: true,
+                      controller: ctr.currentQtyController,
                       decoration: InputDecoration(
                         hintText: "Previous Stock".tr,
                         border: OutlineInputBorder(),
@@ -210,6 +264,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                     Text("Adjusted Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       SizedBox(height: 5,),
                       TextField(
+                        controller: ctr.adjustmentQtyController,
                         decoration: InputDecoration(
                           hintText: "Enter Quantity".tr,
                           border: OutlineInputBorder(),
@@ -226,6 +281,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                     SizedBox(height: 5,),
                     TextField(
                       readOnly: true,
+                      controller: ctr.newQtyController,
                       decoration: InputDecoration(
                         hintText: "New Quantity".tr,
                         border: OutlineInputBorder(),
@@ -241,6 +297,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
               TextField(
                 maxLines: 8,
                 minLines: 3,
+                controller: ctr.reasonController,
                 decoration: InputDecoration(
                   hintText: "Enter Reason".tr,
                   border: OutlineInputBorder(),
@@ -259,9 +316,9 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                   foregroundColor: titleColor,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  ctr.onSaveStockAdjustment();
                 },
-                child: Text("Update".tr,
+                child: Text("Save".tr,
                   style: TextStyle(
                     fontSize: 18,
                   ),

@@ -68,8 +68,18 @@ class ProductController extends GetxController {
   /// Set data from API
   void setProducts(List<Map<String, dynamic>> data) {
     _masterList.assignAll(data);
+  }
 
-      print(_masterList);
+  void clearProducts() {
+    productNameController.clear();
+    productBarcodeController.clear();
+    productCostPriceController.clear();
+    productSalePriceController.clear();
+    productDescriptionController.clear();
+    productPhotoController.clear();
+    selectedCategory.value = null;
+    selectedSupplier.value = null;
+    selectedUnit.value = null;
   }
 
   List<Map<String, dynamic>> get filteredItems {
@@ -89,6 +99,7 @@ class ProductController extends GetxController {
   }
 
   void gotoAddProduct() {
+    clearProducts();
     Get.toNamed(AppRoutes.addProduct);
   }
 
@@ -119,15 +130,7 @@ class ProductController extends GetxController {
       Navigator.pop(context);
 
       // Clear textfields
-      productPhotoController.clear();
-      productNameController.clear();
-      productBarcodeController.clear();
-      productCostPriceController.clear();
-      productSalePriceController.clear();
-      productDescriptionController.clear();
-      selectedCategory.value = null;
-      selectedSupplier.value = null;
-      selectedUnit.value = null;
+      clearProducts();
 
     }catch(e){
       // 

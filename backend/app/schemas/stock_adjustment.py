@@ -12,12 +12,8 @@ class StockAdjustmentCreate(SQLModel):
     warehouse_id: int
     adjustment_type: str
     qty: int
-    previous_qty: int
-    new_qty: int
     reason: str
     reference_no: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
 
 
 class StockAdjustmentUpdate(SQLModel):

@@ -41,6 +41,15 @@ class SupplierController extends GetxController {
     supplierAddressController.dispose();
   }
 
+  void clearSupplier(){
+    supplierNameController.clear();
+    supplierPhoneNumberController.clear();
+    supplierEmailController.clear();
+    supplierMapController.clear();
+    supplierAddressController.clear();
+    status.value = false;
+  }
+
   Future<void> getSuppliers() async {
     try{
       isLoading.value = true;
@@ -69,6 +78,7 @@ class SupplierController extends GetxController {
   }
 
   void addSupplier(BuildContext context){
+    clearSupplier();
     AppBottomSheets.show(
       context,
       child: SupplierAddWidget()
@@ -118,12 +128,7 @@ class SupplierController extends GetxController {
       await getSuppliers();
 
       // Clear textfields
-    supplierNameController.clear();
-    supplierPhoneNumberController.clear();
-    supplierEmailController.clear();
-    supplierMapController.clear();
-    supplierAddressController.clear();
-    status.value = false;
+      clearSupplier();
 
       Get.offNamed(AppRoutes.supplier);
 
@@ -159,12 +164,7 @@ class SupplierController extends GetxController {
       );
 
     // Clear textfields
-    supplierNameController.clear();
-    supplierPhoneNumberController.clear();
-    supplierEmailController.clear();
-    supplierMapController.clear();
-    supplierAddressController.clear();
-    status.value = false;
+    clearSupplier();
 
     // Close BottomSheet
     Navigator.pop(context);

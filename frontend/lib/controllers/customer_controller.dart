@@ -36,6 +36,13 @@ class CustomerController extends GetxController{
     super.onClose();
   }
 
+  void clearCustomer(){
+    customerPhotoController.clear();
+    customerNameController.clear();
+    customerPhoneNumberController.clear();
+    customerAddressController.clear();
+  }
+
   Future<void> getCustomers() async{
     try{
       isLoading.value = true;
@@ -54,6 +61,7 @@ class CustomerController extends GetxController{
   }
 
   void addCustomer(BuildContext context){
+    clearCustomer();
     AppBottomSheets.show(
       context,
       child: AddCustomerWidget()
@@ -83,10 +91,7 @@ class CustomerController extends GetxController{
     await getCustomers();
 
     // Clear textfields
-    customerPhotoController.clear();
-    customerNameController.clear();
-    customerPhoneNumberController.clear();
-    customerAddressController.clear();
+    clearCustomer();
 
     isActive.value = false;
 
@@ -140,10 +145,7 @@ class CustomerController extends GetxController{
       await getCustomers();
 
       // Clear textfields
-      customerPhotoController.clear();
-      customerNameController.clear();
-      customerPhoneNumberController.clear();
-      customerAddressController.clear();
+      clearCustomer();
 
       Get.find<ImageUploadController>()
       .clearImage();

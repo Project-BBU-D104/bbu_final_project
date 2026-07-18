@@ -5,14 +5,13 @@ import 'package:frontend/controllers/stock_adjustment_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:collection/collection.dart';
 
 class AddStockAdjustmentWidget extends StatelessWidget {
   AddStockAdjustmentWidget({super.key});
 
   final ctr = Get.find<StockAdjustmentController>();
-  final warehouseCtr = Get.find<WarehouseController>();
-  final productCtr = Get.find<ProductController>();
+  final warehouseCtr = Get.put(WarehouseController());
+  final productCtr = Get.put(ProductController());
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +92,12 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                   );
                 }).toList(),
 
-                onChanged: (value){
+                onChanged: (value) async {
                   ctr.selectedWarehouse.value = value;
+
+                  if (ctr.selectedProduct.value != null) {
+                    await ctr.loadCurrentQty();
+                  }
                 },
               );
             }),
@@ -168,12 +171,17 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                   ),
                 ),
                 // When select product
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value != null) {
                     ctr.selectedProduct.value =
                         value["id"].toString();
+
+                    if (ctr.selectedWarehouse.value != null) {
+                      await ctr.loadCurrentQty();
+                    }
                   } else {
                     ctr.selectedProduct.value = null;
+                    ctr.currentQtyController.clear();
                   }
                 },
               );
@@ -203,6 +211,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
               ],
               onChanged: (value) {
                 ctr.selectedAdjustmentType.value = value;
+                ctr.calculateNewQty();
               },
             ),
         
@@ -216,6 +225,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                     Text("Reference NO".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                     SizedBox(height: 5,),
                     TextField(
+                      controller: ctr.referenceController,
                       decoration: InputDecoration(
                         hintText: "Enter Reference Number".tr,
                         border: OutlineInputBorder(),
@@ -232,6 +242,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                     SizedBox(height: 5,),
                     TextField(
                       readOnly: true,
+                      controller: ctr.currentQtyController,
                       decoration: InputDecoration(
                         hintText: "Previous Stock".tr,
                         border: OutlineInputBorder(),
@@ -253,6 +264,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                     Text("Adjusted Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       SizedBox(height: 5,),
                       TextField(
+                        controller: ctr.adjustmentQtyController,
                         decoration: InputDecoration(
                           hintText: "Enter Quantity".tr,
                           border: OutlineInputBorder(),
@@ -269,6 +281,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                     SizedBox(height: 5,),
                     TextField(
                       readOnly: true,
+                      controller: ctr.newQtyController,
                       decoration: InputDecoration(
                         hintText: "New Quantity".tr,
                         border: OutlineInputBorder(),
@@ -284,6 +297,7 @@ class AddStockAdjustmentWidget extends StatelessWidget {
               TextField(
                 maxLines: 8,
                 minLines: 3,
+                controller: ctr.reasonController,
                 decoration: InputDecoration(
                   hintText: "Enter Reason".tr,
                   border: OutlineInputBorder(),
@@ -302,9 +316,9 @@ class AddStockAdjustmentWidget extends StatelessWidget {
                   foregroundColor: titleColor,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  ctr.onSaveStockAdjustment();
                 },
-                child: Text("Update".tr,
+                child: Text("Save".tr,
                   style: TextStyle(
                     fontSize: 18,
                   ),

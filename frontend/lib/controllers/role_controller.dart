@@ -16,13 +16,18 @@ class RoleController extends GetxController{
 
   final roleNameController = TextEditingController();
   final roleDescriptionController = TextEditingController();
-
   final isActive = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     getRoles();
+  }
+
+  void clearRole(){
+    roleNameController.clear();
+    roleDescriptionController.clear();
+    isActive.value = false;
   }
 
   Future<void> getRoles() async {
@@ -43,7 +48,7 @@ class RoleController extends GetxController{
   }
 
   void addRole(BuildContext context){
-  
+    clearRole();
     AppBottomSheets.show(
       context,
       child: AddRoleWidget()
@@ -69,9 +74,7 @@ class RoleController extends GetxController{
       );
 
       // Clear textfields
-      roleNameController.clear();
-      roleDescriptionController.clear();
-      isActive.value = false;
+      clearRole();
 
       // Close BottomSheet
       Navigator.pop(Get.context!);
@@ -123,9 +126,7 @@ class RoleController extends GetxController{
       );
 
       // clear
-      roleNameController.clear();
-      roleDescriptionController.clear();
-      isActive.value = false;
+      clearRole();
       
     }catch(e){
       ToastWidget.show(

@@ -34,6 +34,14 @@ class WarehouseStockController extends GetxController{
     });
   }
 
+  void onClearWarehouseStock(){
+    selectedWarehouse.value = null;
+    selectedProduct.value = null;
+    productRows.clear();
+    warehouseStockQtyController.clear();
+    addProductRow();
+  }
+
   void removeProductRow(int index) {
     if (productRows.length == 1) return;
 
@@ -62,6 +70,7 @@ class WarehouseStockController extends GetxController{
   }
 
   void addWarehouseStock(BuildContext context){
+    onClearWarehouseStock();
     AppBottomSheets.show(
       context,
       child: AddWarehouseStockWidget()
@@ -104,11 +113,7 @@ class WarehouseStockController extends GetxController{
       Navigator.pop(Get.context!);
 
       // clear
-      selectedWarehouse.value = null;
-      selectedProduct.value = null;
-      productRows.clear();
-      warehouseStockQtyController.clear();
-      addProductRow();
+      onClearWarehouseStock();
 
     }catch(e){
       ToastWidget.show(
@@ -202,9 +207,7 @@ class WarehouseStockController extends GetxController{
       (row["qty"] as TextEditingController).dispose();
     }
 
-    productRows.clear();
-    warehouseStockQtyController.clear();
-    addProductRow();
+    onClearWarehouseStock();
   } catch (e) {
     ToastWidget.show(
       message: e.toString(),

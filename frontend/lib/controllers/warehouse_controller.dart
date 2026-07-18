@@ -26,6 +26,13 @@ class WarehouseController extends GetxController{
     super.onInit();
   }
 
+  void onClearWarehouse(){
+    warehouseNameController.clear();
+    warehouseReferenceNoController.clear();
+    warehouseLocationController.clear();
+    warehouseNoteController.clear();
+  }
+
   Future<void> getWarehouses() async{
     try{
       isLoading.value = true;
@@ -54,6 +61,7 @@ class WarehouseController extends GetxController{
   }
 
   void addWarehouse(BuildContext context){
+    onClearWarehouse();
     AppBottomSheets.show(
       context,
       child: AddWarehouseWidget()
@@ -83,10 +91,7 @@ class WarehouseController extends GetxController{
       );
 
       // Clear textfields
-      warehouseNameController.clear();
-      warehouseReferenceNoController.clear();
-      warehouseLocationController.clear();
-      warehouseNoteController.clear();
+      onClearWarehouse();
 
     }catch(e){
       // 
@@ -137,10 +142,7 @@ class WarehouseController extends GetxController{
       );
 
       // Clear textfields
-      warehouseNameController.clear();
-      warehouseReferenceNoController.clear();
-      warehouseLocationController.clear();
-      warehouseNoteController.clear();
+      onClearWarehouse();
       
     }catch(e){
       // 

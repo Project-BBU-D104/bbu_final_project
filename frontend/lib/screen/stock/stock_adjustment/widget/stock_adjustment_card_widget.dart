@@ -11,6 +11,16 @@ class StockAdjustmentCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final bool isIncrease =
+    stockAdjustment["adjustment_type"] == "increase";
+
+    final Color badgeBackgroundColor =
+        isIncrease ? Colors.green.shade50 : Colors.red.shade50;
+
+    final Color badgeTextColor =
+        isIncrease ? successColor : dangerColor;
+
     return GestureDetector(
       onTap: () => Get.find<StockAdjustmentController>().gotoStockAdjustmentDetailScreen(stockAdjustment),
       child: Card(
@@ -117,19 +127,18 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade50,
+                        color: badgeBackgroundColor,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        "${stockAdjustment['adjustment_type'] == 'IN' ? '+' : '-'}${stockAdjustment['qty'] ?? '0'}",
+                        "${isIncrease ? '+' : '-'}${stockAdjustment['qty'] ?? '0'}",
                         style: TextStyle(
-                          color: successColor,
+                          color: badgeTextColor,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     )
-      
                   ],
                 ),
               ),

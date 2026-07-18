@@ -5,6 +5,27 @@ from datetime import datetime
 
 from fastapi import HTTPException
 
+def get_stock_by_product_and_warehouse(
+    session: Session,
+    warehouse_id: int,
+    product_id: int,
+):
+    stock = session.exec(
+        select(WarehouseStock).where(
+            WarehouseStock.warehouse_id == warehouse_id,
+            WarehouseStock.product_id == product_id,
+        )
+    ).first()
+
+    if stock is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found in warehouse."
+        )
+
+    return stock
+
+
 def check_product_in_warehouse(
     session: Session,
     warehouse_id: int,

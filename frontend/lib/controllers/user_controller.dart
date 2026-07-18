@@ -36,6 +36,15 @@ class UserController extends GetxController{
     getUserList();
   }
 
+  void clearUser(){
+    selectedRole.value = null;
+    userPhotoController.clear();
+    userNameController.clear();
+    userEmailController.clear();
+    userPhoneController.clear();
+    isChecked.value = false;
+  }
+
   Future<void> getUserList() async {
     try{
       isLoading.value = true;
@@ -57,6 +66,7 @@ class UserController extends GetxController{
   }
 
   void addUser(BuildContext context){
+    clearUser();
     AppBottomSheets.show(
       context,
       child: AddUserWidget()
@@ -87,14 +97,7 @@ class UserController extends GetxController{
 
     // Clear textfields
 
-    selectedRole.value = null;
-
-    userPhotoController.clear();
-    userNameController.clear();
-    userEmailController.clear();
-    userPhoneController.clear();
-
-    isChecked.value = false;
+    clearUser();
 
     Get.find<ImageUploadController>()
     .clearImage();
@@ -171,8 +174,10 @@ class UserController extends GetxController{
       type: ToastType.success,
     );
 
-  Navigator.pop(context);
+      Navigator.pop(context);
       await getUserList();
+
+      clearUser();
     } catch(e){
       ToastWidget.show(
         message: e.toString(),

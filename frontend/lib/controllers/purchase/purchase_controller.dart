@@ -63,6 +63,8 @@ class PurchaseController extends GetxController {
     discount.value = 0;
     paid.value = 0;
     selectedSupplier.value = null;
+    selectedProduct.value = null;
+    selectedWarehouse.value = null;
     purchaseDate.value = DateTime.now();
 
     for (final i in items) {
@@ -113,6 +115,7 @@ class PurchaseController extends GetxController {
   }
 
   void addPurchase(BuildContext context) {
+    
     resetForm();
     AppBottomSheets.show(
       context,

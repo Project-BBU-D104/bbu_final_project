@@ -18,6 +18,15 @@ class WarehouseStockService {
     );
   }
 
+  Future<dynamic> getProductStock({
+    required int warehouseId,
+    required int productId,
+  }) async {
+    return await _api.get(
+      "$endpoint/warehouse/$warehouseId/product/$productId",
+    );
+  }
+
   /// Create Warehouse Stock
   Future<dynamic> createWarehouseStock(
     Map<String, dynamic> data,
