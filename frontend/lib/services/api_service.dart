@@ -11,14 +11,24 @@ class ApiService {
       };
 
   /// GET ALL
-  Future<dynamic> get(String endpoint) async {
-    final response = await http.get(
-      Uri.parse("$baseUrl$endpoint"),
-      headers: headers,
-    );
+  // Future<dynamic> get(String endpoint) async {
+  //   final response = await http.get(
+  //     Uri.parse("$baseUrl$endpoint"),
+  //     headers: headers,
+  //   );
 
-    return _handleResponse(response);
-  }
+  //   return _handleResponse(response);
+  // }
+
+  /// GET ALL
+Future<dynamic> get(String endpoint) async {
+  final response = await http.get(
+    Uri.parse("$baseUrl$endpoint/"),   // ✅ add trailing slash here
+    headers: headers,
+  );
+
+  return _handleResponse(response);
+}
 
   /// GET BY ID
   Future<dynamic> getById(

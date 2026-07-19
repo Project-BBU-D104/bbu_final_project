@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
@@ -120,9 +121,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   _row("Address", supplier.address ?? '-'),
-                  _row("Created", supplier.createdAt != null
-                    ? supplier.createdAt!.toString().substring(0, 10)
-                    : "",),
+                  _row("Created", DateFormatter.formatDate(supplier.createdAt)),
                 ],
               ),
             ),

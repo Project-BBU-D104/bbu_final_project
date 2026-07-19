@@ -15,12 +15,12 @@ class ProductController extends GetxController {
   final SupplierController supplierCtr = Get.find<SupplierController>();
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    await getProducts();
+   getProducts();
 
-    await categoryCtr.getCategory();
-   await supplierCtr.getSuppliers();
+    //  categoryCtr.getCategory();
+    // supplierCtr.getSuppliers();
   }
 
   var isLoading = false.obs;

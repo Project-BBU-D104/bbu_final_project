@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/customer_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
@@ -167,7 +168,7 @@ class CustomerCardWidget extends StatelessWidget {
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    customer['created_at'] ?? "Unknown Date",
+                    DateFormatter.formatDate(DateTime.tryParse(customer['created_at'] ?? ''),),
                     style: TextStyle(
                       fontSize: 16,
                     ),

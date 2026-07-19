@@ -6,10 +6,11 @@ import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
-
 class SupplierScreen extends StatelessWidget {
   SupplierScreen({super.key});
+
   final controller = Get.find<SupplierController>();
+  
   @override
   Widget build(BuildContext context) {
 

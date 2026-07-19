@@ -62,15 +62,31 @@ class UserScreen extends StatelessWidget {
 
               SizedBox(height: 15),
               
-              Obx(()=> ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.userList.length,
-                  itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: UserCardListWidget(user: ctr.userList[index],),
-                  ),
-                ),
+              Obx(() { 
+
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (ctr.userList.isEmpty) {
+                  return Center(child: Text("No User Found".tr));
+                }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: ctr.userList.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: UserCardListWidget(user: ctr.userList[index],),
+                    ),
+                  );
+                }
               )
           
             ],

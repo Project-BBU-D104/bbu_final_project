@@ -77,6 +77,16 @@ class ProductScreen extends StatelessWidget {
 
           /// PRODUCT LIST
           Obx(() {
+
+            if (productCtrl.isLoading.value) {
+              return const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
             final list = productCtrl.filteredItems;
 
             if (list.isEmpty) {

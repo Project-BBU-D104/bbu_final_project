@@ -104,42 +104,6 @@ class ProductCardDetailWidget extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// HEADER
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: _cardDecoration(),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product['name'] ?? "-",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Text(
-                    "\$${product['sale_price'] ?? 0}",
-                    style: const TextStyle(
-                      color: Color(0xff1DB584),
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
             /// PRODUCT INFORMATION
             Container(
               padding: const EdgeInsets.all(18),
@@ -168,15 +132,14 @@ class ProductCardDetailWidget extends StatelessWidget {
                     children: [
 
                       _infoCard(
+                        Icons.inventory_2_outlined,
+                        "Product Name",
+                        product['name']?.toString() ?? "-",
+                      ),
+                      _infoCard(
                         Icons.qr_code,
                         "Barcode",
                         product['barcode']?.toString() ?? "-",
-                      ),
-
-                      _infoCard(
-                        Icons.inventory_2_outlined,
-                        "Stock",
-                        "${product['qty'] ?? 0} Units",
                       ),
 
                       _infoCard(
@@ -208,14 +171,7 @@ class ProductCardDetailWidget extends StatelessWidget {
                         "Supplier",
                         product['supplier']?['name'] ?? "-",
                       ),
-
-                      _infoCard(
-                        Icons.check_circle_outline,
-                        "Insert Qty",
-                        (product['allow_insert_qty'] ?? false)
-                            ? "Allowed"
-                            : "Not Allowed",
-                      ),
+                     
                     ],
                   ),
                 ],

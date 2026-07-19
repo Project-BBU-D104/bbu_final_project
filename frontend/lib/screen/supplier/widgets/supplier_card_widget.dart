@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/models/supplier_model.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
@@ -125,9 +126,7 @@ final SupplierModel item;
                   ),
                   const Spacer(),
                     Text(
-                      item.createdAt != null
-                          ? item.createdAt!.toString().substring(0, 10)
-                          : "",
+                      DateFormatter.formatDate(item.createdAt),
                       style: const TextStyle(
                         color: Color(0xff00a884),
                         fontWeight: FontWeight.bold,

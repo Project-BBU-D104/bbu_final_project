@@ -12,9 +12,11 @@ import 'package:get/get.dart';
 class SupplierController extends GetxController {
 
   var isLoading = false.obs;
+
   final selectedTab = "All".obs;
 
   final SupplierService service = SupplierService();
+
   final suppliers = <SupplierModel>[].obs;
 
   final supplierNameController = TextEditingController();
@@ -85,6 +87,41 @@ class SupplierController extends GetxController {
     );
   }
 
+  void saveSupplier(BuildContext context) async{
+    try{
+      final data = {
+        "name": supplierNameController.text.trim(),
+        "phone": supplierPhoneNumberController.text.trim(),
+        "email": supplierEmailController.text.trim(),
+        "map": supplierMapController.text.trim(),
+        "address": supplierAddressController.text.trim(),
+        "status": status.value
+      };
+
+      await service.createSupplier(data);
+
+      // Reload Supplier
+      await getSuppliers();
+
+      ToastWidget.show(
+        message: "Supplier created successfully",
+        type: ToastType.success,
+      );
+
+    // Clear textfields
+    clearSupplier();
+
+    // Close BottomSheet
+    Navigator.pop(context);
+
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }
+  }
+
   Future<void> editSupplier(int supplierId,BuildContext context) async {
     try{
       final supplier = await service.getSupplierById(supplierId);
@@ -142,45 +179,10 @@ class SupplierController extends GetxController {
     }
   }
 
-  void saveSupplier(BuildContext context){
-    try{
-      final data = {
-        "name": supplierNameController.text.trim(),
-        "phone": supplierPhoneNumberController.text.trim(),
-        "email": supplierEmailController.text.trim(),
-        "map": supplierMapController.text.trim(),
-        "address": supplierAddressController.text.trim(),
-        "status": status.value
-      };
-
-      service.createSupplier(data);
-
-      // Reload Supplier
-      getSuppliers();
-
-      ToastWidget.show(
-        message: "Supplier created successfully",
-        type: ToastType.success,
-      );
-
-    // Clear textfields
-    clearSupplier();
-
-    // Close BottomSheet
-    Navigator.pop(context);
-
-    }catch(e){
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
-    }
-  }
-
   Future<void> deleteSupplier({required int supplierId, required BuildContext context}) async {
     showConfirmDialog(
       context: context,
-      message: "Do you want to delete this category?".tr,
+      message: "Do you want to delete this supplier?".tr,
       onConfirm: () async {
         try{
           await service.deleteSupplier(supplierId);

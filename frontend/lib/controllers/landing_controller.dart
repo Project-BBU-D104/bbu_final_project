@@ -17,8 +17,15 @@ class LandingController extends GetxController {
 
     final user = storage.lastUserLoginRead;
 
-    if (user.isNotEmpty) {
+    // if (user.isNotEmpty) {
+    //   Get.offAllNamed(storage.appStartUpRead);
+    // } else {
+    //   Get.offAllNamed(AppRoutes.login);
+    // }
+    if (user.isNotEmpty && storage.appStartUpRead.isNotEmpty) {
       Get.offAllNamed(storage.appStartUpRead);
+
+      print(storage.appStartUpRead);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }
