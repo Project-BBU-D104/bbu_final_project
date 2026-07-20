@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
-import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/controllers/currency_controller.dart';
 import 'package:get/get.dart';
 
-class AddUnitWidget extends StatelessWidget {
-  AddUnitWidget({super.key});
+class AddCurrencyWidget extends StatelessWidget {
+  AddCurrencyWidget({super.key});
 
-  final ctr = Get.put(UnitController());
+  final ctr = Get.put(CurrencyController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class AddUnitWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Add Unit".tr,
+                "Add Currency".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -43,44 +43,51 @@ class AddUnitWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Unit Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Currency Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
           TextField(
-            controller: ctr.unitNameController,
+            controller: ctr.currencyNameController,
             decoration: InputDecoration(
-              hintText: "Enter Unit".tr,
-              border: OutlineInputBorder(),
-            ),
-          ),
- 
-          const SizedBox(height: 10),
-
-          Text("Short Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            controller: ctr.unitShortNameController,
-            decoration: InputDecoration(
-              hintText: "Enter Short Name".tr,
-              border: OutlineInputBorder(),
-            ),
-          ),
- 
-          const SizedBox(height: 10),
-
-          Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            controller: ctr.unitDescriptionController,
-            maxLines: 8,
-            minLines: 3,
-            decoration: InputDecoration(
-              hintText: "Enter Description".tr,
+              hintText: "Enter Currency Name".tr,
               border: OutlineInputBorder(),
             ),
           ),
 
           const SizedBox(height: 10),
-        
+
+          Text("Currency Code".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          TextField(
+            controller: ctr.currencyCodeController,
+            decoration: InputDecoration(
+              hintText: "Enter Currency Code".tr,
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+          Text("Currency symbol".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          TextField(
+            controller: ctr.currencySymbolController,
+            decoration: InputDecoration(
+              hintText: "Enter Currency symbol".tr,
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+          Text("Exchange Rate".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          SizedBox(height: 5,),
+          TextField(
+            controller: ctr.currencyRateController,
+            decoration: InputDecoration(
+              hintText: "Enter Exchange Rate".tr,
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 10),
            Obx(
               () => Row(
                 children: [
@@ -88,6 +95,26 @@ class AddUnitWidget extends StatelessWidget {
                     value: ctr.isActive.value,
                     onChanged: (value) {
                       ctr.isActive.value = value ?? false;
+                    },
+                  ),
+                  const Text(
+                    "Set as default currency",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+ 
+           Obx(
+              () => Row(
+                children: [
+                  Checkbox(
+                    value: ctr.isDefault.value,
+                    onChanged: (value) {
+                      ctr.isDefault.value = value ?? false;
                     },
                   ),
                   const Text(
@@ -110,7 +137,7 @@ class AddUnitWidget extends StatelessWidget {
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
-                ctr.onSaveUnit();
+                ctr.onSaveCurrency();
               },
               child: Text(
                 "Save".tr,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
-import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/controllers/payment_type_controller.dart';
 import 'package:get/get.dart';
 
-class AddUnitWidget extends StatelessWidget {
-  AddUnitWidget({super.key});
+class EditPaymentTypeWidget extends StatelessWidget {
+  final int paymentTypeId;
+  EditPaymentTypeWidget({super.key, required this.paymentTypeId});
 
-  final ctr = Get.put(UnitController());
+  final ctr = Get.put(PaymentTypeController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class AddUnitWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Add Unit".tr,
+                "Edit Payment Type".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -43,24 +44,12 @@ class AddUnitWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Unit Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+          Text("Payment Type".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
           TextField(
-            controller: ctr.unitNameController,
+            controller: ctr.paymentTypeName,
             decoration: InputDecoration(
-              hintText: "Enter Unit".tr,
-              border: OutlineInputBorder(),
-            ),
-          ),
- 
-          const SizedBox(height: 10),
-
-          Text("Short Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            controller: ctr.unitShortNameController,
-            decoration: InputDecoration(
-              hintText: "Enter Short Name".tr,
+              hintText: "Enter Payment Type".tr,
               border: OutlineInputBorder(),
             ),
           ),
@@ -70,7 +59,7 @@ class AddUnitWidget extends StatelessWidget {
           Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
           TextField(
-            controller: ctr.unitDescriptionController,
+            controller: ctr.paymentTypeDescription,
             maxLines: 8,
             minLines: 3,
             decoration: InputDecoration(
@@ -110,10 +99,12 @@ class AddUnitWidget extends StatelessWidget {
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
-                ctr.onSaveUnit();
+                ctr.onUpdatePaymentType(
+                  paymentTypeId
+                );
               },
               child: Text(
-                "Save".tr,
+                "Update".tr,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
               )
             ),

@@ -1,40 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/controllers/payment_type_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class UnitCardWidget extends StatelessWidget {
-  final Map<String, dynamic> units;
+class PaymentTypeCardWidget extends StatelessWidget {
+  final Map<String, dynamic> paymentType;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
-  UnitCardWidget({
+  PaymentTypeCardWidget({
     super.key,
-    required this.units,
+    required this.paymentType,
     this.onEdit,
     this.onDelete,
   });
 
-  final ctr = Get.put(UnitController());
+  final ctr = Get.find<PaymentTypeController>();
 
   String formatDate(dynamic date) {
-    if(date == null) return "-";
+    if (date == null) return "-";
+
     try {
       return DateFormat("dd MMM yyyy, hh:mm a")
           .format(DateTime.parse(date.toString()));
-    } catch(e){
+    } catch (e) {
       return "-";
     }
   }
   @override
   Widget build(BuildContext context) {
-    final bool isActive = units['status'] ?? false;
+    final bool isActive = paymentType['status'] ?? false;
     return Card(
       elevation: 3,
-      margin: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -42,47 +39,44 @@ class UnitCardWidget extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             /// Header
             Row(
               children: [
-                /// Unit Icon
+                /// Payment Icon
                 Container(
                   height: 50,
                   width: 50,
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: Colors.blue.shade50,
                     borderRadius: BorderRadius.circular(12),
                   ),
+
                   child: Icon(
-                    Icons.inventory_2,
-                    color: Colors.orange.shade700,
+                    Icons.payment,
+                    color: Colors.blue.shade700,
                     size: 28,
                   ),
                 ),
+
                 const SizedBox(width: 12),
-                /// Name
+                /// Name + Description
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            units['name'] ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
+                      Text(
+                        paymentType['name'] ?? "",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
 
-                      const SizedBox(height: 5),
-
+                      const SizedBox(height: 4),
                       Text(
-                        units['description'] ?? "",
+                        paymentType['description'] ?? "",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -103,31 +97,62 @@ class UnitCardWidget extends StatelessWidget {
                     color: isActive
                         ? Colors.green.shade50
                         : Colors.red.shade50,
+
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    isActive
-                        ? "Active"
-                        : "Inactive",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isActive
-                          ? Colors.green
-                          : Colors.red,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isActive
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                        size: 15,
+                        color: isActive
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+
+                      const SizedBox(width: 4),
+
+                      Text(
+                        isActive
+                            ? "Active"
+                            : "Inactive",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isActive
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+
+                const SizedBox(width: 4),
+                /// Action Menu
                 PopupMenuButton<String>(
+
                   icon: const Icon(
                     Icons.more_vert,
                   ),
-                  onSelected: (value){
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (value) {
                     if(value == "edit"){
-                      ctr.editUnit(context, units['id']);
+                      ctr.editPaymentType(
+                        context,
+                        paymentType['id'],
+                      );
                     }
                     if(value == "delete"){
-                      ctr.onDeleteUnit(context, units['id']);
+                      ctr.onDeletePaymentType(
+                        context,
+                        paymentType['id'],
+                      );
                     }
                   },
                   itemBuilder: (context)=>[
@@ -141,10 +166,13 @@ class UnitCardWidget extends StatelessWidget {
                             size: 20,
                           ),
                           SizedBox(width: 10),
-                          Text("Edit"),
+                          Text(
+                            "Edit",
+                          ),
                         ],
                       ),
                     ),
+
                     const PopupMenuItem(
                       value: "delete",
                       child: Row(
@@ -155,17 +183,20 @@ class UnitCardWidget extends StatelessWidget {
                             size: 20,
                           ),
                           SizedBox(width: 10),
-                          Text("Delete"),
+
+                          Text(
+                            "Delete",
+                          ),
                         ],
                       ),
                     ),
                   ],
-                )
-              ]
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             const Divider(),
-            /// Date Info
+            /// Information
             Row(
               children: [
                 Expanded(
@@ -173,7 +204,7 @@ class UnitCardWidget extends StatelessWidget {
                     icon: Icons.calendar_today,
                     title: "Created",
                     value: formatDate(
-                      units['created_at'],
+                      paymentType['created_at'],
                     ),
                   ),
                 ),
@@ -182,7 +213,7 @@ class UnitCardWidget extends StatelessWidget {
                     icon: Icons.update,
                     title: "Updated",
                     value: formatDate(
-                      units['updated_at'],
+                      paymentType['updated_at'],
                     ),
                   ),
                 ),
@@ -194,15 +225,18 @@ class UnitCardWidget extends StatelessWidget {
     );
   }
 }
+
 class _InfoItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
+
   const _InfoItem({
     required this.icon,
     required this.title,
     required this.value,
   });
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -212,7 +246,9 @@ class _InfoItem extends StatelessWidget {
           size: 18,
           color: Colors.grey.shade600,
         ),
+
         const SizedBox(width: 8),
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +268,7 @@ class _InfoItem extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
-              )
+              ),
             ],
           ),
         ),

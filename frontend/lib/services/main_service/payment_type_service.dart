@@ -3,7 +3,7 @@ import 'package:frontend/services/api_service.dart';
 class PaymentTypeService {
   final ApiService _api = ApiService();
 
-  static const String endpoint = "payment_types";
+  static const String endpoint = "payment_type";
 
   /// GET ALL Payment Type
   Future<dynamic> getPaymentTypes() async {
