@@ -8,8 +8,7 @@ import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class ProductTransferController extends GetxController{
-
-  var selectedDate = Rxn<DateTime>();
+ 
   var isLoading = false.obs;
 
   final ProductTransferService service = ProductTransferService();
@@ -42,23 +41,24 @@ class ProductTransferController extends GetxController{
     }
   }
 
-  Future<void> pickDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
+  final Rx<DateTime> selectedDate = DateTime.now().obs;
 
-    if (picked != null) {
-      selectedDate.value = picked;
-    }
+  Future<void> pickDate(BuildContext context) async {
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: selectedDate.value,
+    firstDate: DateTime(2020),
+    lastDate: DateTime(2100),
+  );
+
+  if (picked != null) {
+    selectedDate.value = picked;
   }
+}
 
   String get formattedDate {
-    if (selectedDate.value == null) return "Select Date".tr;
-    return selectedDate.value!.toString().split(" ")[0];
-  }
+  return selectedDate.value.toString().split(" ")[0];
+}
 
   void addStockTransfer(BuildContext context){
     AppBottomSheets.show(

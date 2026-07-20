@@ -317,9 +317,12 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                   foregroundColor: titleColor,
                 ),
                 onPressed: () {
-                  ctr.onSaveStockAdjustment();
+                  ctr.onUpdateStockAdjustment(
+                    context,
+                    stockAdjustmentId
+                  );
                 },
-                child: Text("Save".tr,
+                child: Text("Update".tr,
                   style: TextStyle(
                     fontSize: 18,
                   ),

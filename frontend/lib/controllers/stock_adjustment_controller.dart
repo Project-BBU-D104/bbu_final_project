@@ -182,8 +182,44 @@ void calculateNewQty() {
     }
   }
 
-  void onUpdateStockAdjustment(){
-    print("Update stock adjustment");
+  void onUpdateStockAdjustment(BuildContext context, int stockAdjustmentId) async{
+    try{
+      isLoading.value = true;
+      final data = {
+        'product_id': selectedProduct.value,
+        'warehouse_id': selectedWarehouse.value,
+        'adjustment_type': selectedAdjustmentType.value,
+        'user_id': storage.lastUserLoginRead["user"]["id"],
+        'qty': adjustmentQtyController.text,
+        'previous_qty': currentQtyController.text,
+        'new_qty': newQtyController.text,
+        'reason': reasonController.text,
+        'reference_no': referenceController.text
+      };
+
+      await service.updateStockAdjustment(stockAdjustmentId, data);
+
+      // Refresh category list
+      await getStockAdjustments();
+
+      ToastWidget.show(
+        message: "Stock adjustment updated successfully".tr,
+        type: ToastType.success,
+      );
+
+      // Close BottomSheet
+      Navigator.pop(Get.context!);
+
+      // clearForm();
+      clearForm();
+    }catch(e){
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    }finally{
+      isLoading.value = false;
+    }
   }
 
   void onDeleteStockAdjustment(int stockAdjustmentId, BuildContext context) async{
@@ -221,14 +257,14 @@ void calculateNewQty() {
 
 
   @override
-void onClose() {
-  adjustmentQtyController.removeListener(calculateNewQty);
-  adjustmentQtyController.dispose();
-  currentQtyController.dispose();
-  newQtyController.dispose();
-  referenceController.dispose();
-  reasonController.dispose();
-  super.onClose();
-}
+  void onClose() {
+    adjustmentQtyController.removeListener(calculateNewQty);
+    adjustmentQtyController.dispose();
+    currentQtyController.dispose();
+    newQtyController.dispose();
+    referenceController.dispose();
+    reasonController.dispose();
+    super.onClose();
+  }
 
 }

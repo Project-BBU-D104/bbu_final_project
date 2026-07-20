@@ -108,33 +108,147 @@ def get_stock_adjustments(session: Session, stock_adjustment_id: int):
     )
     return session.exec(statement).first()
 
-def update_stock_adjustment(session: Session, stock_adjustment_id: int, stock_adjustment: StockAdjustmentUpdate):
-    db_stock_adjustment = session.get(StockAdjustment, stock_adjustment_id)
-    if db_stock_adjustment:
-        if stock_adjustment.product_id is not None:
-            db_stock_adjustment.product_id = stock_adjustment.product_id
-        if stock_adjustment.warehouse_id is not None:
-            db_stock_adjustment.warehouse_id = stock_adjustment.warehouse_id
-        if stock_adjustment.user_id is not None:
-            db_stock_adjustment.user_id = stock_adjustment.warehouse_id
-        if stock_adjustment.adjustment_type is not None:
-            db_stock_adjustment.adjustment_type = stock_adjustment.adjustment_type
-        if stock_adjustment.qty is not None:
-            db_stock_adjustment.qty = stock_adjustment.qty
-        if stock_adjustment.previous_qty is not None:
-            db_stock_adjustment.previous_qty = stock_adjustment.previous_qty
-        if stock_adjustment.new_qty is not None:
-            db_stock_adjustment.new_qty = stock_adjustment.new_qty
-        if stock_adjustment.reason is not None:
-            db_stock_adjustment.reason = stock_adjustment.reason
-        if stock_adjustment.reference_no is not None:
-            db_stock_adjustment.reference_no = stock_adjustment.reference_no
+def update_stock_adjustment(
+    session: Session,
+    stock_adjustment_id: int,
+    stock_adjustment: StockAdjustmentUpdate,
+):
+    db_stock_adjustment = session.get(
+        StockAdjustment,
+        stock_adjustment_id,
+    )
 
-        db_stock_adjustment.updated_at = stock_adjustment.updated_at or datetime.utcnow()
-        session.add(db_stock_adjustment)
-        session.commit()
-        session.refresh(db_stock_adjustment)
+    if db_stock_adjustment is None:
+        return None
+
+    old_stock = get_stock_by_product_and_warehouse(
+        session,
+        db_stock_adjustment.warehouse_id,
+        db_stock_adjustment.product_id,
+    )
+
+    if old_stock is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Old warehouse stock not found."
+        )
+
+    if db_stock_adjustment.adjustment_type == "increase":
+        old_stock.qty -= db_stock_adjustment.qty
+
+    elif db_stock_adjustment.adjustment_type == "decrease":
+        old_stock.qty += db_stock_adjustment.qty
+
+    if old_stock.qty < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid stock after reversing adjustment."
+        )
+
+    new_product_id = (
+        stock_adjustment.product_id
+        if stock_adjustment.product_id is not None
+        else db_stock_adjustment.product_id
+    )
+
+    new_warehouse_id = (
+        stock_adjustment.warehouse_id
+        if stock_adjustment.warehouse_id is not None
+        else db_stock_adjustment.warehouse_id
+    )
+
+    new_user_id = (
+        stock_adjustment.user_id
+        if stock_adjustment.user_id is not None
+        else db_stock_adjustment.user_id
+    )
+
+    new_adjustment_type = (
+        stock_adjustment.adjustment_type
+        if stock_adjustment.adjustment_type is not None
+        else db_stock_adjustment.adjustment_type
+    )
+
+    new_qty = (
+        stock_adjustment.qty
+        if stock_adjustment.qty is not None
+        else db_stock_adjustment.qty
+    )
+
+    new_reason = (
+        stock_adjustment.reason
+        if stock_adjustment.reason is not None
+        else db_stock_adjustment.reason
+    )
+
+    new_reference_no = (
+        stock_adjustment.reference_no
+        if stock_adjustment.reference_no is not None
+        else db_stock_adjustment.reference_no
+    )
+
+    new_stock = get_stock_by_product_and_warehouse(
+        session,
+        new_warehouse_id,
+        new_product_id,
+    )
+
+    if new_stock is None:
+        raise HTTPException(
+            status_code=404,
+            detail="New warehouse stock not found."
+        )
+
+    previous_qty = new_stock.qty
+
+    if new_adjustment_type == "increase":
+        final_qty = previous_qty + new_qty
+
+    elif new_adjustment_type == "decrease":
+
+        if new_qty > previous_qty:
+            raise HTTPException(
+                status_code=400,
+                detail="Insufficient stock."
+            )
+
+        final_qty = previous_qty - new_qty
+
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid adjustment type."
+        )
+
+    new_stock.qty = final_qty
+
+    db_stock_adjustment.product_id = new_product_id
+    db_stock_adjustment.warehouse_id = new_warehouse_id
+    db_stock_adjustment.user_id = new_user_id
+    db_stock_adjustment.adjustment_type = new_adjustment_type
+    db_stock_adjustment.qty = new_qty
+    db_stock_adjustment.previous_qty = previous_qty
+    db_stock_adjustment.new_qty = final_qty
+    db_stock_adjustment.reason = new_reason
+    db_stock_adjustment.reference_no = new_reference_no
+    db_stock_adjustment.updated_at = (
+        stock_adjustment.updated_at or datetime.utcnow()
+    )
+    session.add(old_stock)
+
+    # If warehouse/product changed, update both stocks
+    if (
+        old_stock.warehouse_id != new_stock.warehouse_id
+        or old_stock.product_id != new_stock.product_id
+    ):
+        session.add(new_stock)
+    session.add(db_stock_adjustment)
+    session.commit()
+
+    session.refresh(db_stock_adjustment)
+
     return db_stock_adjustment
+
 
 def delete_stock_adjustment(
     session: Session,
@@ -170,9 +284,7 @@ def delete_stock_adjustment(
         )
 
     session.add(stock)
-
     session.delete(stock_adjustment)
-
     session.commit()
 
     return stock_adjustment
