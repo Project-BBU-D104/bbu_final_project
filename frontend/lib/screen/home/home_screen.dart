@@ -14,6 +14,7 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: PageView(
           controller: controller.pageController,
+          physics: const NeverScrollableScrollPhysics(),
           onPageChanged: controller.onPageChanged,
           children: controller.tabPages,
         ),

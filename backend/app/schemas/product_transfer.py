@@ -13,9 +13,6 @@ class ProductTransferCreate(SQLModel):
     reference_no: str
     qty: int
     transfer_date: datetime
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
 
 class ProductTransferUpdate(SQLModel):
     from_warehouse_id: Optional[int] = None

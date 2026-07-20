@@ -19,8 +19,16 @@ def read_stock_adjustment(product_transfer_id: int, session: Session = Depends(g
     return get_product_transfers(session, product_transfer_id)
 
 @router.put("/{product_transfer_id}", response_model=ProductTransferRead)
-def update_product_transfer_route(product_transfer_id: int, product_transfer: ProductTransferUpdate, session: Session = Depends(get_session)):
-    return update_product_transfer_route(session, product_transfer_id, product_transfer)
+def update_product_transfer_route(
+    product_transfer_id: int,
+    product_transfer: ProductTransferUpdate,
+    session: Session = Depends(get_session)
+):
+    return update_product_transfer(
+        session,
+        product_transfer_id,
+        product_transfer
+    )
 
 @router.delete("/{product_transfer_id}")
 def delete_product_transfer_route(product_transfer_id: int, session: Session = Depends(get_session)):

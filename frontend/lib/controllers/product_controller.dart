@@ -11,8 +11,8 @@ class ProductController extends GetxController {
 
   final ProductService service = ProductService();
 
-  final CategoryController categoryCtr = Get.find<CategoryController>();
-  final SupplierController supplierCtr = Get.find<SupplierController>();
+  final CategoryController categoryCtr = Get.put(CategoryController());
+  final SupplierController supplierCtr = Get.put(SupplierController());
 
   @override
   void onInit() {

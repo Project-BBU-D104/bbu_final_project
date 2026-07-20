@@ -33,7 +33,7 @@ class StockTransferCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "#${stockTransfer['id']}",
+                  "#${stockTransfer['reference_no']}",
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 13,

@@ -4,8 +4,32 @@ from app.schemas.product_transfer import ProductTransferCreate, ProductTransferU
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 
+def generate_ref_no(session: Session) -> str:
+    # Get the latest product transfer
+    last_product_transfer = session.exec(
+        select(ProductTransfer).order_by(ProductTransfer.id.desc())
+    ).first()
+
+    if last_product_transfer is None:
+        return "PT001"
+
+    # If previous invoice is PT001 -> number = 1
+    try:
+        last_number = int(last_product_transfer.reference_no.replace("PT", ""))
+    except:
+        last_number = last_product_transfer.id
+
+    return f"PT{last_number + 1:04d}"
+
 def create_product_transfer(session: Session, product_transfer: ProductTransferCreate):
-    db_product_transfer = ProductTransfer.model_validate(product_transfer)
+
+    data = product_transfer.model_dump()
+
+    if not data.get("reference_no"):
+        data["reference_no"] = generate_ref_no(session)
+
+    db_product_transfer = ProductTransfer(**data)
+
     session.add(db_product_transfer)
     session.commit()
     session.refresh(db_product_transfer)

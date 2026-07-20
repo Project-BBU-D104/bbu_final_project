@@ -21,7 +21,6 @@ Future<void> main() async {
   await dotenv.load(fileName: "assets/.env");
   await _initConfig();
 
-
   _initStorage();
   
   await GetStorage.init();
@@ -30,8 +29,8 @@ Future<void> main() async {
   Get.put(LanguageController());
 
    await Supabase.initialize(
-    url: 'https://qyiedqysfsrywlmuzvst.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5aWVkcXlzZnNyeXdsbXV6dnN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0Nzk2MzEsImV4cCI6MjA5OTA1NTYzMX0.I0CAB-6hJQH_tTYz2H38uUDL0OdxtvAF7hw-dw9GgCY',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   runApp(const MyApp());

@@ -12,7 +12,7 @@ class ProductTransfer(SQLModel, table=True):
     from_warehouse_id: int = Field(foreign_key="warehouses.id")
     to_warehouse_id: int = Field(foreign_key="warehouses.id")
     reference_no: str
-    qty: str
+    qty: int
     transfer_date: datetime = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

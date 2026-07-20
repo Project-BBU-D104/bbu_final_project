@@ -48,7 +48,7 @@ class StockTransferScreen extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.6,
                     child: Center(
                       child: Text(
-                        "No data found",
+                        "No data found".tr,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
@@ -64,7 +64,7 @@ class StockTransferScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 100), 
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(bottom: 8),
                         child: StockTransferCardWidget( 
                           stockTransfer: ctr.stockTransfer[index],
                         ),
