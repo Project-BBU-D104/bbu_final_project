@@ -40,4 +40,7 @@ class AppRoutes {
   static const auditLogDetail = '/audit-log-detail';
   static const purchaseReqest = '/purchase-request';
   static const purchasePayment = '/purchase-payment';
+  static const currency = '/currency';
+  static const paymentType = '/payment-type';
+  static const unit = '/unit';
 }

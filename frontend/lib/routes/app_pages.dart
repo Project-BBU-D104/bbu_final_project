@@ -19,9 +19,11 @@ import 'package:frontend/binding/warehouse_stock_binding.dart';
 import 'package:frontend/screen/audit_logs/audit_logs_screen.dart';
 import 'package:frontend/screen/audit_logs/widget/audit_log_detail_widget.dart';
 import 'package:frontend/screen/category/category_screen.dart';
+import 'package:frontend/screen/currency/currency_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
 import 'package:frontend/screen/payment/sale_with_payment/sale_with_payment_screen.dart';
+import 'package:frontend/screen/payment_type/payment_type_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/add_product_widget.dart';
 import 'package:frontend/screen/product/widget/edit_product_widget.dart';
@@ -46,6 +48,7 @@ import 'package:frontend/screen/stock/warehouse/widget/ware_house_detail_widget.
 import 'package:frontend/screen/stock/warehouse_stock/warehouse_stock_screen.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
+import 'package:frontend/screen/unit/unit_screen.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
 import 'package:get/get.dart';
@@ -224,6 +227,21 @@ class AppPages {
       name: AppRoutes.purchasePayment,
       page: () => PurchasePaymentScreen(),
       binding: PurchasePaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.paymentType,
+      page: () => PaymentTypeScreen(),
+      // binding: PurchasePaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.currency,
+      page: () => CurrencyScreen(),
+      // binding: PurchasePaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.unit,
+      page: () => UnitScreen(),
+      // binding: PurchasePaymentBinding(),
     ),
   ];
 }

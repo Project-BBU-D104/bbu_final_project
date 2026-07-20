@@ -20,6 +20,12 @@ class ManageController extends GetxController{
           "icon": Icons.inventory_2_outlined,
           "route": AppRoutes.product,
         },
+        {
+          "title": "Unit",
+          "subtitle": "Unit Management",
+          "icon": Icons.keyboard_command_key_outlined,
+          "route": AppRoutes.unit,
+        },
       ]
     },
 
@@ -133,6 +139,23 @@ class ManageController extends GetxController{
           "subtitle": "User Management",
           "icon": Icons.person_outline,
           "route": AppRoutes.user,
+        },
+      ]
+    },
+    {
+      "title": "Configuration Management",
+      "items": [
+        {
+          "title": "Currency",
+          "subtitle": "Currency Management",
+          "icon": Icons.attach_money_outlined,
+          "route": AppRoutes.currency,
+        },
+        {
+          "title": "Payment Type",
+          "subtitle": "Payment Type Management",
+          "icon": Icons.payment_sharp,
+          "route": AppRoutes.paymentType,
         },
       ]
     },
