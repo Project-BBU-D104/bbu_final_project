@@ -19,3 +19,4 @@ class Supplier(SQLModel, table=True):
 
     products: List["Product"] = Relationship(back_populates="supplier")
     purchases: List["Purchase"] = Relationship(back_populates="supplier")
+    purchase_payments: List["PurchasePayment"] = Relationship(back_populates="supplier")

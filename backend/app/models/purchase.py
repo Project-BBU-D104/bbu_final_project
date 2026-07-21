@@ -7,6 +7,7 @@ from app.models.supplier import Supplier
 if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
     from app.models.warehouse import Warehouse
+    from app.models.purchase_payment import PurchasePayment
 
 
 class Purchase(SQLModel, table=True):
@@ -39,3 +40,7 @@ class Purchase(SQLModel, table=True):
         }
     )
     warehouse: Optional["Warehouse"] = Relationship(back_populates="purchases")
+
+    purchase_payments: Optional["PurchasePayment"] = Relationship(
+        back_populates="purchase"
+    )

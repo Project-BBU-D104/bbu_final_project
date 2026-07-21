@@ -242,9 +242,6 @@ CREATE TABLE sale_payments (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-
-//Can't use yet
-
 CREATE TABLE units (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -277,4 +274,96 @@ CREATE TABLE currencies (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP
+);
+
+//Can't use yet
+
+CREATE TABLE purchase_payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    payment_no VARCHAR(50) UNIQUE NOT NULL,
+    purchase_id INT NOT NULL,
+    supplier_id INT NOT NULL,
+    payment_type_id INT NOT NULL,
+    currency_id INT NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    note TEXT,
+    status Text,
+    created_by INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (purchase_id)
+        REFERENCES purchases(id),
+    FOREIGN KEY (supplier_id)
+        REFERENCES suppliers(id),
+    FOREIGN KEY (payment_type_id)
+        REFERENCES payment_types(id),
+    FOREIGN KEY (currency_id)
+        REFERENCES currencies(id),
+    FOREIGN KEY (created_by)
+        REFERENCES users(id)
+);
+
+CREATE TABLE stock_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_no VARCHAR(50) NOT NULL UNIQUE,
+    request_type ENUM(
+        'purchase',
+        'stock_transfer',
+        'stock_adjustment',
+        'stock_return'
+    ) NOT NULL,
+    warehouse_id INT NOT NULL,
+    requested_by INT NOT NULL,
+    approved_by INT NULL,
+    status ENUM(
+        'pending',
+        'approved',
+        'rejected',
+        'cancelled'
+    ) DEFAULT 'pending',
+    reason TEXT,
+    request_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    approved_date DATETIME NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_stock_request_warehouse
+        FOREIGN KEY (warehouse_id)
+        REFERENCES warehouses(id),
+
+    CONSTRAINT fk_stock_request_requested_by
+        FOREIGN KEY (requested_by)
+        REFERENCES users(id),
+
+    CONSTRAINT fk_stock_request_approved_by
+        FOREIGN KEY (approved_by)
+        REFERENCES users(id)
+);
+
+
+CREATE TABLE stock_request_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_request_id INT NOT NULL,
+    product_id INT NOT NULL,
+    unit INT NOT NULL,
+    qty DECIMAL(12,2) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_stock_request_item_request
+        FOREIGN KEY (stock_request_id)
+        REFERENCES stock_requests(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_stock_request_item_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id),
+
+    CONSTRAINT fk_stock_request_item_unit
+        FOREIGN KEY (unit_id)
+        REFERENCES units(id)
+
 );

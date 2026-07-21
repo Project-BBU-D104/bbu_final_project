@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from app.models.warehouse_stock import WarehouseStock
     from app.models.product_transfer import ProductTransfer
     from app.models.sale_items import SaleItems
+    from app.models.purchase_request_items import PurchaseRequestItems
+    
 
 
 
@@ -38,3 +40,6 @@ class Product(SQLModel, table=True):
     warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="product")
     purchase_items: List["PurchaseItem"] = Relationship(back_populates="product")
     sale_items: List["SaleItems"] = Relationship(back_populates="product")
+    purchase_request_items: List["PurchaseRequestItems"] = Relationship(
+        back_populates="product"
+    )

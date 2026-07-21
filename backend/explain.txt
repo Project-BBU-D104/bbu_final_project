@@ -1,0 +1,23 @@
+
+===========================
+for purchase request
+request_type use for (
+    'purchase',
+    'stock_transfer',
+    'stock_adjustment',
+    'stock_return_supplier',
+    'stock_return_customer',
+    'stock_issue',
+    'stock_receive',
+    'stock_count',
+    'stock_damage',
+    'stock_expired'
+)
+
+status ENUM(
+        'pending',
+        'approved',
+        'rejected',
+        'cancelled'
+    ) DEFAULT 'pending',
+==============================================
