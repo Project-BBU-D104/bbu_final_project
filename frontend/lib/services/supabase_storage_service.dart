@@ -33,7 +33,7 @@ class SupabaseStorageService {
               .getPublicUrl(path);
       return url;
     } catch (e) {
-      print("Supabase upload error: $e");
+    
       return null;
     }
   }
@@ -47,7 +47,7 @@ class SupabaseStorageService {
           .remove([path]);
       return true;
     } catch(e) {
-      print("Delete image error: $e");
+      
       return false;
     }
   }
