@@ -9,6 +9,7 @@ class AppBottomSheets {
     return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: lightColor,
     builder: (_) {
       return child;

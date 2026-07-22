@@ -38,7 +38,7 @@ class EditUserWidget extends StatelessWidget {
                 Text(
                   "Edit User".tr,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

@@ -52,8 +52,8 @@ class EditWarehouseStockWidget extends StatelessWidget {
             const Text(
               "Warehouse",
               style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
 

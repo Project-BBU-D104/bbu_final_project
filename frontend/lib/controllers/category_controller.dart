@@ -15,7 +15,7 @@ class CategoryController extends GetxController {
 
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
-
+  final formKey = GlobalKey<FormState>();
   @override
   void onInit() {
     super.onInit();
@@ -80,12 +80,14 @@ class CategoryController extends GetxController {
     Navigator.pop(context);
 
     }catch(e){
+      final error = e.toString();
+      final msg = error.split('msg: ')[1].split(', input:')[0];
+
       ToastWidget.show(
-        message: e.toString(),
+        message: msg.toString(),
         type: ToastType.error,
       );
     }
-    
   }
 
   void onEditCategory(int categoryId, BuildContext context) async {

@@ -29,7 +29,7 @@ final ctr = Get.find<WarehouseController>();
                 const Text(
                   "Add Warehouse",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -42,6 +42,8 @@ final ctr = Get.find<WarehouseController>();
                 ),
               ],
             ),
+
+            SizedBox(height: 10),
 
             Text("Warehouse Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
             SizedBox(height: 5,),

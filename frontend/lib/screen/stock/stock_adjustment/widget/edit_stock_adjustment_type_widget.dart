@@ -34,7 +34,7 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
                 Text(
                   "Edit Stock Adjustment".tr,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -53,8 +53,8 @@ class EditStockAdjustmentTypeWidget extends StatelessWidget {
             const Text(
               "Warehouse",
               style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                fontSize: 18,
               ),
             ),
 

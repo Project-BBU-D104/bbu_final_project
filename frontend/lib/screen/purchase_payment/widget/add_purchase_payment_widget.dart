@@ -25,7 +25,7 @@ class AddPurchasePaymentWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Add Category".tr,
+                "Add Category".tr,  
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

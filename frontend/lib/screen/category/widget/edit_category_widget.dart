@@ -29,7 +29,7 @@ class EditCategoryWidget extends StatelessWidget {
               Text(
                 "Edit Category".tr,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -47,24 +47,22 @@ class EditCategoryWidget extends StatelessWidget {
 
           Text("Category Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
           SizedBox(height: 5,),
-          TextField(
-            controller: ctr.nameController,
-            decoration: InputDecoration(
-              hintText: "Enter Category Name".tr,
-              border: OutlineInputBorder(),
+          Form(
+            key: ctr.formKey,
+            child: TextFormField(
+              controller: ctr.nameController,
+              validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Category Name is required".tr;
+                  }
+                  return null;
+              },
+              decoration: InputDecoration(
+                hintText: "Enter Category Name".tr,
+                border: OutlineInputBorder(),
+              ),
             ),
           ),
-
-          // const SizedBox(height: 10),
-
-          // Text("Icon".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          // SizedBox(height: 5,),
-          // TextField(
-          //   decoration: InputDecoration(
-          //     hintText: "Enter Icon".tr,
-          //     border: OutlineInputBorder(),
-          //   ),
-          // ),
 
           const SizedBox(height: 10),
 
@@ -94,7 +92,9 @@ class EditCategoryWidget extends StatelessWidget {
                  
               ),
               onPressed: () {
-                ctr.onUpdateCategory(categoryId, context);
+                if(ctr.formKey.currentState!.validate()) {
+                  ctr.onUpdateCategory(categoryId, context);
+                }
               },
               child: Text("Save".tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),)
             ),

@@ -10,7 +10,7 @@ class StockTransferCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.find<ProductTransferController>().gotoStockTransferDetail(stockTransfer ?? {}),
+      onTap: () => Get.find<ProductTransferController>().gotoStockTransferDetail(stockTransfer),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

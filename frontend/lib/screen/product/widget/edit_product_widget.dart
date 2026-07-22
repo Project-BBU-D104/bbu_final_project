@@ -16,263 +16,265 @@ class EditProductWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsetsGeometry.all(8),
         child: SingleChildScrollView(
-          child: SizedBox(
-            child: Card(
-              color: titleColor,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Edit Product".tr,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+          child: SafeArea(
+            child: SizedBox(
+              child: Card(
+                color: titleColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Edit Product".tr,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-        
-                    ImageUploadWidget(
-                      bucket: "product",
-                      folder: "products",
-                      imageUrl: ctr.productPhotoController.text,
-                      onUploaded: (url) {
-                        ctr.productPhotoController.text = url;
-                      },
-                    ),
-                      
-                    const SizedBox(height: 10),
-                    Text("Product Name".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                    const SizedBox(height: 5),
-                     TextField(
-                      controller: ctr.productNameController,
-                      decoration: InputDecoration(
-                        hintText: "Enter Product Name".tr,
-                        border: OutlineInputBorder(),
+                        
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                      Text("Category".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            
+                      const SizedBox(height: 10),
+                    
+                      ImageUploadWidget(
+                        bucket: "product",
+                        folder: "products",
+                        imageUrl: ctr.productPhotoController.text,
+                        onUploaded: (url) {
+                          ctr.productPhotoController.text = url;
+                        },
+                      ),
+                        
+                      const SizedBox(height: 10),
+                      Text("Product Name".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                       const SizedBox(height: 5),
+                       TextField(
+                        controller: ctr.productNameController,
+                        decoration: InputDecoration(
+                          hintText: "Enter Product Name".tr,
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                        Text("Category".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                        const SizedBox(height: 5),
+                      Obx(() {
+                        return DropdownButtonFormField<String>(
+                          value: ctr.selectedCategory.value,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          ),
+                          items: ctr.categoryCtr.categoryList.map((category) {
+                            return DropdownMenuItem<String>(
+                              value: category["id"].toString(),
+                              child: Text(category["name"]),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            ctr.selectedCategory.value = value;
+                          },
+                        );
+                      }),
+                      const SizedBox(height: 10),
+            
+                       Text("Supplier".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                        const SizedBox(height: 5),
+            
                     Obx(() {
                       return DropdownButtonFormField<String>(
-                        value: ctr.selectedCategory.value,
+                        value: ctr.selectedSupplier.value,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         ),
-                        items: ctr.categoryCtr.categoryList.map((category) {
+                        items: ctr.supplierCtr.suppliers.map((supplier) {
                           return DropdownMenuItem<String>(
-                            value: category["id"].toString(),
-                            child: Text(category["name"]),
+                            value: supplier.id.toString(),
+                            child: Text(supplier.name),
                           );
                         }).toList(),
                         onChanged: (value) {
-                          ctr.selectedCategory.value = value;
+                          ctr.selectedSupplier.value = value;
                         },
                       );
                     }),
-                    const SizedBox(height: 10),
-          
-                     Text("Supplier".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
-          
-                  Obx(() {
-                    return DropdownButtonFormField<String>(
-                      value: ctr.selectedSupplier.value,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        
+                      const SizedBox(height: 10),
+                         Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                        const SizedBox(height: 5),
+                  
+                      TextField(
+                        controller: ctr.productBarcodeController,
+                        decoration: InputDecoration(
+                          hintText: "Enter Barcode".tr,
+                          border: OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.qr_code_scanner),
+                            onPressed: () async {
+                              final code = await Navigator.push<String>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const TestProductScannerPage(),
+                                ),
+                              );
+                              if (code != null) {
+                                print(code);
+                              }
+                            },
+                          ),
+                        ),
                       ),
-                      items: ctr.supplierCtr.suppliers.map((supplier) {
-                        return DropdownMenuItem<String>(
-                          value: supplier.id.toString(),
-                          child: Text(supplier.name),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        ctr.selectedSupplier.value = value;
-                      },
-                    );
-                  }),
-                      
-                    const SizedBox(height: 10),
-                       Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
-                
-                    TextField(
-                      controller: ctr.productBarcodeController,
-                      decoration: InputDecoration(
-                        hintText: "Enter Barcode".tr,
-                        border: OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.qr_code_scanner),
-                          onPressed: () async {
-                            final code = await Navigator.push<String>(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const TestProductScannerPage(),
+                      const SizedBox(height: 10),
+            
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Cost Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                              const SizedBox(height: 5),
+                                    
+                              TextField(
+                                controller: ctr.productCostPriceController,
+                                decoration: InputDecoration(
+                                  hintText: "Enter Cost Price".tr,
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
-                            );
-                            if (code != null) {
-                              print(code);
-                            }
+                            ],
+                          )),
+                           const SizedBox(width: 10),
+                           Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Sale Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                              const SizedBox(height: 5),
+                              TextField(
+                                controller: ctr.productSalePriceController,
+                                decoration: InputDecoration(
+                                  hintText: "Enter Sale Price".tr,
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                                ],
+                              )),
+                            ],
+                      ),
+                       
+                      const SizedBox(height: 10),
+            
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                          
+                              const SizedBox(height: 5),
+                          
+                              TextField(
+                                // controller: ctr.productQuantityController,
+                                decoration: InputDecoration(
+                                  hintText: "Enter Quantity".tr,
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              ],
+                            )
+                          ),
+            
+                          const SizedBox(width: 10),
+            
+                      Expanded(child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            
+                           const SizedBox(height: 5),
+                          DropdownButtonFormField<String>(
+                          value: ctr.selectedUnit.value,
+                          decoration: InputDecoration(
+                            hintText: "Select Unit".tr,
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: "kg",
+                              child: Text("Kg"),
+                            ),
+                            DropdownMenuItem(
+                              value: "Unit",
+                              child: Text("Unit"),
+                            ),
+                            DropdownMenuItem(
+                              value: "Bottle",
+                              child: Text("Bottle"),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            ctr.selectedUnit.value = value ?? '';
                           },
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Cost Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                            const SizedBox(height: 5),
-                                  
-                            TextField(
-                              controller: ctr.productCostPriceController,
-                              decoration: InputDecoration(
-                                hintText: "Enter Cost Price".tr,
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ],
-                        )),
-                         const SizedBox(width: 10),
-                         Expanded(child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Sale Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                            const SizedBox(height: 5),
-                            TextField(
-                              controller: ctr.productSalePriceController,
-                              decoration: InputDecoration(
-                                hintText: "Enter Sale Price".tr,
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                              ],
-                            )),
-                          ],
-                    ),
-                     
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                        
-                            const SizedBox(height: 5),
-                        
-                            TextField(
-                              // controller: ctr.productQuantityController,
-                              decoration: InputDecoration(
-                                hintText: "Enter Quantity".tr,
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
                             ],
+                          )),
+                            ],
+                          ),
+                  
+                      const SizedBox(height: 10),
+                      Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                        const SizedBox(height: 5),
+                         TextField(
+                          minLines: 3,
+                          maxLines: 8,
+                          controller: ctr.productDescriptionController,
+                          decoration: InputDecoration(
+                            hintText: "Enter Description".tr,
+                            border: OutlineInputBorder(),
+                              alignLabelWithHint: true,
+                          ),
+                        ),
+                        
+                        
+                      const SizedBox(height: 15),
+                        
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: successColor,
+                            foregroundColor: titleColor
+                          ),
+                          onPressed: () {
+                            ctr.onUpdateProduct(
+                              productId, context
+                            );
+                          },
+                          child: const Text("Update",
+                            style: TextStyle(
+                              fontSize: 18,
+                              
+                            ),
                           )
                         ),
-
-                        const SizedBox(width: 10),
-
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-
-                         const SizedBox(height: 5),
-                        DropdownButtonFormField<String>(
-                        value: ctr.selectedUnit.value,
-                        decoration: InputDecoration(
-                          hintText: "Select Unit".tr,
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: "kg",
-                            child: Text("Kg"),
-                          ),
-                          DropdownMenuItem(
-                            value: "Unit",
-                            child: Text("Unit"),
-                          ),
-                          DropdownMenuItem(
-                            value: "Bottle",
-                            child: Text("Bottle"),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          ctr.selectedUnit.value = value ?? '';
-                        },
                       ),
-                          ],
-                        )),
-                          ],
-                        ),
-                
-                    const SizedBox(height: 10),
-                    Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                      const SizedBox(height: 5),
-                       TextField(
-                        minLines: 3,
-                        maxLines: 8,
-                        controller: ctr.productDescriptionController,
-                        decoration: InputDecoration(
-                          hintText: "Enter Description".tr,
-                          border: OutlineInputBorder(),
-                            alignLabelWithHint: true,
-                        ),
-                      ),
-                      
-                      
-                    const SizedBox(height: 15),
-                      
-                    SizedBox(
-                      width: double.infinity,
-                      height: 45,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: successColor,
-                          foregroundColor: titleColor
-                        ),
-                        onPressed: () {
-                          ctr.onUpdateProduct(
-                            productId, context
-                          );
-                        },
-                        child: const Text("Update",
-                          style: TextStyle(
-                            fontSize: 18,
-                            
-                          ),
-                        )
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

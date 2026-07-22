@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/audit_logs_model.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/audit_logs/widget/add_audit_log_widget.dart';
 import 'package:frontend/screen/audit_logs/widget/edit_audit_log_widget.dart';

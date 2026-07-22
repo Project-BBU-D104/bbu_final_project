@@ -17,73 +17,75 @@ class SupplierScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: "Suppliers"),
       body: SafeArea(
-        child:   Column(
-            children: [
-              SearchWidget(
-                title: "Search Suppliers",
-              ),
-              const SizedBox(height:16),
-              Row(
-                children: [
-                  ChipWidget(
-                    title: "All",
-                  ),
-                  ChipWidget(
-                    title: "Verified",
-                  ),
-                  ChipWidget(
-                    title: "Unverified",
-                  ),
-                  ChipWidget(
-                    title: "Blocked",
-                  ),
-                   
-                ],
-              ),
-              const SizedBox(height:16),
-              Expanded(
-                child: Obx(
-                  () { 
-                    
-                    if (controller.isLoading.value) {
-                      return SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-
-                    if (controller.suppliers.isEmpty) {
-                      return SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: Center(
-                          child: Text("No Suppliers Found".tr),
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                    itemCount: controller.suppliers.length,
-                    padding: const EdgeInsets.only(bottom: 70),
-                    itemBuilder:(context,index){
-                      return Padding(
-                        padding: const EdgeInsetsGeometry.only(
-                          left: 10,
-                          right: 10,
-                          bottom: 0,
-                          top: 0,
-                        ),
-                        child: SupplierCardWidget(
-                         item: controller.suppliers[index]
-                        ),
-                      );
-                    },
-                  );
-                })
-              ),
-            ],
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+              children: [
+                SearchWidget(
+                  title: "Search Suppliers",
+                ),
+                const SizedBox(height:16),
+                Row(
+                  children: [
+                    ChipWidget(
+                      title: "All",
+                    ),
+                    ChipWidget(
+                      title: "Verified",
+                    ),
+                    ChipWidget(
+                      title: "Unverified",
+                    ),
+                    ChipWidget(
+                      title: "Blocked",
+                    ),
+                     
+                  ],
+                ),
+                const SizedBox(height:16),
+                Expanded(
+                  child: Obx(
+                    () { 
+                      if (controller.isLoading.value) {
+                        return SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+          
+                      if (controller.suppliers.isEmpty) {
+                        return SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: Center(
+                            child: Text("No Suppliers Found".tr),
+                          ),
+                        );
+                      }
+          
+                      return ListView.builder(
+                      itemCount: controller.suppliers.length,
+                      padding: const EdgeInsets.only(bottom: 70),
+                      itemBuilder:(context,index){
+                        return Padding(
+                          padding: const EdgeInsetsGeometry.only(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            top: 0,
+                          ),
+                          child: SupplierCardWidget(
+                           item: controller.suppliers[index]
+                          ),
+                        );
+                      },
+                    );
+                  })
+                ),
+              ],
+            ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => controller.addSupplier(context),

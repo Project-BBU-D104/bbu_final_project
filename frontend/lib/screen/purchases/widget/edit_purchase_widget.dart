@@ -45,7 +45,7 @@ class EditPurchaseWidget extends StatelessWidget {
                 children: [
                   const Text(
                     "Edit Purchase",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),

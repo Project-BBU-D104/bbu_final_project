@@ -31,7 +31,7 @@ class AddUserWidget extends StatelessWidget {
                 Text(
                   "Add User".tr,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

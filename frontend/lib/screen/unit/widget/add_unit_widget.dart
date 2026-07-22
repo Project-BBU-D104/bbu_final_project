@@ -27,7 +27,7 @@ class AddUnitWidget extends StatelessWidget {
               Text(
                 "Add Unit".tr,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),

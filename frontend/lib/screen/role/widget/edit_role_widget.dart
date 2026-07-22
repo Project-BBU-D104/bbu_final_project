@@ -28,7 +28,7 @@ class EditRoleWidget extends StatelessWidget {
               Text(
                 "Edit Role".tr,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
