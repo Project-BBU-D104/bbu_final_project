@@ -115,12 +115,12 @@ class ManageController extends GetxController{
           "icon": Icons.point_of_sale_outlined,
           "route": AppRoutes.sale,
         },
-        {
-          "title": "Sale Payment",
-          "subtitle": "Payments",
-          "icon": Icons.payments_outlined,
-          "route": AppRoutes.salePayment,
-        },
+        // {
+        //   "title": "Sale Payment",
+        //   "subtitle": "Payments",
+        //   "icon": Icons.payments_outlined,
+        //   "route": AppRoutes.salePayment,
+        // },
       ]
     },
 

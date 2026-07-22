@@ -4,9 +4,9 @@ from typing import Optional
 from pydantic import field_validator
 
 from app.schemas.purchase import PurchaseRead
-from app.schemas.supplier import SupplierRead
-from app.schemas.payment_type import PaymentTypeRead
-from app.schemas.currency import CurrencyRead
+from app.schemas.supplier import SupplierSimple
+from app.schemas.payment_type import PaymentTypeSimple
+from app.schemas.currency import CurrencySimple
 
 class PurchasePaymentCreate(SQLModel):
     payment_no: str
@@ -35,9 +35,9 @@ class PurchasePaymentUpdate(SQLModel):
 class PurchasePaymentRead(SQLModel):
     payment_no: str
     purchase: PurchaseRead
-    supplier: SupplierRead
-    payment_type: PaymentTypeRead
-    currency: CurrencyRead
+    supplier: SupplierSimple
+    payment_type: PaymentTypeSimple
+    currency: CurrencySimple
     amount: float
     payment_date: datetime
     status: str

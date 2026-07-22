@@ -31,3 +31,7 @@ class PaymentTypeRead(SQLModel):
     status: bool
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+class PaymentTypeSimple(SQLModel):
+    id: Optional[int] = None
+    name: str
