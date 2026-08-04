@@ -17,7 +17,13 @@ class LoginController extends GetxController {
   }
 
   Future<void> onLogin() async {
-    if (usernameController.text.trim().isEmpty ||
+
+      if(isLoading.value) return;
+
+    try {
+      isLoading.value = true;
+
+      if (usernameController.text.trim().isEmpty ||
         passwordController.text.isEmpty) {
       Get.snackbar(
         "Error",
@@ -25,9 +31,6 @@ class LoginController extends GetxController {
       );
       return;
     }
-
-    try {
-      isLoading.value = true;
 
       final response = await authService.login(
         name: usernameController.text.trim(),

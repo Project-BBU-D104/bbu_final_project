@@ -17,13 +17,12 @@ class UserScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "User"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-          
-              SizedBox(height: 8),
+           
               SearchWidget(title: "Search User...".tr),
-              SizedBox(height: 8),
+              SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: Row(
@@ -35,6 +34,7 @@ class UserScreen extends StatelessWidget {
                         value: 100,
                       ),
                     ),
+                    SizedBox(width: 10),
                     Expanded(
                       child: KpiUserWidget(
                         title: "Inactive Users",
@@ -81,10 +81,10 @@ class UserScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: ctr.userList.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: UserCardListWidget(user: ctr.userList[index],),
-                    ),
+                    itemBuilder: (context, index) => 
+                       
+                      UserCardListWidget(user: ctr.userList[index],),
+                     
                   );
                 }
               )

@@ -32,9 +32,8 @@ class PurchasePaymentCardWidget extends StatelessWidget {
     final isPaid = status.toString().toLowerCase() == 'paid';
 
     return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
+      margin: const EdgeInsets.only(
+        bottom: 12,
       ),
       elevation: 1,
       shape: RoundedRectangleBorder(

@@ -17,7 +17,7 @@ class AuditLogsScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Audit Logs"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
 

@@ -19,6 +19,9 @@ class UserCardListWidget extends StatelessWidget {
         Get.find<UserController>().gotoUserDetail(user);
       },
       child: Card(
+        margin: const EdgeInsets.only(
+          bottom: 12,
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(

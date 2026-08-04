@@ -17,7 +17,7 @@ class WarehouseScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Warehouse"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               SearchWidget(title: "Search Warehouse"),

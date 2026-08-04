@@ -15,6 +15,7 @@ class CustomerCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: const EdgeInsets.only(bottom: 10),
       color: titleColor,
       elevation: 0,
       shape: RoundedRectangleBorder(

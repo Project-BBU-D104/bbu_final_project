@@ -31,9 +31,8 @@ class UnitCardWidget extends StatelessWidget {
     final bool isActive = units['status'] ?? false;
     return Card(
       elevation: 3,
-      margin: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
+      margin: const EdgeInsets.only(
+        bottom: 16,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

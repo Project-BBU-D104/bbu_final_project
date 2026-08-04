@@ -10,6 +10,7 @@ class KpiUserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: const EdgeInsets.only(bottom: 10),
       color: titleColor,
       child: Padding(
         padding: const EdgeInsets.all(8.0),

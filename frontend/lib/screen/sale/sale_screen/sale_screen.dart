@@ -38,7 +38,7 @@ class SaleScreen extends StatelessWidget {
               // 🔹 Scrollable content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

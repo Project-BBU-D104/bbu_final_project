@@ -17,15 +17,13 @@ class CustomerScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Customer"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
 
-              SizedBox(height: 8,),
-
               SearchWidget(title: "Search Customers by name or ID".tr),
 
-              SizedBox(height: 8,),
+              SizedBox(height: 10,),
 
               if(ctr.customerList.isNotEmpty)
               GridView.count(
@@ -33,6 +31,7 @@ class CustomerScreen extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 childAspectRatio: 2,
+                crossAxisSpacing: 10,
                 children: [
                     CustomerKpiWidget(
                     title: "Total Customers",
@@ -48,8 +47,7 @@ class CustomerScreen extends StatelessWidget {
                     ),
                 ],
               ),
-              SizedBox(height: 8,),
-
+             
               Obx(()
                 { 
                   if (ctr.isLoading.value) {

@@ -16,7 +16,7 @@ class CurrencyScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Currency"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               SearchWidget(title: "Search Currency"),

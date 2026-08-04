@@ -26,7 +26,7 @@ class ProfileController extends GetxController{
         email.value = data["user"]["email"] ?? "";
         phone.value = data["user"]["phone"] ?? "";
         photo.value = data["user"]["photo"] ?? "";
-        role.value = data["user"]["role"]["name"] ?? "";
+        role.value = data["user"]["role"] ?? "";
       }
     }
   }

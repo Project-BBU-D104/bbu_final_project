@@ -18,7 +18,7 @@ class CategoryScreen extends StatelessWidget {
       backgroundColor: lightColor.shade50,
       appBar: CustomAppBar(title: "Category"),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Obx(
           () => CustomScrollView(
             slivers: [

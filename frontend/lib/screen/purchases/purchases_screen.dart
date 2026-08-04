@@ -17,7 +17,7 @@ class PurchasesScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Purchases"),
 
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
 
@@ -45,7 +45,7 @@ class PurchasesScreen extends StatelessWidget {
             // SEARCH
             SearchWidget(title: "Search Purchases..."),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
 
             // LIST (ONLY SCROLL AREA)
             Obx(() { 

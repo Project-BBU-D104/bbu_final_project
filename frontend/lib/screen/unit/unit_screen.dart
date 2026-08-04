@@ -16,10 +16,12 @@ class UnitScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Unit"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               SearchWidget(title: "Search Unit"),
+
+              SizedBox(height: 16),
 
               Obx(()
                 {
@@ -40,16 +42,7 @@ class UnitScreen extends StatelessWidget {
                       ),
                     );
                   }
-
-                  if (ctr.unitList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Text("No Unit Found".tr),
-                      ),
-                    );
-                  }
-
+ 
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

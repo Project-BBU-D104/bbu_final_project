@@ -16,14 +16,12 @@ class RoleScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Role"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-
-              
-              SizedBox(height: 8,),
+ 
               SearchWidget(title: "Search Role"),
-               SizedBox(height: 8,),
+               SizedBox(height: 16),
               
               Obx(() {
 

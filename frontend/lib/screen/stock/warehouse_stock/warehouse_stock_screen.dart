@@ -19,7 +19,7 @@ class WarehouseStockScreen extends StatelessWidget {
         child: 
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   SizedBox(height: 10),

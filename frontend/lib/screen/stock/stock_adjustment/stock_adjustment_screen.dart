@@ -17,15 +17,13 @@ StockAdjustmentScreen({super.key});
       appBar: CustomAppBar(title: "Stock Adjustment"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
 
-              SizedBox(height: 8,),
-
               SearchWidget(title: "Search Stock Adjustment".tr),
 
-              SizedBox(height: 8,),
+              SizedBox(height: 10,),
 
               Row(
                 children: [

@@ -42,7 +42,7 @@ def login(request: LoginRequest, session: Session):
             "id": user.id,
             "name": user.name,
             "email": user.email,
-            "role": user.role,
+            "role": user.role.name,
             "phone": user.phone,
             "photo": user.photo
         },

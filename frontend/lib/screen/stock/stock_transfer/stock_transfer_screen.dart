@@ -17,12 +17,12 @@ class StockTransferScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Stock Transfer"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              SizedBox(height: 8,),
+             
               SearchWidget(title: "Search Stock Transfer".tr),
-              SizedBox(height: 8,),
+              SizedBox(height: 10),
               Row(
                 children: [
                   ChipWidget(title: "All"),
@@ -31,7 +31,7 @@ class StockTransferScreen extends StatelessWidget {
                 ],
               ),
               
-              SizedBox(height: 8,),
+              SizedBox(height: 10),
         
               Obx((){ 
                 if (ctr.isLoading.value) {

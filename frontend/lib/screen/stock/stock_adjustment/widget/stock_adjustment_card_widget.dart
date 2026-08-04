@@ -24,6 +24,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.find<StockAdjustmentController>().gotoStockAdjustmentDetailScreen(stockAdjustment),
       child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 6),
         elevation: 0,
         color: titleColor,
         shape: RoundedRectangleBorder(

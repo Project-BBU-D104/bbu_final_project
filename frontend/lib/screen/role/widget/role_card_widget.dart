@@ -14,6 +14,7 @@ class RoleCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

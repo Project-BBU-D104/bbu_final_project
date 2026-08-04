@@ -31,6 +31,7 @@ class PaymentTypeCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isActive = paymentType['status'] ?? false;
     return Card(
+      margin: const EdgeInsets.only(bottom: 12),
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

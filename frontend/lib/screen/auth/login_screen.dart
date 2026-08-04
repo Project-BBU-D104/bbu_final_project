@@ -110,29 +110,65 @@ class LoginScreen extends StatelessWidget {
 
                         const SizedBox(height: 24),
 
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF23B2B9),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                        // SizedBox(
+                        //   width: double.infinity,
+                        //   height: 54,
+                        //   child: ElevatedButton(
+                        //     style: ElevatedButton.styleFrom(
+                        //       backgroundColor: const Color(0xFF23B2B9),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(16),
+                        //       ),
+                        //     ),
+                        //     onPressed: () {
+                        //       controller.onLogin();
+                        //     },
+                        //     child: Text(
+                        //       "Login".tr,
+                        //       style: TextStyle(
+                        //         fontSize: 18,
+                        //         fontWeight: FontWeight.bold,
+                        //         color: Colors.white,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        Obx(
+                          () => SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF23B2B9),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                               ),
-                            ),
-                            onPressed: () {
-                              controller.onLogin();
-                            },
-                            child: Text(
-                              "Login".tr,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                              onPressed: controller.isLoading.value
+                                  ? null
+                                  : () {
+                                      controller.onLogin();
+                                    },
+                              child: controller.isLoading.value
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : Text(
+                                      "Login".tr,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
