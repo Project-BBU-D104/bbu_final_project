@@ -9,6 +9,7 @@ from .warehouse import Warehouse
 from .warehouse_stock import WarehouseStock
 from .stock_adjustment import StockAdjustment
 from .product_transfer import ProductTransfer
+from .product_transfer_item import ProductTransferItem
 from .purchase import Purchase
 from .purchase_item import PurchaseItem
 from .sale import Sale
@@ -23,4 +24,4 @@ from .purchase_requests import PurchaseRequest
 from .purchase_request_items import PurchaseRequestItems
 
 # __all__ = ["User", "Employee", "Overtime"]
-__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment", "Unit", "PaymentType", "Currency", "PurchasePayment", "PurchaseRequest", "PurchaseRequestItems"]
+__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment", "Unit", "PaymentType", "Currency", "PurchasePayment", "PurchaseRequest", "PurchaseRequestItems", "ProductTransferItem"]

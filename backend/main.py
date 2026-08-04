@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from contextlib import asynccontextmanager
 from app.seeders.create_admin_user import create_admin_user
-from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router,warehouse_stock_router, stock_adjustment_router, product_transfer_router, purchase_router,purchase_item_router, sale_router, sale_payment_router, telegram_router,auth_router, currency_router, payment_type_router, unit_router, purchase_requests_router, purchase_request_items_router, purchase_payments_router
+from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router,warehouse_stock_router, stock_adjustment_router, product_transfer_router, purchase_router,purchase_item_router, sale_router, sale_payment_router, telegram_router,auth_router, currency_router, payment_type_router, unit_router, purchase_requests_router, purchase_request_items_router, purchase_payments_router,product_transfer_item_router
 
 app = FastAPI()
 
@@ -39,6 +39,7 @@ app.include_router(warehouse_router)
 app.include_router(warehouse_stock_router)
 app.include_router(stock_adjustment_router)
 app.include_router(product_transfer_router)
+app.include_router(product_transfer_item_router)
 app.include_router(purchase_router)
 app.include_router(purchase_item_router)
 app.include_router(sale_router)

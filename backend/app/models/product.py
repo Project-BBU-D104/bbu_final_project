@@ -9,11 +9,9 @@ if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
     from app.models.stock_adjustment import StockAdjustment
     from app.models.warehouse_stock import WarehouseStock
-    from app.models.product_transfer import ProductTransfer
+    from app.models.product_transfer_item  import ProductTransferItem
     from app.models.sale_items import SaleItems
     from app.models.purchase_request_items import PurchaseRequestItems
-    
-
 
 
 class Product(SQLModel, table=True):
@@ -35,7 +33,7 @@ class Product(SQLModel, table=True):
 
     category: Optional["Category"] = Relationship(back_populates="products")
     supplier: Optional["Supplier"] = Relationship(back_populates="products")
-    product_transfers: List["ProductTransfer"] = Relationship(back_populates="product")
+    product_transfer_items: List["ProductTransferItem"] = Relationship(back_populates="product")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")
     warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="product")
     purchase_items: List["PurchaseItem"] = Relationship(back_populates="product")

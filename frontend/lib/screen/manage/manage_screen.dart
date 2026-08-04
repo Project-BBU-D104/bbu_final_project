@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/manage_controller.dart';
 import 'package:frontend/widget/card_feature_widget.dart';
+import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class ManageScreen extends StatelessWidget {
@@ -20,6 +21,10 @@ class ManageScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
+                  SearchWidget(title: "Search Function".tr),
+
+                  const SizedBox(height: 15),
 
                   for (var section in controller.sections) ...[
                     Text(

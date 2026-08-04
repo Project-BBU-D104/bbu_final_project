@@ -73,25 +73,25 @@ class StockDetailCardWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(18),
                   child: Column(
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: NetworkImage(product["photo"]),
-                      ),
+                      // CircleAvatar(
+                      //   radius: 40,
+                      //   backgroundImage: NetworkImage(product["photo"]),
+                      // ),
                       const SizedBox(height: 12),
-                      Text(
-                        product["name"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        product["category"]["name"],
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
+                      // Text(
+                      //   product["name"],
+                      //   style: const TextStyle(
+                      //     fontWeight: FontWeight.bold,
+                      //     fontSize: 22,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 4),
+                      // Text(
+                      //   product["category"]["name"],
+                      //   style: TextStyle(
+                      //     color: Colors.grey.shade600,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -138,23 +138,23 @@ class StockDetailCardWidget extends StatelessWidget {
                       icon: Icons.store,
                     ),
 
-                    _item(
-                      "Quantity",
-                      "${productTransfer["qty"]} ${product["unit"]}",
-                      icon: Icons.inventory_2,
-                    ),
+                    // _item(
+                    //   "Quantity",
+                    //   "${productTransfer["qty"]} ${product["unit"]}",
+                    //   icon: Icons.inventory_2,
+                    // ),
 
-                    _item(
-                      "Barcode",
-                      product["barcode"].toString(),
-                      icon: Icons.qr_code,
-                    ),
+                    // _item(
+                    //   "Barcode",
+                    //   product["barcode"].toString(),
+                    //   icon: Icons.qr_code,
+                    // ),
 
-                    _item(
-                      "Supplier",
-                      product["supplier"]["name"],
-                      icon: Icons.person,
-                    ),
+                    // _item(
+                    //   "Supplier",
+                    //   product["supplier"]["name"],
+                    //   icon: Icons.person,
+                    // ),
 
                     _item(
                       "Transfer Date",

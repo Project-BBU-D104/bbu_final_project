@@ -39,7 +39,6 @@ def get_all_product_transfers(session: Session):
     statement = (
         select(ProductTransfer)
         .options(
-            selectinload(ProductTransfer.product),
             selectinload(ProductTransfer.from_warehouse),
             selectinload(ProductTransfer.to_warehouse),
         )
@@ -51,7 +50,6 @@ def get_product_transfers(session: Session, product_transfer_id: int):
         select(ProductTransfer)
         .where(ProductTransfer.id == product_transfer_id)
         .options(
-            selectinload(ProductTransfer.product),
             selectinload(ProductTransfer.from_warehouse),
             selectinload(ProductTransfer.to_warehouse),
         )
@@ -65,12 +63,8 @@ def update_product_transfer(session: Session, product_transfer_id: int, product_
             db_product_transfer.from_warehouse_id = product_transfer.from_warehouse_id
         if product_transfer.to_warehouse_id is not None:
             db_product_transfer.to_warehouse_id = product_transfer.to_warehouse_id
-        if product_transfer.product_id is not None:
-            db_product_transfer.product_id = product_transfer.product_id
         if product_transfer.reference_no is not None:
             db_product_transfer.reference_no = product_transfer.reference_no
-        if product_transfer.qty is not None:
-            db_product_transfer.qty = product_transfer.qty
         if product_transfer.transfer_date is not None:
             db_product_transfer.transfer_date = product_transfer.transfer_date
 
