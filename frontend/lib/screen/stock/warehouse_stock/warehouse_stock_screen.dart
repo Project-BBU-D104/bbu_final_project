@@ -19,10 +19,10 @@ class WarehouseStockScreen extends StatelessWidget {
         child: 
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 children: [
-                  SizedBox(height: 10),
+                  SizedBox(height: 4),
                   SearchWidget(title: "Search Warehouse Stock"),
                   SizedBox(height: 10),
                   Row(
@@ -59,7 +59,7 @@ class WarehouseStockScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 70),
                       itemBuilder: (context, index) => Padding(
                         padding: const EdgeInsetsGeometry.only(
-                          bottom: 8.0
+                          bottom: 12.0
                         ),
                         child: WarehouseStockCardWidget(warehouseStock: ctr.warehouseStockList[index],),
                       ),

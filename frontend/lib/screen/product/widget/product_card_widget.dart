@@ -13,7 +13,12 @@ class ProductCardWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.find<ProductController>().gotoProductDetail(product),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(
+          bottom: 12,
+          top: 0,
+          left: 0,
+          right: 0,
+        ),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,

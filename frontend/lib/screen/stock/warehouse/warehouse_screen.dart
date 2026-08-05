@@ -17,7 +17,7 @@ class WarehouseScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Warehouse"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
               SearchWidget(title: "Search Warehouse"),
@@ -56,7 +56,7 @@ class WarehouseScreen extends StatelessWidget {
                   itemCount: ctr.warehouseList.length,
                   itemBuilder: (context, index) => Padding(
                     padding: const EdgeInsetsGeometry.only(
-                      bottom: 8.0
+                      bottom: 12.0
                     ),
                     child: WarehouseCardWidget( warehouse: ctr.warehouseList[index],),
                   ),

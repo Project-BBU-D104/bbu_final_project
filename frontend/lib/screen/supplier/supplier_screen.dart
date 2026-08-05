@@ -18,9 +18,10 @@ class SupplierScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Suppliers"),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
               children: [
+                const SizedBox(height: 4),
                 SearchWidget(
                   title: "Search Suppliers",
                 ),

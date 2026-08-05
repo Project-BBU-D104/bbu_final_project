@@ -24,10 +24,11 @@ class ProductScreen extends StatelessWidget {
           /// SEARCH + FILTER SECTION
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 4),
                   SearchWidget(title: 'Search Product'),
                   const SizedBox(height: 16),
 
@@ -73,7 +74,7 @@ class ProductScreen extends StatelessWidget {
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverToBoxAdapter(child: SizedBox(height: 2)),
 
           /// PRODUCT LIST
           Obx(() {
@@ -111,7 +112,11 @@ class ProductScreen extends StatelessWidget {
             }
 
             return SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.only(
+                bottom:12,
+                left: 12,
+                right: 12,
+              ),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, idx) {

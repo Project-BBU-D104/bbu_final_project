@@ -17,15 +17,15 @@ class SaleListScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Sale List"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
 
-              SizedBox(height: 10,),
+              SizedBox(height: 4),
 
               SearchWidget(title: "Search Sale"),
               
-              SizedBox(height: 10,),
+              SizedBox(height: 12),
 
               Row(
                 children: [

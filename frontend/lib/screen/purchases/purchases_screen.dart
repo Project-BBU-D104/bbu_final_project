@@ -17,12 +17,14 @@ class PurchasesScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Purchases"),
 
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
 
+            SizedBox(height: 4),
+
             // KPI ROW
-            if(ctr.purchaseList.isNotEmpty)
+            // if(ctr.purchaseList.isNotEmpty)
             Row(
               children: [
                 Expanded(
@@ -31,6 +33,7 @@ class PurchasesScreen extends StatelessWidget {
                     value: 1000,
                   ),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: PurchaseKpiWidget(
                     title: "Active Supplier".tr,

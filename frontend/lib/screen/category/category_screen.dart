@@ -18,7 +18,7 @@ class CategoryScreen extends StatelessWidget {
       backgroundColor: lightColor.shade50,
       appBar: CustomAppBar(title: "Category"),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Obx(
           () => CustomScrollView(
             slivers: [
@@ -28,6 +28,11 @@ class CategoryScreen extends StatelessWidget {
                 ),
               ),
 
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 10,
+                ),
+              ),
               /// Search Bar
               SliverAppBar(
                 pinned: true,
@@ -105,7 +110,7 @@ class CategoryScreen extends StatelessWidget {
                     (context, index) {
                       final item = ctr.categoryList[index];
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.only(bottom: 12),
                         child: CardCategoryWidget(
                           category: item,
                         ),

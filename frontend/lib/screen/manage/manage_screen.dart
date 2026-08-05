@@ -22,7 +22,9 @@ class ManageScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  SearchFeatureWidget(title: "Search Function".tr),
+                  SearchFeatureWidget(title: "Search Function".tr,
+                    ctr: controller.searchCtr,
+                  ),
 
                   const SizedBox(height: 15),
 

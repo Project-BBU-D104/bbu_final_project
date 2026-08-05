@@ -17,10 +17,10 @@ class CustomerScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Customer"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-
+              
               SearchWidget(title: "Search Customers by name or ID".tr),
 
               SizedBox(height: 10,),

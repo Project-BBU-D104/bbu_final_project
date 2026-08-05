@@ -16,9 +16,11 @@ class UnitScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Unit"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
+
+              SizedBox(height: 4),
               SearchWidget(title: "Search Unit"),
 
               SizedBox(height: 16),

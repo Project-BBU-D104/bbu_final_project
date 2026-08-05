@@ -16,7 +16,7 @@ class PaymentTypeScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Payment Type"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
           

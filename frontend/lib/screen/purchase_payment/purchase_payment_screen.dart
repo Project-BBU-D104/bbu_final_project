@@ -17,7 +17,7 @@ class PurchasePaymentScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Purchase Payment"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
               SearchWidget(

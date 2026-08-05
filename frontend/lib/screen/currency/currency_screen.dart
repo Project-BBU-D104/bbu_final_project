@@ -16,11 +16,11 @@ class CurrencyScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Currency"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
               SearchWidget(title: "Search Currency"),
-              SizedBox(height: 10),
+              SizedBox(height: 12),
               Obx((){
 
                 if (ctr.isLoading.value) {
