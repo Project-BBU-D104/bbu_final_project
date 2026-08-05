@@ -13,7 +13,7 @@ class HomeContent extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:  [
@@ -23,9 +23,13 @@ class HomeContent extends StatelessWidget {
                 ),
 
                 SizedBox(height: 15,),
+
                 QuickActionWidget(),
+
                 SizedBox(height: 15,),
+
                 RecentStockInWidget(),
+
                 RecentStockOutWidget(),
               ]
             ),

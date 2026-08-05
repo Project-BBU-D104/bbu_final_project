@@ -14,9 +14,10 @@ class CardPersonalInfoWidget extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
         color: titleColor,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -16,6 +16,7 @@ class CategoryRevenueWidget extends StatelessWidget {
 
     return Card(
       color: titleColor,
+      margin: const EdgeInsets.all(0),
       child: SizedBox(
         height: 300,
         child: SfCircularChart(

@@ -16,6 +16,7 @@ class StockInChartWidget extends StatelessWidget {
       {"month": "May", "amount": 3000},
     ];
     return Card(
+      margin: const EdgeInsets.all(0),
       color: titleColor,
       child: SfCartesianChart(title: ChartTitle(
         text: 'Monthly Sales',

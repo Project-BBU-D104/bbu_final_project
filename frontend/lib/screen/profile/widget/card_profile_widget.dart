@@ -13,6 +13,7 @@ class CardProfileWidget extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Card(  
+        margin: const EdgeInsets.only(bottom: 10),
         color: titleColor,
         child: SizedBox(
           child: Padding(

@@ -45,6 +45,7 @@ class RecentStockOutWidget extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: Card(
+            margin: const EdgeInsets.all(0),
             color: titleColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

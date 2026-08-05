@@ -12,7 +12,7 @@ class DashboardScreen extends StatelessWidget {
           body: SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   children: [
                     CardKpiWidget(
@@ -35,6 +35,7 @@ class DashboardScreen extends StatelessWidget {
                       
                     SizedBox(height: 20),
                     StockInChartWidget(),
+                    SizedBox(height: 12),
                     CategoryRevenueWidget(),
                   ],
                 ),
