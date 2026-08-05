@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/manage_controller.dart';
 import 'package:frontend/widget/card_feature_widget.dart';
-import 'package:frontend/widget/search_widget.dart';
+import 'package:frontend/widget/search_feature_widget.dart';
 import 'package:get/get.dart';
 
 class ManageScreen extends StatelessWidget {
@@ -22,46 +22,54 @@ class ManageScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  SearchWidget(title: "Search Function".tr),
+                  SearchFeatureWidget(title: "Search Function".tr),
 
                   const SizedBox(height: 15),
 
-                  for (var section in controller.sections) ...[
-                    Text(
-                      "${section["title".tr]}".tr,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  Obx(() {
+                    final sections = controller.filteredSections;
 
-                    const SizedBox(height: 10),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var section in sections) ...[
+                          Text(
+                            section["title"],
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
 
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: (section["items"] as List).length,
-                      gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: _getCrossAxisCount(constraints.maxWidth),
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: _getAspectRatio(constraints.maxWidth),
-                      ),
-                      itemBuilder: (context, index) {
-                        final item = (section["items"] as List)[index];
+                          const SizedBox(height: 10),
 
-                        return CardFeatureWidget(
-                          title: item["title"],
-                          subtitle: item["subtitle"],
-                          icon: item["icon"],
-                          onTap: () => controller.goTo(item["route"]),
-                        );
-                      },
-                    ),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: (section["items"] as List).length,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: _getCrossAxisCount(constraints.maxWidth),
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: _getAspectRatio(constraints.maxWidth),
+                            ),
+                            itemBuilder: (context, index) {
+                              final item = (section["items"] as List)[index];
 
-                    const SizedBox(height: 15),
-                  ],
+                              return CardFeatureWidget(
+                                title: item["title"],
+                                subtitle: item["subtitle"],
+                                icon: item["icon"],
+                                onTap: () => controller.goTo(item["route"]),
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 15),
+                        ],
+                      ],
+                    );
+                  }),
                 ],
               ),
             );

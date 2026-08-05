@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/home_controller.dart';
 import 'package:get/get.dart';
 
 class WelcomeWidget extends StatelessWidget {
-  const WelcomeWidget({super.key});
+  WelcomeWidget({super.key});
+
+  final ctr = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +15,7 @@ class WelcomeWidget extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF4F46E5),
+            Color.fromARGB(255, 79, 70, 229),
             Color(0xFF7C3AED),
           ],
         ),
@@ -28,14 +31,11 @@ class WelcomeWidget extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.white,
-            child: CircleAvatar(
-              radius: 27,
-              backgroundImage: const NetworkImage(
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu3-_TbUInL975rAfMjR83kQAjePhVRRJFfw&s',
-              ),
-            ),
+            radius: 40,
+            backgroundImage: ctr.welcomePage.value?["photo"] != null &&
+                    ctr.welcomePage.value?["photo"]!.isNotEmpty
+                ? NetworkImage(ctr.welcomePage.value?["photo"]!)
+                : const NetworkImage('https://imgs.search.brave.com/Y20_Qf09jZ8KyraFayP-Bh7mXPopmU4Pc6JBLcB4CBY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMjcv/OTUxLzEzMC9zbWFs/bC9hZnJpY2EtZ3V5/LTNkLWF2YXRhci1j/aGFyYWN0ZXItaWxs/dXN0cmF0aW9ucy1w/bmcucG5n'),
           ),
 
           const SizedBox(width: 16),
@@ -52,12 +52,14 @@ class WelcomeWidget extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4),
-                Text(
-                  "Lim Sabrey",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Obx(
+                  () => Text(
+                    ctr.welcomePage.value?["name"] ?? "",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 SizedBox(height: 2),

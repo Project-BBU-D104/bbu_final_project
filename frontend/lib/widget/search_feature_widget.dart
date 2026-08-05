@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart' hide SearchController;
+import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:get/get.dart';
-import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/controllers/search_feature_controller.dart';
 
-class SearchWidget extends StatelessWidget {
+class SearchFeatureWidget extends StatelessWidget {
   final String title;
 
-  SearchWidget({
+  SearchFeatureWidget({
     super.key,
     required this.title,
   });
 
-  final ctr = Get.put(SearchController());
+  final ctr = Get.put(SearchFeatureController());
 
   @override
   Widget build(BuildContext context) {

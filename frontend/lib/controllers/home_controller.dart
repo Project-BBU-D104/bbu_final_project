@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/global.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:frontend/screen/home/home_content.dart';
@@ -11,6 +12,21 @@ class HomeController extends GetxController{
 
   RxInt selectedIndex = 0.obs;
   final PageController pageController = PageController();
+
+final Rxn<Map<String, dynamic>> welcomePage = Rxn<Map<String, dynamic>>();
+
+  @override
+  void onInit() {
+    onWelcome();
+    super.onInit();
+  }
+  void onWelcome() {
+  final welcome = storage.lastUserLoginRead;
+
+  if (welcome.isEmpty) return;
+
+  welcomePage.value = welcome["user"] as Map<String, dynamic>?;
+}
 
   void onTabChanged(int index) {
     if (index != selectedIndex.value) {
