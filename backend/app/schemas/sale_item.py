@@ -2,7 +2,6 @@ from sqlmodel import SQLModel
 from typing import Optional
 from app.schemas.product import ProductSimple
 
-
 class SaleItemRead(SQLModel):
     id: int
     product: ProductSimple

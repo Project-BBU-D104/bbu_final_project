@@ -15,7 +15,6 @@ class AuditLogsCreate(SQLModel):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-
 class AuditLogsUpdate(SQLModel):
     user_id: Optional[int] = None
     title: Optional[str] = None
@@ -25,7 +24,6 @@ class AuditLogsUpdate(SQLModel):
     old_value: Optional[str] = None
     new_value: Optional[str] = None
     updated_at: Optional[datetime] = None
-
 
 class AuditLogsRead(SQLModel):
     id: Optional[int] = None

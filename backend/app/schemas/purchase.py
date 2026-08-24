@@ -8,7 +8,6 @@ from app.schemas.purchase_item import PurchaseItemRead
 from app.schemas.warehouse_base import WarehouseSimple
 from app.schemas.purchase_item import PurchaseItemCreate
 
-
 class PurchaseCreate(SQLModel):
     user_id: int
     supplier_id: int

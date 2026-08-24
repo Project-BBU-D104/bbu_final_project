@@ -119,11 +119,6 @@ def delete_warehouse_stock(session: Session, warehouse_stock_id: int):
         session.commit()
     return warehouse_stock
 
-
-# -----------------------------------------
-# Inventory Helper Functions
-# -----------------------------------------
-
 def increase_stock(
     session: Session,
     product_id: int,
@@ -160,10 +155,6 @@ def decrease_stock(
     warehouse_id: int,
     qty: int,
 ):
-    """
-    Decrease warehouse stock after sale.
-    """
-
     stock = session.exec(
         select(WarehouseStock).where(
             WarehouseStock.product_id == product_id,

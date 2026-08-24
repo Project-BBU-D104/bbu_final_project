@@ -15,7 +15,6 @@ class StockAdjustmentCreate(SQLModel):
     reason: str
     reference_no: str
 
-
 class StockAdjustmentUpdate(SQLModel):
     user_id: Optional[int] = None
     product_id: Optional[int] = None
@@ -27,7 +26,6 @@ class StockAdjustmentUpdate(SQLModel):
     reason: Optional[str] = None
     reference_no: Optional[str] = None
     updated_at: Optional[datetime] = None
-
 
 class StockAdjustmentRead(SQLModel):
     id: Optional[int] = None

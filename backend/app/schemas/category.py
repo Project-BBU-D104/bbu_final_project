@@ -3,7 +3,6 @@ from sqlmodel import SQLModel
 from typing import Optional
 from pydantic import field_validator
 
-
 class CategoryCreate(SQLModel):
     name: str
     description: Optional[str] = None
@@ -15,12 +14,10 @@ class CategoryCreate(SQLModel):
             raise ValueError("Name cannot be empty")
         return v
 
-
 class CategoryUpdate(SQLModel):
     name: Optional[str] = None
     description: Optional[str] = None
     updated_at: Optional[datetime] = None
-
 
 class CategoryRead(SQLModel):
     id: Optional[int] = None

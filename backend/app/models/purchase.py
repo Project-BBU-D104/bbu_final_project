@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from app.models.warehouse import Warehouse
     from app.models.purchase_payment import PurchasePayment
 
-
 class Purchase(SQLModel, table=True):
     __tablename__ = "purchases"
 

@@ -7,7 +7,6 @@ router = APIRouter(
     tags=["Telegram"]
 )
 
-
 @router.post("/send")
 def telegram(req: TelegramRequest):
 

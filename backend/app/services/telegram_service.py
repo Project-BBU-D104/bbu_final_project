@@ -19,7 +19,3 @@ def send_message(message: str):
             "parse_mode": "HTML",
         },
     )
-
-    # print(response.text)
-    # print("Telegram Status:", response.status_code)
-    # print("Telegram Response:", response.text)

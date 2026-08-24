@@ -3,7 +3,6 @@ from sqlmodel import SQLModel
 from typing import Optional
 from pydantic import field_validator
 
-
 class SupplierCreate(SQLModel):
     name: str
     phone: str
@@ -20,7 +19,6 @@ class SupplierCreate(SQLModel):
             raise ValueError("Field cannot be empty")
         return v.strip()
 
-
 class SupplierUpdate(SQLModel):
     name: Optional[str] = None
     phone: Optional[str] = None
@@ -31,7 +29,6 @@ class SupplierUpdate(SQLModel):
     status: Optional[bool] = None
     description: Optional[str] = None
     updated_at: Optional[datetime] = None
-
 
 class SupplierRead(SQLModel):
     id: Optional[int] = None
@@ -45,8 +42,6 @@ class SupplierRead(SQLModel):
     description: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-
-
 class SupplierSimple(SQLModel):
     id: int
     name: str

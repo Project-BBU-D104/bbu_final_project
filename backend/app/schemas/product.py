@@ -16,7 +16,6 @@ class ProductCreate(SQLModel):
     unit: str
     description: Optional[str] = None
 
-
 class ProductUpdate(SQLModel):
     category_id: Optional[int] = None
     supplier_id: Optional[int] = None
@@ -30,7 +29,6 @@ class ProductUpdate(SQLModel):
     unit: Optional[str] = None
     description: Optional[str] = None
     updated_at: Optional[datetime] = None
-
 
 class ProductRead(SQLModel):
     id: int
@@ -46,7 +44,6 @@ class ProductRead(SQLModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at : Optional[datetime] = None
-
 
 class ProductSimple(SQLModel):
     id: int

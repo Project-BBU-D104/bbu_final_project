@@ -3,7 +3,6 @@ from sqlmodel import SQLModel
 from typing import Optional
 from pydantic import field_validator
 
-
 class PaymentTypeCreate(SQLModel):
     name: str
     description: str
@@ -16,13 +15,11 @@ class PaymentTypeCreate(SQLModel):
             raise ValueError("Name cannot be empty")
         return v
 
-
 class PaymentTypeUpdate(SQLModel):
     name: Optional[str] = None 
     status: Optional[bool] = None
     description: Optional[str] = None
     updated_at: Optional[datetime] = None
-
 
 class PaymentTypeRead(SQLModel):
     id: Optional[int] = None

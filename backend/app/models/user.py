@@ -3,7 +3,6 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List,TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from app.models.audit_logs import AuditLogs
     from app.models.stock_adjustment import StockAdjustment

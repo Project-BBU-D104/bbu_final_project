@@ -16,7 +16,6 @@ class WarehouseStockUpdate(SQLModel):
     warehouse_id: Optional[int] = None
     items: list[WarehouseStockItem] 
 
-
 class WarehouseStockRead(SQLModel):
     id: Optional[int] = None
     warehouse_id: int

@@ -2,7 +2,6 @@ from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
 
-
 class CustomerCreate(SQLModel):
     name: str
     photo: str
@@ -17,7 +16,6 @@ class CustomerUpdate(SQLModel):
     address: Optional[str] = None
     is_active: Optional[bool] = None
     updated_at: Optional[datetime] = None
-
 
 class CustomerRead(SQLModel):
     id: Optional[int] = None

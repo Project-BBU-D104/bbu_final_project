@@ -3,7 +3,6 @@ from sqlmodel import SQLModel
 from typing import Optional
 from pydantic import field_validator
 
-
 class CurrencyCreate(SQLModel):
     name: str
     code: str
@@ -19,7 +18,6 @@ class CurrencyCreate(SQLModel):
             raise ValueError("Name cannot be empty")
         return v
 
-
 class CurrencyUpdate(SQLModel):
     name: Optional[str] = None
     code: Optional[str] = None
@@ -28,7 +26,6 @@ class CurrencyUpdate(SQLModel):
     is_default: Optional[bool] = None
     status: Optional[bool] = None
     updated_at: Optional[datetime] = None
-
 
 class CurrencyRead(SQLModel):
     id: Optional[int] = None

@@ -1,12 +1,9 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
-
 from app.schemas.user import UserRead
 from app.schemas.customer import CustomerSimple
-
 from app.schemas.sale_item import SaleItemRead
-
 from typing import List
 
 class SaleCreate(SQLModel):

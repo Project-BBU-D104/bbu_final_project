@@ -12,7 +12,6 @@ class UserCreate(SQLModel):
     phone: Optional[str]
     photo: Optional[str]
 
-
 class UserRead(SQLModel):
     id: Optional[int] = None
     name: str

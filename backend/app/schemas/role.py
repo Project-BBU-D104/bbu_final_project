@@ -2,7 +2,6 @@ from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
 
-
 class RoleCreate(SQLModel):
     name: str
     description: Optional[str] = None

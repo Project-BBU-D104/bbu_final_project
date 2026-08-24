@@ -31,7 +31,6 @@ class PurchasePaymentUpdate(SQLModel):
     note: Optional[str] = None
     updated_at: Optional[datetime] = None
 
-
 class PurchasePaymentRead(SQLModel):
     payment_no: str
     purchase: PurchaseRead
