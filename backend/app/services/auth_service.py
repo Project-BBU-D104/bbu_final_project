@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from app.models.user import User
-from app.schemas.auth import LoginRequest
+from app.schemas.auth.auth import LoginRequest
 from app.security import verify_password, create_access_token
 
 
