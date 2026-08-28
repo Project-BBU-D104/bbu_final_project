@@ -37,6 +37,8 @@ def get_recent_purchases():
             ON c.id = pr.category_id
 
         ORDER BY p.id DESC, pi.id ASC
+
+        LIMIT 5
     """)
 
     with engine.connect() as conn:
@@ -45,6 +47,6 @@ def get_recent_purchases():
     return result
 
 
-@router.get("/recent-purchases")
-def get_recent_purchases():
+@router.get("/recent-sales")
+def get_recent_sales():
     pass
