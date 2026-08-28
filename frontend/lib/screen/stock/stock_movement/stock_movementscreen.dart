@@ -185,7 +185,7 @@ Widget build(BuildContext context) {
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.05),
+          color: Colors.black.withValues(alpha: 0.05),
           blurRadius: 15,
           offset: const Offset(0, 4),
         ),
@@ -282,7 +282,7 @@ Widget build(BuildContext context) {
     return Row(
       children: [
         CircleAvatar(
-          backgroundColor: color.withOpacity(0.12),
+          backgroundColor: color.withValues(alpha: 0.12),
           child: Icon(
             Icons.inventory_2_outlined,
             color: color,

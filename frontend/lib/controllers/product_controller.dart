@@ -173,7 +173,7 @@ class ProductController extends GetxController {
         arguments: productId,
       );
     } catch (e) {
-      print(e);
+      // print(e);
     }
   }
 

@@ -29,7 +29,7 @@ class TelegramService {
         throw Exception("Failed to send message: ${response.body}");
       }
     } catch (e) {
-      print("Telegram error: $e");
+      // print("Telegram error: $e");
     }
   }
 }

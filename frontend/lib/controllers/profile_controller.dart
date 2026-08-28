@@ -16,18 +16,14 @@ class ProfileController extends GetxController{
   }
 
   void loadUserLogin() {
-   final data = storage.lastUserLoginRead;
-
-    if(data !=null ){
-      final user = data["user"];
-
-      if(user !=null){
-        username.value = data["user"]["name"] ?? "";
-        email.value = data["user"]["email"] ?? "";
-        phone.value = data["user"]["phone"] ?? "";
-        photo.value = data["user"]["photo"] ?? "";
-        role.value = data["user"]["role"] ?? "";
-      }
+    final data = storage.lastUserLoginRead;
+    final user = data["user"];
+    if(user !=null){
+      username.value = data["user"]["name"] ?? "";
+      email.value = data["user"]["email"] ?? "";
+      phone.value = data["user"]["phone"] ?? "";
+      photo.value = data["user"]["photo"] ?? "";
+      role.value = data["user"]["role"] ?? "";
     }
   }
 

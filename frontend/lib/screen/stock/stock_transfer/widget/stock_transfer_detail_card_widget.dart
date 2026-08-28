@@ -48,7 +48,7 @@ class StockDetailCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = productTransfer["product"];
+    // final product = productTransfer["product"];
     final fromWarehouse = productTransfer["from_warehouse"];
     final toWarehouse = productTransfer["to_warehouse"];
 

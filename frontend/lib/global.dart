@@ -143,7 +143,7 @@ Future<void> callPhone(String phone) async {
     );
   } else if (Platform.isWindows) {
     // Windows: open browser/search or copy number
-    print("Phone call not supported on Windows: $phone");
+    // print("Phone call not supported on Windows: $phone");
   }
 }
 

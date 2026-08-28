@@ -24,7 +24,7 @@ class PurchasePaymentController extends GetxController{
         purchasePaymentList.value = List<Map<String, dynamic>>.from(resp);
       }
 
-      print(purchasePaymentList);
+      // print(purchasePaymentList);
 
     }catch(e){
       ToastWidget.show(

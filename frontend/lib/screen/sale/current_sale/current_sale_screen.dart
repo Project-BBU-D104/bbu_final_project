@@ -87,7 +87,7 @@ class CurrentSaleWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // TODO: Save as draft
+                    //do it
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),

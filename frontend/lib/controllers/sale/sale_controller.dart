@@ -1,6 +1,5 @@
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
-import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class SaleController extends GetxController{
@@ -10,6 +9,7 @@ class SaleController extends GetxController{
   @override
   void onInit() {
     super.onInit();
+    onCurrentSale();
   }
 
   void onCurrentSale(){

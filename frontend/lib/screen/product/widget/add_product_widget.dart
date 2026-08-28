@@ -171,7 +171,7 @@ class AddProductWidget extends StatelessWidget {
                               );
             
                               if (code != null) {
-                                print(code);
+                                // print(code);
             
                                 // Search your database
                                 // searchProduct(code);

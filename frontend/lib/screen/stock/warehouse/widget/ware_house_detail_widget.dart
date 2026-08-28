@@ -33,7 +33,7 @@ class WareHouseDetailWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12.withOpacity(.05),
+                    color: Colors.black12.withValues(alpha: .05),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   )
@@ -44,7 +44,7 @@ class WareHouseDetailWidget extends StatelessWidget {
 
                   CircleAvatar(
                     radius: 35,
-                    backgroundColor: successColor.withOpacity(.15),
+                    backgroundColor: successColor.withValues(alpha: .15),
                     child: Icon(
                       Icons.warehouse,
                       size: 40,
@@ -191,7 +191,7 @@ class WareHouseDetailWidget extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(.1),
+                      color: Colors.green.withValues(alpha: .1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -356,7 +356,7 @@ class WareHouseDetailWidget extends StatelessWidget {
       horizontal: 10,
     ),
     decoration: BoxDecoration(
-      color: color.withOpacity(.08),
+      color: color.withValues(alpha: .08),
       borderRadius: BorderRadius.circular(12),
     ),
     child: Column(
@@ -432,7 +432,7 @@ class WareHouseDetailWidget extends StatelessWidget {
         children: [
 
           CircleAvatar(
-            backgroundColor: color.withOpacity(.12),
+            backgroundColor: color.withValues(alpha: .12),
             child: Icon(icon, color: color),
           ),
 

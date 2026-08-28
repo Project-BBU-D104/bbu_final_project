@@ -24,7 +24,7 @@ class PaymentController extends GetxController{
         if(resp is List){
           paymentList.value = List<Map<String, dynamic>>.from(resp);
         }
-        print(paymentList);
+        // print(paymentList);
 
       }catch(e){
         ToastWidget.show(

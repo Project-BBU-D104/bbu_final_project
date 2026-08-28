@@ -6,14 +6,17 @@ class InputLoginWidget extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
   final IconData icon;
-    bool obscureText = false;
-  VoidCallback? onTogglePassword;
-  InputLoginWidget({super.key,
+  final bool obscureText;
+  final VoidCallback? onTogglePassword;
+  
+  InputLoginWidget({
+    super.key,
     required this.controller,
     required this.hint,
     required this.icon,
     this.obscureText = false,
-    this.onTogglePassword,});
+    this.onTogglePassword,
+  });
 
   final LoginController controllers = Get.find<LoginController>();
 

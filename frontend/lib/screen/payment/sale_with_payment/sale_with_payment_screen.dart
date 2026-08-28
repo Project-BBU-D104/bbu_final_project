@@ -70,7 +70,7 @@ final ctr = Get.find<SaleController>();
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Save as draft
+                    //Save as draft
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: titleColor,

@@ -7,7 +7,7 @@ class SearchFeatureWidget extends StatelessWidget {
   final String title;
   final SearchFeatureController ctr;
 
-  SearchFeatureWidget({
+  const SearchFeatureWidget({
     super.key,
     required this.title,
     required this.ctr,

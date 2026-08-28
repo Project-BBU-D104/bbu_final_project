@@ -130,7 +130,7 @@ class EditProductWidget extends StatelessWidget {
                                 ),
                               );
                               if (code != null) {
-                                print(code);
+                                // print(code);
                               }
                             },
                           ),

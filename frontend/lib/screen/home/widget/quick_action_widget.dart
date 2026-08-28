@@ -23,7 +23,7 @@ class QuickActionWidget extends StatelessWidget {
     else {
       aspectRatio = 1.2;
     }
-    return Container(
+    return SizedBox(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -81,7 +81,7 @@ class AuditLogDetailWidget extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(.08),
+            color: color.withValues(alpha: .08),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -118,7 +118,7 @@ class AuditLogDetailWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 8,
           )
         ],
@@ -148,10 +148,10 @@ class AuditLogDetailWidget extends StatelessWidget {
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(.05),
+        color: Colors.red.withValues(alpha: .05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.red.withOpacity(.2),
+          color: Colors.red.withValues(alpha: .2),
         ),
       ),
       child: Column(
@@ -206,7 +206,7 @@ class AuditLogDetailWidget extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     color,
-                    color.withOpacity(.7),
+                    color.withValues(alpha: .7),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),

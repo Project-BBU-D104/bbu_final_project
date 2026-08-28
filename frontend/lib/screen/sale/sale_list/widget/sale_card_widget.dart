@@ -19,16 +19,13 @@ class SaleCardWidget extends StatelessWidget {
     final date = DateFormat("dd MMM yyyy").format(
       DateTime.parse(sale["sale_date"]),
     );
-
-    final bool isPaid = sale["due_amount"] == 0;
-
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -40,8 +37,8 @@ class SaleCardWidget extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => Get.put(SaleListController()).gotoSaleListDetail(sale),
-          splashColor: const Color(0xff2563EB).withOpacity(0.06),
-          highlightColor: const Color(0xff2563EB).withOpacity(0.03),
+          splashColor: const Color(0xff2563EB).withValues(alpha: 0.06),
+          highlightColor: const Color(0xff2563EB).withValues(alpha: 0.03),
           hoverColor: const Color(0xffF9FAFB),
           child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

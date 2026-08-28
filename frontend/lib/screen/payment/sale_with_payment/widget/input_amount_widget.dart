@@ -5,7 +5,7 @@ class InputAmountWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       child: TextField(
         keyboardType: TextInputType.number,
         decoration: InputDecoration(

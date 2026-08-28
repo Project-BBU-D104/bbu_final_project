@@ -82,7 +82,7 @@ class PaymentCardListWidget extends StatelessWidget {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(.12),
+                    color: statusColor.withValues(alpha: .12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

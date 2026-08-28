@@ -62,6 +62,6 @@ class AuditLogController extends GetxController{
   }
 
   void onDeleteAuditLog(){
-    print("Delete audit log");
+    // print("Delete audit log");
   }
 }

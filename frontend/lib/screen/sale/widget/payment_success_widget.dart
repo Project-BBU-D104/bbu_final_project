@@ -157,7 +157,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                         height: 140,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: primaryBlue.withOpacity(0.15),
+                          color: primaryBlue.withValues(alpha: 0.15),
                         ),
                       ),
                     ),
@@ -168,7 +168,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: primaryBlue.withOpacity(0.35),
+                          color: primaryBlue.withValues(alpha: 0.35),
                         ),
                       ),
                     ),
