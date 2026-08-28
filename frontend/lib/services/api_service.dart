@@ -11,24 +11,14 @@ class ApiService {
       };
 
   /// GET ALL
-  // Future<dynamic> get(String endpoint) async {
-  //   final response = await http.get(
-  //     Uri.parse("$baseUrl$endpoint"),
-  //     headers: headers,
-  //   );
+  Future<dynamic> get(String endpoint) async {
+    final response = await http.get(
+      _buildUri(endpoint, trailingSlash: !endpoint.contains('/')),
+      headers: headers,
+    );
 
-  //   return _handleResponse(response);
-  // }
-
-  /// GET ALL
-Future<dynamic> get(String endpoint) async {
-  final response = await http.get(
-    Uri.parse("$baseUrl$endpoint/"),   // ✅ add trailing slash here
-    headers: headers,
-  );
-
-  return _handleResponse(response);
-}
+    return _handleResponse(response);
+  }
 
   /// GET BY ID
   Future<dynamic> getById(
@@ -36,7 +26,7 @@ Future<dynamic> get(String endpoint) async {
     String id,
   ) async {
     final response = await http.get(
-      Uri.parse("$baseUrl$endpoint/$id"),
+      _buildUri("$endpoint/$id"),
       headers: headers,
     );
 
@@ -49,7 +39,7 @@ Future<dynamic> get(String endpoint) async {
     Map<String, dynamic> data,
   ) async {
     final response = await http.post(
-      Uri.parse("$baseUrl$endpoint/"),
+      _buildUri(endpoint, trailingSlash: true),
       headers: headers,
       body: jsonEncode(data),
     );
@@ -64,7 +54,7 @@ Future<dynamic> get(String endpoint) async {
     Map<String, dynamic> data,
   ) async {
     final response = await http.put(
-      Uri.parse("$baseUrl$endpoint/$id"),
+      _buildUri("$endpoint/$id"),
       headers: headers,
       body: jsonEncode(data),
     );
@@ -78,22 +68,37 @@ Future<dynamic> get(String endpoint) async {
     String id,
   ) async {
     final response = await http.delete(
-      Uri.parse("$baseUrl$endpoint/$id"),
+      _buildUri("$endpoint/$id"),
       headers: headers,
     );
 
     return _handleResponse(response);
   }
 
-  dynamic _handleResponse(http.Response response) {
-    final body = jsonDecode(response.body);
+  Uri _buildUri(String endpoint, {bool trailingSlash = false}) {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final cleanEndpoint = endpoint.startsWith('/')
+        ? endpoint.substring(1)
+        : endpoint;
+    final path = trailingSlash && !cleanEndpoint.endsWith('/')
+        ? '$cleanEndpoint/'
+        : cleanEndpoint;
 
-    if (response.statusCode >= 200 &&
-        response.statusCode < 300) {
+    return Uri.parse('$cleanBaseUrl/$path');
+  }
+
+  dynamic _handleResponse(http.Response response) {
+    final dynamic body = response.body.isEmpty ? null : jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
       return body;
     } else {
       throw Exception(
-        body["detail"] ?? "API Error",
+        body is Map<String, dynamic>
+            ? body["detail"] ?? "API Error (${response.statusCode})"
+            : "API Error (${response.statusCode})",
       );
     }
   }

@@ -25,4 +25,6 @@ from .purchase.purchase_requests import router as purchase_requests_router
 from .purchase.purchase_request_items import router as purchase_request_items_router
 from .purchase.purchase_payment import router as purchase_payments_router
 
-__all__ = ["users_router",category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router,warehouse_router,warehouse_stock_router,stock_adjustment_router, product_transfer_router,purchase_router,purchase_item_router, sale_router, sale_payment_router,telegram_router, auth_router, currency_router, payment_type_router, unit_router, purchase_requests_router, purchase_request_items_router, purchase_payments_router,product_transfer_item_router]
+from .home.home import router as recent_purchase_router
+
+__all__ = ["users_router",category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router,warehouse_router,warehouse_stock_router,stock_adjustment_router, product_transfer_router,purchase_router,purchase_item_router, sale_router, sale_payment_router,telegram_router, auth_router, currency_router, payment_type_router, unit_router, purchase_requests_router, purchase_request_items_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router]

@@ -5,27 +5,42 @@ import 'package:frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:frontend/screen/home/home_content.dart';
 import 'package:frontend/screen/manage/manage_screen.dart';
 import 'package:frontend/screen/profile/profile_screen.dart';
+import 'package:frontend/services/main_service/home_service.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController{
 
-
   RxInt selectedIndex = 0.obs;
   final PageController pageController = PageController();
 
-final Rxn<Map<String, dynamic>> welcomePage = Rxn<Map<String, dynamic>>();
+  final Rxn<Map<String, dynamic>> welcomePage = Rxn<Map<String, dynamic>>();
+
+    final HomeService service = HomeService();
 
   @override
   void onInit() {
-    onWelcome();
     super.onInit();
+    getRecentPurchase();
+    onWelcome();
   }
+
+  final RxList<Map<String, dynamic>> recentPurchaseList = <Map<String, dynamic>>[].obs;
+
+  Future<void> getRecentPurchase() async {
+    final resp = await service.getRecentPrucases();
+
+    if (resp is List) {
+      recentPurchaseList.value =
+          List<Map<String, dynamic>>.from(resp);
+    }
+  }
+  
   void onWelcome() {
-  final welcome = storage.lastUserLoginRead;
+    final welcome = storage.lastUserLoginRead;
 
-  if (welcome.isEmpty) return;
+    if (welcome.isEmpty) return;
 
-  welcomePage.value = welcome["user"] as Map<String, dynamic>?;
+    welcomePage.value = welcome["user"] as Map<String, dynamic>?;
 }
 
   void onTabChanged(int index) {
@@ -70,4 +85,5 @@ final Rxn<Map<String, dynamic>> welcomePage = Rxn<Map<String, dynamic>>();
   void gotoSale(){
     Get.toNamed(AppRoutes.sale);
   }
+
 }

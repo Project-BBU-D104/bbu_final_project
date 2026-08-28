@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/controllers/home_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class RecentStockInWidget extends StatelessWidget {
-  const RecentStockInWidget({super.key});
+  RecentStockInWidget({super.key});
+  final controller = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
-    final items = const [
-      {'product': 'Coffee', 'qty': '2', 'price': '\$4.00', 'date': '7/1/2026'},
-      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
-      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
-      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
-      {'product': 'Tea', 'qty': '1', 'price': '\$2.50', 'date': '7/1/2026'},
-    ];
 
+    return Obx(() {
+
+    final items = controller.recentPurchaseList ;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -94,20 +94,28 @@ class RecentStockInWidget extends StatelessWidget {
                       children: [
                         Expanded(
                           flex: 3,
-                          child: Text(items[i]['product']!),
+                          child: Text(
+                            items[i]['product_name']?.toString() ?? '',
+                          ),
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text(items[i]['qty']!),
+                          child: Text(
+                            items[i]['qty']?.toString() ?? '',
+                          ),
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text(items[i]['price']!),
+                          child: Text(
+                            items[i]['subtotal']?.toString() ?? '',
+                          ),
                         ),
                         Expanded(
                           flex: 3,
                           child: Text(
-                            items[i]['date']!,
+                            DateFormatter.formatDate(
+                              DateTime.tryParse(items[i]['purchase_date']?.toString() ?? ''),
+                            ),
                             textAlign: TextAlign.end,
                           ),
                         ),
@@ -122,5 +130,6 @@ class RecentStockInWidget extends StatelessWidget {
         ),
       ],
     );
+    });
   }
 }
