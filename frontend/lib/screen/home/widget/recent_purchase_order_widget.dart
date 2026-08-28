@@ -56,12 +56,24 @@ class RecentStockInWidget extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Text(
-                          'Product'.tr,
+                          'NO'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
+
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          textAlign: TextAlign.left,
+                          'Supplier'.tr,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -76,6 +88,7 @@ class RecentStockInWidget extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
+                     
                       Expanded(
                         flex: 3,
                         child: Text(
@@ -95,9 +108,17 @@ class RecentStockInWidget extends StatelessWidget {
                         Expanded(
                           flex: 3,
                           child: Text(
-                            items[i]['product_name']?.toString() ?? '',
+                            items[i]['invoice_no']?.toString() ?? '',
                           ),
                         ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            textAlign: TextAlign.left,
+                            items[i]['supplier_name']?.toString() ?? '',
+                          ),
+                        ),
+                        
                         Expanded(
                           flex: 2,
                           child: Text(

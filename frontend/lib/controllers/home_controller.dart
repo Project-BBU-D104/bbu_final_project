@@ -21,16 +21,27 @@ class HomeController extends GetxController{
   void onInit() {
     super.onInit();
     getRecentPurchase();
+    getRecentSale();
     onWelcome();
   }
 
   final RxList<Map<String, dynamic>> recentPurchaseList = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> recentSaleList = <Map<String, dynamic>>[].obs;
 
   Future<void> getRecentPurchase() async {
     final resp = await service.getRecentPrucases();
 
     if (resp is List) {
       recentPurchaseList.value =
+          List<Map<String, dynamic>>.from(resp);
+    }
+  }
+
+  Future<void> getRecentSale() async {
+    final resp = await service.getRecentSales();
+
+    if (resp is List) {
+      recentSaleList.value =
           List<Map<String, dynamic>>.from(resp);
     }
   }
