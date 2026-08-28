@@ -30,7 +30,7 @@ class ManageController extends GetxController{
     },
 
     {
-      "title": "Product & Category Management",
+      "title": "Product Management",
       "items": [
         {
           "title": "Unit",

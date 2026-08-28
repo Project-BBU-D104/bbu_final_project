@@ -156,7 +156,7 @@ const Map<String, String> kmKH = {
   'Light Mode': 'ផ្ទៃភ្លឺ',
   'Language': 'ភាសា',
   'Push Notifications': 'ការជូនដំណឹង',
-  'Product Management': 'ការគ្រប់គ្រងផលិតផល',
+  'Product Management': 'គ្រប់គ្រងផលិតផល',
   'Purchase Management': 'ការគ្រប់គ្រងការទិញ',
   'Supplier Management': 'ការគ្រប់គ្រងអ្នកផ្គត់ផ្គង់',
   'View Sales': 'មើលការលក់',

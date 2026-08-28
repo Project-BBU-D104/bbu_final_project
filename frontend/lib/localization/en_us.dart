@@ -178,5 +178,5 @@ const Map<String, String> enUS = {
   'Select To Warehouse':'Select To Warehouse',
   'Transfer Date':'Transfer Date',
   'Select Transfer Date':'Select Transfer Date',
-  'Select Date':'Select Date'
+  'Select Date':'Select Date',
 };

@@ -60,7 +60,7 @@ class ManageScreen extends StatelessWidget {
 
                               return CardFeatureWidget(
                                 title: item["title"],
-                                subtitle: item["subtitle"],
+                                // subtitle: item["subtitle"],
                                 icon: item["icon"],
                                 onTap: () => controller.goTo(item["route"]),
                               );

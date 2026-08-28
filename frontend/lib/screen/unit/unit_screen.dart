@@ -49,6 +49,9 @@ class UnitScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: ctr.unitList.length,
+                    padding: EdgeInsets.only(
+                      bottom: 50,
+                    ),
                     itemBuilder: (context, index){
                       final unit = ctr.unitList[index];
                       return UnitCardWidget(units: unit,);
