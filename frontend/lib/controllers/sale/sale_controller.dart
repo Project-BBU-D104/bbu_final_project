@@ -9,7 +9,6 @@ class SaleController extends GetxController{
   @override
   void onInit() {
     super.onInit();
-    onCurrentSale();
   }
 
   void onCurrentSale(){

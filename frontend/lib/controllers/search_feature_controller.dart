@@ -27,7 +27,5 @@ class SearchFeatureController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-
-    textController.dispose();
   }
 }
