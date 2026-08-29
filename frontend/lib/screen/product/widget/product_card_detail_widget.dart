@@ -157,7 +157,7 @@ class ProductCardDetailWidget extends StatelessWidget {
                       _infoCard(
                         Icons.straighten,
                         "Unit",
-                        product['unit'] ?? "-",
+                        product['unit']?['name'] ?? "-",
                       ),
 
                       _infoCard(

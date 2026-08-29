@@ -31,3 +31,8 @@ class UnitRead(SQLModel):
     status: bool
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+class UnitSimple(SQLModel):
+    id: Optional[int] = None
+    name: str
+    short_name: str

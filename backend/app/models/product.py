@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from app.models.product_transfer_item  import ProductTransferItem
     from app.models.sale_items import SaleItems
     from app.models.purchase_request_items import PurchaseRequestItems
+    from app.models.currency import Currency
+    from app.models.unit import Unit
 
 
 class Product(SQLModel, table=True):
@@ -20,12 +22,13 @@ class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     category_id: int = Field(foreign_key="categories.id")
     supplier_id: int = Field(foreign_key="supplier.id")
+    currency_id: int = Field(foreign_key="currency.id")
+    unit_id: int = Field(foreign_key="unit.id")
     name: str
     barcode: str
     photo: str
     cost_price: int
     sale_price: int
-    unit: str
     description: Optional[str] = None
     deleted_at: datetime = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -33,6 +36,8 @@ class Product(SQLModel, table=True):
 
     category: Optional["Category"] = Relationship(back_populates="products")
     supplier: Optional["Supplier"] = Relationship(back_populates="products")
+    currency: Optional["Currency"] = Relationship(back_populates="products")
+    unit: Optional["Unit"] = Relationship(back_populates="products")
     product_transfer_items: List["ProductTransferItem"] = Relationship(back_populates="product")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="product")
     warehouse_stock: List["WarehouseStock"] = Relationship(back_populates="product")

@@ -1,7 +1,5 @@
 These for SQLite Only
 
-//Can be use 
-
 -- Categories Table
 CREATE TABLE categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,7 +9,6 @@ CREATE TABLE categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- Users Table
 CREATE TABLE users (
@@ -26,11 +23,25 @@ CREATE TABLE users (
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
+
+CREATE TABLE units (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    short_name VARCHAR(20) NOT NULL,
+    description TEXT,
+    status BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Products Table (Added SKU, min_qty, soft delete)
 CREATE TABLE products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id INTEGER NOT NULL,
     supplier_id INTEGER NOT NULL,
+    unit_id INTEGER NOT NULL,
+    currency_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     barcode TEXT UNIQUE,
     photo TEXT,
@@ -38,7 +49,6 @@ CREATE TABLE products (
     sale_price REAL NOT NULL,
     qty INTEGER DEFAULT 0,
     allow_insert_qty BOOLEAN 0,
-    unit TEXT,
     description TEXT,
     deleted_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -253,17 +263,6 @@ CREATE TABLE sale_payments (
 
     FOREIGN KEY (sale_id) REFERENCES sales(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE units (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    short_name VARCHAR(20) NOT NULL,
-    description TEXT,
-    status BOOLEAN DEFAULT TRUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE payment_types (

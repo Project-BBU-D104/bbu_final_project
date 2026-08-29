@@ -18,7 +18,10 @@ def get_all_product(session: Session):
         select(Product)
         .options(
             selectinload(Product.category),
-            selectinload(Product.supplier)
+            selectinload(Product.supplier),
+            selectinload(Product.unit),
+            selectinload(Product.currency),
+
         )
     )
     return session.exec(statement).all()
@@ -29,7 +32,9 @@ def get_product(session: Session, product_id: int):
         .where(Product.id == product_id)
         .options(
             selectinload(Product.category),
-            selectinload(Product.supplier)
+            selectinload(Product.supplier),
+            selectinload(Product.unit),
+            selectinload(Product.currency),
         )
     )
     return session.exec(statement).first()
@@ -55,8 +60,12 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
             db_product.qty = product.qty
         if product.allow_insert_qty is not None:
             db_product.allow_insert_qty = product.allow_insert_qty
-        if product.unit is not None:
-            db_product.unit = product.unit
+        if product.unit_id is not None:
+            db_product.unit_id = product.unit_id
+        if product.currency_id is not None:
+            db_product.currency_id = product.currency_id
+        if product.unit_id is not None:
+            db_product.unit_id = product.unit_id
         if product.description is not None:
             db_product.description = product.description
 

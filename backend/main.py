@@ -9,6 +9,9 @@ from app.routes import users_router,category_router,product_router,supplier_rout
 
 app = FastAPI()
 
+
+# create user 
+# if this uncomment when create table new pls uncomment
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
 #     create_admin_user()

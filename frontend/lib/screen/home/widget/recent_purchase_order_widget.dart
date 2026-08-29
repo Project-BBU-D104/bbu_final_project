@@ -45,11 +45,25 @@ class RecentStockInWidget extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: Card(
-            margin: const EdgeInsets.all(0),
+            margin: EdgeInsets.zero,
             color: titleColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Column(
+              child: items.isEmpty
+                    ? SizedBox(
+                        height: 100,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text(
+                            "No Data".tr,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                    :  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header row

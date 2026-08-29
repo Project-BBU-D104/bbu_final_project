@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/category_controller.dart';
+import 'package:frontend/controllers/currency_controller.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/controllers/unit_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/product_service.dart';
@@ -13,14 +15,14 @@ class ProductController extends GetxController {
 
   final CategoryController categoryCtr = Get.put(CategoryController());
   final SupplierController supplierCtr = Get.put(SupplierController());
+  final UnitController unitCtr = Get.put(UnitController());
+  final CurrencyController currencyCtr = Get.put(CurrencyController());
 
   @override
   void onInit() {
     super.onInit();
    getProducts();
-
-    //  categoryCtr.getCategory();
-    // supplierCtr.getSuppliers();
+ 
   }
 
   var isLoading = false.obs;
@@ -32,6 +34,7 @@ class ProductController extends GetxController {
   final selectedCategory = RxnString();
   final selectedSupplier = RxnString();
   final selectedUnit = RxnString();
+  final selectedCurrency = RxnString();
 
   var scannedProduct = Rxn<Map<String, dynamic>>();
   var scanResultText = ''.obs;
@@ -80,6 +83,7 @@ class ProductController extends GetxController {
     selectedCategory.value = null;
     selectedSupplier.value = null;
     selectedUnit.value = null;
+    selectedCurrency.value = null;
   }
 
   List<Map<String, dynamic>> get filteredItems {
@@ -111,7 +115,8 @@ class ProductController extends GetxController {
         'name': productNameController.text,
         'category_id': selectedCategory.value,
         'supplier_id': selectedSupplier.value,
-        'unit': selectedUnit.value,
+        'unit_id': selectedUnit.value,
+        'currency_id': selectedCurrency.value,
         'barcode': productBarcodeController.text,
         'cost_price': productCostPriceController.text,
         'sale_price': productSalePriceController.text,
@@ -166,7 +171,15 @@ class ProductController extends GetxController {
           product["supplier"] is Map
               ? product["supplier"]["id"].toString()
               : product["supplier"].toString();
-          selectedUnit.value = product["unit"];
+      
+      selectedUnit.value = product["unit"] is Map
+          ? product["unit"]["id"].toString()
+          : product["unit"].toString();
+
+      selectedCurrency.value =
+          product["currency"] is Map
+              ? product["currency"]["id"].toString()
+              : product["currency"].toString();
 
       Get.toNamed(
         AppRoutes.editProduct,
@@ -183,10 +196,11 @@ class ProductController extends GetxController {
         "name": productNameController.text.trim(),
         "category_id": selectedCategory.value,
         "supplier_id": selectedSupplier.value,
+        "currency_id": selectedCurrency.value,
+        "unit_id": selectedUnit.value,
         "barcode": productBarcodeController.text.trim(),
         "cost_price": double.tryParse(productCostPriceController.text) ?? 0,
         "sale_price": double.tryParse(productSalePriceController.text) ?? 0,
-        "unit": selectedUnit.value,
         "description": productDescriptionController.text.trim(),
         "photo": productPhotoController.text,
       };
@@ -279,5 +293,6 @@ class ProductController extends GetxController {
     selectedCategory.value = null;
     selectedSupplier.value = null;
     selectedUnit.value = null;
+    selectedCurrency.value = null;
   }
 }

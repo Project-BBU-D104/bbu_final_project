@@ -4,6 +4,7 @@ from datetime import datetime
 
 if TYPE_CHECKING:
     from app.models.purchase_payment import PurchasePayment
+    from app.models.product import Product
 
 class Currency(SQLModel, table=True):
     __tablename__ = "currency"
@@ -19,4 +20,5 @@ class Currency(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     purchase_payments: List["PurchasePayment"] = Relationship(back_populates="currency")
+    products: List["Product"] = Relationship(back_populates="currency")
 

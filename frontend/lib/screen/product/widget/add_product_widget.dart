@@ -180,6 +180,69 @@ class AddProductWidget extends StatelessWidget {
                           ),
                         ),
                       ),
+                       const SizedBox(height: 10),
+            
+                      Row(
+                        children: [
+                            Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            
+                                const SizedBox(height: 5),
+                                DropdownButtonFormField<String>(
+                                value: ctr.selectedUnit.value,
+                                decoration: InputDecoration(
+                                  hintText: "Select Unit".tr,
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                ),
+                                 items: ctr.unitCtr.unitList.map((unit) {
+                                  return DropdownMenuItem<String>(
+                                    value: unit['id'].toString(),
+                                    child: Text(unit['short_name'].toString()),
+                                  );
+                                }).toList(),
+            
+                            onChanged: (value) {
+                              ctr.selectedUnit.value = value;
+                            },
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                            Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Currency".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+            
+                                const SizedBox(height: 5),
+                                DropdownButtonFormField<String>(
+                                value: ctr.selectedCurrency.value,
+                                decoration: InputDecoration(
+                                  hintText: "Select Currency".tr,
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                ),
+                                 items: ctr.currencyCtr.currencyList.map((currency) {
+                                  return DropdownMenuItem<String>(
+                                    value: currency['id'].toString(),
+                                    child: Text(currency['name'].toString()),
+                                  );
+                                }).toList(),
+            
+                            onChanged: (value) {
+                              ctr.selectedCurrency.value = value;
+                            },
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
                       const SizedBox(height: 10),
             
                       Row(
@@ -218,46 +281,6 @@ class AddProductWidget extends StatelessWidget {
                             ],
                       ),
                        
-                      const SizedBox(height: 10),
-            
-                      Row(
-                        children: [
-                            Expanded(child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Unit".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-            
-                                const SizedBox(height: 5),
-                                DropdownButtonFormField<String>(
-                                value: ctr.selectedUnit.value,
-                                decoration: InputDecoration(
-                                  hintText: "Select Unit".tr,
-                                  border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                                ),
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: "kg",
-                                    child: Text("Kg"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Unit",
-                                    child: Text("Unit"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Bottle",
-                                    child: Text("Bottle"),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  ctr.selectedUnit.value = value ?? '';
-                                },
-                              ),
-                            ],
-                          )),
-                        ],
-                      ),
-                  
                       const SizedBox(height: 10),
                       Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                         const SizedBox(height: 5),

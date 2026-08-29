@@ -4,21 +4,26 @@ from typing import Optional
 
 from app.schemas.category.category import CategorySimple
 from app.schemas.supplier.supplier import SupplierSimple
+from app.schemas.unit.unit import UnitSimple
+from app.schemas.currency.currency import CurrencySimple
 
 class ProductCreate(SQLModel):
     category_id: int
     supplier_id: int
+    unit_id: int
+    currency_id: int
     name: str
     barcode: str
     photo: str
     cost_price: int
     sale_price: int
-    unit: str
     description: Optional[str] = None
 
 class ProductUpdate(SQLModel):
     category_id: Optional[int] = None
     supplier_id: Optional[int] = None
+    currency_id: Optional[int] = None
+    unit_id: Optional[int] = None
     name: Optional[str] = None
     barcode: Optional[str] = None
     photo: Optional[str] = None
@@ -26,7 +31,6 @@ class ProductUpdate(SQLModel):
     sale_price: Optional[int] = None
     qty: Optional[int] = None
     allow_insert_qty: Optional[bool] = None
-    unit: Optional[str] = None
     description: Optional[str] = None
     updated_at: Optional[datetime] = None
 
@@ -34,12 +38,13 @@ class ProductRead(SQLModel):
     id: int
     category: CategorySimple
     supplier: SupplierSimple
+    unit: UnitSimple
+    currency: CurrencySimple
     name: str
     barcode: str
     photo: Optional[str] = None
     cost_price: Optional[int] = None
     sale_price: Optional[int] = None
-    unit: Optional[str] = None
     description: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
