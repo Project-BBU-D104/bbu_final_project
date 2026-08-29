@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 
 class ProductCardWidget extends StatelessWidget {
  final Map<String, dynamic> product;
@@ -84,7 +85,10 @@ class ProductCardWidget extends StatelessWidget {
                       const SizedBox(width: 8),
 
                       Text(
-                        '\$${product['sale_price']}',
+                        CurrencyFormatter.format(
+                          (product['sale_price'] as num?)?.toDouble() ?? 0,
+                          product['currency'],
+                        ),
                         style: const TextStyle(
                           color: Color(0xFF1DB584),
                           fontSize: 20,

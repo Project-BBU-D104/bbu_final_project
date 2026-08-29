@@ -25,28 +25,26 @@ class CustomerScreen extends StatelessWidget {
 
               SizedBox(height: 10,),
 
-              if(ctr.customerList.isNotEmpty)
+              
+              Obx(() => 
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 childAspectRatio: 2,
                 crossAxisSpacing: 10,
-                children: [
+                children: [                  
                     CustomerKpiWidget(
-                    title: "Total Customers",
-                    value: "1,000",
+                      title: "Total Customers",
+                      value: ctr.customerList.length.toString(),
                     ),
                     CustomerKpiWidget(
-                    title : "Active Customers",
-                    value: "1,000",
-                    ),
-                    CustomerKpiWidget(
-                    title: "Inactive Customers",
-                    value: "1,000",
-                    ),
+                      title : "Active Customers",
+                      value: "1,000",
+                    )
+
                 ],
-              ),
+              )),
              
               Obx(()
                 { 

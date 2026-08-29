@@ -100,7 +100,7 @@ class AddCustomerWidget extends StatelessWidget {
                     ctr.isActive.value = value!;
                   },
                 ),
-                Text("Disable User".tr),
+                Text("Disable Customer".tr),
               ],
             );
           }),

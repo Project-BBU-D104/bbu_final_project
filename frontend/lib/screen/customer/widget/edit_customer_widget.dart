@@ -91,6 +91,21 @@ class EditCustomerWidget extends StatelessWidget {
                   alignLabelWithHint: true,
                 ),
               ),
+
+              Obx(() {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Checkbox(
+                  value: ctr.isActive.value,
+                  onChanged: (value) {
+                    ctr.isActive.value = value!;
+                  },
+                ),
+                Text("Disable Customer".tr),
+              ],
+            );
+          }),
       
             const SizedBox(height: 15),
       

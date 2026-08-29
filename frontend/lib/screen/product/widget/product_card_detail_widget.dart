@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 
 class ProductCardDetailWidget extends StatelessWidget {
   ProductCardDetailWidget({super.key});
@@ -143,15 +144,12 @@ class ProductCardDetailWidget extends StatelessWidget {
                       ),
 
                       _infoCard(
-                        Icons.attach_money,
-                        "Cost Price",
-                        "\$${product['cost_price'] ?? 0}",
-                      ),
-
-                      _infoCard(
                         Icons.sell,
                         "Sale Price",
-                        "\$${product['sale_price'] ?? 0}",
+                        CurrencyFormatter.format(
+                          (product['sale_price'] as num?)?.toDouble() ?? 0,
+                          product['currency'],
+                        ),
                       ),
 
                       _infoCard(
