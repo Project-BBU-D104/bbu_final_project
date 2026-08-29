@@ -19,15 +19,15 @@ def generate_invoice_no(session: Session) -> str:
     ).first()
 
     if last_purchase is None:
-        return "INV001"
+        return "P001"
 
-    # If previous invoice is INV001 -> number = 1
+    # If previous invoice is P001 -> number = 1
     try:
-        last_number = int(last_purchase.invoice_no.replace("INV", ""))
+        last_number = int(last_purchase.invoice_no.replace("P", ""))
     except:
         last_number = last_purchase.id
 
-    return f"INV{last_number + 1:04d}"
+    return f"P{last_number + 1:03d}"
 
 def create_purchase(session: Session, purchase: PurchaseCreate):
     purchase_data = purchase.model_dump(exclude={"items"})

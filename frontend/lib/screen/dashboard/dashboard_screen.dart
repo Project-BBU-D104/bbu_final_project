@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/dashboard/widget/card_kpi_widget.dart';
 import 'package:frontend/screen/dashboard/widget/category_revenue_widget.dart';
+import 'package:frontend/screen/dashboard/widget/low_stock_widget.dart';
 import 'package:frontend/screen/dashboard/widget/stock_in_chart_widget.dart';
+import 'package:frontend/screen/dashboard/widget/top_proudct_widget.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -37,6 +39,10 @@ class DashboardScreen extends StatelessWidget {
                     StockInChartWidget(),
                     SizedBox(height: 12),
                     CategoryRevenueWidget(),
+                    SizedBox(height: 12),
+                    LowStockWidget(),
+                    SizedBox(height: 12),
+                    TopProudctWidget(),
                   ],
                 ),
               ),

@@ -66,7 +66,9 @@ def get_recent_sales():
             si.qty AS qty,
             si.sale_price AS sale_price,
             si.subtotal AS subtotal,
-            c.name AS category_name
+            c.name AS category_name,
+
+            cu.name AS customer_name
         FROM sales s
 
         LEFT JOIN sale_items si
@@ -77,6 +79,9 @@ def get_recent_sales():
 
         LEFT JOIN categories c
             ON c.id = pr.category_id
+
+        LEFT JOIN customers cu
+            ON cu.id = s.customer_id
 
         ORDER BY s.id DESC, si.id ASC
 

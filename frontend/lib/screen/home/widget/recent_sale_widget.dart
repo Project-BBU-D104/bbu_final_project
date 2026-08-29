@@ -57,22 +57,26 @@ class RecentStockOutWidget extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Text(
-                          'Product'.tr,
+                           textAlign: TextAlign.start,
+                          'NO'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
                         flex: 2,
                         child: Text(
-                          'Qty'.tr,
+                           textAlign: TextAlign.start,
+                          'Customer'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
+                      
                       Expanded(
                         flex: 2,
                         child: Text(
+                           textAlign: TextAlign.end,
                           'Amount'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -94,20 +98,24 @@ class RecentStockOutWidget extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          flex: 3,
+                          flex: 2,
                           child: Text(
-                            items[i]['product_name']?.toString() ?? '',
+                             textAlign: TextAlign.start,
+                            items[i]['invoice_no']?.toString() ?? '',
                           ),
                         ),
                         Expanded(
                           flex: 2,
                           child: Text(
-                            items[i]['qty']?.toString() ?? '',
+                             textAlign: TextAlign.start,
+                            items[i]['customer_name']?.toString() ?? '',
                           ),
                         ),
+                        
                         Expanded(
                           flex: 2,
                           child: Text(
+                             textAlign: TextAlign.end,
                             items[i]['subtotal']?.toString() ?? '',
                           ),
                         ),

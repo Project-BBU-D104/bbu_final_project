@@ -27,19 +27,15 @@ class PurchasesScreen extends StatelessWidget {
             // if(ctr.purchaseList.isNotEmpty)
             Row(
               children: [
-                Expanded(
-                  child: PurchaseKpiWidget(
-                    title: "Total Purchases".tr,
-                    value: 1000,
+                Obx(() =>
+                  Expanded(
+                    child: PurchaseKpiWidget(
+                      title: "Total Purchases".tr,
+                      value: ctr.purchaseList.length,
+                    ),
                   ),
                 ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: PurchaseKpiWidget(
-                    title: "Active Supplier".tr,
-                    value: 1000,
-                  ),
-                ),
+                
               ],
             ),
 

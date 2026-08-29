@@ -58,6 +58,7 @@ class RecentStockInWidget extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
+                           textAlign: TextAlign.start,
                           'NO'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -66,7 +67,7 @@ class RecentStockInWidget extends StatelessWidget {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          textAlign: TextAlign.left,
+                          textAlign: TextAlign.start,
                           'Supplier'.tr,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -77,6 +78,7 @@ class RecentStockInWidget extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
+                           textAlign: TextAlign.center,
                           'Qty'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -84,7 +86,8 @@ class RecentStockInWidget extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          'Price'.tr,
+                           textAlign: TextAlign.end,
+                          'Total'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -106,15 +109,16 @@ class RecentStockInWidget extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          flex: 3,
+                          flex: 2,
                           child: Text(
+                             textAlign: TextAlign.start,
                             items[i]['invoice_no']?.toString() ?? '',
                           ),
                         ),
                         Expanded(
                           flex: 3,
                           child: Text(
-                            textAlign: TextAlign.left,
+                            textAlign: TextAlign.start,
                             items[i]['supplier_name']?.toString() ?? '',
                           ),
                         ),
@@ -122,12 +126,14 @@ class RecentStockInWidget extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: Text(
+                             textAlign: TextAlign.center,
                             items[i]['qty']?.toString() ?? '',
                           ),
                         ),
                         Expanded(
                           flex: 2,
                           child: Text(
+                             textAlign: TextAlign.end,
                             items[i]['subtotal']?.toString() ?? '',
                           ),
                         ),
