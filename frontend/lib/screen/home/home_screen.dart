@@ -21,9 +21,11 @@ class HomeScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Obx(() {
         return NavigationBar(
+           height: 60,
           backgroundColor: titleColor,
           selectedIndex: controller.selectedIndex.value,
           onDestinationSelected: controller.onTabChanged,
+           labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           destinations: [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),

@@ -147,7 +147,7 @@ class ProductCardDetailWidget extends StatelessWidget {
                         Icons.sell,
                         "Sale Price",
                         CurrencyFormatter.format(
-                          (product['sale_price'] as num?)?.toDouble() ?? 0,
+                           double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
                           product['currency'],
                         ),
                       ),

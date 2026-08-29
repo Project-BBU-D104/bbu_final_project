@@ -86,7 +86,7 @@ class ProductCardWidget extends StatelessWidget {
 
                       Text(
                         CurrencyFormatter.format(
-                          (product['sale_price'] as num?)?.toDouble() ?? 0,
+                          double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
                           product['currency'],
                         ),
                         style: const TextStyle(

@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
+from decimal import Decimal
 
 from app.schemas.category.category import CategorySimple
 from app.schemas.unit.unit import UnitSimple
@@ -13,8 +14,8 @@ class ProductCreate(SQLModel):
     name: str
     barcode: str
     photo: str
-    cost_price: int
-    sale_price: int
+    cost_price: Decimal
+    sale_price: Decimal
     description: Optional[str] = None
 
 class ProductUpdate(SQLModel):
@@ -24,8 +25,8 @@ class ProductUpdate(SQLModel):
     name: Optional[str] = None
     barcode: Optional[str] = None
     photo: Optional[str] = None
-    cost_price: Optional[int] = None
-    sale_price: Optional[int] = None
+    cost_price: Optional[Decimal] = None
+    sale_price: Optional[Decimal] = None
     qty: Optional[int] = None
     allow_insert_qty: Optional[bool] = None
     description: Optional[str] = None
@@ -39,8 +40,8 @@ class ProductRead(SQLModel):
     name: str
     barcode: str
     photo: Optional[str] = None
-    cost_price: Optional[int] = None
-    sale_price: Optional[int] = None
+    cost_price: Optional[Decimal] = None
+    sale_price: Optional[Decimal] = None
     description: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

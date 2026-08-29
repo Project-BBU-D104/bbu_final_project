@@ -3,6 +3,9 @@ from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from app.models.category import Category
 
+from decimal import Decimal
+from sqlalchemy import Numeric
+
 if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
     from app.models.purchase_item import PurchaseItem
@@ -25,8 +28,15 @@ class Product(SQLModel, table=True):
     name: str
     barcode: str
     photo: str
-    cost_price: int
-    sale_price: int
+    cost_price: Decimal = Field(
+        default=Decimal("0.00"),
+        sa_type=Numeric(12, 2)
+    )
+
+    sale_price: Decimal = Field(
+        default=Decimal("0.00"),
+        sa_type=Numeric(12, 2)
+    )
     description: Optional[str] = None
     deleted_at: datetime = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)
