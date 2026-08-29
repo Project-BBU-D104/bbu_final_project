@@ -3,13 +3,11 @@ from sqlmodel import SQLModel
 from typing import Optional
 
 from app.schemas.category.category import CategorySimple
-from app.schemas.supplier.supplier import SupplierSimple
 from app.schemas.unit.unit import UnitSimple
 from app.schemas.currency.currency import CurrencySimple
 
 class ProductCreate(SQLModel):
     category_id: int
-    supplier_id: int
     unit_id: int
     currency_id: int
     name: str
@@ -21,7 +19,6 @@ class ProductCreate(SQLModel):
 
 class ProductUpdate(SQLModel):
     category_id: Optional[int] = None
-    supplier_id: Optional[int] = None
     currency_id: Optional[int] = None
     unit_id: Optional[int] = None
     name: Optional[str] = None
@@ -37,7 +34,6 @@ class ProductUpdate(SQLModel):
 class ProductRead(SQLModel):
     id: int
     category: CategorySimple
-    supplier: SupplierSimple
     unit: UnitSimple
     currency: CurrencySimple
     name: str

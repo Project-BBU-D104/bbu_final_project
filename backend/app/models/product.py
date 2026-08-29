@@ -2,7 +2,6 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from app.models.category import Category
-from app.models.supplier import Supplier
 
 if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
@@ -21,7 +20,6 @@ class Product(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     category_id: int = Field(foreign_key="categories.id")
-    supplier_id: int = Field(foreign_key="supplier.id")
     currency_id: int = Field(foreign_key="currency.id")
     unit_id: int = Field(foreign_key="unit.id")
     name: str
@@ -35,7 +33,6 @@ class Product(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     category: Optional["Category"] = Relationship(back_populates="products")
-    supplier: Optional["Supplier"] = Relationship(back_populates="products")
     currency: Optional["Currency"] = Relationship(back_populates="products")
     unit: Optional["Unit"] = Relationship(back_populates="products")
     product_transfer_items: List["ProductTransferItem"] = Relationship(back_populates="product")

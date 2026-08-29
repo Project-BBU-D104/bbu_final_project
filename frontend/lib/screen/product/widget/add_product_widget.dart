@@ -108,50 +108,7 @@ class AddProductWidget extends StatelessWidget {
                           },
                         );
                       }),
-                      const SizedBox(height: 10),
-            
-                      Text(
-                        "Supplier".tr,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-            
-                        Obx(() {
-            
-                          if (ctr.supplierCtr.isLoading.value) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-            
-                          return DropdownButtonFormField<String>(
-                            value: ctr.selectedSupplier.value,
-            
-                            decoration: InputDecoration(
-                              hintText: "Select Supplier".tr,
-                              border: const OutlineInputBorder(),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 16,
-                              ),
-                            ),
-            
-                            items: ctr.supplierCtr.suppliers.map((supplier) {
-                              return DropdownMenuItem<String>(
-                                value: supplier.id.toString(),
-                                child: Text(supplier.name),
-                              );
-                            }).toList(),
-            
-                            onChanged: (value) {
-                              ctr.selectedSupplier.value = value;
-                            },
-                          );
-                        }),
-                        
+                       
                       const SizedBox(height: 10),
                          Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                         const SizedBox(height: 5),

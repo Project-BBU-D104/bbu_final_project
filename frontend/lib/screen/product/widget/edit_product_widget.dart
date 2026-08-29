@@ -87,29 +87,6 @@ class EditProductWidget extends StatelessWidget {
                           },
                         );
                       }),
-                      const SizedBox(height: 10),
-            
-                       Text("Supplier".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                        const SizedBox(height: 5),
-            
-                    Obx(() {
-                      return DropdownButtonFormField<String>(
-                        value: ctr.selectedSupplier.value,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                        ),
-                        items: ctr.supplierCtr.suppliers.map((supplier) {
-                          return DropdownMenuItem<String>(
-                            value: supplier.id.toString(),
-                            child: Text(supplier.name),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          ctr.selectedSupplier.value = value;
-                        },
-                      );
-                    }),
                         
                       const SizedBox(height: 10),
                          Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),

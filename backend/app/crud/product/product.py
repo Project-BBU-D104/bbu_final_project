@@ -18,7 +18,6 @@ def get_all_product(session: Session):
         select(Product)
         .options(
             selectinload(Product.category),
-            selectinload(Product.supplier),
             selectinload(Product.unit),
             selectinload(Product.currency),
 
@@ -32,7 +31,6 @@ def get_product(session: Session, product_id: int):
         .where(Product.id == product_id)
         .options(
             selectinload(Product.category),
-            selectinload(Product.supplier),
             selectinload(Product.unit),
             selectinload(Product.currency),
         )
@@ -44,8 +42,6 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
     if db_product:
         if product.category_id is not None:
             db_product.category_id = product.category_id
-        if product.supplier_id is not None:
-            db_product.supplier_id = product.supplier_id
         if product.name is not None:
             db_product.name = product.name
         if product.barcode is not None:

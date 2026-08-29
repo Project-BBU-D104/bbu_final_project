@@ -17,6 +17,5 @@ class Supplier(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    products: List["Product"] = Relationship(back_populates="supplier")
     purchases: List["Purchase"] = Relationship(back_populates="supplier")
     purchase_payments: List["PurchasePayment"] = Relationship(back_populates="supplier")

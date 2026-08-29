@@ -163,13 +163,6 @@ class ProductCardDetailWidget extends StatelessWidget {
                         "Category",
                         product['category']?['name'] ?? "-",
                       ),
-
-                      _infoCard(
-                        Icons.local_shipping_outlined,
-                        "Supplier",
-                        product['supplier']?['name'] ?? "-",
-                      ),
-                     
                     ],
                   ),
                 ],
