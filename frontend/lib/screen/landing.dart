@@ -39,8 +39,8 @@ class LandingScreen extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25),
-                  child: Image.network(
-                    "https://static.vecteezy.com/vite/assets/photo-masthead-375-BoK_p8LG.webp",
+                  child: Image.asset(
+                    "assets/icon/logo.jpg",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -51,7 +51,7 @@ class LandingScreen extends StatelessWidget {
               // InventoryPro នៅកណ្ដាល
               const Center(
                 child: Text(
-                  "InventoryPro",
+                  "គ្រប់គ្រងស្តុកទីទីម៉ាត",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 30,
@@ -66,7 +66,7 @@ class LandingScreen extends StatelessWidget {
               // Synchronizing warehouse data... នៅក្រោម
               const Center(
                 child: Text(
-                  "Synchronizing warehouse data...",
+                  "កំពុងដំណើរការទិន្នន័យស្តុកទីទីម៉ាត",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
