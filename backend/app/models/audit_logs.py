@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field,Relationship
-from typing import Optional,List
+from typing import Optional
 from datetime import datetime
 from app.models.user import User
 

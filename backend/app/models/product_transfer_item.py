@@ -1,6 +1,5 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import TYPE_CHECKING, Optional
-from datetime import datetime
 from app.models.product import Product
 
 if TYPE_CHECKING:

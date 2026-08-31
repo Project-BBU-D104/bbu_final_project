@@ -1,11 +1,9 @@
 from sqlmodel import SQLModel, Field,Relationship
-from typing import Optional, List,TYPE_CHECKING
+from typing import Optional
 from datetime import datetime
 from app.models.user import User
 from app.models.sale import Sale
 
-# if TYPE_CHECKING:
-#     from app.models.purchase_item import PurchaseItem
 
 class SalePayment(SQLModel, table=True):
     __tablename__ = "sale_payments"

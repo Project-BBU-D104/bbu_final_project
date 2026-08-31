@@ -23,5 +23,7 @@ from .purchase_payment import PurchasePayment
 from .purchase_requests import PurchaseRequest
 from .purchase_request_items import PurchaseRequestItems
 
+from .system_configuration import SystemConfiguration
+
 # __all__ = ["User", "Employee", "Overtime"]
-__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment", "Unit", "PaymentType", "Currency", "PurchasePayment", "PurchaseRequest", "PurchaseRequestItems", "ProductTransferItem"]
+__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment", "Unit", "PaymentType", "Currency", "PurchasePayment", "PurchaseRequest", "PurchaseRequestItems", "ProductTransferItem", "SystemConfiguration"]

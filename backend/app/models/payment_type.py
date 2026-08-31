@@ -4,6 +4,8 @@ from datetime import datetime
 
 if TYPE_CHECKING:
     from app.models.purchase_payment import PurchasePayment
+    from app.models.system_configuration import SystemConfiguration
+
 
 class PaymentType(SQLModel, table=True):
     __tablename__ = "payment_type"
@@ -16,3 +18,4 @@ class PaymentType(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     purchase_payments: List["PurchasePayment"] = Relationship(back_populates="payment_type")
+    system_configuration: Optional["SystemConfiguration"] = Relationship(back_populates="payment_type")

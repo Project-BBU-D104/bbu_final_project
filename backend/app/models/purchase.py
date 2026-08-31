@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field,Relationship
-from typing import Optional, List,TYPE_CHECKING
+from typing import Optional,TYPE_CHECKING
 from datetime import datetime
 from app.models.user import User
 from app.models.supplier import Supplier
