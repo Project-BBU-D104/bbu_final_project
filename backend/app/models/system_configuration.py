@@ -31,5 +31,5 @@ class SystemConfiguration(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     currency: Optional["Currency"] = Relationship(back_populates="system_configuration")
-    warehouses: Optional["Warehouse"] = Relationship(back_populates="system_configuration")
+    warehouse: Optional["Warehouse"] = Relationship(back_populates="system_configuration")
     payment_type: Optional["PaymentType"] = Relationship(back_populates="system_configuration")

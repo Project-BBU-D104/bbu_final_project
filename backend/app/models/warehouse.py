@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.models.warehouse_stock import WarehouseStock
     from app.models.purchase import Purchase
     from app.models.purchase_requests import PurchaseRequest
+    from app.models.system_configuration import SystemConfiguration 
 
 class Warehouse(SQLModel, table=True):
     __tablename__ = "warehouses"
@@ -41,3 +42,5 @@ class Warehouse(SQLModel, table=True):
 
     purchases: List["Purchase"] = Relationship(back_populates="warehouse")
     purchase_requests: List["PurchaseRequest"] = Relationship(back_populates="warehouse")
+
+    system_configuration: List["SystemConfiguration"] = Relationship(back_populates="warehouse")
