@@ -151,6 +151,12 @@ class ManageController extends GetxController{
       "title": "Configuration Management",
       "items": [
         {
+          "title": "System Configuration",
+          "subtitle": "System Configuration",
+          "icon": Icons.settings_outlined,
+          "route": AppRoutes.systemConfiguration,
+        },
+        {
           "title": "Currency",
           "subtitle": "Currency Management",
           "icon": Icons.attach_money_outlined,

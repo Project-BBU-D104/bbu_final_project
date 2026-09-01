@@ -8,18 +8,20 @@ from app.schemas.purchase.purchase_item import PurchaseItemRead
 from app.schemas.warehouse.warehouse_base import WarehouseSimple
 from app.schemas.purchase.purchase_item import PurchaseItemCreate
 
+from decimal import Decimal
+
 class PurchaseCreate(SQLModel):
     user_id: int
     supplier_id: int
     warehouse_id: int
     invoice_no: Optional[str] = None
     purchase_date: datetime
-    subtotal: int
-    tax_amount: int
-    discount_amount: int
-    total_amount: int
-    paid_amount: int
-    due_amount: int
+    subtotal: Decimal
+    tax_amount: Decimal
+    discount_amount: Decimal
+    total_amount: Decimal
+    paid_amount: Decimal
+    due_amount: Decimal
     items: List[PurchaseItemCreate]
     payment_status: str = "unpaid"
     status: str = "completed"
@@ -31,12 +33,12 @@ class PurchaseUpdate(SQLModel):
     warehouse_id: Optional[int] = None
     invoice_no: Optional[str] = None
     purchase_date: Optional[datetime] = None
-    subtotal: Optional[int] = None
-    tax_amount: Optional[int] = None
-    discount_amount: Optional[int] = None
-    total_amount: Optional[int] = None
-    paid_amount: Optional[int] = None
-    due_amount: Optional[int] = None
+    subtotal: Optional[Decimal] = None
+    tax_amount: Optional[Decimal] = None
+    discount_amount: Optional[Decimal] = None
+    total_amount: Optional[Decimal] = None
+    paid_amount: Optional[Decimal] = None
+    due_amount: Optional[Decimal] = None
     payment_status: Optional[str] = None
     status: Optional[str] = None
     description: Optional[str] = None
@@ -52,12 +54,12 @@ class PurchaseRead(SQLModel):
     purchase_items: List[PurchaseItemRead] = []
     invoice_no: str
     purchase_date: datetime
-    subtotal: int
-    tax_amount: int
-    discount_amount: int
-    total_amount: int
-    paid_amount: int
-    due_amount: int
+    subtotal: Decimal
+    tax_amount: Decimal
+    discount_amount: Decimal
+    total_amount: Decimal
+    paid_amount: Decimal
+    due_amount: Decimal
     payment_status: str
     status: str
     description: Optional[str] = None

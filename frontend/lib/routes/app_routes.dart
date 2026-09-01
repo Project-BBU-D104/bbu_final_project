@@ -43,4 +43,6 @@ class AppRoutes {
   static const currency = '/currency';
   static const paymentType = '/payment-type';
   static const unit = '/unit';
+
+  static const systemConfiguration = '/system-configuration';
 }

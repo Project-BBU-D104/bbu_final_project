@@ -48,6 +48,7 @@ import 'package:frontend/screen/stock/warehouse/widget/ware_house_detail_widget.
 import 'package:frontend/screen/stock/warehouse_stock/warehouse_stock_screen.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
+import 'package:frontend/screen/system_configuration/system_configuration_screen.dart';
 import 'package:frontend/screen/unit/unit_screen.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
@@ -242,6 +243,10 @@ class AppPages {
       name: AppRoutes.unit,
       page: () => UnitScreen(),
       // binding: PurchasePaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.systemConfiguration,
+      page: () => SystemConfigurationScreen(),
     ),
   ];
 }

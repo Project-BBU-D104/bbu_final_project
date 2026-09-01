@@ -137,13 +137,13 @@ class WarehouseStockCardWidget extends StatelessWidget {
                   ),
                 ),
 
-                Text(
-                  product["unit"] ?? "",
-                  style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                // Text(
+                //   product["unit"] ?? "",
+                //   style: TextStyle(
+                //     color: Colors.green.shade700,
+                //     fontWeight: FontWeight.w600,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -163,15 +163,6 @@ class WarehouseStockCardWidget extends StatelessWidget {
               ),
 
               const SizedBox(width: 12),
-
-              Expanded(
-                child: _infoCard(
-                  icon: Icons.local_shipping_rounded,
-                  title: "Supplier",
-                  value: product["supplier"]["name"] ?? "-",
-                  color: Colors.blue,
-                ),
-              ),
             ],
           ),
 

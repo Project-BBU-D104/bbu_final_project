@@ -4,6 +4,9 @@ from datetime import datetime
 from app.models.user import User
 from app.models.supplier import Supplier
 
+from decimal import Decimal
+from sqlalchemy import Numeric
+
 if TYPE_CHECKING:
     from app.models.purchase_item import PurchaseItem
     from app.models.warehouse import Warehouse
@@ -18,12 +21,12 @@ class Purchase(SQLModel, table=True):
     warehouse_id: int = Field(foreign_key="warehouses.id")
     invoice_no: str
     purchase_date: datetime
-    subtotal: int
-    tax_amount: int
-    discount_amount: int
-    total_amount: int
-    paid_amount: int
-    due_amount: int
+    subtotal: Decimal = Field(sa_column=Numeric(10, 2))
+    tax_amount: Decimal = Field(sa_column=Numeric(10, 2))
+    discount_amount: Decimal = Field(sa_column=Numeric(10, 2))
+    total_amount: Decimal = Field(sa_column=Numeric(10, 2))
+    paid_amount: Decimal = Field(sa_column=Numeric(10, 2))
+    due_amount: Decimal = Field(sa_column=Numeric(10, 2))
     payment_status: str
     status: str
     deleted_at: datetime = Field(default_factory=datetime.utcnow)

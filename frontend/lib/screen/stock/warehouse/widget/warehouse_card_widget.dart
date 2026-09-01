@@ -59,7 +59,8 @@ class WarehouseCardWidget extends StatelessWidget {
             const SizedBox(height: 6),
       
             /// LOCATION
-            Row(
+            if(warehouse['location'] != null && warehouse['location'].toString().isNotEmpty)
+            Wrap(
               children: [
                 Icon(Icons.location_on, size: 16, color: Colors.grey),
                 SizedBox(width: 4),
@@ -76,6 +77,7 @@ class WarehouseCardWidget extends StatelessWidget {
             const SizedBox(height: 14),
       
             /// NOTE BOX
+            if(warehouse['note'] != null && warehouse['note'].toString().isNotEmpty)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),

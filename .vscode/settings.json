@@ -1,3 +1,4 @@
 {
-    "dotenv.enableAutocloaking": false
+    "dotenv.enableAutocloaking": false,
+    "cmake.sourceDirectory": "F:/ProjectSarona/bbu_final_project/frontend/linux"
 }
