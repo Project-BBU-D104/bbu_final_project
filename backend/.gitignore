@@ -64,5 +64,6 @@ Thumbs.db
 *.bak
 *.tmp
 
-# Database
+# Other
 database.db
+plan.md
