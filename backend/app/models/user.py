@@ -21,6 +21,7 @@ class User(SQLModel, table=True):
     photo: Optional[str]
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = Field(default=False)
 
     audit_logs: List["AuditLogs"] = Relationship(back_populates="user")
     stock_adjustments: List["StockAdjustment"] = Relationship(back_populates="user")

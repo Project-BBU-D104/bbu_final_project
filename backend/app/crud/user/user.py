@@ -9,6 +9,7 @@ def create_user(session: Session, user: UserCreate):
         name=user.name,
         email=user.email,
         password=hash_password(user.password),
+        is_active=user.is_active,
         role_id=user.role_id,
         phone=user.phone,
         photo=user.photo
@@ -30,6 +31,7 @@ def update_user(session: Session, user_id: int, user: UserCreate):
         db_user.name = user.name
         db_user.email = user.email
         db_user.password = hash_password(user.password)
+        db_user.is_active = user.is_active
         db_user.phone = user.phone
         db_user.photo = user.photo
         db_user.role_id = user.role_id
@@ -44,4 +46,7 @@ def delete_user(session: Session, user_id: int):
     if user:
         session.delete(user)
         session.commit()
-    return user
+    return {
+        "message": "User deleted successfully.",
+        "user": user
+    }

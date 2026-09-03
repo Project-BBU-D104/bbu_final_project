@@ -26,7 +26,7 @@ python -m venv .venv
 
 ### 3. Install Dependencies
 ```bash
-pip install -r requiment.txt
+pip install -r requirements.txt
 ```
 
 ## Running the Project
@@ -78,7 +78,7 @@ pip install -r requiment.txt
 ### Port Already in Use
 If port 8000 is already in use:
 ```bash
-uvicorn main:app --port 8001 --reload
+uvicorn main:app --port 8000 --reload
 ```
 
 ## Additional Resources
@@ -91,7 +91,7 @@ uvicorn main:app --port 8001 --reload
 ## run migrate backend database
 ## create migrate
 
-alembic revision --autogenerate -m "create categories table"
+alembic revision --autogenerate -m "create table"
 
 ## commit migrate
 alembic upgrade head
