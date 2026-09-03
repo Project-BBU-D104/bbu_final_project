@@ -23,33 +23,40 @@ class UserScreen extends StatelessWidget {
            
               SearchWidget(title: "Search User...".tr),
               SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: KpiUserWidget(
-                        title: "Active Users",
-                        value: 100,
+              Obx(() {
+                final activeUsers = ctr.userList
+                    .where((user) => user["is_active"] == true)
+                    .length;
+                final inactiveUsers = ctr.userList.length - activeUsers;
+
+                return SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: KpiUserWidget(
+                          title: "Active Users",
+                          value: activeUsers,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: KpiUserWidget(
-                        title: "Inactive Users",
-                        value: 100,
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: KpiUserWidget(
+                          value: inactiveUsers,
+                          title: "Inactive Users",
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                );
+              }),
           
               SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("100 Users"),
+                  Obx(() => Text("${ctr.userList.length} Users")),
                 
                   ElevatedButton(
                     onPressed: (){
@@ -62,32 +69,26 @@ class UserScreen extends StatelessWidget {
 
               SizedBox(height: 15),
               
-              Obx(() { 
-
-                if (ctr.isLoading.value) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-
-                if (ctr.userList.isEmpty) {
-                  return Center(child: Text("No User Found".tr));
-                }
-
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.userList.length,
-                    itemBuilder: (context, index) => 
-                       
-                      UserCardListWidget(user: ctr.userList[index],),
-                     
-                  );
-                }
-              )
+              Obx(
+                () => ctr.isLoading.value
+                    ? SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : ctr.userList.isEmpty
+                        ? Center(child: Text("No User Found".tr))
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: ctr.userList.length,
+                            itemBuilder: (context, index) =>
+                                UserCardListWidget(
+                                  user: ctr.userList[index],
+                                ),
+                          ),
+              ),
           
             ],
           ),

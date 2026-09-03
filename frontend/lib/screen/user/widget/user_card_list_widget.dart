@@ -67,7 +67,10 @@ class UserCardListWidget extends StatelessWidget {
                 ),
               ),
 
-              const StatusWidget(text: "Active"),
+              StatusWidget(
+                text: user["is_active"] == true ? "Active" : "Inactive",
+                color: user["is_active"] == true ? Colors.green : Colors.red,
+              ),
             ],
           ),
         ),

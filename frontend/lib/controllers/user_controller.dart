@@ -83,7 +83,8 @@ class UserController extends GetxController{
         'email': userEmailController.text.trim(),
         'password': userPasswordController.text.trim(),
         'phone': userPhoneController.text.trim(),
-        'role_id': selectedRole.value
+        'role_id': selectedRole.value,
+        'is_active': !isChecked.value,
       };
 
       await service.createUser(data);
