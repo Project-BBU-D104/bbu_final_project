@@ -445,3 +445,75 @@ Full codebase review (routers, CRUD, models, schemas, services, security, config
 7. Cleanup pass (deprecated APIs, dead code, naming, pins).
 
 No code was changed. Approve items (by number/heading) and I'll implement them.
+
+---
+
+## Fix Groups (session checklist)
+
+Work through ONE group per session. Check items off as they're completed. Commit to git after each group before moving to the next. If a session runs out of tokens mid-group, resume with `/resume` and re-check this list — anything unchecked in the current group is still pending.
+
+### Group 1 — Rotate secrets (do this first, before any other work)
+- [ ] Rotate Aiven MySQL `avnadmin` password
+- [ ] Rotate Telegram bot token
+- [ ] Rotate JWT `SECRET_KEY`
+- [ ] Confirm `.env` is not committed to git or its history
+- [ ] Force strong passwords for seeded `admin` / `cashier` / `stockmanager` accounts (env var or forced first-login change) — `app/seeders/create_admin_user.py`
+
+### Group 2 — Fix the two always-500 endpoints
+- [ ] `app/crud/sale/sale.py` L11 — change `sale.model_validate(sale)` → `Sale.model_validate(sale)`
+- [ ] `app/crud/sale/sale_payment.py` L8 — same fix: `SalePayment.model_validate(sale)`
+- [ ] `app/crud/sale/sale.py` — wire up `sale_items` creation and call `decrease_stock` in the same transaction (sale flow currently never touches stock)
+
+### Group 3 — Authentication & authorization (plan steps 1–4 above)
+- [ ] `app/security.py` — add `HTTPBearer()`, `get_current_user()`, JWT decode using `SECRET_KEY`/`ALGORITHM`
+- [ ] `get_current_user()` loads user + role from DB on every request (not just from token claim)
+- [ ] Fail fast if `SECRET_KEY` is missing or empty
+- [ ] Use timezone-aware UTC timestamps for token expiry
+- [ ] Remove plaintext-password fallback in `security.py` L31-L33 (after legacy passwords migrated)
+- [ ] Add `require_roles()` dependency factory
+- [ ] Apply `Depends(get_current_user)` to all business routers in `main.py` (keep `/auth/login/` public)
+- [ ] Apply the permission matrix (role checks) per route, per the table in this plan
+- [ ] Check `is_active` at login in `app/services/auth_service.py` (currently never checked, and defaults to `False` — so it's meaningless)
+- [ ] Fix `User.name.collate("utf8mb4_bin")` (MySQL-only, blocks index use — drop or set DB collation)
+- [ ] Restrict CORS (`main.py` L23-L29 — `allow_origins=["*"]` + `allow_credentials=True` is invalid/dangerous)
+- [ ] Remove the duplicate `app = FastAPI()` definition in `main.py`
+- [ ] Test with Admin / Cashier / Stock Manager accounts per the Swagger Testing Plan above
+- [ ] Verify `401`/`403` responses match the expected table above
+
+### Group 4 — 404/409/delete-semantics helper
+- [ ] Add shared `get_or_404(session, model, id)` helper
+- [ ] Apply it across all listed modules (user, role, category, product, supplier, customer, warehouse, warehouse_stock, sale, sale_payment, stock_adjustment, payment_type, currency, unit, system_configuration, product_transfer + items, purchase_request*)
+- [ ] Fix delete endpoints: 404 on missing id, `204`/id-only response on success (never return the deleted ORM object — currently leaks password hash on user delete)
+- [ ] Catch `IntegrityError` on delete of referenced rows → return `409` instead of 500
+- [ ] Remove unauthenticated PUT/DELETE on `app/crud/audit_logs/audit_logs.py` (audit trail should be server-write-only)
+- [ ] Require auth on `app/routes/telegram/telegram_router.py`; escape user text before sending (HTML injection); add `timeout=` and error handling to `telegram_service.py`
+
+### Group 5 — Money/qty types + server-side recomputation
+- [ ] Unify `qty` type across `purchase_item.py` and `warehouse_stock.py` (Decimal vs int truncation) + migration
+- [ ] Unify money columns to `Numeric(12,2)` Decimal in `sale.py`, `sale_items.py`, `sale_payment.py`, `purchase_payment.py` (currently mixed int/float) + migration
+- [ ] Recompute `subtotal`/`tax_amount`/`total_amount`/`paid_amount`/`due_amount` server-side in purchase/sale CRUD instead of trusting client values
+- [ ] Validate item `subtotal` against `qty × cost_price` with a Pydantic `model_validator`
+- [ ] Add unique DB constraint + retry (or counter table) for document-number generators (`purchase.py`, `warehouse.py`, `product_transfer.py`, `stock_adjustment.py`) — replace bare `except:`
+
+### Group 6 — Eager loading + pagination
+- [ ] Add `selectinload` to `get_all_users`, `get_all_warehouse` (worst N+1 offender), `get_all_warehouse_stock`, `get_all_purchase_payment`, `get_recent_purchases`, `get_sale_payment`-family (pattern already correct in `get_all_product` — copy it)
+- [ ] Add `limit`/`offset` params to every `GET /` list endpoint (none currently paginated)
+- [ ] Fix `app/routes/home/home.py` — `LIMIT 5` applies to joined rows not parent rows; move to a subquery on parent id
+- [ ] Route `home.py` through `get_session` instead of a direct `engine.connect()`
+- [ ] Fix `decrease_stock` bare `ValueError` → proper `HTTPException`/service error (400, not 500)
+- [ ] Fix `update_warehouse_stock` `items[0]` IndexError on empty `items`; handle `items[1:]`; don't overwrite `warehouse_id` on partial update
+
+### Group 7 — Cleanup pass
+- [ ] Replace deprecated `from_orm()` → `model_validate()` (10 files listed in Medium section)
+- [ ] Replace `datetime.utcnow()` → `datetime.now(timezone.utc)` (all CRUD + models + `security.py`)
+- [ ] Fix schema/model drift issues (product `qty`/`allow_insert_qty`, purchase `description`, purchase_request_items field name mismatch, missing `id` on several Read schemas)
+- [ ] Fix relationship cardinality (`purchase_payments` should be `List[...]`, currency/payment_type → `List`)
+- [ ] Add missing DB unique constraints (`user.name`/`email`, `supplier.phone`/`email`, `warehouse_stock(warehouse_id, product_id)`, invoice/reference/payment numbers)
+- [ ] Split `UserUpdate` from `UserCreate` so editing a user doesn't require resending the password / doesn't allow any caller to change `role_id`
+- [ ] Fix login timing oracle (nonexistent-user path should still run bcrypt-equivalent work)
+- [ ] Pick one convention for `HTTPException` (routes/services only, not CRUD layer)
+- [ ] Delete dead code: `app/routes/dashboard/dashboard.py` stubs, empty `app/seeders/user_seeder.py`
+- [ ] Gate `database.py` `echo=True` behind `DEBUG` env var
+- [ ] Pin exact versions in `requirements.txt`; run `pip-audit`
+- [ ] Fix LOW-severity typos/naming/unused imports listed in the LOW section
+- [ ] Write basic smoke tests (none exist currently) — at minimum cover the two endpoints fixed in Group 2
