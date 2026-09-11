@@ -10,7 +10,6 @@
 - The current CRUD routes only depend on the database session, for example `Depends(get_session)`.
 - There is no current `jwt.decode`, `OAuth2PasswordBearer`, `HTTPBearer`, `get_current_user`, or role-permission dependency in the route layer.
 - Therefore, users can currently call most read, create, update, and delete endpoints without logging in.
-- The running server was previously unavailable at port `8000`; the development API is normally tested at `http://127.0.0.1:8001/docs`.
 
 ## Main Goal
 
