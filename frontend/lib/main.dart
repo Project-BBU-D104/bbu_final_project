@@ -13,8 +13,8 @@ import 'localization/app_translation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/gestures.dart'; 
 import 'package:get_storage/get_storage.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:device_preview/device_preview.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,13 +28,17 @@ Future<void> main() async {
 
   Get.put(LanguageController());
 
-   await Supabase.initialize(
+  await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  runApp(const MyApp());
-
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 Future<void> _initConfig() async {
@@ -59,7 +63,6 @@ Future<void> _initStorage() async {
 
 class _CustomScrollBehavior extends MaterialScrollBehavior {
   @override
-  // override behavior
   Set<PointerDeviceKind> get dragDevices => {
     PointerDeviceKind.touch,
     PointerDeviceKind.mouse,
@@ -72,40 +75,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languageController = Get.find<LanguageController>();
 
-    final languageController = Get.put(LanguageController());
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
 
-    return Obx(
-      ()=> GetMaterialApp(
-        // hide debug
-        debugShowCheckedModeBanner: false,
-      
-        scrollBehavior: _CustomScrollBehavior(),
-        initialRoute: AppRoutes.landing,
-        getPages: AppPages.pages,
-      
-        // translate
-        translations: AppTranslation(),
-        locale: languageController.locale.value,
-        fallbackLocale: const Locale("km", "KH"),
-      
-        // theme
-        transitionDuration: const Duration(milliseconds: 0),
-        defaultTransition: Transition.noTransition,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.isEnabled(context)
+          ? DevicePreview.locale(context)
+          : languageController.locale.value,
+      fallbackLocale: const Locale("km", "KH"),
 
-        themeMode: ThemeMode.light,
-        builder: (context, child) {
-          return Stack(
+      scrollBehavior: _CustomScrollBehavior(),
+      initialRoute: AppRoutes.landing,
+      getPages: AppPages.pages,
+
+      translations: AppTranslation(),
+
+      transitionDuration: const Duration(milliseconds: 0),
+      defaultTransition: Transition.noTransition,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.light,
+
+      builder: (context, child) {
+        return DevicePreview.appBuilder(
+          context,
+          Stack(
             children: [
               const AppBackground(child: SizedBox.expand()),
               child ?? const SizedBox(),
             ],
-          );
-        },
-      
-      ),
+          ),
+        );
+      },
     );
   }
 }

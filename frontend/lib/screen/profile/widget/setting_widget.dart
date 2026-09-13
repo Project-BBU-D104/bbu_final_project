@@ -26,16 +26,16 @@ class SettingWidget extends StatelessWidget {
               ],
             ),
             Divider(),
-            Obx(
-              () => cardInfo(
-                active: themeController.isDark.value,
-                icon: Icons.dark_mode_outlined,
-                title: "Dark Mode".tr,
-                onSwitch: (value) {
-                  themeController.toggleTheme();
-                },
-              ),
-            ),
+            // Obx(
+            //   () => cardInfo(
+            //     active: themeController.isDark.value,
+            //     icon: Icons.dark_mode_outlined,
+            //     title: "Dark Mode".tr,
+            //     onSwitch: (value) {
+            //       themeController.toggleTheme();
+            //     },
+            //   ),
+            // ),
             SizedBox(height: 5,),
             cardInfo(
               icon: Icons.language_outlined,
