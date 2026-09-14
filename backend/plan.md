@@ -464,14 +464,14 @@ Work through ONE group per session. Check items off as they're completed. Commit
 - [ ] `app/crud/sale/sale.py` — wire up `sale_items` creation and call `decrease_stock` in the same transaction (sale flow currently never touches stock)
 
 ### Group 3 — Authentication & authorization (plan steps 1–4 above)
-- [ ] `app/security.py` — add `HTTPBearer()`, `get_current_user()`, JWT decode using `SECRET_KEY`/`ALGORITHM`
-- [ ] `get_current_user()` loads user + role from DB on every request (not just from token claim)
+- [x] `app/security.py` — add `HTTPBearer()`, `get_current_user()`, JWT decode using `SECRET_KEY`/`ALGORITHM`
+- [x] `get_current_user()` loads user + role from DB on every request (not just from token claim)
 - [ ] Fail fast if `SECRET_KEY` is missing or empty
-- [ ] Use timezone-aware UTC timestamps for token expiry
+- [x] Use timezone-aware UTC timestamps for token expiry
 - [ ] Remove plaintext-password fallback in `security.py` L31-L33 (after legacy passwords migrated)
-- [ ] Add `require_roles()` dependency factory
-- [ ] Apply `Depends(get_current_user)` to all business routers in `main.py` (keep `/auth/login/` public)
-- [ ] Apply the permission matrix (role checks) per route, per the table in this plan
+- [x] Add `require_roles()` dependency factory
+- [ ] Apply `Depends(get_current_user)` to all business routers in `main.py` (keep `/auth/login/` public) — **role_router done, rest pending**
+- [ ] Apply the permission matrix (role checks) per route, per the table in this plan — **role_router done, rest pending**
 - [ ] Check `is_active` at login in `app/services/auth_service.py` (currently never checked, and defaults to `False` — so it's meaningless)
 - [ ] Fix `User.name.collate("utf8mb4_bin")` (MySQL-only, blocks index use — drop or set DB collation)
 - [ ] Restrict CORS (`main.py` L23-L29 — `allow_origins=["*"]` + `allow_credentials=True` is invalid/dangerous)
