@@ -2,19 +2,26 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = dotenv.env['API_URL']!;
 
-  Map<String, String> get headers => {
-        "Content-Type": "application/json",
-      };
+  Future<Map<String, String>> get headers async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    
+    return {
+      "Content-Type": "application/json",
+      if (token != null) "Authorization": "Bearer $token",
+    };
+  }
 
   /// GET ALL
   Future<dynamic> get(String endpoint) async {
     final response = await http.get(
       _buildUri(endpoint, trailingSlash: !endpoint.contains('/')),
-      headers: headers,
+      headers: await headers,
     );
 
     return _handleResponse(response);
@@ -27,7 +34,7 @@ class ApiService {
   ) async {
     final response = await http.get(
       _buildUri("$endpoint/$id"),
-      headers: headers,
+      headers: await headers,
     );
 
     return _handleResponse(response);
@@ -40,7 +47,7 @@ class ApiService {
   ) async {
     final response = await http.post(
       _buildUri(endpoint, trailingSlash: true),
-      headers: headers,
+      headers: await headers,
       body: jsonEncode(data),
     );
 
@@ -55,7 +62,7 @@ class ApiService {
   ) async {
     final response = await http.put(
       _buildUri("$endpoint/$id"),
-      headers: headers,
+      headers: await headers,
       body: jsonEncode(data),
     );
 
@@ -69,7 +76,7 @@ class ApiService {
   ) async {
     final response = await http.delete(
       _buildUri("$endpoint/$id"),
-      headers: headers,
+      headers: await headers,
     );
 
     return _handleResponse(response);
