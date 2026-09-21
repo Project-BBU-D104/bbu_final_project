@@ -472,10 +472,10 @@ Work through ONE group per session. Check items off as they're completed. Commit
 - [x] Add `require_roles()` dependency factory
 - [ ] Apply `Depends(get_current_user)` to all business routers in `main.py` (keep `/auth/login/` public) — **role_router done, rest pending**
 - [ ] Apply the permission matrix (role checks) per route, per the table in this plan — **role_router done, rest pending**
-- [ ] Check `is_active` at login in `app/services/auth_service.py` (currently never checked, and defaults to `False` — so it's meaningless)
+- [x] Check `is_active` at login in `app/services/auth_service.py` (currently never checked, and defaults to `False` — so it's meaningless)
 - [ ] Fix `User.name.collate("utf8mb4_bin")` (MySQL-only, blocks index use — drop or set DB collation)
 - [ ] Restrict CORS (`main.py` L23-L29 — `allow_origins=["*"]` + `allow_credentials=True` is invalid/dangerous)
-- [ ] Remove the duplicate `app = FastAPI()` definition in `main.py`
+- [x] Remove the duplicate `app = FastAPI()` definition in `main.py`
 - [ ] Test with Admin / Cashier / Stock Manager accounts per the Swagger Testing Plan above
 - [ ] Verify `401`/`403` responses match the expected table above
 

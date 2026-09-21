@@ -29,6 +29,12 @@ def login(request: LoginRequest, session: Session):
             detail="Invalid name or password",
         )
 
+    if not user.is_active:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid name or password",
+        )
+
     token = create_access_token(
         {
             "sub": str(user.id)

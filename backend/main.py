@@ -10,17 +10,6 @@ from app.security import require_roles
 
 app = FastAPI()
 
-
-# create user 
-# if this uncomment when create table new pls uncomment
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     create_admin_user()
-#     yield
-
-# app = FastAPI(lifespan=lifespan)
-
-# Add CORS middleware (optional, for frontend requests)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,10 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Include routers
 app.include_router(auth_router)
-app.include_router(users_router)
+app.include_router(users_router, dependencies=[Depends(require_roles("Admin"))])
 app.include_router(category_router)
 app.include_router(supplier_router)
 app.include_router(product_router)  
