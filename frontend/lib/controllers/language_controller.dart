@@ -7,7 +7,7 @@ class LanguageController extends GetxController {
 
   static const String storageKey = "language";
 
-  final locale = const Locale("km", "KH").obs;
+  final locale = const Locale("en", "US").obs;
 
   @override
   void onInit() {
