@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import TYPE_CHECKING, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.warehouse import Warehouse
 
 if TYPE_CHECKING:
@@ -13,9 +13,9 @@ class ProductTransfer(SQLModel, table=True):
     from_warehouse_id: int = Field(foreign_key="warehouses.id")
     to_warehouse_id: int = Field(foreign_key="warehouses.id")
     reference_no: str
-    transfer_date: datetime = Field(default_factory=datetime.utcnow)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    transfer_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
  
     product_transfer_items: list["ProductTransferItem"] = Relationship(back_populates="product_transfer")
     from_warehouse: Optional["Warehouse"] = Relationship(

@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.product import Product
 
 if TYPE_CHECKING:
@@ -15,8 +15,8 @@ class SaleItems(SQLModel, table=True):
     qty: int
     sale_price: int
     subtotal: int
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     sales: Optional["Sale"] = Relationship(back_populates="sale_items")
     product: Optional[Product] = Relationship(back_populates="sale_items")

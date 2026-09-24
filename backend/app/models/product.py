@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List, TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.category import Category
 
 from decimal import Decimal
@@ -38,9 +38,9 @@ class Product(SQLModel, table=True):
         sa_type=Numeric(12, 2)
     )
     description: Optional[str] = None
-    deleted_at: datetime = Field(default_factory=datetime.utcnow)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    deleted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     category: Optional["Category"] = Relationship(back_populates="products")
     currency: Optional["Currency"] = Relationship(back_populates="products")

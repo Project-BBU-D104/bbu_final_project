@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,List, TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime,timezone
 
 if TYPE_CHECKING:
     from app.models.purchase_payment import PurchasePayment
@@ -17,8 +17,8 @@ class Currency(SQLModel, table=True):
     exchange_rate: float
     is_default: bool = False
     status: bool = True
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     purchase_payments: List["PurchasePayment"] = Relationship(back_populates="currency")
     products: List["Product"] = Relationship(back_populates="currency")

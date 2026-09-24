@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.supplier import Supplier
 from app.models.purchase import Purchase
 from app.models.payment_type import PaymentType
@@ -19,8 +19,8 @@ class PurchasePayment(SQLModel, table=True):
     payment_date: datetime
     note: str
     status: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     supplier: Optional[Supplier] = Relationship(back_populates="purchase_payments")
     purchase: Optional[Purchase] = Relationship(back_populates="purchase_payments")

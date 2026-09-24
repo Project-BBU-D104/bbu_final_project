@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List, TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 
 if TYPE_CHECKING:
     from app.models.stock_adjustment import StockAdjustment
@@ -18,8 +18,8 @@ class Warehouse(SQLModel, table=True):
     reference_no: str
     location: str
     note: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     stock_adjustments: List["StockAdjustment"] = Relationship(
         back_populates="warehouse"

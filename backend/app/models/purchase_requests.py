@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional, TYPE_CHECKING, List
-from datetime import datetime
+from datetime import datetime, timezone
 
 if TYPE_CHECKING:
     from app.models.warehouse import Warehouse
@@ -19,9 +19,9 @@ class PurchaseRequest(SQLModel, table=True):
     reason: str
     request_date: datetime
     approved_date: datetime
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
- 
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
     warehouse: Optional["Warehouse"] = Relationship(back_populates="purchase_requests")
 
      # ADD THIS

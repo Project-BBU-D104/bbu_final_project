@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.product import Product
 from app.models.purchase import Purchase
 
@@ -20,9 +20,9 @@ class PurchaseItem(SQLModel, table=True):
     cost_price: Decimal = Field(sa_column=Numeric(10, 2))
     qty: Decimal = Field(sa_column=Numeric(10, 2))
     subtotal: Decimal = Field(sa_column=Numeric(10, 2))
-    deleted_at: datetime = Field(default_factory=datetime.utcnow)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    deleted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     purchase: Optional["Purchase"] = Relationship(
         back_populates="purchase_items"

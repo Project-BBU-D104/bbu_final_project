@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional, TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 
 if TYPE_CHECKING:
     from app.models.warehouse import Warehouse
@@ -15,8 +15,7 @@ class PurchaseRequestItems(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id")
     unit: str
     qty: int
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-   
-     
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
     product: Optional["Product"] = Relationship(back_populates="purchase_request_items")
     purchase_request: Optional["PurchaseRequest"] = Relationship(back_populates="purchase_request_items")

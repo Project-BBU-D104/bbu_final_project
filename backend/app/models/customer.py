@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,List,TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 
 if TYPE_CHECKING:
     from app.models.sale import Sale
@@ -15,7 +15,7 @@ class Customer(SQLModel, table=True):
     address: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     sales: List["Sale"] = Relationship(back_populates="customer")

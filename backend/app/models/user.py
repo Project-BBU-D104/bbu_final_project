@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List,TYPE_CHECKING
@@ -19,8 +19,8 @@ class User(SQLModel, table=True):
     role_id: int = Field(foreign_key="role.id")
     phone: Optional[str]
     photo: Optional[str]
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_active: bool = Field(default=False)
 
     audit_logs: List["AuditLogs"] = Relationship(back_populates="user")

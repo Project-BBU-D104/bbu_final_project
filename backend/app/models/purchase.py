@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.user import User
 from app.models.supplier import Supplier
 
@@ -29,9 +29,9 @@ class Purchase(SQLModel, table=True):
     due_amount: Decimal = Field(sa_column=Numeric(10, 2))
     payment_status: str
     status: str
-    deleted_at: datetime = Field(default_factory=datetime.utcnow)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    deleted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     user: Optional[User] = Relationship(back_populates="purchases")
     supplier: Optional[Supplier] = Relationship(back_populates="purchases")

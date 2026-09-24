@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 
 if TYPE_CHECKING:
     from app.models.currency import Currency
@@ -27,8 +27,8 @@ class SystemConfiguration(SQLModel, table=True):
 
     low_stock_warning: Optional[int] = None
 
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     currency: Optional["Currency"] = Relationship(back_populates="system_configuration")
     warehouse: Optional["Warehouse"] = Relationship(back_populates="system_configuration")
