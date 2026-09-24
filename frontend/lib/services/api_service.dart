@@ -1,14 +1,23 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend/global.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
   final String baseUrl = dotenv.env['API_URL']!;
 
-  Map<String, String> get headers => {
-        "Content-Type": "application/json",
-      };
+   Map<String, String> get headers {
+    final loginData = storage.lastUserLoginRead;
+    final token = loginData["token"];
+
+    return {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      if (token != null && token.toString().isNotEmpty)
+        "Authorization": "Bearer $token",
+    };
+  }
 
   /// GET ALL
   Future<dynamic> get(String endpoint) async {
