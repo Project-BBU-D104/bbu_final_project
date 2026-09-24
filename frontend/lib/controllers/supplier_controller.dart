@@ -25,7 +25,7 @@ class SupplierController extends GetxController {
   final supplierMapController = TextEditingController();
   final supplierAddressController = TextEditingController();
 
-  final status = false.obs;
+  final status = true.obs;
 
   @override
   void onInit() {
@@ -49,7 +49,7 @@ class SupplierController extends GetxController {
     supplierEmailController.clear();
     supplierMapController.clear();
     supplierAddressController.clear();
-    status.value = false;
+    status.value = true;
   }
 
   Future<void> getSuppliers() async {
@@ -88,6 +88,14 @@ class SupplierController extends GetxController {
   }
 
   void saveSupplier(BuildContext context) async{
+    if (supplierPhoneNumberController.text.trim().isEmpty) {
+      ToastWidget.show(
+        message: "Phone number is required".tr,
+        type: ToastType.error,
+      );
+      return;
+    }
+    
     try{
       final data = {
         "name": supplierNameController.text.trim(),

@@ -83,3 +83,8 @@ def create_admin_user():
             email="stockmanager",
             password="123456",
         )
+
+if __name__ == "__main__":
+    print("Starting seeding process...")
+    create_admin_user()
+    print("Seeding completed successfully!")

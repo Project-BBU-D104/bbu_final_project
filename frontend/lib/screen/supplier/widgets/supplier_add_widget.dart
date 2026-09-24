@@ -99,6 +99,7 @@ class SupplierAddWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
                   SizedBox(height: 5,),
                   TextField(
@@ -110,22 +111,7 @@ class SupplierAddWidget extends StatelessWidget {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                   
-                  Obx(() {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Checkbox(
-                        value: ctr.status.value,
-                        onChanged: (value) {
-                          ctr.status.value = value ?? false;
-                        },
-                      ),
-                      Text("Status".tr),
-                    ],
-                  );
-                }),
-            
+
                   const SizedBox(height: 15),
             
                   SizedBox(

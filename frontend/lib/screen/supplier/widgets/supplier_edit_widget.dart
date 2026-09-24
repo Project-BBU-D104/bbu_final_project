@@ -122,7 +122,7 @@ class SupplierEditWidget extends StatelessWidget {
                           ctr.status.value = value ?? false;
                         },
                       ),
-                      Text("Status".tr),
+                      Text("Active".tr),
                     ],
                   );
                 }),

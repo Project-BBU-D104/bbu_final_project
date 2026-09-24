@@ -1,4 +1,5 @@
 import 'package:frontend/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final ApiService _api = ApiService();
@@ -13,9 +14,16 @@ class AuthService {
         "name": name,
         "password": password,
       },
-      
+
     );
 
-    return Map<String, dynamic>.from(response);
+    final data = Map<String, dynamic>.from(response);
+    
+    if (data.containsKey('access_token')) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['access_token']);
+    }
+
+    return data;
   }
 }

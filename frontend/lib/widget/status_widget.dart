@@ -18,6 +18,7 @@ class StatusWidget extends StatelessWidget {
       case "verified":
         return Colors.green;
       case "on hold":
+      case "inactive":
         return Colors.red;
       case "pending":
         return Colors.orange;

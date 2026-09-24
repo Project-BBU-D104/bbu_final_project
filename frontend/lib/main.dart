@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
       locale: DevicePreview.isEnabled(context)
           ? DevicePreview.locale(context)
           : languageController.locale.value,
-      fallbackLocale: const Locale("km", "KH"),
+      fallbackLocale: const Locale("en", "US"),
 
       scrollBehavior: _CustomScrollBehavior(),
       initialRoute: AppRoutes.landing,

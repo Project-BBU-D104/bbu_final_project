@@ -134,7 +134,7 @@ class UserController extends GetxController{
       userPasswordController.text = user["password"] ?? "";
       selectedRole.value =
         user["role"]?["id"]?.toString();
-      isChecked.value = user["is_active"] ?? false;
+      isChecked.value = user["is_active"] != true;
       AppBottomSheets.show(
       context,
       child: EditUserWidget(

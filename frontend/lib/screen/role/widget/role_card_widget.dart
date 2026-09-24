@@ -41,7 +41,7 @@ class RoleCardWidget extends StatelessWidget {
                 ),
                 
                 StatusWidget(
-                  text: "Active",
+                  text: role["is_active"] == true ? "Active" : "Inactive",
                 ),
               ],
             ),
