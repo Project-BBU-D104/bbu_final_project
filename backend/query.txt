@@ -34,7 +34,6 @@ CREATE TABLE categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
-    icon TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -46,7 +45,9 @@ CREATE TABLE users (
     username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    disable BOOLEAN DEFAULT 0,
+    phone TEXT NOT NULL,
+    photo TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(id)
@@ -68,7 +69,6 @@ CREATE TABLE units (
 CREATE TABLE products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id INTEGER NOT NULL,
-    supplier_id INTEGER NOT NULL,
     unit_id INTEGER NOT NULL,
     currency_id INTEGER NOT NULL,
     name TEXT NOT NULL,
@@ -76,8 +76,6 @@ CREATE TABLE products (
     photo TEXT,
     cost_price REAL NOT NULL,
     sale_price REAL NOT NULL,
-    qty INTEGER DEFAULT 0,
-    allow_insert_qty BOOLEAN 0,
     description TEXT,
     deleted_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -213,6 +211,7 @@ CREATE TABLE purchases (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     supplier_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
+    warehouse_id INTEGER NOT NULL,
     invoice_no TEXT NOT NULL UNIQUE,
     purchase_date DATE NOT NULL,
     subtotal REAL DEFAULT 0,
@@ -247,6 +246,7 @@ CREATE TABLE sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     customer_id INTEGER,
     user_id INTEGER NOT NULL,
+    payment_type_id INTEGER NOT NULL,
     invoice_no TEXT NOT NULL UNIQUE,
     sale_date DATE NOT NULL,
     subtotal REAL DEFAULT 0,
@@ -257,7 +257,6 @@ CREATE TABLE sales (
     due_amount REAL DEFAULT 0,
     payment_status TEXT DEFAULT 'unpaid',
     status TEXT DEFAULT 'pending',
-    payment_method TEXT,
     deleted_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -283,7 +282,7 @@ CREATE TABLE sale_payments (
     sale_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     amount REAL NOT NULL,
-    payment_method TEXT NOT NULL,
+    payment_type_id INTEGER NOT NULL,
     reference_no TEXT,
     payment_date DATE NOT NULL,
     note TEXT,
@@ -317,8 +316,6 @@ CREATE TABLE currencies (
         ON UPDATE CURRENT_TIMESTAMP
 );
 
-//Can't use yet
-
 CREATE TABLE purchase_payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     payment_no VARCHAR(50) UNIQUE NOT NULL,
@@ -334,6 +331,8 @@ CREATE TABLE purchase_payments (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
+    
+    deleted_at DATETIME NULL,
 
     FOREIGN KEY (purchase_id)
         REFERENCES purchases(id),
@@ -347,7 +346,7 @@ CREATE TABLE purchase_payments (
         REFERENCES users(id)
 );
 
-CREATE TABLE stock_requests (
+CREATE TABLE purchase_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     request_no VARCHAR(50) NOT NULL UNIQUE,
     request_type ENUM(
@@ -371,6 +370,8 @@ CREATE TABLE stock_requests (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
+    
+    deleted_at DATETIME Null,
 
     CONSTRAINT fk_stock_request_warehouse
         FOREIGN KEY (warehouse_id)
@@ -386,24 +387,24 @@ CREATE TABLE stock_requests (
 );
 
 
-CREATE TABLE stock_request_items (
+CREATE TABLE purchase_request_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    stock_request_id INT NOT NULL,
+    purchase_request_id INT NOT NULL,
     product_id INT NOT NULL,
-    unit INT NOT NULL,
+    unit_id INT NOT NULL,
     qty DECIMAL(12,2) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_stock_request_item_request
-        FOREIGN KEY (stock_request_id)
-        REFERENCES stock_requests(id)
+    CONSTRAINT fk_purchase_request_item_request
+        FOREIGN KEY (purchase_request_id)
+        REFERENCES purchase_requests(id)
         ON DELETE CASCADE,
 
-    CONSTRAINT fk_stock_request_item_product
+    CONSTRAINT fk_purchase_request_item_product
         FOREIGN KEY (product_id)
         REFERENCES products(id),
 
-    CONSTRAINT fk_stock_request_item_unit
+    CONSTRAINT fk_purchase_request_item_unit
         FOREIGN KEY (unit_id)
         REFERENCES units(id)
 

@@ -1,19 +1,22 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend/global.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = dotenv.env['API_URL']!;
 
-  Future<Map<String, String>> get headers async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    
+   Map<String, String> get headers {
+    final loginData = storage.lastUserLoginRead;
+    final token = loginData["token"];
+
     return {
       "Content-Type": "application/json",
-      if (token != null) "Authorization": "Bearer $token",
+      "Accept": "application/json",
+      if (token != null && token.toString().isNotEmpty)
+        "Authorization": "Bearer $token",
     };
   }
 

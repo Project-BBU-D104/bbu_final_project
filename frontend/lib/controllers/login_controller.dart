@@ -40,13 +40,14 @@ class LoginController extends GetxController {
       await storage.lastUserLoginWrite(
         data: {
           "token": response["access_token"],
+          "token_type": response["token_type"],
           "user": response["user"],
         },
       );
 
       await storage.appStartUpWrite(route: "/home");
 
-      // print(storage.lastUserLoginRead);
+      print(storage.lastUserLoginRead);
 
       Get.offAllNamed("/home");
     } catch (e) {

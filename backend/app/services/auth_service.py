@@ -14,12 +14,14 @@ def login(request: LoginRequest, session: Session):
         )
     ).first()
 
+    # User not found
     if user is None:
         raise HTTPException(
             status_code=401,
             detail="Invalid name or password",
         )
 
+    # Verify password
     if not verify_password(
         request.password,
         user.password,
@@ -29,18 +31,16 @@ def login(request: LoginRequest, session: Session):
             detail="Invalid name or password",
         )
 
-    if not user.is_active:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid name or password",
-        )
-
+    # Create access token
     token = create_access_token(
         {
             "sub": str(user.id)
         }
     )
 
+    print(f"User {user.name} logged in successfully. Token: {token}")
+
+    # Return login response
     return {
         "access_token": token,
         "token_type": "bearer",
