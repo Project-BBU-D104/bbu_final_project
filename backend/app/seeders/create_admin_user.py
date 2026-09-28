@@ -60,6 +60,15 @@ def create_admin_user():
             password="123456",
         )
 
+        # Supervisor (below Admin)
+        if not session.exec(select(Role).where(Role.name == "Supervisor")).first():
+            session.add(Role(
+                name="Supervisor",
+                description="Supervisor",
+                is_active=True,
+            ))
+            session.commit()
+
         # ==========================
         # Cashier
         # ==========================
