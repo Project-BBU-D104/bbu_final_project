@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 from app.models.unit import Unit
 from app.schemas.unit.unit import UnitCreate, UnitUpdate
 from datetime import datetime
+from app.models.product import Product
 
 def create_unit(session: Session, unit: UnitCreate):
     existing = session.exec(
@@ -53,6 +54,8 @@ def update_unit(session: Session, unit_id: int, unit: UnitUpdate):
     return db_unit
 
 def delete_unit(session: Session, unit_id: int):
+
+    # Check if the unit exists
     if not session.get(Unit, unit_id):
         raise HTTPException(
             status_code=404,
@@ -61,6 +64,19 @@ def delete_unit(session: Session, unit_id: int):
     
     unit = session.get(Unit, unit_id)
 
+    # Check if the unit is being used by any product
+    product = session.exec(
+        select(Product).where(Product.unit_id == unit_id)
+    ).first()
+
+    # throw message when unit is being used by a product
+    if product:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete unit '{unit.name}' because it is being used by a product."
+        )
+
+    # delete unit
     if unit:
         session.delete(unit)
         session.commit()

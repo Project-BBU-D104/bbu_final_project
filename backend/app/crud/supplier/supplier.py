@@ -3,6 +3,8 @@ from app.models.supplier import Supplier
 from app.schemas.supplier.supplier import SupplierCreate, SupplierUpdate
 from datetime import datetime
 from fastapi import HTTPException
+from app.models.purchase import Purchase
+from app.models.purchase_payment import PurchasePayment
 
 def create_supplier(session: Session, supplier: SupplierCreate):
 
@@ -63,7 +65,32 @@ def delete_supplier(session: Session, supplier_id: int):
             status_code=404,
             detail="Supplier not found."
         )
+    
     supplier = session.get(Supplier, supplier_id)
+
+    purchase = session.exec(
+        select(Purchase).where(Purchase.supplier_id == supplier_id)
+    ).first()
+
+    # throw message when supplier is being used by a purchase
+    if purchase:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete supplier '{supplier.name}' because it is being used by a purchase."
+        )
+
+    purchase_payment = session.exec(
+        select(PurchasePayment).where(PurchasePayment.supplier_id == supplier_id)
+    ).first()
+
+    # throw message when supplier is being used by a purchase payment
+    if purchase_payment:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete supplier '{supplier.name}' because it is being used by a purchase payment."
+        )
+    
+    # delete supplier
     if supplier:
         session.delete(supplier)
         session.commit()

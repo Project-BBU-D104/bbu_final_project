@@ -10,6 +10,9 @@ from app.crud.warehouse.warehouse_stock import (
     increase_stock,
     check_product_in_warehouse,
 )
+from app.models.purchase_requests import PurchaseRequest
+from app.models.system_configuration import SystemConfiguration
+
 from sqlalchemy import text
 
 def generate_invoice_no(session: Session) -> str:
@@ -216,11 +219,38 @@ def update_purchase(
 
     return db_purchase
 
+def is_purchase_use(session: Session, purchase_id: int):
+    models = [
+        WarehouseStock,
+        PurchaseRequest,
+        SystemConfiguration,
+    ]
+    for model in models:
+        if hasattr(model, "purchase_id"):
+
+            result = session.exec(
+                select(model).where(
+                    model.purchase_id == purchase_id
+                )
+            ).first()
+
+            if result:
+                return model.__name__
+    return None
+
 def delete_purchase(session: Session, purchase_id: int):
+
     purchase = session.get(Purchase, purchase_id)
 
     if not purchase:
         raise HTTPException(status_code=404, detail="Purchase not found")
+
+    used_by = is_purchase_use(session, purchase_id)
+    if used_by:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete purchase because it is used by {used_by}."
+        )
     
     # Reverse stock
     items = session.exec(

@@ -5,6 +5,13 @@ from app.models.product import Product
 from app.schemas.product.product import ProductCreate, ProductUpdate
 from datetime import datetime
 from sqlalchemy.orm import selectinload
+ 
+from app.models.purchase_item import PurchaseItem
+from app.models.sale_items import SaleItems
+from app.models.stock_adjustment import StockAdjustment
+from app.models.warehouse_stock import WarehouseStock
+from app.models.product_transfer_item import ProductTransferItem
+from app.models.purchase_request_items import PurchaseRequestItems
 
 def create_product(session: Session, product: ProductCreate):
     db_product = Product.model_validate(product)
@@ -71,6 +78,25 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
         session.refresh(db_product)
     return db_product
 
+# check if product is used
+def is_product_used(session: Session, product_id: int):
+
+    models = [
+        PurchaseItem,
+        SaleItems,
+        StockAdjustment,
+        WarehouseStock,
+        ProductTransferItem,
+        PurchaseRequestItems,
+    ]
+
+    return any(
+        session.exec(
+            select(model).where(model.product_id == product_id)
+        ).first()
+        for model in models
+    )
+
 def delete_product(session: Session, product_id: int):
 
     if not session.get(Product, product_id):
@@ -80,6 +106,14 @@ def delete_product(session: Session, product_id: int):
         )
     
     product = session.get(Product, product_id)
+
+    if is_product_used(session, product_id):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete product '{product.name}' because it is being used."
+        )
+
+    # delete product
     if product:
         session.delete(product)
         session.commit()

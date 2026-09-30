@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 from app.models.category import Category
 from app.schemas.category.category import CategoryCreate, CategoryUpdate
 from datetime import datetime
+from app.models.product import Product
 
 from app.services.telegram_service import send_message
 
@@ -75,6 +76,7 @@ def update_category(session: Session, category_id: int, category: CategoryUpdate
     return db_category
 
 def delete_category(session: Session, category_id: int):
+
     if not session.get(Category, category_id):
         raise HTTPException(
             status_code=404,
@@ -83,6 +85,17 @@ def delete_category(session: Session, category_id: int):
     
     category = session.get(Category, category_id)
 
+    product = session.exec(
+        select(Product).where(Product.category_id == category_id)
+    ).first()
+
+    if product:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete category '{category.name}' because it is being used by a product."
+        )
+
+    # delete category
     if category:
         session.delete(category)
         session.commit()

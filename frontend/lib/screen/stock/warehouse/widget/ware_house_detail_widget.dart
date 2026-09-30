@@ -224,17 +224,17 @@ class WareHouseDetailWidget extends StatelessWidget {
 
                   const SizedBox(height: 6),
 
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.straighten,
-                        size: 18,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(product["unit"]),
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     const Icon(
+                  //       Icons.straighten,
+                  //       size: 18,
+                  //       color: Colors.grey,
+                  //     ),
+                  //     const SizedBox(width: 5),
+                  //     Text(product["unit"]),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
