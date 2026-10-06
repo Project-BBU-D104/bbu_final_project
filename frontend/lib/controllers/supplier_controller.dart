@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/models/supplier_model.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -8,29 +8,35 @@ import 'package:frontend/services/main_service/supplier_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class SupplierController extends GetxController {
 
   var isLoading = false.obs;
-
   final selectedTab = "All".obs;
-
   final SupplierService service = SupplierService();
-
   final suppliers = <SupplierModel>[].obs;
-
+  final searchSuppliers = <SupplierModel>[].obs;
   final supplierNameController = TextEditingController();
   final supplierPhoneNumberController = TextEditingController();
   final supplierEmailController = TextEditingController();
   final supplierMapController = TextEditingController();
   final supplierAddressController = TextEditingController();
-
   final status = true.obs;
 
   @override
   void onInit() {
     super.onInit();
     getSuppliers();
+
+    final searchController = Get.put(SearchController());
+
+    ever(
+      searchController.keyword,
+      (keyword) {
+        searchSupplier(keyword);
+      },
+    );
   }
 
   @override
@@ -55,15 +61,15 @@ class SupplierController extends GetxController {
   Future<void> getSuppliers() async {
     try{
       isLoading.value = true;
-
       final resp = await service.getSuppliers();
-
       if(resp is List){
         suppliers.value = resp
             .map((item) => SupplierModel.fromJson(item))
             .toList();
-      }
 
+        // Show all suppliers initially
+        searchSuppliers.value = suppliers;
+      }
     }catch(e){
         ToastWidget.show(
           message: e.toString(),
@@ -73,6 +79,20 @@ class SupplierController extends GetxController {
     finally {
       isLoading.value = false;
     }
+  }
+
+  // search supplier
+  void searchSupplier(String keyword){
+    final search = keyword.toLowerCase();
+
+    if(search.isEmpty){
+      searchSuppliers.value = suppliers;
+      return;
+    }
+
+    searchSuppliers.value = suppliers.where((supplier) {
+      return supplier.name.toLowerCase().contains(search);
+    }).toList();
   }
 
   void gotoSupplierDetail(SupplierModel supplier){
@@ -153,7 +173,6 @@ class SupplierController extends GetxController {
         type: ToastType.error,
       );
     }
-    
   }
 
   Future<void> updateSupplier(int supplierId, BuildContext context) async {
@@ -181,7 +200,6 @@ class SupplierController extends GetxController {
         message: "Supplier updated successfully",
         type: ToastType.success,
       );
-
     }catch(e){
       // Do nothing
     }

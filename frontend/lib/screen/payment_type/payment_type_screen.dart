@@ -26,7 +26,6 @@ class PaymentTypeScreen extends StatelessWidget {
 
               Obx(()
                 {
-
                   if (ctr.isLoading.value) {
                     return SizedBox(
                       height: MediaQuery.of(context).size.height * 0.6,
@@ -44,13 +43,21 @@ class PaymentTypeScreen extends StatelessWidget {
                       ),
                     );
                   }
+                  if (ctr.searchPaymentType.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text("Search Payment Type Not Found".tr),
+                      ),
+                    );
+                  }
 
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.paymentTypeList.length,
+                    itemCount: ctr.searchPaymentType.length,
                     itemBuilder: (context, index){
-                      final paymentType = ctr.paymentTypeList[index];
+                      final paymentType = ctr.searchPaymentType[index];
                       return PaymentTypeCardWidget(paymentType: paymentType);
                     },
                   );

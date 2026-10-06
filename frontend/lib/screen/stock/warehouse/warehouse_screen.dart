@@ -49,16 +49,24 @@ class WarehouseScreen extends StatelessWidget {
                     ),
                   );
                 }
+                if (ctr.searchWarehouseList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text("Search Result Not Found".tr),
+                    ),
+                  );
+                }
 
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.warehouseList.length,
+                  itemCount: ctr.searchWarehouseList.length,
                   itemBuilder: (context, index) => Padding(
                     padding: const EdgeInsetsGeometry.only(
                       bottom: 12.0
                     ),
-                    child: WarehouseCardWidget( warehouse: ctr.warehouseList[index],),
+                    child: WarehouseCardWidget( warehouse: ctr.searchWarehouseList[index],),
                   ),
                 );
               }),

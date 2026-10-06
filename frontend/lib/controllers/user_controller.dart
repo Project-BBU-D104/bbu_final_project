@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/image_upload_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -8,6 +8,7 @@ import 'package:frontend/services/main_service/user_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class UserController extends GetxController{
   final UserService service = UserService();
@@ -17,9 +18,8 @@ class UserController extends GetxController{
 
   // final selectedRole = ''.obs;
   final selectedRole = RxnString(null);
-
   final  userList = <Map<String, dynamic>>[].obs;
-
+  final searchUserList = <Map<String, dynamic>>[].obs;
   final userPhotoController = TextEditingController();
   final userNameController = TextEditingController();
   final userEmailController = TextEditingController();
@@ -34,6 +34,14 @@ class UserController extends GetxController{
     super.onInit();
 
     getUserList();
+
+    final search = Get.put(SearchController());
+    ever(
+      search.keyword,
+      (keyword) {
+        searchUser(keyword);
+      },
+    );
   }
 
   void clearUser(){
@@ -52,7 +60,10 @@ class UserController extends GetxController{
       final resp = await service.getUsers();
 
       if(resp is List){
+
         userList.value = List<Map<String, dynamic>>.from(resp);
+
+        searchUserList.value = userList;
       }
     }catch(e){
       ToastWidget.show(
@@ -63,6 +74,19 @@ class UserController extends GetxController{
     finally{
       isLoading.value = false;
     }
+  }
+
+  void searchUser(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchUserList.value = userList;
+      return;
+    }
+
+    searchUserList.value = userList.where((user) {
+      return (user["name"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void addUser(BuildContext context){

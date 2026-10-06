@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/category/widget/add_category_widget.dart';
 import 'package:frontend/screen/category/widget/edit_category_widget.dart';
@@ -6,20 +6,30 @@ import 'package:frontend/services/main_service/category_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class CategoryController extends GetxController {
   final CategoryService service = CategoryService();
 
   final categoryList = <Map<String, dynamic>>[].obs;
+  final searchCategoryList = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
-
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+
   @override
   void onInit() {
     super.onInit();
     getCategory();
+
+    final search = Get.put(SearchController());
+    ever(
+      search.keyword,
+      (keyword) {
+        searchCategory(keyword);
+      },
+    );
   }
 
   @override
@@ -37,6 +47,8 @@ class CategoryController extends GetxController {
 
       if (resp is List) {
         categoryList.value = List<Map<String, dynamic>>.from(resp);
+
+        searchCategoryList.value = categoryList;
       }
     } catch (e) {
         ToastWidget.show(
@@ -46,6 +58,19 @@ class CategoryController extends GetxController {
     } finally {
         isLoading.value = false;
     }
+  }
+
+  void searchCategory(String keyword) {
+    final search = keyword.trim().toLowerCase();
+
+    if (search.isEmpty) {
+      searchCategoryList.value = categoryList;
+      return;
+    }
+
+    searchCategoryList.value = categoryList.where((category) {
+      return (category["name"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void addCategory(BuildContext context) {

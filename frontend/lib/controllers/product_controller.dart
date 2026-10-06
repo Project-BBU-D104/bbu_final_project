@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/controllers/currency_controller.dart';
 import 'package:frontend/controllers/unit_controller.dart';
@@ -7,6 +7,7 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/product_service.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class ProductController extends GetxController {
 
@@ -19,7 +20,16 @@ class ProductController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-   getProducts();
+    getProducts();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (keyword) {
+        searchProduct(keyword);
+      },
+    );
  
   }
 
@@ -46,24 +56,57 @@ class ProductController extends GetxController {
   final RxList<Map<String, dynamic>> _masterList =
     <Map<String, dynamic>>[].obs;
 
+  final searchProductList = <Map<String, dynamic>>[].obs;
+
     Future<void> getProducts() async {
-      try {
-        isLoading.value = true;
-        final resp = await service.getProducts();
-        if (resp is List) {
-          _masterList.value = List<Map<String, dynamic>>.from(resp);
-        }
-      } catch (e) {
-        ToastWidget.show(
-          message: e.toString(),
-          type: ToastType.error,
-        );
-      } finally {
-        isLoading.value = false;
-      }
+  try {
+    isLoading.value = true;
+
+    final resp = await service.getProducts();
+
+    if (resp is List) {
+      _masterList.assignAll(
+        List<Map<String, dynamic>>.from(resp),
+      );
+
+      searchProductList.assignAll(_masterList);
     }
+  } catch (e) {
+    ToastWidget.show(
+      message: e.toString(),
+      type: ToastType.error,
+    );
+  } finally {
+    isLoading.value = false;
+  }
+}
 
   List<Map<String, dynamic>> get products => _masterList;
+
+  // search
+void searchProduct(String keyword) {
+  final search = keyword.trim().toLowerCase();
+
+  // Keep ProductController searchQuery in sync
+  searchQuery.value = search;
+
+  if (search.isEmpty) {
+    searchProductList.assignAll(_masterList);
+    return;
+  }
+
+  searchProductList.assignAll(
+    _masterList.where((product) {
+      final name =
+          (product['name'] ?? '').toString().toLowerCase();
+
+      final barcode =
+          (product['barcode'] ?? '').toString().toLowerCase();
+
+      return name.contains(search) || barcode.contains(search);
+    }).toList(),
+  );
+}
 
   /// Set data from API
   void setProducts(List<Map<String, dynamic>> data) {
@@ -82,21 +125,32 @@ class ProductController extends GetxController {
     selectedCurrency.value = null;
   }
 
-  List<Map<String, dynamic>> get filteredItems {
-    return _masterList.where((item) {
-      final queryMatch =
-          (item['name'] ?? '')
-              .toString()
-              .toLowerCase()
-              .contains(searchQuery.value.toLowerCase());
+ List<Map<String, dynamic>> get filteredItems {
+  return _masterList.where((item) {
+    // Category filter
+    final catMatch =
+        filterCategory.value == 'All' ||
+        (item['category']?['name'] ?? '') ==
+            filterCategory.value;
 
-      final catMatch =
-          filterCategory.value == 'All' ||
-          (item['category']?['name'] ?? '') == filterCategory.value;
+    // Status filter
+    bool statusMatch = true;
 
-      return queryMatch && catMatch;
-    }).toList();
-  }
+    if (selectedStatus.value != 'All') {
+      final stockQty = item['stock_qty'] ?? 0;
+
+      if (selectedStatus.value == 'IN STOCK') {
+        statusMatch = stockQty > 0;
+      } else if (selectedStatus.value == 'LOW STOCK') {
+        statusMatch = stockQty > 0 && stockQty <= 10;
+      } else if (selectedStatus.value == 'OUT OF STOCK') {
+        statusMatch = stockQty <= 0;
+      }
+    }
+
+    return catMatch && statusMatch;
+  }).toList();
+}
 
   void gotoAddProduct() {
     clearProducts();

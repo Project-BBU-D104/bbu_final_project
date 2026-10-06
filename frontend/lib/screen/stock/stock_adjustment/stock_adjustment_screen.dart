@@ -21,7 +21,9 @@ StockAdjustmentScreen({super.key});
           child: Column(
             children: [
 
-              SearchWidget(title: "Search Stock Adjustment".tr),
+              SearchWidget(
+                title: "Search Stock Adjustment".tr
+              ),
 
               SizedBox(height: 10,),
 
@@ -61,19 +63,32 @@ StockAdjustmentScreen({super.key});
                       ),
                     );
                   }
+
+                  if (ctr.searchStockAdjustmentList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text(
+                          "Search result not found",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: ctr.stockAdjustmentList.length,
+                    itemCount: ctr.searchStockAdjustmentList.length,
                     itemBuilder: (context, index){
-                      return StockAdjustmentCardWidget(stockAdjustment: ctr.stockAdjustmentList[index]);
+                      return StockAdjustmentCardWidget(stockAdjustment: ctr.searchStockAdjustmentList[index]);
                     }
                   );
                 }
                ),
-
               SizedBox(height: 80,),
-
             ]
           ),
         ),

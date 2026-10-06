@@ -71,12 +71,26 @@ class PurchasesScreen extends StatelessWidget {
                     ),
                   );
                 }
+                if (ctr.searchPurchaseList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "Search results not found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
               return Expanded(
                 child: ListView.builder(
-                  itemCount: ctr.purchaseList.length,
+                  itemCount: ctr.searchPurchaseList.length,
                   padding: const EdgeInsets.only(bottom: 70),
                   itemBuilder: (context, index) {
-                    final purchase = ctr.purchaseList[index];
+                    final purchase = ctr.searchPurchaseList[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: PurchaseCardWidget(purchase: purchase),

@@ -71,23 +71,27 @@ class UserScreen extends StatelessWidget {
               
               Obx(
                 () => ctr.isLoading.value
-                    ? SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                  ? SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : ctr.userList.isEmpty
+                    ? Center(child: Text("No User Found".tr))
+                    : ctr.searchUserList.isEmpty
+                    ? Center(
+                        child: Text("No User Found for search".tr),
                       )
-                    : ctr.userList.isEmpty
-                        ? Center(child: Text("No User Found".tr))
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: ctr.userList.length,
-                            itemBuilder: (context, index) =>
-                                UserCardListWidget(
-                                  user: ctr.userList[index],
-                                ),
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: ctr.searchUserList.length,
+                        itemBuilder: (context, index) =>
+                          UserCardListWidget(
+                            user: ctr.searchUserList[index],
                           ),
+                      ),
               ),
           
             ],

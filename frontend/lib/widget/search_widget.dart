@@ -25,25 +25,25 @@ class SearchWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
-  controller: ctr.textController,
+        controller: ctr.textController,
 
-  decoration: InputDecoration(
-    hintText: title.tr,
+        decoration: InputDecoration(
+        hintText: title.tr,
 
-    prefixIcon: const Icon(Icons.search),
+        prefixIcon: const Icon(Icons.search),
 
-    suffixIcon: Obx(() {
-      return ctr.keyword.value.isEmpty
-          ? const SizedBox()
-          : IconButton(
-              onPressed: ctr.clear,
-              icon: const Icon(Icons.close),
-            );
-    }),
+      suffixIcon: Obx(() {
+        return ctr.keyword.value.isEmpty
+            ? const SizedBox()
+            : IconButton(
+                onPressed: ctr.clear,
+                icon: const Icon(Icons.close),
+              );
+      }),
 
-    border: InputBorder.none,
-  ),
-)
-    );
+        border: InputBorder.none,
+      ),
+    )
+  );
   }
 }

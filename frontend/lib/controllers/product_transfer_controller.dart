@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/add_stock_transfer_widget.dart';
@@ -7,6 +7,7 @@ import 'package:frontend/services/main_service/product_transfer_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class ProductTransferController extends GetxController{
  
@@ -14,6 +15,7 @@ class ProductTransferController extends GetxController{
   final Rx<DateTime> selectedDate = DateTime.now().obs;
   final ProductTransferService service = ProductTransferService();
   final stockTransfer = <Map<String, dynamic>>[].obs;
+  final searchStockTransferList = <Map<String, dynamic>>[].obs;
   final RxnInt selectedFromWarehouse = RxnInt();
   final RxnInt selectedToWarehouse = RxnInt();
   final RxnInt selectedProduct = RxnInt();
@@ -26,18 +28,26 @@ class ProductTransferController extends GetxController{
 
   @override
   void onInit() {
-    onGetProductTransferList();
     super.onInit();
+    onGetProductTransferList(); 
+
+    final search = Get.put(SearchController());
+    ever(
+      search.keyword,
+      (keyword) {
+        searchStockTransfer(keyword);
+      },
+    );
   }
 
   void onClear(){
-      selectedFromWarehouse.value = null;
-      selectedToWarehouse.value = null;
-      selectedProduct.value = null;
-      quantity.value = null;
-      productTransferDate.clear();
-      productTransferRefController.clear();
-      quantityController.clear();
+    selectedFromWarehouse.value = null;
+    selectedToWarehouse.value = null;
+    selectedProduct.value = null;
+    quantity.value = null;
+    productTransferDate.clear();
+    productTransferRefController.clear();
+    quantityController.clear();
   }
 
   Future<void> onGetProductTransferList() async{
@@ -47,7 +57,12 @@ class ProductTransferController extends GetxController{
       final resp = await service.getProductTransfers();
 
       if(resp is List){
+
         stockTransfer.value = List<Map<String, dynamic>>.from(resp);
+
+        // search
+        searchStockTransferList.value = stockTransfer;
+
       }
     }catch(e){
       ToastWidget.show(
@@ -57,6 +72,22 @@ class ProductTransferController extends GetxController{
     }finally{
       isLoading.value = false;
     }
+  }
+
+  void searchStockTransfer(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchStockTransferList.value = stockTransfer;
+      return;
+    }
+
+    searchStockTransferList.value = stockTransfer.where((transfer) {
+      return 
+        (transfer["reference_no"] ?? "").toString().toLowerCase().contains(search) ||
+        (transfer["from_warehouse"]["name"] ?? "").toString().toLowerCase().contains(search) ||
+        (transfer["to_warehouse"]["name"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   Future<void> pickDate(BuildContext context) async {

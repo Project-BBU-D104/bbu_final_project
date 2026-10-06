@@ -23,8 +23,6 @@ class SystemConfigurationController extends GetxController{
 
       if (resp is List) {
         systemConfigurationList.value = List<Map<String, dynamic>>.from(resp);
-
-        print("System Configurations: $systemConfigurationList");
       }
     } catch (e) {
         ToastWidget.show(

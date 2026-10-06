@@ -20,12 +20,11 @@ class CustomerScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              
-              SearchWidget(title: "Search Customers by name or ID".tr),
-
+              SearchWidget(
+                title: "Search Customers".tr
+              ),
               SizedBox(height: 10,),
 
-              
               Obx(() => 
               GridView.count(
                 crossAxisCount: 2,
@@ -42,7 +41,6 @@ class CustomerScreen extends StatelessWidget {
                       title : "Active Customers",
                       value: "1,000",
                     )
-
                 ],
               )),
              
@@ -71,12 +69,26 @@ class CustomerScreen extends StatelessWidget {
                       ),
                     );
                   }
+                  if (ctr.searchCustomerList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text(
+                          "No customers found for the search keyword",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.customerList.length,
+                    itemCount: ctr.searchCustomerList.length,
                     itemBuilder: (context, index){
-                      final customer = ctr.customerList[index];
+                      final customer = ctr.searchCustomerList[index];
                       return CustomerCardWidget(customer: customer);
                     },
                   );

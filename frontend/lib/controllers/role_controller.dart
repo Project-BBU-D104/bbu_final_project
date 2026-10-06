@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/role/widget/add_role_widget.dart';
 import 'package:frontend/screen/role/widget/edit_role_widget.dart';
@@ -6,14 +6,15 @@ import 'package:frontend/services/main_service/role_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class RoleController extends GetxController{
+
   final RoleService service = RoleService();
 
   var isLoading = false.obs;
-
   final roleList = <Map<String, dynamic>> [].obs;
-
+  final searchRoleList = <Map<String, dynamic>>[].obs;
   final roleNameController = TextEditingController();
   final roleDescriptionController = TextEditingController();
   final isActive = false.obs;
@@ -22,6 +23,15 @@ class RoleController extends GetxController{
   void onInit() {
     super.onInit();
     getRoles();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (keyword) {
+        searchRole(keyword);
+      },
+    );
   }
 
   void clearRole(){
@@ -35,7 +45,11 @@ class RoleController extends GetxController{
       isLoading.value = true;
       final resp = await service.getRoles();
       if (resp is List) {
+
         roleList.value = List<Map<String, dynamic>>.from(resp);
+
+        searchRoleList.value = roleList;
+
       }
     } catch (e) {
         ToastWidget.show(
@@ -45,6 +59,19 @@ class RoleController extends GetxController{
     } finally {
         isLoading.value = false;
     }
+  }
+
+  void searchRole(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(keyword.isEmpty){
+      searchRoleList.value = roleList;
+      return;
+    }
+
+    searchRoleList.value = roleList.where((role){
+      return role["name"].toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void addRole(BuildContext context){

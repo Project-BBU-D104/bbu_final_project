@@ -49,11 +49,25 @@ class RoleScreen extends StatelessWidget {
                     ),
                   );
                 }
+                if (ctr.searchRoleList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "Search result not found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
                  return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.roleList.length,
-                  itemBuilder: (context, index) => RoleCardWidget( role: ctr.roleList[index],),
+                  itemCount: ctr.searchRoleList.length,
+                  itemBuilder: (context, index) => RoleCardWidget( role: ctr.searchRoleList[index],),
                 );
                 }),
               SizedBox(height: 80,)

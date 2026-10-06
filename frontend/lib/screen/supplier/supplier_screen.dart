@@ -56,7 +56,7 @@ class SupplierScreen extends StatelessWidget {
                         );
                       }
           
-                      if (controller.suppliers.isEmpty) {
+                      if (controller.searchSuppliers.isEmpty) {
                         return SizedBox(
                           height: MediaQuery.of(context).size.height * 0.6,
                           child: Center(
@@ -66,7 +66,7 @@ class SupplierScreen extends StatelessWidget {
                       }
           
                       return ListView.builder(
-                      itemCount: controller.suppliers.length,
+                      itemCount: controller.searchSuppliers.length,
                       padding: const EdgeInsets.only(bottom: 70),
                       itemBuilder:(context,index){
                         return Padding(
@@ -77,7 +77,7 @@ class SupplierScreen extends StatelessWidget {
                             top: 0,
                           ),
                           child: SupplierCardWidget(
-                           item: controller.suppliers[index]
+                           item: controller.searchSuppliers[index]
                           ),
                         );
                       },

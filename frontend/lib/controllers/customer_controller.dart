@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/image_upload_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/customer/widget/add_customer_widget.dart';
@@ -7,24 +7,35 @@ import 'package:frontend/services/main_service/customer_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class CustomerController extends GetxController{
+
   final customerList = <Map<String, dynamic>>[].obs;
-
   final CustomerService service = CustomerService();
-  
   var isLoading = false.obs;
-
   final customerPhotoController = TextEditingController();
   final customerNameController = TextEditingController();
   final customerPhoneNumberController = TextEditingController();
   final customerAddressController = TextEditingController();
   final isActive = false.obs;
 
+  final searchCustomerList = <Map<String, dynamic>>[].obs;  
+  
+
   @override
   void onInit() {
     super.onInit();
     getCustomers();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (keyword) {
+        searchCustomer(keyword);
+      },
+    );
   }
 
   @override
@@ -46,18 +57,36 @@ class CustomerController extends GetxController{
   Future<void> getCustomers() async{
     try{
       isLoading.value = true;
-
       final resp = await service.getCustomers();
-
       if (resp is List) {
+
         customerList.value = List<Map<String, dynamic>>.from(resp);
+
+        // For Search
+        searchCustomerList.value = customerList;
       }
     }catch(e){
-      // 
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
     finally{
       isLoading.value = false;
     }
+  }
+
+  void searchCustomer(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchCustomerList.value = customerList;
+      return;
+    }
+
+    searchCustomerList.value = customerList.where((customer) {
+      return (customer["name"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void addCustomer(BuildContext context){
@@ -83,11 +112,11 @@ class CustomerController extends GetxController{
       await service.createCustomer(data);
 
       ToastWidget.show(
-        message: "Category created successfully",
+        message: "Customer created successfully",
         type: ToastType.success,
       );
 
-      // Reload Category
+      // Reload Customer
     await getCustomers();
 
     // Clear textfields
@@ -126,7 +155,10 @@ class CustomerController extends GetxController{
       )
     );
     }catch(e){
-      // do it
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
   }
 
@@ -140,13 +172,10 @@ class CustomerController extends GetxController{
       };
 
       await service.updateCustomer(customerId, data);
-
-      // Reload Category
+      // Reload Customer
       await getCustomers();
-
       // Clear textfields
       clearCustomer();
-
       Get.find<ImageUploadController>()
       .clearImage();
 
@@ -159,7 +188,10 @@ class CustomerController extends GetxController{
       );
       
     }catch(e){
-      // 
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
   }
 
@@ -170,7 +202,7 @@ class CustomerController extends GetxController{
       onConfirm: () async {
         try{
           await service.deleteCustomer(customerId);
-          // Refresh category list
+          // Refresh customer list
           await getCustomers();
 
           ToastWidget.show(

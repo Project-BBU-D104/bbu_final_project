@@ -88,18 +88,26 @@ class ProductScreen extends StatelessWidget {
               );
             }
 
-            final list = productCtrl.filteredItems;
+            // final list = productCtrl.filteredItems;
+             final list = productCtrl.searchQuery.value.isNotEmpty
+              ? productCtrl.searchProductList
+              : productCtrl.filteredItems;
 
             if (list.isEmpty) {
               return SliverFillRemaining(
+                hasScrollBody: false,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.inbox, size: 64, color: Colors.grey[300]),
+
                       const SizedBox(height: 16),
+
                       Text(
-                        'No products found',
+                        productCtrl.searchQuery.value.isNotEmpty
+                        ? 'No products found' :
+                        'No products available', 
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 16,

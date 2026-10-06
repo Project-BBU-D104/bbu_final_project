@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/global.dart';
@@ -10,13 +10,15 @@ import 'package:frontend/screen/purchases/widget/purchase_item_form.dart';
 import 'package:frontend/services/main_service/purchase/purchase_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
+import 'package:frontend/controllers/search_controller.dart';
 import 'package:get/get.dart';
 
 class PurchaseController extends GetxController {
+
   final PurchaseService service = PurchaseService();
+
   var isLoading = false.obs;
   final purchaseList = <Map<String, dynamic>>[].obs;
-
   final RxnInt selectedSupplier = RxnInt();
   final RxnInt selectedProduct = RxnInt();
   final RxnInt selectedWarehouse = RxnInt();
@@ -26,12 +28,10 @@ class PurchaseController extends GetxController {
   final discountCtrl = TextEditingController(text: '0');
   final paidCtrl = TextEditingController(text: '0');
   final Rx<DateTime> purchaseDate = DateTime.now().obs;
-
   final Rxn<Map<String, dynamic>> editingPurchase = Rxn<Map<String, dynamic>>();
-
   final RxInt editingPurchaseId = 0.obs;
-
   final RxList<PurchaseItemForm> items = <PurchaseItemForm>[].obs;
+  final searchPurchaseList = <Map<String, dynamic>>[].obs;
 
   final RxDouble tax = 0.0.obs;
   final RxDouble discount = 0.0.obs;
@@ -55,6 +55,7 @@ class PurchaseController extends GetxController {
   }
 
   void resetForm() {
+
     invoiceCtrl.clear();
     taxCtrl.text = '0';
     discountCtrl.text = '0';
@@ -92,9 +93,20 @@ class PurchaseController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     onGetPurchaseList();
     Get.find<ProductController>().getProducts();
     Get.find<WarehouseController>().getWarehouses();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (search){
+        searchPurchase(search);
+      }
+    );
+
   }
 
   Future<void> onGetPurchaseList() async {
@@ -102,7 +114,11 @@ class PurchaseController extends GetxController {
       isLoading.value = true;
       final resp = await service.getPurchases();
       if (resp is List) {
+
         purchaseList.value = List<Map<String, dynamic>>.from(resp);
+
+        searchPurchaseList.value = purchaseList;
+
       }
     } catch (e) {
       ToastWidget.show(
@@ -112,6 +128,23 @@ class PurchaseController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void searchPurchase(String keyword) {
+    final search = keyword.trim().toLowerCase();
+
+    if (search.isEmpty) {
+      searchPurchaseList.value = purchaseList;
+      return;
+    }
+
+    searchPurchaseList.value = purchaseList.where((purchase) {
+      final invoiceNo =
+          (purchase["invoice_no"] ?? "").toString().toLowerCase();
+      final supplierName =
+          (purchase["supplier"]?["name"] ?? "").toString().toLowerCase();
+      return invoiceNo.contains(search) || supplierName.contains(search);
+    }).toList();
   }
 
   void addPurchase(BuildContext context) {

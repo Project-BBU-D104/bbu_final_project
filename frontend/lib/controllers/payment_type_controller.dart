@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/payment_type/widget/add_payment_type_widget.dart';
 import 'package:frontend/screen/payment_type/widget/edit_payment_type_widget.dart';
@@ -6,6 +6,7 @@ import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class PaymentTypeController extends GetxController{
   
@@ -16,11 +17,23 @@ class PaymentTypeController extends GetxController{
   final paymentTypeName = TextEditingController();
   final paymentTypeDescription = TextEditingController();
   final paymentTypeList = <Map<String, dynamic>>[].obs;
+  final searchPaymentType = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() async {
-    getPaymentTypes();
     super.onInit();
+
+    getPaymentTypes();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (keyword) {
+        searchPaymentTypeList(keyword);
+      },
+    );
+    
   }
 
   void onClear() {
@@ -34,7 +47,10 @@ class PaymentTypeController extends GetxController{
       isLoading.value = true;
       final resp = await service.getPaymentTypes();
       if(resp is List){
+
         paymentTypeList.value = List<Map<String, dynamic>>.from(resp);
+
+        searchPaymentType.value = paymentTypeList;
       }
     }catch(e){
       ToastWidget.show(
@@ -44,6 +60,19 @@ class PaymentTypeController extends GetxController{
     }finally{
       isLoading.value = false;
     }
+  }
+
+  void searchPaymentTypeList(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchPaymentType.value = paymentTypeList;
+      return;
+    }
+
+    searchPaymentType.value = paymentTypeList.where((paymentType) {
+      return paymentType["name"].toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void addPaymentType(BuildContext context) {

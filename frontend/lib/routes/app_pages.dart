@@ -10,7 +10,6 @@ import 'package:frontend/binding/purchase/purchase_request_binding.dart';
 import 'package:frontend/binding/role_binding.dart';
 import 'package:frontend/binding/sale_binding.dart';
 import 'package:frontend/binding/stock_adjustment_binding.dart';
-import 'package:frontend/binding/stock_movement_binding.dart';
 import 'package:frontend/binding/stock_transfer_binding.dart';
 import 'package:frontend/binding/supplier_binding.dart';
 import 'package:frontend/binding/user_binding.dart';
@@ -40,7 +39,6 @@ import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/screen/sale/widget/payment_success_widget.dart';
 import 'package:frontend/screen/stock/stock_adjustment/stock_adjustment_screen.dart';
 import 'package:frontend/screen/stock/stock_adjustment/widget/stock_adjustment_detail_widget.dart';
-import 'package:frontend/screen/stock/stock_movement/stock_movementscreen.dart';
 import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_detail_card_widget.dart';
 import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
@@ -105,11 +103,6 @@ class AppPages {
       name: AppRoutes.customer,
       page: () => CustomerScreen(),
       binding: CustomerBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.stockMovement,
-      page: () => StockMovementscreen(),
-      binding: StockMovementBinding(),
     ),
     GetPage(
       name: AppRoutes.stockAdjustment,

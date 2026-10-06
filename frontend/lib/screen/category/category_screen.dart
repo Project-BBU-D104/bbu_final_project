@@ -56,7 +56,7 @@ class CategoryScreen extends StatelessWidget {
                         MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${ctr.categoryList.length} CATEGORIES",
+                        "${ctr.searchCategoryList.length} CATEGORIES",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,                        
@@ -103,12 +103,21 @@ class CategoryScreen extends StatelessWidget {
                   ),
                 )
 
+              else if (ctr.searchCategoryList.isEmpty)
+                const SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      "Search Not Found",
+                    ),
+                  ),
+                )
+
               /// Grid
               else
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final item = ctr.categoryList[index];
+                      final item = ctr.searchCategoryList[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: CardCategoryWidget(
@@ -116,7 +125,7 @@ class CategoryScreen extends StatelessWidget {
                         ),
                       );
                     },
-                    childCount: ctr.categoryList.length,
+                    childCount: ctr.searchCategoryList.length,
                   ),
                 ),
 

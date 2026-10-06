@@ -57,16 +57,31 @@ class StockTransferScreen extends StatelessWidget {
                     ),
                   );
                 }
+
+                if (ctr.searchStockTransferList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No data found".tr,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
                 return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.stockTransfer.length,
+                    itemCount: ctr.searchStockTransferList.length,
                     padding: const EdgeInsets.only(bottom: 100), 
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: StockTransferCardWidget( 
-                          stockTransfer: ctr.stockTransfer[index],
+                          stockTransfer: ctr.searchStockTransferList[index],
                         ),
                       );
                     },

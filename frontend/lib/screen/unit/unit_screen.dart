@@ -44,16 +44,25 @@ class UnitScreen extends StatelessWidget {
                       ),
                     );
                   }
+
+                  if (ctr.searchUnitList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text("Search Not Found".tr),
+                      ),
+                    );
+                  }
  
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.unitList.length,
+                    itemCount: ctr.searchUnitList.length,
                     padding: EdgeInsets.only(
                       bottom: 50,
                     ),
                     itemBuilder: (context, index){
-                      final unit = ctr.unitList[index];
+                      final unit = ctr.searchUnitList[index];
                       return UnitCardWidget(units: unit,);
                     },
                   );

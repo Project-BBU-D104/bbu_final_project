@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/global.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -9,13 +9,13 @@ import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/services/main_service/warehouse_stock_service.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class StockAdjustmentController extends GetxController{
+
   final StockAdjustmentService service = StockAdjustmentService();
   final WarehouseStockService warehouseStockService = WarehouseStockService();
-
   var isLoading = false.obs;
-
   final selectedProduct = RxnString();
   final selectedAdjustmentType = RxnString();
   final selectedWarehouse = RxnString();
@@ -25,22 +25,30 @@ class StockAdjustmentController extends GetxController{
   final reasonController = TextEditingController();
   final currentQtyController = TextEditingController();
   final stockAdjustmentList = <Map<String, dynamic>> [].obs;
+  final searchStockAdjustmentList = <Map<String, dynamic>>[].obs;
   final newQtyController = TextEditingController();
 
 
   @override
-  void onInit() async{
-    await getStockAdjustments();
+  void onInit(){
+    super.onInit();
 
     adjustmentQtyController.addListener(calculateNewQty);
 
-    super.onInit();
+    getStockAdjustments();
+
+    final search = Get.put(SearchController());
+    ever(
+      search.keyword,
+      (keyword) {
+        searchStockAdjustment(keyword);
+      },
+    );
   }
   void clearForm(){
     selectedProduct.value = null;
     selectedWarehouse.value = null;
     selectedAdjustmentType.value = null;
-
     referenceController.clear();
     adjustmentQtyController.clear();
     reasonController.clear();
@@ -64,11 +72,15 @@ Future<void> loadCurrentQty() async {
 
     currentQty.value = stock["qty"];
     currentQtyController.text = currentQty.value.toString();
+
     calculateNewQty();
+
   } catch (e) {
     currentQty.value = 0;
     currentQtyController.text = "0";
+
     calculateNewQty();
+
   }
 }
 
@@ -92,7 +104,11 @@ void calculateNewQty() {
       isLoading.value = true;
       final resp = await service.getStockAdjustments();
       if(resp is List){
+
         stockAdjustmentList.value = List<Map<String, dynamic>>.from(resp);
+
+        // search
+        searchStockAdjustmentList.value = stockAdjustmentList;
       }
     }catch(e){
       ToastWidget.show(
@@ -105,8 +121,26 @@ void calculateNewQty() {
     }
   }
 
+  void searchStockAdjustment(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchStockAdjustmentList.value = stockAdjustmentList;
+      return;
+    }
+
+    searchStockAdjustmentList.value = stockAdjustmentList.where((stockAdjustment) {
+      return 
+      (stockAdjustment["product"]["name"] ?? "").toString().toLowerCase().contains(search)||
+      (stockAdjustment["warehouse"]["name"] ?? "").toString().toLowerCase().contains(search) ||
+      (stockAdjustment["adjustment_type"] ?? "").toString().toLowerCase().contains(search) ||
+      (stockAdjustment["reference_no"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
+  }
+
   void addStockAdjustment(BuildContext context){
     clearForm();
+
     AppBottomSheets.show(
       context,
       child: AddStockAdjustmentWidget()
@@ -257,7 +291,6 @@ void calculateNewQty() {
     Get.toNamed(AppRoutes.stockAdjustmentDetail, arguments: stockAdjustment);
   }
 
-
   @override
   void onClose() {
     adjustmentQtyController.removeListener(calculateNewQty);
@@ -268,5 +301,4 @@ void calculateNewQty() {
     reasonController.dispose();
     super.onClose();
   }
-
 }

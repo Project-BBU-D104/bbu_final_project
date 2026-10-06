@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/currency/widget/add_currency_widget.dart';
 import 'package:frontend/screen/currency/widget/edit_currency_widget.dart';
@@ -6,10 +6,12 @@ import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class CurrencyController extends GetxController{
   
   final CurrencyService service = CurrencyService();
+
   var isLoading = false.obs;
 
   final currencyNameController = TextEditingController();
@@ -20,11 +22,22 @@ class CurrencyController extends GetxController{
   final isActive = false.obs;
 
   var currencyList = <Map<String, dynamic>>[].obs;
+  final searchCurrencyList = <Map<String, dynamic>>[].obs;
 
   @override
-  void onInit() async {
-    await getCurrencyList();
+  void onInit()  {
     super.onInit();
+    getCurrencyList();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (search) {
+        searchCurrency(search);
+      },
+    );
+    
   }
 
   void onClear(){
@@ -44,7 +57,10 @@ class CurrencyController extends GetxController{
       final resp = await service.getCurrencies();
 
       if(resp is List){
+
         currencyList.value = List<Map<String, dynamic>>.from(resp);
+
+        searchCurrencyList.value = currencyList;
       }
 
     }catch(e){
@@ -56,6 +72,20 @@ class CurrencyController extends GetxController{
     finally{
       isLoading.value = false;
     }
+  }
+
+  void searchCurrency(String keyword){
+    final search = keyword.trim().toLowerCase();
+    if(search.isEmpty){
+      searchCurrencyList.value = currencyList;
+    }
+
+    searchCurrencyList.value = currencyList.where((currency) {
+      final name = currency["name"]?.toLowerCase() ?? "";
+      final code = currency["code"]?.toLowerCase() ?? "";
+      final symbol = currency["symbol"]?.toLowerCase() ?? "";
+      return name.contains(search) || code.contains(search) || symbol.contains(search);
+    }).toList();
   }
 
   void addCurrency(BuildContext context) {

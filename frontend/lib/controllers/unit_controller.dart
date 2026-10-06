@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/unit/widget/add_unit_widget.dart';
 import 'package:frontend/screen/unit/widget/edit_unit_widget.dart';
@@ -6,13 +6,14 @@ import 'package:frontend/services/main_service/unit_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class UnitController extends GetxController{
 
   final UnitService service = UnitService();  
   var isLoading = false.obs;
   var unitList = <Map<String, dynamic>>[].obs;
-
+  var searchUnitList = <Map<String, dynamic>>[].obs;
   final unitNameController = TextEditingController();
   final unitShortNameController = TextEditingController();
   final unitDescriptionController = TextEditingController();
@@ -22,6 +23,14 @@ class UnitController extends GetxController{
   void onInit() {
     getUnitList();
     super.onInit();
+
+    final search = Get.put(SearchController());
+    ever(
+      search.keyword,
+      (keyword) {
+        searchUnit(keyword);
+      },
+    );
   }
 
   void onClear() {
@@ -38,7 +47,11 @@ class UnitController extends GetxController{
       final resp = await service.getUnits();
 
       if (resp is List) {
+        // show all
         unitList.value = List<Map<String, dynamic>>.from(resp);
+        
+        // search list
+        searchUnitList.value = unitList;
       }
     }catch(e){
       ToastWidget.show(
@@ -49,6 +62,20 @@ class UnitController extends GetxController{
     finally{
       isLoading.value = false;
     }
+  }
+
+  void searchUnit(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchUnitList.value = unitList;
+      return;
+    }
+
+    searchUnitList.value = unitList.where((unit){
+      return (unit["name"] ?? "").toString().toLowerCase().contains(search) ||
+              (unit["short_name"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void addUnit(BuildContext context) {

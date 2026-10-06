@@ -41,12 +41,21 @@ class CurrencyScreen extends StatelessWidget {
                     );
                   }
 
+                  if (ctr.searchCurrencyList.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Text("Search Result Not Found".tr),
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.currencyList.length,
+                    itemCount: ctr.searchCurrencyList.length,
                     itemBuilder: (context, index){
-                      final currency = ctr.currencyList[index];
+                      final currency = ctr.searchCurrencyList[index];
                       return CurrencyCardWidget(currency: currency);
                     },
                   );

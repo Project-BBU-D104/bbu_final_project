@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/stock/warehouse/widget/add_warehouse_widget.dart';
@@ -7,6 +7,7 @@ import 'package:frontend/services/main_service/warehouse_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
 
 class WarehouseController extends GetxController{
 
@@ -14,7 +15,7 @@ class WarehouseController extends GetxController{
   var isLoading = false.obs;
   
   final warehouseList = <Map<String, dynamic>>  [].obs;
-
+  final searchWarehouseList = <Map<String, dynamic>>  [].obs;
   final warehouseNameController = TextEditingController();
   final warehouseReferenceNoController = TextEditingController();
   final warehouseLocationController = TextEditingController();
@@ -22,8 +23,18 @@ class WarehouseController extends GetxController{
 
   @override
   void onInit() {
-    getWarehouses();
     super.onInit();
+
+    final search = Get.put(SearchController());
+    ever(
+      search.keyword,
+      (keyword) {
+        searchWarehouse(keyword);
+      },
+    );
+
+    getWarehouses();
+    
   }
 
   void onClearWarehouse(){
@@ -41,6 +52,9 @@ class WarehouseController extends GetxController{
 
       if(resp is List){
         warehouseList.value = List<Map<String, dynamic>>.from(resp);
+
+        // search
+        searchWarehouseList.value = warehouseList;
       }
 
     }catch(e){
@@ -51,6 +65,21 @@ class WarehouseController extends GetxController{
     }finally{
       isLoading.value = false;
     }
+  }
+
+  void searchWarehouse(String keyword){
+    final search = keyword.trim().toLowerCase();
+
+    if(search.isEmpty){
+      searchWarehouseList.value = warehouseList;
+      return;
+    }
+
+    searchWarehouseList.value = warehouseList.where((warehouse) {
+      return 
+        (warehouse["name"] ?? "").toString().toLowerCase().contains(search) ||
+        (warehouse["reference_no"] ?? "").toString().toLowerCase().contains(search);
+    }).toList();
   }
 
   void gotoWarehouseDetail(Map<String, dynamic> warehouse){
