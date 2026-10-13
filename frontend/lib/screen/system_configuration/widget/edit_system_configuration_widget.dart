@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AddSystemConfigurationWidget extends StatelessWidget {
-  const AddSystemConfigurationWidget({super.key});
+class EditSystemConfigurationWidget extends StatelessWidget {
+  const EditSystemConfigurationWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

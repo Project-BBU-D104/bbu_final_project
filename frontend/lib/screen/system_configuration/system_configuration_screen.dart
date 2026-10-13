@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 class SystemConfigurationScreen extends StatelessWidget {
   SystemConfigurationScreen({super.key});
+
   final ctr = Get.put(SystemConfigurationController());
 
   @override
@@ -14,22 +15,40 @@ class SystemConfigurationScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'System Configuration',
       ),
-      body: Center(
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              CardSystemConfigurationWidget(),
-            ]
-          ),
-        ),
-      ),
+      body: Obx(() {
+        if (ctr.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
+        if (ctr.systemConfigurationList.isEmpty) {
+          return const Center(
+            child: Text('No system configuration found'),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: ctr.getSystemConfigurations,
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: ctr.systemConfigurationList.length,
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final configuration =
+                  ctr.systemConfigurationList[index];
+
+              return CardSystemConfigurationWidget(
+                configuration: configuration, 
+              );
+            },
+          ),
+        );
+      }),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => ctr.addSystemConfiguration(
-          context
-        ),
+        onPressed: () => ctr.addSystemConfiguration(context),
+        child: const Icon(Icons.edit),
       ),
     );
   }

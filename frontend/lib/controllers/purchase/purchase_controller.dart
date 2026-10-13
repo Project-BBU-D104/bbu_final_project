@@ -95,8 +95,8 @@ class PurchaseController extends GetxController {
     super.onInit();
 
     onGetPurchaseList();
-    Get.find<ProductController>().getProducts();
-    Get.find<WarehouseController>().getWarehouses();
+    Get.put(ProductController()).getProducts();
+    Get.put(WarehouseController()).getWarehouses();
 
     final search = Get.put(SearchController());
 

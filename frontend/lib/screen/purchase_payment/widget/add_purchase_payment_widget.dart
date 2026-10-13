@@ -43,15 +43,44 @@ class AddPurchasePaymentWidget extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          Text("Category Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            // controller: ctr.nameController,
+         Obx(() {
+            
+          if (ctr.purchaseCtr.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return DropdownButtonFormField<String>(
+            value: ctr.selectedPurchase.value,
+
             decoration: InputDecoration(
-              hintText: "Enter Category Name".tr,
-              border: OutlineInputBorder(),
+              hintText: "Select Purchase".tr,
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
             ),
-          ),
+
+            items: ctr.purchaseCtr.purchaseList.map((purchase) {
+              return DropdownMenuItem<String>(
+                value: purchase["id"].toString(),
+                child: Row(
+                  children: [
+                    Text(purchase["invoice_no"]),
+                    Text(" - "),
+                    Text(purchase["due_amount"]),
+                  ],
+                ),
+              );
+            }).toList(),
+
+            onChanged: (value) {
+              ctr.selectedPurchase.value = value;
+            },
+          );
+        }),
 
           const SizedBox(height: 10),
 

@@ -17,22 +17,6 @@ class ProductController extends GetxController {
   final UnitController unitCtr = Get.put(UnitController());
   final CurrencyController currencyCtr = Get.put(CurrencyController());
 
-  @override
-  void onInit() {
-    super.onInit();
-    getProducts();
-
-    final search = Get.put(SearchController());
-
-    ever(
-      search.keyword,
-      (keyword) {
-        searchProduct(keyword);
-      },
-    );
- 
-  }
-
   var isLoading = false.obs;
   var searchQuery = ''.obs;
   var filterCategory = 'All'.obs;
@@ -53,25 +37,40 @@ class ProductController extends GetxController {
   final productSalePriceController = TextEditingController();
   final productDescriptionController = TextEditingController();
 
-  final RxList<Map<String, dynamic>> _masterList =
-    <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> _masterList = <Map<String, dynamic>>[].obs;
 
   final searchProductList = <Map<String, dynamic>>[].obs;
 
-    Future<void> getProducts() async {
+   List<Map<String, dynamic>> get products => _masterList;
+
+  @override
+  void onInit() {
+    super.onInit();
+    getProducts();
+
+    final search = Get.put(SearchController());
+
+    ever(
+      search.keyword,
+      (keyword) {
+        searchProduct(keyword);
+      },
+    );
+ 
+  }
+
+  Future<void> getProducts() async {
   try {
     isLoading.value = true;
 
     final resp = await service.getProducts();
 
-    if (resp is List) {
-      _masterList.assignAll(
-        List<Map<String, dynamic>>.from(resp),
-      );
-
-      searchProductList.assignAll(_masterList);
-    }
-  } catch (e) {
+  if (resp is List) {
+    _masterList.assignAll(
+      List<Map<String, dynamic>>.from(resp),
+    );
+    searchProductList.assignAll(_masterList);
+  }} catch (e) {
     ToastWidget.show(
       message: e.toString(),
       type: ToastType.error,
@@ -80,8 +79,6 @@ class ProductController extends GetxController {
     isLoading.value = false;
   }
 }
-
-  List<Map<String, dynamic>> get products => _masterList;
 
   // search
 void searchProduct(String keyword) {

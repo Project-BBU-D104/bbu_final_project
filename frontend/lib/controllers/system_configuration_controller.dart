@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screen/system_configuration/widget/edit_system_configuration_widget.dart';
+import 'package:frontend/screen/system_configuration/widget/add_system_configuration_widget.dart';
 import 'package:frontend/services/main_service/system_configuration_service.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
@@ -26,6 +26,8 @@ class SystemConfigurationController extends GetxController{
 
       if (resp is List) {
         systemConfigurationList.value = List<Map<String, dynamic>>.from(resp);
+
+        print(systemConfigurationList);
       }
     } catch (e) {
         ToastWidget.show(
