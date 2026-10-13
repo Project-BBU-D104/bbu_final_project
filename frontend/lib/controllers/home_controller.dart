@@ -5,6 +5,7 @@ import 'package:frontend/screen/dashboard/dashboard_screen.dart';
 import 'package:frontend/screen/home/home_content.dart';
 import 'package:frontend/screen/manage/manage_screen.dart';
 import 'package:frontend/screen/profile/profile_screen.dart';
+import 'package:frontend/screen/report/report_screen.dart';
 import 'package:frontend/services/main_service/home_service.dart';
 import 'package:get/get.dart';
 
@@ -77,6 +78,7 @@ class HomeController extends GetxController{
     HomeContent(),
     DashboardScreen(),
     ManageScreen(),
+    ReportScreen(),
     ProfileScreen(),
   ];
 

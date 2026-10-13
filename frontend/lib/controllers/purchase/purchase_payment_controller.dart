@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/screen/purchase_payment/widget/add_purchase_payment_widget.dart';
 import 'package:frontend/services/main_service/purchase/purchase_payment_service.dart';
+import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
@@ -35,5 +38,12 @@ class PurchasePaymentController extends GetxController{
     finally{
       isLoading.value = false;
     }
+  }
+
+  Future<void> addPurchasePayment(BuildContext context) async{
+    AppBottomSheets.show(
+      context,
+      child: AddPurchasePaymentWidget(),
+    );
   }
 }

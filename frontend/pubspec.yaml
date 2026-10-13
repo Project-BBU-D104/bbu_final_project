@@ -73,6 +73,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  fl_chart: ^1.2.0
   
 
 dev_dependencies:
@@ -105,6 +106,19 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+
+  fonts:
+
+    - family: NotoSans
+      fonts:
+        - asset: fonts/NotoSans.ttf
+          weight: 400
+
+    - family: NotoSansKhmer  
+      fonts:    
+        - asset: fonts/NotoSansKhmer.ttf
+          weight: 400
 
   # To add assets to your application, add an assets section, like this:
   # assets:

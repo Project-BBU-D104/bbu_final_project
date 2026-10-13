@@ -31,6 +31,7 @@ import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
 import 'package:frontend/screen/purchase_request/purchase_request_screen.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
+import 'package:frontend/screen/report/all_report/sales_report_screen.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
 import 'package:frontend/screen/sale/sale_list/widget/sale_list_detail_widget.dart';
@@ -240,6 +241,13 @@ class AppPages {
     GetPage(
       name: AppRoutes.systemConfiguration,
       page: () => SystemConfigurationScreen(),
+    ),
+
+
+    // report 
+     GetPage(
+      name: AppRoutes.saleReport,
+      page: () => SalesReportScreen(),
     ),
   ];
 }

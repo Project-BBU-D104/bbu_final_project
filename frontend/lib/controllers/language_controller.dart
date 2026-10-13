@@ -9,6 +9,13 @@ class LanguageController extends GetxController {
 
   final locale = const Locale("en", "US").obs;
 
+   // Automatically select font based on language
+  String get fontFamily {
+    return locale.value.languageCode == "km"
+        ? "NotoSansKhmer"
+        : "NotoSans";
+  }
+
   @override
   void onInit() {
     super.onInit();

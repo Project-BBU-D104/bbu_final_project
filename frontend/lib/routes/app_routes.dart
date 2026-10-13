@@ -45,4 +45,8 @@ class AppRoutes {
   static const unit = '/unit';
 
   static const systemConfiguration = '/system-configuration';
+
+
+  // report
+  static const saleReport = '/sale-report';
 }

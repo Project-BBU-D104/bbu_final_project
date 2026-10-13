@@ -63,7 +63,7 @@ class PurchasePaymentScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-
+            ctr.addPurchasePayment(context);
         },
         child: const Icon(Icons.add)
       ),

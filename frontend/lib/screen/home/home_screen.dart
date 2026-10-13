@@ -40,6 +40,10 @@ class HomeScreen extends StatelessWidget {
               label: 'Manage'.tr,
             ),
             NavigationDestination(
+              icon: Icon(Icons.receipt_long_sharp),
+              label: 'Report'.tr,
+            ),
+            NavigationDestination(
               icon: Icon(Icons.person_2_outlined),
               label: 'Profile'.tr,
             ),
