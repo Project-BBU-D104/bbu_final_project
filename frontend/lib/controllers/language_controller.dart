@@ -3,10 +3,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class LanguageController extends GetxController {
+  
   final box = GetStorage();
-
   static const String storageKey = "language";
-
   final locale = const Locale("en", "US").obs;
 
    // Automatically select font based on language
@@ -37,9 +36,7 @@ class LanguageController extends GetxController {
     }
 
     locale.value = newLocale;
-
     Get.updateLocale(newLocale);
-
     box.write(storageKey, languageCode);
   }
 }

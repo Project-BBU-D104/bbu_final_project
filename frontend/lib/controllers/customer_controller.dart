@@ -19,10 +19,8 @@ class CustomerController extends GetxController{
   final customerPhoneNumberController = TextEditingController();
   final customerAddressController = TextEditingController();
   final isActive = false.obs;
-
   final searchCustomerList = <Map<String, dynamic>>[].obs;  
   
-
   @override
   void onInit() {
     super.onInit();
@@ -61,7 +59,6 @@ class CustomerController extends GetxController{
       if (resp is List) {
 
         customerList.value = List<Map<String, dynamic>>.from(resp);
-
         // For Search
         searchCustomerList.value = customerList;
       }
@@ -77,8 +74,8 @@ class CustomerController extends GetxController{
   }
 
   void searchCustomer(String keyword){
-    final search = keyword.trim().toLowerCase();
 
+    final search = keyword.trim().toLowerCase();
     if(search.isEmpty){
       searchCustomerList.value = customerList;
       return;

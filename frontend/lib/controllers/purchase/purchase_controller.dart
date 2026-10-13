@@ -39,12 +39,8 @@ class PurchaseController extends GetxController {
 
   var isSaving = false.obs;
 
-  double get itemsSubtotal =>
-      items.fold(0.0, (sum, item) => sum + item.subtotal);
-
-  double get total =>
-      (itemsSubtotal + tax.value - discount.value).clamp(0, double.infinity);
-
+  double get itemsSubtotal => items.fold(0.0, (sum, item) => sum + item.subtotal);
+  double get total => (itemsSubtotal + tax.value - discount.value).clamp(0, double.infinity);
   double get due => (total - paid.value).clamp(0, double.infinity);
 
   PurchaseController() {
@@ -106,7 +102,6 @@ class PurchaseController extends GetxController {
         searchPurchase(search);
       }
     );
-
   }
 
   Future<void> onGetPurchaseList() async {
@@ -116,7 +111,6 @@ class PurchaseController extends GetxController {
       if (resp is List) {
 
         purchaseList.value = List<Map<String, dynamic>>.from(resp);
-
         searchPurchaseList.value = purchaseList;
 
       }
@@ -139,16 +133,13 @@ class PurchaseController extends GetxController {
     }
 
     searchPurchaseList.value = purchaseList.where((purchase) {
-      final invoiceNo =
-          (purchase["invoice_no"] ?? "").toString().toLowerCase();
-      final supplierName =
-          (purchase["supplier"]?["name"] ?? "").toString().toLowerCase();
+      final invoiceNo = (purchase["invoice_no"] ?? "").toString().toLowerCase();
+      final supplierName = (purchase["supplier"]?["name"] ?? "").toString().toLowerCase();
       return invoiceNo.contains(search) || supplierName.contains(search);
     }).toList();
   }
 
   void addPurchase(BuildContext context) {
-    
     resetForm();
     AppBottomSheets.show(
       context,
@@ -163,7 +154,6 @@ class PurchaseController extends GetxController {
   Future<void> editPurchase(BuildContext context, int purchaseId) async {
   try {
     isLoading.value = true;
-    // Get purchase detail
     final purchase = await service.getPurchaseById(purchaseId);
     if (purchase == null) {
       ToastWidget.show(
@@ -174,56 +164,32 @@ class PurchaseController extends GetxController {
     }
     editingPurchaseId.value = purchaseId;
     editingPurchase.value = purchase;
-    // =========================
-    // Basic Information
-    // =========================
-    invoiceCtrl.text =
-        purchase["invoice_no"] ?? "";
-    taxCtrl.text =
-        (purchase["tax_amount"] ?? 0).toString();
-    discountCtrl.text =
-        (purchase["discount_amount"] ?? 0).toString();
 
-    paidCtrl.text =
-        (purchase["paid_amount"] ?? 0).toString();
-    // =========================
-    // Supplier
-    // =========================
-    selectedSupplier.value =
-        purchase["supplier"]?["id"];
-    // =========================
-    // Warehouse
-    // =========================
-    selectedWarehouse.value =
-        purchase["warehouse"]?["id"];
-    // =========================
-    // Date
-    // ========================
+    invoiceCtrl.text = purchase["invoice_no"] ?? "";
+    taxCtrl.text = (purchase["tax_amount"] ?? 0).toString();
+    discountCtrl.text = (purchase["discount_amount"] ?? 0).toString();
+    paidCtrl.text = (purchase["paid_amount"] ?? 0).toString();
+    selectedSupplier.value = purchase["supplier"]?["id"];
+    selectedWarehouse.value = purchase["warehouse"]?["id"];
+
     if (purchase["purchase_date"] != null) {
       purchaseDate.value =
-          DateTime.parse(
-            purchase["purchase_date"].toString(),
-          );
+        DateTime.parse(
+          purchase["purchase_date"].toString(),
+        );
     }
-    // =========================
-    // Clear old items
-    // =========================
+
     for (final item in items) {
       item.dispose();
     }
     items.clear();
-    // =========================
-    // Load Purchase Items
-    // =========================
-    final purchaseItems =
-        purchase["purchase_items"] ?? [];
+  
+    final purchaseItems = purchase["purchase_items"] ?? [];
     for (final data in purchaseItems) {
+
       final row = PurchaseItemForm();
-      // -------- Product --------
-      final productId =
-          data["product"]?["id"];
-      final product =
-          Get.find<ProductController>()
+      final productId = data["product"]?["id"];
+      final product = Get.find<ProductController>()
               .products
               .firstWhere(
                 (p) =>
@@ -231,36 +197,32 @@ class PurchaseController extends GetxController {
                 orElse: () => {},
               );
       row.product.value = product;
-      // -------- Qty --------
       final qty =
           double.tryParse(
             data["qty"].toString(),
           ) ??
           0;
       row.qty.value = qty;
-      // IMPORTANT
-      row.qtyCtrl.text =
-          qty.toString();
-      // -------- Cost Price --------
+      row.qtyCtrl.text = qty.toString();
+
       final cost =
           double.tryParse(
             data["cost_price"].toString(),
           ) ??
           0;
       row.cost.value = cost;
-      // IMPORTANT
       row.costCtrl.text =
           cost.toString();
       items.add(row);
     }
-    // If empty purchase item
+
     if (items.isEmpty) {
 
       items.add(
         PurchaseItemForm(),
       );
     }
-    // Open edit form
+   
     AppBottomSheets.show(
       context,
       child: EditPurchaseWidget(),
@@ -278,7 +240,6 @@ class PurchaseController extends GetxController {
 Future<void> onUpdatePurchase(BuildContext context) async {
 
   if (!formKey.currentState!.validate()) return;
-
   if(editingPurchaseId.value == 0){
     ToastWidget.show(
       message: "Invalid purchase",
@@ -304,20 +265,13 @@ Future<void> onUpdatePurchase(BuildContext context) async {
     "supplier_id": selectedSupplier.value,
     "warehouse_id": selectedWarehouse.value,
     "invoice_no": invoiceCtrl.text.trim(),
-    "purchase_date":
-        purchaseDate.value.toIso8601String(),
-    "subtotal":
-        itemsSubtotal,
-    "tax_amount":
-        tax.value,
-    "discount_amount":
-        discount.value,
-    "total_amount":
-        total,
-    "paid_amount":
-        paid.value,
-    "due_amount":
-        due,
+    "purchase_date": purchaseDate.value.toIso8601String(),
+    "subtotal": itemsSubtotal,
+    "tax_amount": tax.value,
+    "discount_amount": discount.value,
+    "total_amount": total,
+    "paid_amount": paid.value,
+    "due_amount": due,
     "payment_status":
       due <= 0
       ? "paid"
@@ -370,7 +324,6 @@ Future<void> onUpdatePurchase(BuildContext context) async {
         try{
           await service.deletePurchase(purchaseId);
 
-          // Refresh category list
           await onGetPurchaseList();
 
           ToastWidget.show(
@@ -429,15 +382,15 @@ Future<void> onUpdatePurchase(BuildContext context) async {
     "payment_status":
         due <= 0 ? "paid" : (paid.value > 0 ? "partial" : "unpaid"),
     "items": items
-        .map(
-          (i) => {
-            "product_id": i.product.value!["id"],
-            "qty": i.qty.value,
-            "cost_price": i.cost.value,
-            "subtotal": i.subtotal,
-          },
-        )
-        .toList(),
+      .map(
+        (i) => {
+          "product_id": i.product.value!["id"],
+          "qty": i.qty.value,
+          "cost_price": i.cost.value,
+          "subtotal": i.subtotal,
+        },
+      )
+      .toList(),
   };
 
   try {
@@ -453,6 +406,7 @@ Future<void> onUpdatePurchase(BuildContext context) async {
     );
 
     Navigator.pop(context);
+
   } catch (e) {
     ToastWidget.show(
       message: e.toString(),
