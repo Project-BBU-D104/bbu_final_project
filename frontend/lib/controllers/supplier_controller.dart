@@ -58,6 +58,11 @@ class SupplierController extends GetxController {
     status.value = true;
   }
 
+  void onRefresh(){
+    getSuppliers();
+    print("Helo");
+  }
+
   Future<void> getSuppliers() async {
     try{
       isLoading.value = true;

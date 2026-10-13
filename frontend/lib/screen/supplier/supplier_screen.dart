@@ -15,7 +15,10 @@ class SupplierScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: CustomAppBar(title: "Suppliers"),
+      appBar: CustomAppBar(
+        title: "Suppliers",
+         
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(12.0),

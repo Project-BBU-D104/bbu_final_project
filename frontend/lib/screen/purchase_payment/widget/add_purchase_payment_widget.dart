@@ -51,6 +51,18 @@ class AddPurchasePaymentWidget extends StatelessWidget {
             );
           }
 
+          if (ctr.purchaseCtr.purchaseList.isEmpty) {
+            return Center(
+              child: Text("No Purchase Found".tr),
+            );
+          }
+
+  // Filter purchases that still have an outstanding balance
+final selectDuePurchase = ctr.purchaseCtr.purchaseList
+    .where((purchase) =>
+        (double.tryParse(purchase['due_amount'].toString()) ?? 0) > 0)
+    .toList();
+
           return DropdownButtonFormField<String>(
             value: ctr.selectedPurchase.value,
 
@@ -63,15 +75,11 @@ class AddPurchasePaymentWidget extends StatelessWidget {
               ),
             ),
 
-            items: ctr.purchaseCtr.purchaseList.map((purchase) {
+            items: selectDuePurchase.map((purchase) {
               return DropdownMenuItem<String>(
-                value: purchase["id"].toString(),
-                child: Row(
-                  children: [
-                    Text(purchase["invoice_no"]),
-                    Text(" - "),
-                    Text(purchase["due_amount"]),
-                  ],
+                value: purchase['id'].toString(),
+                child: Text(
+                  "${purchase['invoice_no']} - Due: ${purchase['due_amount']}",
                 ),
               );
             }).toList(),

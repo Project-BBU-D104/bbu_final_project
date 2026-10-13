@@ -93,16 +93,27 @@ class AddPurchaseWidget extends StatelessWidget {
               }),
 
               const SizedBox(height: 12),
+
               _label("Supplier"),
+
                Obx(() {
+
                 if (supplierCtr.isLoading.value) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
+                  final activeSuppliers = supplierCtr.suppliers
+      .where((supplier) => supplier.status == true)
+      .toList();
+
                 return DropdownButtonFormField<int>(
-                  value: ctr.selectedSupplier.value,
+                  value: activeSuppliers.any(
+      (supplier) => supplier.id == ctr.selectedSupplier.value,
+    )
+        ? ctr.selectedSupplier.value
+        : null,
                   decoration: const InputDecoration(
                     hintText: "Select Supplier",
                     border: OutlineInputBorder(),
@@ -111,12 +122,12 @@ class AddPurchaseWidget extends StatelessWidget {
                       vertical: 16,
                     ),
                   ),
-                  items: supplierCtr.suppliers.map((supplier) {
-                    return DropdownMenuItem<int>(
-                      value: supplier.id,
-                      child: Text(supplier.name),
-                    );
-                  }).toList(),
+                  items: activeSuppliers.map((supplier) {
+      return DropdownMenuItem<int>(
+        value: supplier.id,
+        child: Text(supplier.name),
+      );
+    }).toList(),
                   onChanged: (value) {
                     ctr.selectedSupplier.value = value;
                   },
