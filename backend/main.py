@@ -31,6 +31,7 @@ app.include_router(product_transfer_router)
 app.include_router(product_transfer_item_router)
 app.include_router(purchase_router)
 app.include_router(purchase_item_router)
+app.include_router(purchase_payments_router)
 app.include_router(sale_router)
 app.include_router(sale_payment_router)
 app.include_router(telegram_router)
@@ -40,7 +41,7 @@ app.include_router(unit_router)
 
 app.include_router(recent_purchase_router)
 
-app.include_router(purchase_payments_router)
+
 
 app.include_router(product_category_router)
 app.include_router(system_configuration_router)

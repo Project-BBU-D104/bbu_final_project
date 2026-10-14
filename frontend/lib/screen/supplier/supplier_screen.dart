@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_card_widget.dart';
+import 'package:frontend/screen/supplier/widgets/supplier_table_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
@@ -68,22 +69,40 @@ class SupplierScreen extends StatelessWidget {
                         );
                       }
           
-                      return ListView.builder(
-                      itemCount: controller.searchSuppliers.length,
-                      padding: const EdgeInsets.only(bottom: 70),
-                      itemBuilder:(context,index){
-                        return Padding(
-                          padding: const EdgeInsetsGeometry.only(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            top: 0,
-                          ),
-                          child: SupplierCardWidget(
-                           item: controller.searchSuppliers[index]
-                          ),
-                        );
-                      },
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+
+                          final isMobile = constraints.maxWidth < 600;
+                          final suppliers = controller.searchSuppliers.toList();
+                        
+                        if(isMobile){
+                          return ListView.builder(
+                            itemCount: controller.searchSuppliers.length,
+                            padding: const EdgeInsets.only(bottom: 70),
+                            itemBuilder:(context,index){
+                              return Padding(
+                                padding: const EdgeInsetsGeometry.only(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  top: 0,
+                                ),
+                                child: SupplierCardWidget(
+                                item: suppliers[index],
+                                ),
+                              );
+                            },
+                          );
+                        }
+
+                        return SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 70),
+                        child: SupplierTableWidget(
+                          items: suppliers,
+                        ),
+                      );
+                        
+                      }
                     );
                   })
                 ),

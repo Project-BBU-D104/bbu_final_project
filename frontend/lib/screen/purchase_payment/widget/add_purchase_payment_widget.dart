@@ -57,11 +57,11 @@ class AddPurchasePaymentWidget extends StatelessWidget {
             );
           }
 
-  // Filter purchases that still have an outstanding balance
-final selectDuePurchase = ctr.purchaseCtr.purchaseList
-    .where((purchase) =>
-        (double.tryParse(purchase['due_amount'].toString()) ?? 0) > 0)
-    .toList();
+        // Filter purchases that still have an outstanding balance
+        final selectDuePurchase = ctr.purchaseCtr.purchaseList
+          .where((purchase) =>
+              (double.tryParse(purchase['due_amount'].toString()) ?? 0) > 0)
+          .toList();
 
           return DropdownButtonFormField<String>(
             value: ctr.selectedPurchase.value,
