@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:frontend/services/main_service/sale_service.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:intl/intl.dart';
 
 class SalesReportScreen extends StatefulWidget {
@@ -12,62 +14,80 @@ class SalesReportScreen extends StatefulWidget {
 }
 
 class _SalesReportScreenState extends State<SalesReportScreen> {
-  DateTime startDate = DateTime(2026, 10, 1);
-  DateTime endDate = DateTime(2026, 10, 31);
+  DateTime startDate = _monthStart();
+  DateTime endDate = _monthEnd();
 
   bool showKpi = true;
   bool showChart = true;
   bool showTable = true;
+  bool loading = true;
 
   String searchText = '';
 
   final dateFormat = DateFormat('dd MMM yyyy');
   final currencyFormat = NumberFormat('#,##0.00');
 
-  final List<Map<String, dynamic>> sales = [
-    {
-      'invoice': 'INV-001',
-      'customer': 'John',
-      'date': DateTime(2026, 10, 2),
-      'total': 150.00,
-      'status': 'Paid',
-    },
-    {
-      'invoice': 'INV-002',
-      'customer': 'David',
-      'date': DateTime(2026, 10, 5),
-      'total': 230.00,
-      'status': 'Paid',
-    },
-    {
-      'invoice': 'INV-003',
-      'customer': 'Sokha',
-      'date': DateTime(2026, 10, 8),
-      'total': 95.50,
-      'status': 'Pending',
-    },
-    {
-      'invoice': 'INV-004',
-      'customer': 'Dara',
-      'date': DateTime(2026, 10, 12),
-      'total': 320.00,
-      'status': 'Paid',
-    },
-    {
-      'invoice': 'INV-005',
-      'customer': 'Lina',
-      'date': DateTime(2026, 10, 15),
-      'total': 180.00,
-      'status': 'Paid',
-    },
-    {
-      'invoice': 'INV-006',
-      'customer': 'Vanna',
-      'date': DateTime(2026, 10, 20),
-      'total': 275.00,
-      'status': 'Pending',
-    },
-  ];
+  final SaleService service = SaleService();
+  List<Map<String, dynamic>> sales = [];
+
+  static DateTime _monthStart() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month);
+  }
+
+  static DateTime _monthEnd() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month + 1, 0);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadSales();
+  }
+
+  /// ponytail: filters the whole sales list client-side; move to
+  /// GET /sale?start_date=&end_date= once the list is too big to fetch.
+  Future<void> loadSales() async {
+    setState(() => loading = true);
+    try {
+      final resp = await service.getSales();
+      final rows = <Map<String, dynamic>>[];
+
+      if (resp is List) {
+        for (final sale in List<Map<String, dynamic>>.from(resp)) {
+          // Soft-deleted and cancelled sales are not sales.
+          if (sale['deleted_at'] != null) continue;
+          if ((sale['status'] ?? '').toString().toLowerCase() ==
+              'cancelled') {
+            continue;
+          }
+
+          rows.add({
+            'invoice': sale['invoice_no'] ?? '',
+            'customer': sale['customer']?['name'] ?? '',
+            'date': DateTime.parse(sale['sale_date']),
+            'total': (sale['total_amount'] as num?) ?? 0,
+            'status': _capitalize(sale['payment_status']),
+          });
+        }
+      }
+
+      setState(() => sales = rows);
+    } catch (e) {
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    } finally {
+      setState(() => loading = false);
+    }
+  }
+
+  String _capitalize(String? value) {
+    if (value == null || value.isEmpty) return '';
+    return value[0].toUpperCase() + value.substring(1).toLowerCase();
+  }
 
   List<Map<String, dynamic>> get filteredSales {
     return sales.where((sale) {
@@ -335,9 +355,11 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
 
   Widget buildChartSection() {
     // Sales total for each day in the selected date range.
+    // ponytail: one point per day; group by week/month if users pick year-long ranges.
+    final int days = endDate.difference(startDate).inDays + 1;
     final List<FlSpot> spots = [];
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < days; i++) {
       final DateTime day =
           startDate.add(Duration(days: i));
 
@@ -398,11 +420,11 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        interval: 1,
+                        interval: (days / 7).ceilToDouble(),
                         getTitlesWidget: (value, meta) {
                           final int index = value.toInt();
 
-                          if (index < 0 || index >= 7) {
+                          if (index < 0 || index >= days) {
                             return const SizedBox.shrink();
                           }
 
@@ -588,17 +610,15 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         title: "Sales Report" ,
         centerTitle: false,
         showRefresh: true,
-        onRefresh: () => setState(() {
-          
-        }),
+        onRefresh: loadSales,
         actions: [
           IconButton(
             tooltip: 'Reset filters',
             icon: const Icon(Icons.refresh),
             onPressed: () {
               setState(() {
-                startDate = DateTime(2026, 10, 1);
-                endDate = DateTime(2026, 10, 31);
+                startDate = _monthStart();
+                endDate = _monthEnd();
                 searchText = '';
               });
             },
@@ -617,7 +637,14 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               alignment: Alignment.topCenter,
               child: SizedBox(
                 width: contentWidth,
-                child: ListView(
+                child: loading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 48),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
                     // The two date filters stay grouped.
