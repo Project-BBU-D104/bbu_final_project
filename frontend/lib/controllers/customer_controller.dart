@@ -145,6 +145,8 @@ class CustomerController extends GetxController{
       customerPhoneNumberController.text = customer["phone"] ?? "";
       customerAddressController.text = customer["address"] ?? "";
 
+      isActive.value = customer["is_active"] ?? false;
+
       AppBottomSheets.show(
       context,
       child: EditCustomerWidget(
@@ -166,6 +168,7 @@ class CustomerController extends GetxController{
         "name": customerNameController.text.trim(),
         "phone": customerPhoneNumberController.text.trim(),
         "address": customerAddressController.text.trim(),
+        "is_active": isActive.value
       };
 
       await service.updateCustomer(customerId, data);

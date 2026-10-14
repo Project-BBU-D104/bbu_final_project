@@ -26,8 +26,8 @@ class SupplierTableWidget extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: SizedBox(
+                width: constraints.maxWidth,
                 child: DataTable(
                   headingRowColor: WidgetStateProperty.all(
                     Colors.grey.shade100,

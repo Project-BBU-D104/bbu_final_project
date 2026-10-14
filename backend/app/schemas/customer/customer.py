@@ -1,13 +1,16 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
+from pydantic import field_validator
 
 class CustomerCreate(SQLModel):
-    name: str
+    name: str 
     photo: str
     phone: str
     address: str
     is_active: bool
+
+     
 
 class CustomerUpdate(SQLModel):
     name: Optional[str] = None

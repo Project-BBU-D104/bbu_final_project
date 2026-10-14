@@ -96,11 +96,11 @@ class SupplierScreen extends StatelessWidget {
                         }
 
                         return SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 70),
-                        child: SupplierTableWidget(
-                          items: suppliers,
-                        ),
-                      );
+                          padding: const EdgeInsets.only(bottom: 70),
+                          child: SupplierTableWidget(
+                            items: suppliers,
+                          ),
+                        );
                         
                       }
                     );

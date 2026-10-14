@@ -69,12 +69,11 @@ class CustomerCardWidget extends StatelessWidget {
                             ),
                           ),
 
-                          StatusWidget(text: "Active", color: successColor,)
-                          // StatusWidget(
-                          //   text: customer.status == true
-                          //       ? "Active"
-                          //       : "Inactive",
-                          // )
+                          StatusWidget(
+                            text: customer['is_active']
+                                ? "Active"
+                                : "Inactive",
+                          )
                         ],
                       ),
 

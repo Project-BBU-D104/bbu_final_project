@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/screen/customer/widget/customer_card_widget.dart';
 import 'package:frontend/screen/customer/widget/customer_kpi_widget.dart';
+import 'package:frontend/screen/customer/widget/customer_table_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -83,14 +84,32 @@ class CustomerScreen extends StatelessWidget {
                       ),
                     );
                   }
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.searchCustomerList.length,
-                    itemBuilder: (context, index){
-                      final customer = ctr.searchCustomerList[index];
-                      return CustomerCardWidget(customer: customer);
-                    },
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+
+                      final isMobile = constraints.maxWidth < 600;
+                    
+                    if(isMobile){
+                       return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: ctr.searchCustomerList.length,
+                        itemBuilder: (context, index){
+                          final customer = ctr.searchCustomerList[index];
+                          return CustomerCardWidget(customer: customer);
+                        },
+                      );
+                    }
+
+                   return Padding(
+                    padding: const EdgeInsets.only(bottom: 70),
+                    child: CustomerTableWidget(
+                      customers: ctr.searchCustomerList
+                          .map((customer) => Map<String, dynamic>.from(customer))
+                          .toList(),
+                    ),
+                  );
+                  }
                   );
                 }
               ),

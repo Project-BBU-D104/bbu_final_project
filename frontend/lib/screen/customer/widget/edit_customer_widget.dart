@@ -10,6 +10,8 @@ class EditCustomerWidget extends StatelessWidget {
 
   final ctr = Get.find<CustomerController>();
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -20,110 +22,124 @@ class EditCustomerWidget extends StatelessWidget {
           top: 16,
           bottom: MediaQuery.of(context).viewInsets.bottom + 20,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Edit Customer".tr,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Edit Customer".tr,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+                
+              const SizedBox(height: 10),
+          
+              ImageUploadWidget(
+                bucket: "customer",
+                folder: "customers",
+                imageUrl: ctr.customerPhotoController.text,
+                onUploaded: (url) {
+                  ctr.customerPhotoController.text = url;
+                },
+              ),
+                
+              const SizedBox(height: 10),
+                
+              Text("Customer Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+              SizedBox(height: 5),
+              TextFormField(
+                controller: ctr.customerNameController,
+                decoration: InputDecoration(
+                  hintText: "Enter Customer Name".tr,
+                  border: OutlineInputBorder(),
+                ),
+                 validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Customer name is required".tr;
+                  }
+                  return null;
+                },
+              ),
+                
+              const SizedBox(height: 10),
+              Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+              SizedBox(height: 5),
+              TextField(
+                controller: ctr.customerPhoneNumberController,
+                decoration: InputDecoration(
+                  hintText: "Enter Phone Number".tr,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+                
+              const SizedBox(height: 10),
+              Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+              SizedBox(height: 5),
+               TextField(
+                  maxLines: 8,
+                  minLines: 3,
+                  controller: ctr.customerAddressController,
+                  decoration: InputDecoration(
+                    hintText: "Enter Address".tr,
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
                   ),
                 ),
-      
-                IconButton(
-                  icon: const Icon(Icons.close),
+          
+                Obx(() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Checkbox(
+                    value: ctr.isActive.value,
+                    onChanged: (value) {
+                      ctr.isActive.value = value!;
+                    },
+                  ),
+                  Text("Status".tr),
+                ],
+              );
+            }),
+                
+              const SizedBox(height: 15),
+                
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: successColor,
+                    foregroundColor: titleColor,
+                  ),
                   onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-      
-            const SizedBox(height: 10),
-        
-            ImageUploadWidget(
-              bucket: "customer",
-              folder: "customers",
-              imageUrl: ctr.customerPhotoController.text,
-              onUploaded: (url) {
-                ctr.customerPhotoController.text = url;
-              },
-            ),
-      
-            const SizedBox(height: 10),
-      
-            Text("Customer Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5),
-            TextField(
-              controller: ctr.customerNameController,
-              decoration: InputDecoration(
-                hintText: "Enter Customer Name".tr,
-                border: OutlineInputBorder(),
-              ),
-            ),
-      
-            const SizedBox(height: 10),
-            Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5),
-            TextField(
-              controller: ctr.customerPhoneNumberController,
-              decoration: InputDecoration(
-                hintText: "Enter Phone Number".tr,
-                border: OutlineInputBorder(),
-              ),
-            ),
-      
-            const SizedBox(height: 10),
-            Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5),
-             TextField(
-                maxLines: 8,
-                minLines: 3,
-                controller: ctr.customerAddressController,
-                decoration: InputDecoration(
-                  hintText: "Enter Address".tr,
-                  border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-              ),
 
-              Obx(() {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Checkbox(
-                  value: ctr.isActive.value,
-                  onChanged: (value) {
-                    ctr.isActive.value = value!;
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+
+                    ctr.onUpdateCustomer(customerId, context);
                   },
+                  child: Text("Update".tr, style: TextStyle(fontSize: 18),),
                 ),
-                Text("Disable Customer".tr),
-              ],
-            );
-          }),
-      
-            const SizedBox(height: 15),
-      
-            SizedBox(
-              width: double.infinity,
-              height: 45,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: successColor,
-                  foregroundColor: titleColor,
-                ),
-                onPressed: () {
-                  ctr.onUpdateCustomer(customerId, context);
-                },
-                child: Text("Update".tr, style: TextStyle(fontSize: 18),),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
