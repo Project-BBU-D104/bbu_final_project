@@ -17,7 +17,7 @@ class PurchasePayment(SQLModel, table=True):
     payment_no: str
     amount: float
     payment_date: datetime
-    note: str
+    note: str = ""
     status: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

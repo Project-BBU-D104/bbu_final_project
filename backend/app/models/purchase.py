@@ -26,6 +26,7 @@ class Purchase(SQLModel, table=True):
     discount_amount: Decimal = Field(sa_column=Numeric(10, 2))
     total_amount: Decimal = Field(sa_column=Numeric(10, 2))
     paid_amount: Decimal = Field(sa_column=Numeric(10, 2))
+    initial_paid_amount: Decimal = Field(default=Decimal("0.00"), sa_column=Numeric(10, 2))
     due_amount: Decimal = Field(sa_column=Numeric(10, 2))
     payment_status: str
     status: str

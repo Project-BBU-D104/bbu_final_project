@@ -12,6 +12,11 @@ from app.crud.warehouse.warehouse_stock import (
 )
 from app.models.purchase_requests import PurchaseRequest
 from app.models.system_configuration import SystemConfiguration
+from app.crud.purchase.purchase_payment import (
+    calculate_purchase_payment,
+    get_completed_purchase_payment_total,
+)
+from decimal import Decimal
 
 from sqlalchemy import text
 
@@ -37,6 +42,8 @@ def create_purchase(session: Session, purchase: PurchaseCreate):
 
     if not purchase_data.get("invoice_no"):
         purchase_data["invoice_no"] = generate_invoice_no(session)
+
+    purchase_data["initial_paid_amount"] = purchase_data["paid_amount"]
 
     db_purchase = Purchase(**purchase_data)
 
@@ -153,6 +160,14 @@ def update_purchase(
 
     if purchase.paid_amount is not None:
         db_purchase.paid_amount = purchase.paid_amount
+        completed_payment_total = get_completed_purchase_payment_total(
+            session,
+            purchase_id,
+        )
+        db_purchase.initial_paid_amount = max(
+            Decimal(str(purchase.paid_amount)) - completed_payment_total,
+            Decimal("0"),
+        )
 
     if purchase.due_amount is not None:
         db_purchase.due_amount = purchase.due_amount
@@ -214,6 +229,7 @@ def update_purchase(
     db_purchase.updated_at = datetime.utcnow()
 
     session.add(db_purchase)
+    calculate_purchase_payment(session, purchase_id)
     session.commit()
     session.refresh(db_purchase)
 

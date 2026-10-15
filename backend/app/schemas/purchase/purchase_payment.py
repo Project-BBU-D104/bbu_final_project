@@ -16,7 +16,7 @@ class PurchasePaymentCreate(SQLModel):
     currency_id: int
     amount: float
     payment_date: datetime
-    status: str
+    status: str = "completed"
     note: Optional[str] = None
 
 class PurchasePaymentUpdate(SQLModel):
