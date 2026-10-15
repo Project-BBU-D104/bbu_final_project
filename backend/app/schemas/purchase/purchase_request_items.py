@@ -1,26 +1,24 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
-from pydantic import field_validator
-
-from app.schemas.purchase.purchase_requests import PurchaseRequestRead
-from app.schemas.product.product import ProductRead
+from pydantic import Field
 
 class PurchaseRequestItemCreate(SQLModel):
-    stock_request_id: int
-    product_id: int
+    stock_request_id: int = Field(gt=0)
+    product_id: int = Field(gt=0)
     unit: str
-    qty: int
+    qty: int = Field(gt=0)
 
 class PurchaseRequestItemUpdate(SQLModel):
-    stock_request_id: Optional[int] = None
-    product_id: Optional[int] = None
+    stock_request_id: Optional[int] = Field(default=None, gt=0)
+    product_id: Optional[int] = Field(default=None, gt=0)
     unit: Optional[str] = None
-    qty: Optional[int] = None
+    qty: Optional[int] = Field(default=None, gt=0)
 
 class PurchaseRequestItemRead(SQLModel):
-    stock_request_id: PurchaseRequestRead
-    product_id: ProductRead
+    id: int
+    stock_request_id: int
+    product_id: int
     unit: str
     qty: int
     created_at: Optional[datetime] = None

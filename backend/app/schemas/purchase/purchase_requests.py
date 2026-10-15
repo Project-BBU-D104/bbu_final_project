@@ -1,20 +1,17 @@
 from datetime import datetime
 from sqlmodel import SQLModel
 from typing import Optional
-from pydantic import field_validator
-
-from app.schemas.warehouse.warehouse import WarehouseRead
 
 class PurchaseRequestCreate(SQLModel):
-    request_no: str
+    request_no: Optional[str] = None
     request_type: str
     warehouse_id: int
     requested_by: str
-    approved_by: Optional[str] = None
+    approved_by: str
     status: str
     reason: str
     request_date: datetime
-    approved_date: Optional[datetime] = None
+    approved_date: datetime
 
 class PurchaseRequestUpdate(SQLModel):
     request_no: Optional[str] = None
@@ -28,12 +25,15 @@ class PurchaseRequestUpdate(SQLModel):
     approved_date: Optional[datetime] = None
 
 class PurchaseRequestRead(SQLModel):
+    id: int
     request_no: str
     request_type: str
-    warehouse_id: WarehouseRead
+    warehouse_id: int
     requested_by: str
-    approved_by: Optional[str] = None
+    approved_by: str
     status: str
     reason: str
     request_date: datetime
-    approved_date: Optional[datetime] = None
+    approved_date: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

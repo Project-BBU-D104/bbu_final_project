@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router,warehouse_stock_router, stock_adjustment_router, product_transfer_router, purchase_router,purchase_item_router, sale_router, sale_payment_router, telegram_router,auth_router, currency_router, payment_type_router, unit_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router,product_category_router,system_configuration_router
+from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router,warehouse_stock_router, stock_adjustment_router, product_transfer_router, purchase_router,purchase_item_router, sale_router, sale_payment_router, telegram_router,auth_router, currency_router, payment_type_router, unit_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router,product_category_router,system_configuration_router, purchase_requests_router, purchase_request_items_router
 from app.security import require_roles
 
 app = FastAPI()
@@ -29,9 +29,13 @@ app.include_router(warehouse_stock_router)
 app.include_router(stock_adjustment_router)
 app.include_router(product_transfer_router)
 app.include_router(product_transfer_item_router)
+
 app.include_router(purchase_router)
 app.include_router(purchase_item_router)
 app.include_router(purchase_payments_router)
+app.include_router(purchase_requests_router)
+app.include_router(purchase_request_items_router)
+
 app.include_router(sale_router)
 app.include_router(sale_payment_router)
 app.include_router(telegram_router)
@@ -40,8 +44,6 @@ app.include_router(payment_type_router)
 app.include_router(unit_router)
 
 app.include_router(recent_purchase_router)
-
-
 
 app.include_router(product_category_router)
 app.include_router(system_configuration_router)
