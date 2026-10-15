@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/screen/stock/warehouse/widget/warehouse_card_widget.dart';
+import 'package:frontend/screen/stock/warehouse/widget/warehouse_table_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class WarehouseScreen extends StatelessWidget {
-    WarehouseScreen({super.key});
+  WarehouseScreen({super.key});
 
   final ctr = Get.find<WarehouseController>();
 
@@ -21,7 +22,7 @@ class WarehouseScreen extends StatelessWidget {
           child: Column(
             children: [
               SearchWidget(title: "Search Warehouse"),
-              SizedBox(height: 10,),
+              SizedBox(height: 10),
               Row(
                 children: [
                   ChipWidget(title: "All"),
@@ -29,55 +30,60 @@ class WarehouseScreen extends StatelessWidget {
                   ChipWidget(title: "Inactive"),
                 ],
               ),
-           SizedBox(height: 15,),
+              SizedBox(height: 15),
 
               Obx(() {
                 if (ctr.isLoading.value) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                }
 
                 if (ctr.warehouseList.isEmpty) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(
-                      child: Text("No Warehouse Found".tr),
-                    ),
+                    child: Center(child: Text("No Warehouse Found".tr)),
                   );
                 }
                 if (ctr.searchWarehouseList.isEmpty) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(
-                      child: Text("Search Result Not Found".tr),
-                    ),
+                    child: Center(child: Text("Search Result Not Found".tr)),
                   );
                 }
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.searchWarehouseList.length,
-                  itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsetsGeometry.only(
-                      bottom: 12.0
-                    ),
-                    child: WarehouseCardWidget( warehouse: ctr.searchWarehouseList[index],),
-                  ),
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final warehouses = ctr.searchWarehouseList.toList();
+                    final isMobile = constraints.maxWidth < 600;
+
+                    if (isMobile) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: warehouses.length,
+                        itemBuilder: (context, index) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: WarehouseCardWidget(
+                            warehouse: warehouses[index],
+                          ),
+                        ),
+                      );
+                    }
+
+                    return WarehouseTableWidget(warehouses: warehouses);
+                  },
                 );
               }),
-              
-              SizedBox(height: 70,)
+
+              SizedBox(height: 70),
             ],
           ),
-        )
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           ctr.addWarehouse(context);
         },
         child: const Icon(Icons.add),

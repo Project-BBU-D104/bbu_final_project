@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/screen/product/widget/filter_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_widget.dart';
+import 'package:frontend/screen/product/widget/product_table_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -15,9 +16,7 @@ class ProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-          title: 'Product',
-      ),
+      appBar: CustomAppBar(title: 'Product'),
 
       body: CustomScrollView(
         slivers: [
@@ -78,20 +77,17 @@ class ProductScreen extends StatelessWidget {
 
           /// PRODUCT LIST
           Obx(() {
-
             if (productCtrl.isLoading.value) {
               return const SliverFillRemaining(
                 hasScrollBody: false,
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: Center(child: CircularProgressIndicator()),
               );
             }
 
             // final list = productCtrl.filteredItems;
-             final list = productCtrl.searchQuery.value.isNotEmpty
-              ? productCtrl.searchProductList
-              : productCtrl.filteredItems;
+            final list = productCtrl.searchQuery.value.isNotEmpty
+                ? productCtrl.searchProductList
+                : productCtrl.filteredItems;
 
             if (list.isEmpty) {
               return SliverFillRemaining(
@@ -106,12 +102,9 @@ class ProductScreen extends StatelessWidget {
 
                       Text(
                         productCtrl.searchQuery.value.isNotEmpty
-                        ? 'No products found' :
-                        'No products available', 
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 16,
-                        ),
+                            ? 'No products found'
+                            : 'No products available',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
                       ),
                     ],
                   ),
@@ -119,23 +112,44 @@ class ProductScreen extends StatelessWidget {
               );
             }
 
-            return SliverPadding(
-              padding: const EdgeInsets.only(
-                bottom:12,
-                left: 12,
-                right: 12,
-              ),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, idx) {
-                    return ProductCardWidget(product: list[idx]);
-                  },
-                  childCount: list.length,
-                ),
-              ),
+            return SliverLayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.crossAxisExtent >= 760) {
+                  return SliverPadding(
+                    padding: const EdgeInsets.only(
+                      bottom: 12,
+                      left: 12,
+                      right: 12,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        if (index == 0) {
+                          return const _ProductTableHeader();
+                        }
+                        return ProductTableWidget(product: list[index - 1]);
+                      }, childCount: list.length + 1),
+                    ),
+                  );
+                }
+
+                return SliverPadding(
+                  padding: const EdgeInsets.only(
+                    bottom: 12,
+                    left: 12,
+                    right: 12,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) =>
+                          ProductCardWidget(product: list[index]),
+                      childCount: list.length,
+                    ),
+                  ),
+                );
+              },
             );
           }),
-           const SliverToBoxAdapter(child: SizedBox(height: 70)),
+          const SliverToBoxAdapter(child: SizedBox(height: 70)),
         ],
       ),
 
@@ -144,9 +158,7 @@ class ProductScreen extends StatelessWidget {
           productCtrl.gotoAddProduct();
         },
         backgroundColor: const Color(0xFF1DB584),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Icon(Icons.add, color: lightColor, size: 28),
       ),
     );
@@ -165,7 +177,6 @@ class ProductScreen extends StatelessWidget {
     if (type == 'status') {
       options = ['All', 'IN STOCK', 'LOW STOCK', 'OUT OF STOCK'];
     }
-    
 
     Get.bottomSheet(
       Container(
@@ -180,21 +191,18 @@ class ProductScreen extends StatelessWidget {
           children: [
             Text(
               'Filter by ${type.capitalizeFirst}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             ...options.map(
               (opt) => ListTile(
                 title: Text(opt),
-                trailing: (type == 'category' &&
+                trailing:
+                    (type == 'category' &&
                             ctrl.selectedCategory.value == opt) ||
                         (type == 'status' &&
                             ctrl.selectedStatus.value == opt) ||
-                        (type == 'recency' &&
-                            ctrl.selectedRecency.value == opt)
+                        (type == 'recency' && ctrl.selectedRecency.value == opt)
                     ? const Icon(Icons.check, color: Color(0xFF1DB584))
                     : null,
                 onTap: () {
@@ -207,6 +215,46 @@ class ProductScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProductTableHeader extends StatelessWidget {
+  const _ProductTableHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      color: Colors.grey.shade700,
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+    );
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Row(
+              children: [
+                const SizedBox(width: 40),
+                const SizedBox(width: 12),
+                Text('PRODUCT', style: style),
+              ],
+            ),
+          ),
+          Expanded(flex: 3, child: Text('BARCODE', style: style)),
+          Expanded(flex: 2, child: Text('PRICE', style: style)),
+          Expanded(flex: 2, child: Text('CREATED', style: style)),
+        ],
       ),
     );
   }

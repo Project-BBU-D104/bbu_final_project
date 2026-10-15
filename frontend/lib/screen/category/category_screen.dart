@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/screen/category/widget/card_category_widget.dart';
+import 'package:frontend/screen/category/widget/table_category_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,6 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: lightColor.shade50,
       appBar: CustomAppBar(title: "Category"),
@@ -22,17 +22,10 @@ class CategoryScreen extends StatelessWidget {
         child: Obx(
           () => CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(
-                child: const SizedBox(
-                  height: 10,
-                ),
-              ),
+              SliverToBoxAdapter(child: const SizedBox(height: 10)),
 
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 10,
-                ),
-              ),
+              SliverToBoxAdapter(child: SizedBox(height: 10)),
+
               /// Search Bar
               SliverAppBar(
                 pinned: true,
@@ -40,43 +33,33 @@ class CategoryScreen extends StatelessWidget {
                 floating: false,
                 backgroundColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
-                flexibleSpace: SearchWidget(
-                  title: "Search Category",
-                )
+                flexibleSpace: SearchWidget(title: "Search Category"),
               ),
 
               /// Header
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16.0,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "${ctr.searchCategoryList.length} CATEGORIES",
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,                        
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange.shade700,
                         ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
+                        icon: const Icon(Icons.add, color: Colors.white),
                         label: Text(
                           "Add Category".tr,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                          style: TextStyle(color: Colors.white),
                         ),
-                        onPressed: (){
+                        onPressed: () {
                           ctr.addCategory(context);
                         },
                       ),
@@ -88,50 +71,50 @@ class CategoryScreen extends StatelessWidget {
               /// Loading
               if (ctr.isLoading.value)
                 const SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 )
-
               /// Empty State
               else if (ctr.categoryList.isEmpty)
                 const SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      "No Category Found",
-                    ),
-                  ),
+                  child: Center(child: Text("No Category Found")),
                 )
-
               else if (ctr.searchCategoryList.isEmpty)
                 const SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      "Search Not Found",
-                    ),
-                  ),
+                  child: Center(child: Text("Search Not Found")),
                 )
-
-              /// Grid
+              /// Category list
               else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final item = ctr.searchCategoryList[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: CardCategoryWidget(
-                          category: item,
+                SliverLayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.crossAxisExtent >= 600) {
+                      return SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: TableCategoryWidget(
+                            categories: ctr.searchCategoryList
+                                .map(
+                                  (category) =>
+                                      Map<String, dynamic>.from(category),
+                                )
+                                .toList(),
+                          ),
                         ),
                       );
-                    },
-                    childCount: ctr.searchCategoryList.length,
-                  ),
+                    }
+
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final item = ctr.searchCategoryList[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: CardCategoryWidget(category: item),
+                        );
+                      }, childCount: ctr.searchCategoryList.length),
+                    );
+                  },
                 ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 24),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
           ),
         ),
