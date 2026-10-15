@@ -18,6 +18,7 @@ class PurchasePaymentController extends GetxController{
   final selectedPaymentType = RxnString();
   final selectedPurchase = RxnString();
 
+  final Rx<DateTime> purchaseDate = DateTime.now().obs;
 
   @override
   void onInit() {
@@ -49,10 +50,18 @@ class PurchasePaymentController extends GetxController{
     }
   }
 
+  void pickPurchaseDate(DateTime date) {
+    purchaseDate.value = date;
+  }
+
   Future<void> addPurchasePayment(BuildContext context) async{
     AppBottomSheets.show(
       context,
       child: AddPurchasePaymentWidget(),
     );
+  }
+
+  Future<void> onSavePurchasePayment() async{
+    
   }
 }

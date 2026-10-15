@@ -104,30 +104,30 @@ class AddPurchaseWidget extends StatelessWidget {
                   );
                 }
 
-                  final activeSuppliers = supplierCtr.suppliers
-      .where((supplier) => supplier.status == true)
-      .toList();
+                final activeSuppliers = supplierCtr.suppliers
+                  .where((supplier) => supplier.status == true)
+                  .toList();
 
-                return DropdownButtonFormField<int>(
-                  value: activeSuppliers.any(
-      (supplier) => supplier.id == ctr.selectedSupplier.value,
-    )
-        ? ctr.selectedSupplier.value
-        : null,
-                  decoration: const InputDecoration(
-                    hintText: "Select Supplier",
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
-                    ),
-                  ),
-                  items: activeSuppliers.map((supplier) {
-      return DropdownMenuItem<int>(
-        value: supplier.id,
-        child: Text(supplier.name),
-      );
-    }).toList(),
+                  return DropdownButtonFormField<int>(
+                    value: activeSuppliers.any(
+                    (supplier) => supplier.id == ctr.selectedSupplier.value,
+                  )
+                      ? ctr.selectedSupplier.value
+                      : null,
+                        decoration: const InputDecoration(
+                          hintText: "Select Supplier",
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
+                        ),
+                        items: activeSuppliers.map((supplier) {
+                    return DropdownMenuItem<int>(
+                      value: supplier.id,
+                      child: Text(supplier.name),
+                    );
+                  }).toList(),
                   onChanged: (value) {
                     ctr.selectedSupplier.value = value;
                   },
