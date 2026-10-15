@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/screen/role/widget/role_card_widget.dart';
+import 'package:frontend/screen/role/widget/role_table_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class RoleScreen extends StatelessWidget {
   RoleScreen({super.key});
-  
+
   final ctr = Get.find<RoleController>();
 
   @override
@@ -19,19 +20,15 @@ class RoleScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-
               SizedBox(height: 4),
               SearchWidget(title: "Search Role"),
-               SizedBox(height: 16),
-              
-              Obx(() {
+              SizedBox(height: 16),
 
+              Obx(() {
                 if (ctr.isLoading.value) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.6,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    child: const Center(child: CircularProgressIndicator()),
                   );
                 }
 
@@ -41,10 +38,7 @@ class RoleScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         "No roles found",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
                   );
@@ -55,28 +49,37 @@ class RoleScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         "Search result not found",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
                   );
                 }
-                 return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ctr.searchRoleList.length,
-                  itemBuilder: (context, index) => RoleCardWidget( role: ctr.searchRoleList[index],),
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final roles = ctr.searchRoleList.toList();
+                    final isMobile = constraints.maxWidth < 600;
+
+                    if (isMobile) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: roles.length,
+                        itemBuilder: (context, index) =>
+                            RoleCardWidget(role: roles[index]),
+                      );
+                    }
+
+                    return RoleTableWidget(roles: roles);
+                  },
                 );
-                }),
-              SizedBox(height: 80,)
-            ]
+              }),
+              SizedBox(height: 80),
+            ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           ctr.addRole(context);
         },
         child: const Icon(Icons.add),

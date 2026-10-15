@@ -152,11 +152,6 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
                         Icons.category,
                         product["category"]["name"],
                       ),
-                      const SizedBox(width:8),
-                      _chip(
-                        Icons.local_shipping,
-                        product["supplier"]["name"],
-                      ),
                     ],
                   )
                 ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_transfer_controller.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_card_widget.dart';
+import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_table_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
@@ -20,7 +21,6 @@ class StockTransferScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-             
               SearchWidget(title: "Search Stock Transfer".tr),
               SizedBox(height: 10),
               Row(
@@ -30,16 +30,14 @@ class StockTransferScreen extends StatelessWidget {
                   ChipWidget(title: "Received"),
                 ],
               ),
-              
+
               SizedBox(height: 10),
-        
-              Obx((){ 
+
+              Obx(() {
                 if (ctr.isLoading.value) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.6,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    child: const Center(child: CircularProgressIndicator()),
                   );
                 }
 
@@ -49,10 +47,7 @@ class StockTransferScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         "No data found".tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
                   );
@@ -64,40 +59,50 @@ class StockTransferScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         "No data found".tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
                   );
                 }
-                return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.searchStockTransferList.length,
-                    padding: const EdgeInsets.only(bottom: 100), 
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: StockTransferCardWidget( 
-                          stockTransfer: ctr.searchStockTransferList[index],
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final transfers = ctr.searchStockTransferList.toList();
+                    final isMobile = constraints.maxWidth < 600;
+
+                    if (isMobile) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: transfers.length,
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemBuilder: (context, index) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: StockTransferCardWidget(
+                            stockTransfer: transfers[index],
+                          ),
                         ),
                       );
-                    },
-                  );
-                }
-              ),
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 100),
+                      child: StockTransferTableWidget(
+                        stockTransfers: transfers,
+                      ),
+                    );
+                  },
+                );
+              }),
             ],
-              ),
+          ),
         ),
       ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: (){
-        ctr.addStockTransfer(context);
-      },
-      child: const Icon(Icons.add),
-    ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          ctr.addStockTransfer(context);
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

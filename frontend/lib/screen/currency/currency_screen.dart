@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/currency_controller.dart';
 import 'package:frontend/screen/currency/widget/currency_card_widget.dart';
+import 'package:frontend/screen/currency/widget/currency_table_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -21,51 +22,53 @@ class CurrencyScreen extends StatelessWidget {
             children: [
               SearchWidget(title: "Search Currency"),
               SizedBox(height: 12),
-              Obx((){
-
+              Obx(() {
                 if (ctr.isLoading.value) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  if (ctr.currencyList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Text("No Currency Found".tr),
-                      ),
-                    );
-                  }
-
-                  if (ctr.searchCurrencyList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Text("Search Result Not Found".tr),
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.searchCurrencyList.length,
-                    itemBuilder: (context, index){
-                      final currency = ctr.searchCurrencyList[index];
-                      return CurrencyCardWidget(currency: currency);
-                    },
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(child: CircularProgressIndicator()),
                   );
                 }
-              )
-          ]),
+
+                if (ctr.currencyList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(child: Text("No Currency Found".tr)),
+                  );
+                }
+
+                if (ctr.searchCurrencyList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(child: Text("Search Result Not Found".tr)),
+                  );
+                }
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final currencies = ctr.searchCurrencyList.toList();
+                    final isMobile = constraints.maxWidth < 600;
+
+                    if (isMobile) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: currencies.length,
+                        itemBuilder: (context, index) =>
+                            CurrencyCardWidget(currency: currencies[index]),
+                      );
+                    }
+
+                    return CurrencyTableWidget(currencies: currencies);
+                  },
+                );
+              }),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           ctr.addCurrency(context);
         },
         child: const Icon(Icons.add),

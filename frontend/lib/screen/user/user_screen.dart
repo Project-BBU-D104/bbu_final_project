@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/screen/user/widget/kpi_user_widget.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
+import 'package:frontend/screen/user/widget/user_table_list_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class UserScreen extends StatelessWidget {
-   UserScreen({super.key});
+  UserScreen({super.key});
 
   final ctr = Get.find<UserController>();
 
@@ -20,7 +21,6 @@ class UserScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-           
               SearchWidget(title: "Search User...".tr),
               SizedBox(height: 12),
               Obx(() {
@@ -51,53 +51,57 @@ class UserScreen extends StatelessWidget {
                   ),
                 );
               }),
-          
+
               SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Obx(() => Text("${ctr.userList.length} Users")),
-                
+
                   ElevatedButton(
-                    onPressed: (){
+                    onPressed: () {
                       ctr.addUser(context);
-                    }, 
-                    child: Text("New User".tr)
-                  )
+                    },
+                    child: Text("New User".tr),
+                  ),
                 ],
               ),
 
               SizedBox(height: 15),
-              
+
               Obx(
                 () => ctr.isLoading.value
-                  ? SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  : ctr.userList.isEmpty
+                    ? SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const Center(child: CircularProgressIndicator()),
+                      )
+                    : ctr.userList.isEmpty
                     ? Center(child: Text("No User Found".tr))
                     : ctr.searchUserList.isEmpty
-                    ? Center(
-                        child: Text("No User Found for search".tr),
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: ctr.searchUserList.length,
-                        itemBuilder: (context, index) =>
-                          UserCardListWidget(
-                            user: ctr.searchUserList[index],
-                          ),
+                    ? Center(child: Text("No User Found for search".tr))
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          final users = ctr.searchUserList.toList();
+                          final isMobile = constraints.maxWidth < 600;
+
+                          if (isMobile) {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: users.length,
+                              itemBuilder: (context, index) =>
+                                  UserCardListWidget(user: users[index]),
+                            );
+                          }
+
+                          return UserTableListWidget(users: users);
+                        },
                       ),
               ),
-          
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/stock_adjustment_controller.dart';
 import 'package:frontend/screen/stock/stock_adjustment/widget/stock_adjustment_card_widget.dart';
+import 'package:frontend/screen/stock/stock_adjustment/widget/stock_adjustment_table_widget.dart';
 import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class StockAdjustmentScreen extends StatelessWidget {
-StockAdjustmentScreen({super.key});
+  StockAdjustmentScreen({super.key});
 
   final ctr = Get.find<StockAdjustmentController>();
 
@@ -20,12 +21,9 @@ StockAdjustmentScreen({super.key});
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
+              SearchWidget(title: "Search Stock Adjustment".tr),
 
-              SearchWidget(
-                title: "Search Stock Adjustment".tr
-              ),
-
-              SizedBox(height: 10,),
+              SizedBox(height: 10),
 
               Row(
                 children: [
@@ -33,68 +31,72 @@ StockAdjustmentScreen({super.key});
                   ChipWidget(title: "Increases"),
                   ChipWidget(title: "Decreases"),
                   ChipWidget(title: "Rejected"),
-                ]
+                ],
               ),
-        
-              SizedBox(height: 10,),
-              
-               Obx(() {
 
-                  if (ctr.isLoading.value) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
+              SizedBox(height: 10),
 
-                  if (ctr.stockAdjustmentList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Text(
-                          "No stock adjustment found",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-
-                  if (ctr.searchStockAdjustmentList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Text(
-                          "Search result not found",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: ctr.searchStockAdjustmentList.length,
-                    itemBuilder: (context, index){
-                      return StockAdjustmentCardWidget(stockAdjustment: ctr.searchStockAdjustmentList[index]);
-                    }
+              Obx(() {
+                if (ctr.isLoading.value) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(child: CircularProgressIndicator()),
                   );
                 }
-               ),
-              SizedBox(height: 80,),
-            ]
+
+                if (ctr.stockAdjustmentList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "No stock adjustment found",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+
+                if (ctr.searchStockAdjustmentList.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        "Search result not found",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final adjustments = ctr.searchStockAdjustmentList.toList();
+                    final isMobile = constraints.maxWidth < 600;
+
+                    if (isMobile) {
+                      return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: adjustments.length,
+                        itemBuilder: (context, index) =>
+                            StockAdjustmentCardWidget(
+                              stockAdjustment: adjustments[index],
+                            ),
+                      );
+                    }
+
+                    return StockAdjustmentTableWidget(
+                      stockAdjustments: adjustments,
+                    );
+                  },
+                );
+              }),
+              SizedBox(height: 80),
+            ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           ctr.addStockAdjustment(context);
         },
         child: const Icon(Icons.add),
