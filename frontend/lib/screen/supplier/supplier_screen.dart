@@ -30,24 +30,6 @@ class SupplierScreen extends StatelessWidget {
                   title: "Search Suppliers",
                 ),
                 const SizedBox(height:16),
-                Row(
-                  children: [
-                    ChipWidget(
-                      title: "All",
-                    ),
-                    ChipWidget(
-                      title: "Verified",
-                    ),
-                    ChipWidget(
-                      title: "Unverified",
-                    ),
-                    ChipWidget(
-                      title: "Blocked",
-                    ),
-                     
-                  ],
-                ),
-                const SizedBox(height:16),
                 Expanded(
                   child: Obx(
                     () { 

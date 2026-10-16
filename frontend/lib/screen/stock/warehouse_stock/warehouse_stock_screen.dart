@@ -23,17 +23,11 @@ class WarehouseStockScreen extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 4),
-                SearchWidget(title: "Search Warehouse Stock"),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    ChipWidget(title: "All"),
-                    ChipWidget(title: "Active"),
-                    ChipWidget(title: "Inactive"),
-                  ],
-                ),
-                SizedBox(height: 10),
 
+                SearchWidget(title: "Search Warehouse Stock"),
+                
+                SizedBox(height: 10),
+                 
                 Obx(() {
                   if (ctr.isLoading.value) {
                     return SizedBox(

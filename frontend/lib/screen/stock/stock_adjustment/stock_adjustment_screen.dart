@@ -25,17 +25,6 @@ class StockAdjustmentScreen extends StatelessWidget {
 
               SizedBox(height: 10),
 
-              Row(
-                children: [
-                  ChipWidget(title: "All"),
-                  ChipWidget(title: "Increases"),
-                  ChipWidget(title: "Decreases"),
-                  ChipWidget(title: "Rejected"),
-                ],
-              ),
-
-              SizedBox(height: 10),
-
               Obx(() {
                 if (ctr.isLoading.value) {
                   return SizedBox(

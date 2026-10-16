@@ -22,14 +22,7 @@ class WarehouseScreen extends StatelessWidget {
           child: Column(
             children: [
               SearchWidget(title: "Search Warehouse"),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  ChipWidget(title: "All"),
-                  ChipWidget(title: "Active"),
-                  ChipWidget(title: "Inactive"),
-                ],
-              ),
+              
               SizedBox(height: 15),
 
               Obx(() {

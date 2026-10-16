@@ -22,15 +22,7 @@ class StockTransferScreen extends StatelessWidget {
           child: Column(
             children: [
               SearchWidget(title: "Search Stock Transfer".tr),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  ChipWidget(title: "All"),
-                  ChipWidget(title: "Sent"),
-                  ChipWidget(title: "Received"),
-                ],
-              ),
-
+             
               SizedBox(height: 10),
 
               Obx(() {

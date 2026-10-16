@@ -17,22 +17,11 @@ class PurchasePaymentScreen extends StatelessWidget {
       appBar: CustomAppBar(title: "Purchase Payment"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 88),
           child: Column(
             children: [
               SearchWidget(
                 title: "Search Purchase Payment",
-              ),
-
-              SizedBox(height: 10,),
-
-              Row(
-                children: [
-                  ChipWidget(title: "All"),
-                  ChipWidget(title: "Pending"),
-                  ChipWidget(title: "Completed"),
-                  ChipWidget(title: "Canceled"),
-                ]
               ),
 
               SizedBox(height: 10,),
@@ -49,7 +38,11 @@ class PurchasePaymentScreen extends StatelessWidget {
                 }
                 return ListView.builder(
                   shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: ctr.purchasePaymentList.length,
+                  // padding: const EdgeInsets.only(
+                  //   bottom: 20
+                  // ),
                   itemBuilder: (context, index) {
                     return PurchasePaymentCardWidget(
                       payment: ctr.purchasePaymentList[index],

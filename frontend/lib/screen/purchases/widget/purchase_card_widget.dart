@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase/purchase_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class PurchaseCardWidget extends StatelessWidget {
@@ -105,7 +106,9 @@ class PurchaseCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      purchase['purchase_date'],
+                      DateFormatter.formatDate(
+                        DateTime.parse(purchase['purchase_date']),
+                      ),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
