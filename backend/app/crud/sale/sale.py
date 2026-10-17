@@ -1,18 +1,69 @@
-from http.client import HTTPException
-
 from sqlmodel import Session, select
 from app.models.sale import Sale
+from app.models.product import Product
 from app.schemas.sale.sale import SaleCreate, SaleUpdate
 from datetime import datetime
+from decimal import Decimal
 from sqlalchemy.orm import selectinload
 from app.models.sale_items import SaleItems
+from fastapi import HTTPException
+from app.schemas.sale.sale_item import SaleItemCreate
+
+
+def _build_sale_items(
+    session: Session, sale_id: int, sale_items: list[SaleItemCreate]
+) -> tuple[list[SaleItems], Decimal]:
+    items = []
+    subtotal = Decimal("0.00")
+
+    for item in sale_items:
+        product = session.exec(select(Product).where(Product.id == item.product_id)).first()
+        if product is None:
+            raise HTTPException(status_code=404, detail=f"Product {item.product_id} not found")
+
+        line_subtotal = product.sale_price * item.qty
+        subtotal += line_subtotal
+        items.append(SaleItems(
+            sale_id=sale_id,
+            product_id=product.id,
+            qty=item.qty,
+            sale_price=product.sale_price,
+            subtotal=line_subtotal,
+        ))
+
+    return items, subtotal
+
+
+def _set_sale_totals(db_sale: Sale) -> None:
+    db_sale.total_amount = max(
+        db_sale.subtotal + db_sale.tax_amount - db_sale.discount_amount,
+        Decimal("0.00"),
+    )
+    db_sale.due_amount = max(db_sale.total_amount - db_sale.paid_amount, Decimal("0.00"))
+    db_sale.payment_status = (
+        "paid" if db_sale.due_amount == 0
+        else "partial" if db_sale.paid_amount > 0
+        else "unpaid"
+    )
 
 def create_sale(session: Session, sale: SaleCreate):
-    db_sale = sale.model_validate(sale)
-    session.add(db_sale)
-    session.commit()
-    session.refresh(db_sale)
-    return db_sale
+    sale_data = sale.model_dump(
+        exclude={"sale_items"},
+        exclude_none=True,
+    )
+    db_sale = Sale.model_validate(sale_data)
+    try:
+        session.add(db_sale)
+        session.flush()
+        items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
+        db_sale.sale_items.extend(items)
+        _set_sale_totals(db_sale)
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+
+    return get_sale(session, db_sale.id)
 
 def get_all_sales(session: Session):
     statement = (
@@ -32,45 +83,36 @@ def get_sale(session: Session, sale_id: int):
         .where(Sale.id == sale_id)
         .options(
             selectinload(Sale.user),
-            selectinload(Sale.customer)
+            selectinload(Sale.customer),
+            selectinload(Sale.sale_items).selectinload(SaleItems.product),
         )
     )
     return session.exec(statement).first()
 
 def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
-    db_sale = session.get(Sale, sale_id)
+    statement = select(Sale).where(Sale.id == sale_id).options(selectinload(Sale.sale_items))
+    db_sale = session.exec(statement).first()
     if db_sale:
-        if sale.customer_id is not None:
-            db_sale.customer_id = sale.customer_id
-        if sale.user_id is not None:
-            db_sale.user_id = sale.user_id
-        if sale.invoice_no is not None:
-            db_sale.invoice_no = sale.invoice_no
-        if sale.sale_date is not None:
-            db_sale.sale_date = sale.sale_date
-        if sale.subtotal is not None:
-            db_sale.subtotal = sale.subtotal
-        if sale.tax_amount is not None:
-            db_sale.tax_amount = sale.tax_amount
-        if sale.discount_amount is not None:
-            db_sale.discount_amount = sale.discount_amount
-        if sale.total_amount is not None:
-            db_sale.total_amount = sale.total_amount
-        if sale.paid_amount is not None:
-            db_sale.paid_amount = sale.paid_amount
-        if sale.due_amount is not None:
-            db_sale.due_amount = sale.due_amount
-        if sale.payment_status is not None:
-            db_sale.payment_status = sale.payment_status
-        if sale.status is not None:
-            db_sale.status = sale.status
-        if sale.payment_method is not None:
-            db_sale.payment_method = sale.payment_method
+        updates = sale.model_dump(
+            exclude_unset=True,
+            exclude={"sale_items", "subtotal", "total_amount", "due_amount", "payment_status"},
+        )
+        for field, value in updates.items():
+            if value is not None:
+                setattr(db_sale, field, value)
+
+        if sale.sale_items is not None:
+            items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
+            for old_item in db_sale.sale_items:
+                session.delete(old_item)
+            db_sale.sale_items = items
+
+        _set_sale_totals(db_sale)
 
         db_sale.updated_at = sale.updated_at or datetime.utcnow()
         session.add(db_sale)
         session.commit()
-        session.refresh(db_sale)
+        return get_sale(session, sale_id)
     return db_sale
 
 def delete_sale(session: Session, sale_id: int):

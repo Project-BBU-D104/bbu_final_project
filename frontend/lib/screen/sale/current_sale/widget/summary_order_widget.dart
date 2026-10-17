@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 
 class SummaryOrderWidget extends StatelessWidget {
-  const SummaryOrderWidget({super.key});
+  final double subtotal;
+
+  const SummaryOrderWidget({super.key, required this.subtotal});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +12,6 @@ class SummaryOrderWidget extends StatelessWidget {
     final valueColor = darkColor;
     final greenColor = successColor;
     final dividerColor = lightColor.shade600;
-    final badgeBg = lightColor.shade600;
 
     return Card(
       color: Colors.white,
@@ -36,35 +37,33 @@ class SummaryOrderWidget extends StatelessWidget {
 
             _buildRow(
               label: 'Items Subtotal',
-              value: '\$1,093.38',
+              value: '\$${subtotal.toStringAsFixed(2)}',
               labelColor: labelColor,
               valueColor: valueColor,
             ),
             const SizedBox(height: 12),
-              Divider(color: dividerColor, height: 1),
+            Divider(color: dividerColor, height: 1),
             const SizedBox(height: 12),
 
             _buildRow(
               label: 'Tax',
-              value: '\$87.47',
+              value: '\$0.00',
               labelColor: labelColor,
               valueColor: valueColor,
-              badge: '8%',
-              badgeBg: badgeBg,
             ),
             const SizedBox(height: 12),
-              Divider(color: dividerColor, height: 1),
+            Divider(color: dividerColor, height: 1),
             const SizedBox(height: 12),
 
             _buildRow(
               label: 'Discount',
-              value: '-\$50.00',
+              value: '-\$0.00',
               labelColor: labelColor,
               valueColor: greenColor,
               icon: Icons.local_offer_outlined,
             ),
             const SizedBox(height: 16),
-             Divider(color: dividerColor, height: 1),
+            Divider(color: dividerColor, height: 1),
             const SizedBox(height: 16),
 
             Row(
@@ -81,14 +80,13 @@ class SummaryOrderWidget extends StatelessWidget {
                         fontSize: 18,
                       ),
                     ),
-                   
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                      Text(
-                      '\$1,130.85',
+                    Text(
+                      '\$${subtotal.toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -119,10 +117,7 @@ class SummaryOrderWidget extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 15, color: labelColor),
-            ),
+            Text(label, style: TextStyle(fontSize: 15, color: labelColor)),
             if (icon != null) ...[
               const SizedBox(width: 6),
               Icon(icon, size: 16, color: labelColor),

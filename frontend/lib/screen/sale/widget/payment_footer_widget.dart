@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 class PaymentFooterWidget extends StatelessWidget {
-
   final VoidCallback onTap;
-  const PaymentFooterWidget({super.key, required this.onTap});
+  final int itemCount;
+  final double total;
+
+  const PaymentFooterWidget({
+    super.key,
+    required this.onTap,
+    required this.itemCount,
+    required this.total,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +46,9 @@ class PaymentFooterWidget extends StatelessWidget {
                 size: 24,
               ),
             ),
-      
+
             const SizedBox(width: 12),
-      
+
             // Current Order + items
             Expanded(
               child: Column(
@@ -57,8 +64,8 @@ class PaymentFooterWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const Text(
-                    '3 Items',
+                  Text(
+                    '$itemCount ${itemCount == 1 ? 'Item' : 'Items'}',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -68,16 +75,15 @@ class PaymentFooterWidget extends StatelessWidget {
                 ],
               ),
             ),
-      
+
             // Total Value + amount
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
               children: [
-                
                 const SizedBox(height: 2),
-                const Text(
-                  '\$45.00',
+                Text(
+                  '\$${total.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -86,9 +92,9 @@ class PaymentFooterWidget extends StatelessWidget {
                 ),
               ],
             ),
-      
+
             const SizedBox(width: 12),
-      
+
             // Arrow button
             Container(
               width: 44,

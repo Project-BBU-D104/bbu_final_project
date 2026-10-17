@@ -5,10 +5,14 @@ from datetime import datetime
 from sqlalchemy.orm import selectinload
 
 def create_sale_payment(session: Session, sale: SalePaymentCreate):
-    db_sale_payment = sale.model_validate(sale)
-    session.add(db_sale_payment)
-    session.commit()
-    session.refresh(db_sale_payment)
+    db_sale_payment = SalePayment.model_validate(sale.model_dump(exclude_none=True))
+    try:
+        session.add(db_sale_payment)
+        session.commit()
+        session.refresh(db_sale_payment)
+    except Exception:
+        session.rollback()
+        raise
     return db_sale_payment
 
 def get_all_sale_payments(session: Session):

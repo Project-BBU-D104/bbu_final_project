@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/role_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
@@ -69,7 +70,10 @@ class RoleCardWidget extends StatelessWidget {
                 ),
                 SizedBox(width: 5,),
                 Text(
-                  role["created_at"]
+                  DateFormatter.formatDate(
+                    DateTime.parse(role["created_at"]),
+                  ),
+                  
                 ),
                 Spacer(),
                 PopupMenuButton<String>(

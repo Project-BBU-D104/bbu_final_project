@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from sqlmodel import SQLModel
 from typing import Optional
 
@@ -7,7 +8,7 @@ from app.schemas.sale.sale import SaleRead
 class SalePaymentCreate(SQLModel):
     user_id: int
     sale_id: int
-    amount: int
+    amount: Decimal
     payment_method: str
     reference_no: str
     payment_date: datetime
@@ -18,7 +19,7 @@ class SalePaymentCreate(SQLModel):
 class SalePaymentUpdate(SQLModel):
     user_id: Optional[int] = None
     sale_id: Optional[int] = None
-    amount: Optional[int] = None
+    amount: Optional[Decimal] = None
     payment_method: Optional[str] = None
     reference_no: Optional[str] = None
     payment_date: Optional[datetime] = None
@@ -28,7 +29,7 @@ class SalePaymentUpdate(SQLModel):
 class SalePaymentRead(SQLModel):
     user: UserRead
     sale: SaleRead
-    amount: int
+    amount: Decimal
     payment_method: str
     reference_no: str
     payment_date: datetime

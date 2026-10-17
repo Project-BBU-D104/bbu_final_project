@@ -26,24 +26,15 @@ final ctr = Get.find<SaleController>();
                 width: double.infinity,
                 child: PaymentCardSummaryWidget()
               ),
-              SizedBox(height: 10,),
-              SizedBox(
-                width: double.infinity,
-                child: InputAmountWidget()
-              ),
+               
                SizedBox(height: 10,),
               SizedBox(
                 width: double.infinity,
                 child: Column(
                   children: [
                   
-                    PaymentMethodCardWidget(),
-                    SizedBox(height: 10,),
-                    PaymentMethodCardWidget(),
-                    SizedBox(height: 10,),
-                    PaymentMethodCardWidget(),
-                    SizedBox(height: 10,),
-                    PaymentMethodCardWidget(),
+                    
+                  
                   ],
                 )
               ),

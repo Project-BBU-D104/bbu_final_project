@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional
 from datetime import datetime, timezone
+from decimal import Decimal
+from sqlalchemy import Numeric
 from app.models.user import User
 from app.models.sale import Sale
 
@@ -11,7 +13,7 @@ class SalePayment(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     sale_id: int = Field(foreign_key="sales.id")
-    amount: int
+    amount: Decimal = Field(sa_type=Numeric(12, 2))
     payment_method: str
     reference_no: str
     payment_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

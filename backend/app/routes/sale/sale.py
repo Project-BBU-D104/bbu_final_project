@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from database import get_session
 from app.schemas.sale.sale import SaleCreate,SaleRead,SaleUpdate
@@ -16,12 +16,21 @@ def read_sales(session: Session = Depends(get_session)):
 
 @router.get("/{sale_id}", response_model=SaleRead)
 def read_sale(sale_id: int, session: Session = Depends(get_session)):
-    return get_sale(session, sale_id)
+    sale = get_sale(session, sale_id)
+    if sale is None:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    return sale
 
 @router.put("/{sale_id}", response_model=SaleRead)
 def update_sale_route(sale_id: int, sale: SaleUpdate, session: Session = Depends(get_session)):
-    return update_sale(session, sale_id, sale)
+    updated_sale = update_sale(session, sale_id, sale)
+    if updated_sale is None:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    return updated_sale
 
 @router.delete("/{sale_id}")
 def delete_sale_route(sale_id: int, session: Session = Depends(get_session)):
-    return delete_sale(session, sale_id)
+    deleted_sale = delete_sale(session, sale_id)
+    if deleted_sale is None:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    return deleted_sale

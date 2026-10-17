@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class PaymentSuccessWidget extends StatefulWidget {
@@ -8,6 +9,7 @@ class PaymentSuccessWidget extends StatefulWidget {
   @override
   State<PaymentSuccessWidget> createState() => _PaymentSuccessWidgetState();
 }
+
 class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
     with TickerProviderStateMixin {
   static const primaryBlue = Color(0xFF1479F2);
@@ -74,10 +76,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _contentSlide = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _contentController, curve: Curves.easeOut));
+    _contentSlide =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
+          CurvedAnimation(parent: _contentController, curve: Curves.easeOut),
+        );
     _contentOpacity = CurvedAnimation(
       parent: _contentController,
       curve: Curves.easeIn,
@@ -105,6 +107,14 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
 
   @override
   Widget build(BuildContext context) {
+    final rawReceipt = Get.arguments;
+    final receipt = rawReceipt is Map
+        ? Map<String, dynamic>.from(rawReceipt)
+        : <String, dynamic>{};
+    final paymentDate = DateTime.tryParse(
+      receipt['payment_date']?.toString() ?? '',
+    );
+
     return Scaffold(
       backgroundColor: lightGrey,
       body: SafeArea(
@@ -124,7 +134,11 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                     _sparkle(
                       left: 30,
                       top: 20,
-                      child: Icon(Icons.auto_awesome, color: Colors.purple.shade300, size: 22),
+                      child: Icon(
+                        Icons.auto_awesome,
+                        color: Colors.purple.shade300,
+                        size: 22,
+                      ),
                     ),
                     _sparkle(
                       right: 100,
@@ -132,7 +146,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                       child: Container(
                         width: 8,
                         height: 8,
-                        decoration: const BoxDecoration(color: Colors.pinkAccent, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(
+                          color: Colors.pinkAccent,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ),
                     _sparkle(
@@ -141,13 +158,20 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                       child: Container(
                         width: 8,
                         height: 8,
-                        decoration: const BoxDecoration(color: Colors.pinkAccent, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(
+                          color: Colors.pinkAccent,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ),
                     _sparkle(
                       right: 30,
                       bottom: 30,
-                      child: Icon(Icons.auto_awesome, color: Colors.pinkAccent, size: 22),
+                      child: Icon(
+                        Icons.auto_awesome,
+                        color: Colors.pinkAccent,
+                        size: 22,
+                      ),
                     ),
 
                     ScaleTransition(
@@ -183,7 +207,11 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                             shape: BoxShape.circle,
                             color: primaryBlue,
                           ),
-                          child: const Icon(Icons.check, color: Colors.white, size: 30),
+                          child: const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ),
@@ -212,7 +240,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                       Text(
                         'Your transaction has been completed',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade500,
+                        ),
                       ),
                     ],
                   ),
@@ -227,20 +258,44 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                   position: _contentSlide,
                   child: Column(
                     children: [
-                      _detailRow('Payment Method:', 'VISA Classic'),
+                      _detailRow(
+                        'Customer:',
+                        receipt['customer']?.toString() ?? '—',
+                      ),
                       const SizedBox(height: 12),
-                      _detailRow('Date:', '26 Sep 2022'),
+                      _detailRow(
+                        'Payment Method:',
+                        receipt['payment_method']?.toString() ?? '—',
+                      ),
                       const SizedBox(height: 12),
-                      _detailRow('Transaction ID:', 'FT4J5KN0'),
+                      _detailRow(
+                        'Date:',
+                        DateFormatter.formatDateTime(paymentDate?.toLocal()),
+                      ),
                       const SizedBox(height: 12),
-                      _detailRow('Subtotal:', '\$450'),
+                      _detailRow(
+                        'Transaction ID:',
+                        receipt['transaction_id']?.toString() ?? '—',
+                      ),
+                      const SizedBox(height: 12),
+                      _detailRow(
+                        'Subtotal:',
+                        _formatAmount(receipt['subtotal']),
+                      ),
                       const SizedBox(height: 12),
                       CustomPaint(
                         painter: _DashedLinePainter(),
-                        child: const SizedBox(width: double.infinity, height: 1),
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: 1,
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      _detailRow('Total:', '\$450', boldValue: true),
+                      _detailRow(
+                        'Total:',
+                        _formatAmount(receipt['total']),
+                        boldValue: true,
+                      ),
                     ],
                   ),
                 ),
@@ -262,14 +317,20 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                           backgroundColor: Colors.white,
                           foregroundColor: primaryBlue,
                           elevation: 0,
-                          side: const BorderSide(color: primaryBlue, width: 1.5),
+                          side: const BorderSide(
+                            color: primaryBlue,
+                            width: 1.5,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
                         ),
                         child: const Text(
                           'Export Receipt',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -279,7 +340,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                       height: 52,
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.offAllNamed(AppRoutes.sale);
+                          Get.offNamedUntil(
+                            AppRoutes.sale,
+                            ModalRoute.withName(AppRoutes.home),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryBlue,
@@ -291,7 +355,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                         ),
                         child: const Text(
                           'Back to Sale',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -307,7 +374,13 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
     );
   }
 
-  Widget _sparkle({double? left, double? right, double? top, double? bottom, required Widget child}) {
+  Widget _sparkle({
+    double? left,
+    double? right,
+    double? top,
+    double? bottom,
+    required Widget child,
+  }) {
     return Positioned(
       left: left,
       right: right,
@@ -315,10 +388,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
       bottom: bottom,
       child: ScaleTransition(
         scale: _sparkleScale,
-        child: FadeTransition(
-          opacity: _sparkleOpacity,
-          child: child,
-        ),
+        child: FadeTransition(opacity: _sparkleOpacity, child: child),
       ),
     );
   }
@@ -327,7 +397,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey.shade500)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+        ),
         Text(
           value,
           style: TextStyle(
@@ -338,6 +411,11 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
         ),
       ],
     );
+  }
+
+  String _formatAmount(Object? value) {
+    final amount = double.tryParse(value?.toString() ?? '') ?? 0;
+    return '\$${amount.toStringAsFixed(2)}';
   }
 }
 

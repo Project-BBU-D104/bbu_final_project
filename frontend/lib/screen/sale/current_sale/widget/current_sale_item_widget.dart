@@ -7,6 +7,8 @@ class CurrentSaleItemWidget extends StatelessWidget {
   final int quantity;
   final double unitPrice;
   final double subtotal;
+  final VoidCallback onIncrease;
+  final VoidCallback onDecrease;
 
   const CurrentSaleItemWidget({
     required this.productName,
@@ -14,6 +16,8 @@ class CurrentSaleItemWidget extends StatelessWidget {
     required this.quantity,
     required this.unitPrice,
     required this.subtotal,
+    required this.onIncrease,
+    required this.onDecrease,
     super.key,
   });
 
@@ -24,10 +28,7 @@ class CurrentSaleItemWidget extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(
-          color: Color(0xFFE5E5E5),
-          width: 0.5,
-        ),
+        side: const BorderSide(color: Color(0xFFE5E5E5), width: 0.5),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -41,11 +42,18 @@ class CurrentSaleItemWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: NetworkImage(imageUrl),
-                  fit: BoxFit.cover,
-                ),
               ),
+              child: imageUrl.isEmpty
+                  ? const Icon(Icons.inventory_2_outlined)
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.inventory_2_outlined),
+                      ),
+                    ),
             ),
 
             const SizedBox(width: 16),
@@ -66,16 +74,23 @@ class CurrentSaleItemWidget extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  Text(
-                    '$quantity x \$${unitPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Decrease quantity',
+                        onPressed: onDecrease,
+                        icon: const Icon(Icons.remove_circle_outline),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      Text('$quantity x \$${unitPrice.toStringAsFixed(2)}'),
+                      IconButton(
+                        tooltip: 'Increase quantity',
+                        onPressed: onIncrease,
+                        icon: const Icon(Icons.add_circle_outline),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ],
                   ),
-
-                 
                 ],
               ),
             ),

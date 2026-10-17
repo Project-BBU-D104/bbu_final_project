@@ -1,80 +1,104 @@
 import 'package:flutter/material.dart';
 
 class CardItemWidget extends StatelessWidget {
-  const CardItemWidget({super.key});
+  final Map<String, dynamic> product;
+  final int quantity;
+  final VoidCallback onTap;
+
+  const CardItemWidget({
+    super.key,
+    required this.product,
+    required this.quantity,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final photo = product['photo']?.toString() ?? '';
+    final price = double.tryParse(product['sale_price']?.toString() ?? '') ?? 0;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🔹 Image (responsive height)
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-            ),
-            child: Image.network(
-              'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
-              height: screenHeight * 0.18, // ✅ responsive
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                height: screenHeight * 0.18,
-                color: const Color(0xFFEEEEEE),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.image_outlined,
-                  color: Colors.grey.shade400,
-                  size: 40,
-                ),
-              ),
-            ),
-          ),
-
-          // 🔹 Content
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(
+          children: [
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Titanium',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A2E),
-                  ),
+              children: [
+                Expanded(
+                  child: photo.isEmpty
+                      ? const Center(
+                          child: Icon(Icons.inventory_2_outlined, size: 44),
+                        )
+                      : Image.network(
+                          photo,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Center(
+                                child: Icon(
+                                  Icons.inventory_2_outlined,
+                                  size: 44,
+                                ),
+                              ),
+                        ),
                 ),
-
-                SizedBox(height: 6),
-
-                Text(
-                  '\$12.50',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF00C896),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product['name']?.toString() ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 4),
+                      Text('\$${price.toStringAsFixed(2)}'),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            if (quantity > 0)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minWidth: 28,
+                    minHeight: 28,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 7),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00C896),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '$quantity',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional, List,TYPE_CHECKING
 from datetime import datetime, timezone
+from decimal import Decimal
+from sqlalchemy import Numeric
 from app.models.user import User
 from app.models.customer import Customer
 
@@ -16,16 +18,16 @@ class Sale(SQLModel, table=True):
     customer_id: int = Field(foreign_key="customers.id")
     invoice_no: str
     sale_date: datetime
-    subtotal: int
-    tax_amount: int
-    discount_amount: int
-    total_amount: int
-    paid_amount: int
-    due_amount: int
+    subtotal: Decimal = Field(sa_type=Numeric(12, 2))
+    tax_amount: Decimal = Field(sa_type=Numeric(12, 2))
+    discount_amount: Decimal = Field(sa_type=Numeric(12, 2))
+    total_amount: Decimal = Field(sa_type=Numeric(12, 2))
+    paid_amount: Decimal = Field(sa_type=Numeric(12, 2))
+    due_amount: Decimal = Field(sa_type=Numeric(12, 2))
     payment_status: str
     status: str
     payment_method: str
-    deleted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    deleted_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

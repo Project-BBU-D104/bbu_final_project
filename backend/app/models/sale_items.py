@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional,TYPE_CHECKING
 from datetime import datetime, timezone
+from decimal import Decimal
+from sqlalchemy import Numeric
 from app.models.product import Product
 
 if TYPE_CHECKING:
@@ -13,8 +15,8 @@ class SaleItems(SQLModel, table=True):
     sale_id: int = Field(foreign_key="sales.id")
     product_id: int = Field(foreign_key="product.id")
     qty: int
-    sale_price: int
-    subtotal: int
+    sale_price: Decimal = Field(sa_type=Numeric(12, 2))
+    subtotal: Decimal = Field(sa_type=Numeric(12, 2))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
