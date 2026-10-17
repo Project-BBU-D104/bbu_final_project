@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -16,16 +17,7 @@ class UnitCardWidget extends StatelessWidget {
   });
 
   final ctr = Get.put(UnitController());
-
-  String formatDate(dynamic date) {
-    if(date == null) return "-";
-    try {
-      return DateFormat("dd MMM yyyy, hh:mm a")
-          .format(DateTime.parse(date.toString()));
-    } catch(e){
-      return "-";
-    }
-  }
+ 
   @override
   Widget build(BuildContext context) {
     final bool isActive = units['status'] ?? false;
@@ -171,8 +163,8 @@ class UnitCardWidget extends StatelessWidget {
                   child: _InfoItem(
                     icon: Icons.calendar_today,
                     title: "Created",
-                    value: formatDate(
-                      units['created_at'],
+                    value: DateFormatter.formatDate(
+                      DateTime.tryParse(units['created_at']),
                     ),
                   ),
                 ),
@@ -180,8 +172,8 @@ class UnitCardWidget extends StatelessWidget {
                   child: _InfoItem(
                     icon: Icons.update,
                     title: "Updated",
-                    value: formatDate(
-                      units['updated_at'],
+                    value: DateFormatter.formatDate(
+                      DateTime.tryParse(units['updated_at']),
                     ),
                   ),
                 ),

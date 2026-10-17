@@ -24,18 +24,7 @@ class SaleListScreen extends StatelessWidget {
               SizedBox(height: 4),
 
               SearchWidget(title: "Search Sale"),
-              
-              SizedBox(height: 12),
-
-              Row(
-                children: [
-                  ChipWidget(title: "All"),
-                  ChipWidget(title: "Pending"),
-                  ChipWidget(title: "Completed"),
-                  ChipWidget(title: "Canceled"),
-                ]
-              ),
-
+               
               SizedBox(height: 10,),
 
               Obx((){ 

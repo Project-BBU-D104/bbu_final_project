@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_transfer_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class StockTransferCardWidget extends StatelessWidget {
@@ -145,7 +146,7 @@ class StockTransferCardWidget extends StatelessWidget {
                         size: 16, color: Colors.grey),
                     SizedBox(width: 6),
                     Text(
-                      stockTransfer['created_at'],
+                      DateFormatter.formatDate(DateTime.tryParse(stockTransfer['created_at'])),
                       style: TextStyle(color: Colors.grey),
                     ),
                   ],

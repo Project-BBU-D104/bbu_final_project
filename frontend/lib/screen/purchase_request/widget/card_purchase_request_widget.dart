@@ -125,58 +125,12 @@ class CardPurchaseRequestWidget extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
-              if (items.isNotEmpty) ...[
-                const SizedBox(height: 9),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(9),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${"Items".tr} (${items.length})",
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                      const SizedBox(height: 4),
-                      ...items.take(2).map((item) {
-                        final productId = int.tryParse(
-                          item["product_id"].toString(),
-                        );
-                        final product = controller.productController.products
-                            .where(
-                              (product) =>
-                                  int.tryParse(product["id"].toString()) ==
-                                  productId,
-                            )
-                            .firstOrNull;
-                        final productName =
-                            product?["name"]?.toString() ??
-                            "Product $productId";
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Text(
-                            "$productName  ·  ${item["qty"]} ${item["unit"]}",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        );
-                      }),
-                      if (items.length > 2)
-                        Text("+${items.length - 2} more".tr),
-                    ],
-                  ),
-                ),
-              ],
+
               const SizedBox(height: 8),
               _detail(
                 context,
                 Icons.calendar_today_outlined,
-                "${_date(purchaseRequest["request_date"])}  ·  ${_date(purchaseRequest["approved_date"])}",
+                _date(purchaseRequest["request_date"]),
               ),
             ],
           ),

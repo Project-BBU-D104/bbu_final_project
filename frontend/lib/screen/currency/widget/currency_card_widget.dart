@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/currency_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -24,8 +25,8 @@ class CurrencyCardWidget extends StatelessWidget {
     final bool isDefault = currency["is_default"] ?? false;
 
     final String createdAt = currency["created_at"] != null
-        ? DateFormat("dd MMM yyyy • hh:mm a")
-            .format(DateTime.parse(currency["created_at"]))
+        ? DateFormatter
+            .formatDate(DateTime.parse(currency["created_at"]))
         : "-";
 
     return Card(

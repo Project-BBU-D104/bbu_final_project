@@ -30,6 +30,7 @@ class SystemConfigurationUpdate(SQLModel):
     updated_at: Optional[datetime] = None
 
 class SystemConfigurationRead(SQLModel):
+    id: Optional[int] = None
     company_name: str
     company_address: Optional[str] = None
     phone: Optional[str] = None

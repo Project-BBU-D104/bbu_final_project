@@ -48,6 +48,7 @@ import 'package:frontend/screen/stock/warehouse_stock/warehouse_stock_screen.dar
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_detail_card_widget.dart';
 import 'package:frontend/screen/system_configuration/system_configuration_screen.dart';
+import 'package:frontend/screen/system_configuration/widget/card_system_cofiguration_detail_widget.dart';
 import 'package:frontend/screen/unit/unit_screen.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
@@ -69,17 +70,13 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.put(LandingController());
       }),
-    
     ),
     GetPage(
       name: AppRoutes.home,
       page: () => HomeScreen(),
       binding: HomeBinding(),
     ),
-    GetPage(
-      name: AppRoutes.login,
-      page: () => LoginScreen(),
-    ),
+    GetPage(name: AppRoutes.login, page: () => LoginScreen()),
     GetPage(
       name: AppRoutes.category,
       page: () => CategoryScreen(),
@@ -120,10 +117,7 @@ class AppPages {
       page: () => SaleScreen(),
       binding: SaleBinding(),
     ),
-    GetPage(
-      name: AppRoutes.saleList,
-      page: () => SaleListScreen(),
-    ),
+    GetPage(name: AppRoutes.saleList, page: () => SaleListScreen()),
     GetPage(
       name: AppRoutes.salePayment,
       page: () => PaymentScreen(),
@@ -158,37 +152,23 @@ class AppPages {
       page: () => AuditLogsScreen(),
       binding: AuditLogsBinding(),
     ),
-    GetPage(
-      name: AppRoutes.addProduct,
-      page: () => AddProductWidget(),
-    ),
+    GetPage(name: AppRoutes.addProduct, page: () => AddProductWidget()),
     GetPage(
       name: AppRoutes.editProduct,
-      page: () => EditProductWidget(
-        productId: Get.arguments as int,
-      ),
+      page: () => EditProductWidget(productId: Get.arguments as int),
     ),
-    GetPage(
-      name: AppRoutes.currentSale,
-      page: () => CurrentSaleWidget(),
-    ),
+    GetPage(name: AppRoutes.currentSale, page: () => CurrentSaleWidget()),
     GetPage(
       name: AppRoutes.saleWithPayment,
       page: () => SaleWithPaymentScreen(),
     ),
-    GetPage(
-      name: AppRoutes.paymentSuccess,
-      page: () => PaymentSuccessWidget(),
-    ),
+    GetPage(name: AppRoutes.paymentSuccess, page: () => PaymentSuccessWidget()),
 
     GetPage(
       name: AppRoutes.productCardDetail,
       page: () => ProductCardDetailWidget(),
     ),
-    GetPage(
-      name: AppRoutes.purchaseDetail,
-      page: () => PurchaseDetailWidget(),
-    ),
+    GetPage(name: AppRoutes.purchaseDetail, page: () => PurchaseDetailWidget()),
     GetPage(
       name: AppRoutes.supplierDetail,
       page: () => SupplierDetailCardWidget(),
@@ -201,18 +181,9 @@ class AppPages {
       name: AppRoutes.stockTransferDetail,
       page: () => StockDetailCardWidget(),
     ),
-    GetPage(
-      name: AppRoutes.saleListDetail,
-      page: () => SaleListDetailWidget(),
-    ),
-    GetPage(
-      name: AppRoutes.userDetail,
-      page: () => UserDetailCardWidget(),
-    ),
-    GetPage(
-      name: AppRoutes.auditLogDetail,
-      page: () => AuditLogDetailWidget(),
-    ),
+    GetPage(name: AppRoutes.saleListDetail, page: () => SaleListDetailWidget()),
+    GetPage(name: AppRoutes.userDetail, page: () => UserDetailCardWidget()),
+    GetPage(name: AppRoutes.auditLogDetail, page: () => AuditLogDetailWidget()),
     GetPage(
       name: AppRoutes.purchaseReqest,
       page: () => PurchaseRequestScreen(),
@@ -242,13 +213,14 @@ class AppPages {
       name: AppRoutes.systemConfiguration,
       page: () => SystemConfigurationScreen(),
     ),
-
-
-    // report 
-     GetPage(
-      name: AppRoutes.saleReport,
-      page: () => SalesReportScreen(),
+    GetPage(
+      name: AppRoutes.systemConfigurationDetail,
+      page: () => CardSystemConfigurationDetailWidget(
+        configuration: Map<String, dynamic>.from(Get.arguments as Map),
+      ),
     ),
+
+    // report
+    GetPage(name: AppRoutes.saleReport, page: () => SalesReportScreen()),
   ];
 }
-  

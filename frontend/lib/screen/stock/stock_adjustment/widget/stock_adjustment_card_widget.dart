@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/stock_adjustment_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class StockAdjustmentCardWidget extends StatelessWidget {
@@ -161,7 +162,7 @@ class StockAdjustmentCardWidget extends StatelessWidget {
                       const SizedBox(width: 8),
       
                       Text(
-                        stockAdjustment["created_at"],
+                        DateFormatter.formatDate(DateTime.parse(stockAdjustment["created_at"])),
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.w600,

@@ -34,10 +34,11 @@ class SystemConfigurationScreen extends StatelessWidget {
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: configurations.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  separatorBuilder: (_, _) => const SizedBox(height: 16),
                   itemBuilder: (context, index) =>
                       CardSystemConfigurationWidget(
                         configuration: configurations[index],
+                        onTap: () => ctr.openDetail(configurations[index]),
                       ),
                 );
               }

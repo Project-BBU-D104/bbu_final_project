@@ -1,8 +1,7 @@
 class AppRoutes {
-
   static const landing = '/landing';
   static const login = '/login';
-  
+
   static const home = '/home';
 
   static const category = '/category';
@@ -45,7 +44,7 @@ class AppRoutes {
   static const unit = '/unit';
 
   static const systemConfiguration = '/system-configuration';
-
+  static const systemConfigurationDetail = '/system-configuration-detail';
 
   // report
   static const saleReport = '/sale-report';
