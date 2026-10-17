@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import SQLModel
+from pydantic import field_validator
 from typing import List, Optional
 
 from app.schemas.user.user import UserSimple
@@ -27,6 +28,13 @@ class PurchaseCreate(SQLModel):
     status: str = "completed"
     description: Optional[str] = None
 
+    @field_validator("purchase_date")
+    @classmethod
+    def ensure_purchase_date_timezone(cls, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
+
 class PurchaseUpdate(SQLModel):
     user_id: Optional[int] = None
     supplier_id: Optional[int] = None
@@ -44,6 +52,13 @@ class PurchaseUpdate(SQLModel):
     description: Optional[str] = None
     items: Optional[List[PurchaseItemCreate]] = None
     updated_at: Optional[datetime] = None
+
+    @field_validator("purchase_date")
+    @classmethod
+    def ensure_purchase_date_timezone(cls, value: Optional[datetime]) -> Optional[datetime]:
+        if value is not None and value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
 
 
 class PurchaseRead(SQLModel):

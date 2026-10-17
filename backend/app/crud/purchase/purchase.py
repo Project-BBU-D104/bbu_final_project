@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.purchase import Purchase
 from app.schemas.purchase.purchase import PurchaseCreate, PurchaseUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from app.models.purchase_item import PurchaseItem
@@ -226,7 +226,7 @@ def update_purchase(
                 qty=item.qty,
             )
 
-    db_purchase.updated_at = datetime.utcnow()
+    db_purchase.updated_at = datetime.now(timezone.utc)
 
     session.add(db_purchase)
     calculate_purchase_payment(session, purchase_id)
