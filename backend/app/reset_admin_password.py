@@ -11,11 +11,12 @@ from app.security import hash_password
 with Session(engine) as session:
 
     user = session.exec(
-        select(User).where(User.name == "cashier")
+        # select(User).where(User.name == "cashier")
+        select(User).where(User.name == "admin")
     ).first()
 
     if user is None:
-        print("Cashier user not found")
+        print("Admin user not found")
     else:
         user.password = hash_password("123456")
 
@@ -23,3 +24,4 @@ with Session(engine) as session:
         session.commit()
 
         print("Admin password reset successfully")
+        # print("Cashier password reset successfully")
