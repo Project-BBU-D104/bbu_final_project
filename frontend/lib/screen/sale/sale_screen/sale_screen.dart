@@ -92,6 +92,7 @@ class SaleScreen extends StatelessWidget {
                                         return Obx(
                                           () => CardItemWidget(
                                             product: product,
+                                            currency: ctr.currency.value,
                                             quantity:
                                                 ctr.cart[productId]?['qty']
                                                     as int? ??
@@ -122,6 +123,7 @@ class SaleScreen extends StatelessWidget {
                           child: PaymentFooterWidget(
                             itemCount: ctr.totalItems,
                             total: ctr.subtotal,
+                            currency: ctr.currency.value,
                             onTap: ctr.onCurrentSale,
                           ),
                         ),

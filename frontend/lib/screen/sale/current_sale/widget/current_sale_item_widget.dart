@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 
 class CurrentSaleItemWidget extends StatelessWidget {
   final String productName;
@@ -7,6 +8,7 @@ class CurrentSaleItemWidget extends StatelessWidget {
   final int quantity;
   final double unitPrice;
   final double subtotal;
+  final Map<String, dynamic>? currency;
   final VoidCallback onIncrease;
   final VoidCallback onDecrease;
 
@@ -16,6 +18,7 @@ class CurrentSaleItemWidget extends StatelessWidget {
     required this.quantity,
     required this.unitPrice,
     required this.subtotal,
+    this.currency,
     required this.onIncrease,
     required this.onDecrease,
     super.key,
@@ -82,7 +85,9 @@ class CurrentSaleItemWidget extends StatelessWidget {
                         icon: const Icon(Icons.remove_circle_outline),
                         visualDensity: VisualDensity.compact,
                       ),
-                      Text('$quantity x \$${unitPrice.toStringAsFixed(2)}'),
+                      Text(
+                        '$quantity x ${CurrencyFormatter.format(unitPrice, currency)}',
+                      ),
                       IconButton(
                         tooltip: 'Increase quantity',
                         onPressed: onIncrease,
@@ -102,7 +107,7 @@ class CurrentSaleItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '\$${subtotal.toStringAsFixed(2)}',
+                  CurrencyFormatter.format(subtotal, currency),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
