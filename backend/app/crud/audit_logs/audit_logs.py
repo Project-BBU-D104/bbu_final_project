@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.audit_logs import AuditLogs
 from app.schemas.audit_logs.audit_logs import AuditLogsCreate, AuditLogsUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import selectinload
 
 def create_audit_logs(session: Session, audit_logs: AuditLogsCreate):
@@ -48,7 +48,7 @@ def update_audit_logs(session: Session, audit_logs_id: int, audit_logs: AuditLog
         if audit_logs.new_value is not None:
             db_audit_logs.new_value = audit_logs.new_value
 
-        db_audit_logs.updated_at = audit_logs.updated_at or datetime.utcnow()
+        db_audit_logs.updated_at = datetime.now(timezone.utc)
         session.add(db_audit_logs)
         session.commit()
         session.refresh(db_audit_logs)

@@ -1,7 +1,7 @@
 from sqlmodel import Session, select, or_
 from app.models.supplier import Supplier
 from app.schemas.supplier.supplier import SupplierCreate, SupplierUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import HTTPException
 from app.models.purchase import Purchase
 from app.models.purchase_payment import PurchasePayment
@@ -53,7 +53,7 @@ def update_supplier(session: Session, supplier_id: int, supplier: SupplierUpdate
         if supplier.status is not None:
             db_supplier.status = supplier.status
 
-        db_supplier.updated_at = supplier.updated_at or datetime.utcnow()
+        db_supplier.updated_at = datetime.now(timezone.utc)
         session.add(db_supplier)
         session.commit()
         session.refresh(db_supplier)

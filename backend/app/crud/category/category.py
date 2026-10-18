@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.category import Category
 from app.schemas.category.category import CategoryCreate, CategoryUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.product import Product
 
 from app.services.telegram_service import send_message
@@ -69,7 +69,7 @@ def update_category(session: Session, category_id: int, category: CategoryUpdate
         if category.description is not None:
             db_category.description = category.description
 
-        db_category.updated_at = category.updated_at or datetime.utcnow()
+        db_category.updated_at = datetime.now(timezone.utc)
         session.add(db_category)
         session.commit()
         session.refresh(db_category)

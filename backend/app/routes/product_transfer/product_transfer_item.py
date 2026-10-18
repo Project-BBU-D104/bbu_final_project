@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from database import get_session
 from app.schemas.product_transfer.product_transfer_item import ProductTransferItemCreate,ProductTransferItemRead,ProductTransferItemUpdate
@@ -16,7 +16,10 @@ def read_product_transfer_items(session: Session = Depends(get_session)):
 
 @router.get("/{product_transfer_item_id}", response_model=ProductTransferItemRead)
 def read_product_transfer_item(product_transfer_item_id: int, session: Session = Depends(get_session)):
-    return get_product_transfer_item(session, product_transfer_item_id)
+    item = get_product_transfer_item(session, product_transfer_item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Transfer item not found.")
+    return item
 
 @router.put("/{product_transfer_item_id}", response_model=ProductTransferItemRead)
 def update_product_transfer_item_route(
@@ -24,12 +27,18 @@ def update_product_transfer_item_route(
     product_transfer: ProductTransferItemUpdate,
     session: Session = Depends(get_session)
 ):
-    return update_product_transfer_item(
+    item = update_product_transfer_item(
         session,
         product_transfer_item_id,
         product_transfer
     )
+    if item is None:
+        raise HTTPException(status_code=404, detail="Transfer item not found.")
+    return item
 
 @router.delete("/{product_transfer_item_id}")
 def delete_product_transfer_item_route(product_transfer_item_id: int, session: Session = Depends(get_session)):
-    return delete_product_transfer_item(session, product_transfer_item_id)
+    item = delete_product_transfer_item(session, product_transfer_item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Transfer item not found.")
+    return {"message": "Transfer item deleted successfully."}

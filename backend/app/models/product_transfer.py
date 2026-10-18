@@ -17,7 +17,10 @@ class ProductTransfer(SQLModel, table=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
  
-    product_transfer_items: list["ProductTransferItem"] = Relationship(back_populates="product_transfer")
+    product_transfer_items: list["ProductTransferItem"] = Relationship(
+        back_populates="product_transfer",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
     from_warehouse: Optional["Warehouse"] = Relationship(
         back_populates="outgoing_transfers",
         sa_relationship_kwargs={

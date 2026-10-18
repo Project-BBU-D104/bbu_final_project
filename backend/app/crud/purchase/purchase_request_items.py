@@ -4,7 +4,6 @@ from app.models.purchase_request_items import PurchaseRequestItems
 from app.models.purchase_requests import PurchaseRequest
 from app.models.product import Product
 from app.schemas.purchase.purchase_request_items import PurchaseRequestItemCreate, PurchaseRequestItemUpdate
-from datetime import datetime
 
 def _item_response(item: PurchaseRequestItems):
     return {

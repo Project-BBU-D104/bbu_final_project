@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.unit import Unit
 from app.schemas.unit.unit import UnitCreate, UnitUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.product import Product
 
 def create_unit(session: Session, unit: UnitCreate):
@@ -47,7 +47,7 @@ def update_unit(session: Session, unit_id: int, unit: UnitUpdate):
         if unit.status is not None:
             db_unit.status = unit.status
 
-        db_unit.updated_at = unit.updated_at or datetime.utcnow()
+        db_unit.updated_at = datetime.now(timezone.utc)
         session.add(db_unit)
         session.commit()
         session.refresh(db_unit)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from database import get_session
 from app.schemas.product_transfer.product_transfer import ProductTransferCreate,ProductTransferRead,ProductTransferUpdate
@@ -16,7 +16,10 @@ def read_product_transfers(session: Session = Depends(get_session)):
 
 @router.get("/{product_transfer_id}", response_model=ProductTransferRead)
 def read_stock_adjustment(product_transfer_id: int, session: Session = Depends(get_session)):
-    return get_product_transfers(session, product_transfer_id)
+    transfer = get_product_transfers(session, product_transfer_id)
+    if transfer is None:
+        raise HTTPException(status_code=404, detail="Stock transfer not found.")
+    return transfer
 
 @router.put("/{product_transfer_id}", response_model=ProductTransferRead)
 def update_product_transfer_route(
@@ -24,12 +27,18 @@ def update_product_transfer_route(
     product_transfer: ProductTransferUpdate,
     session: Session = Depends(get_session)
 ):
-    return update_product_transfer(
+    transfer = update_product_transfer(
         session,
         product_transfer_id,
         product_transfer
     )
+    if transfer is None:
+        raise HTTPException(status_code=404, detail="Stock transfer not found.")
+    return transfer
 
 @router.delete("/{product_transfer_id}")
 def delete_product_transfer_route(product_transfer_id: int, session: Session = Depends(get_session)):
-    return delete_product_transfer(session, product_transfer_id)
+    transfer = delete_product_transfer(session, product_transfer_id)
+    if transfer is None:
+        raise HTTPException(status_code=404, detail="Stock transfer not found.")
+    return {"message": "Stock transfer deleted successfully."}

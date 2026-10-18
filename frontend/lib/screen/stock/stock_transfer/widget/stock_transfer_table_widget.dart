@@ -44,9 +44,18 @@ class StockTransferTableWidget extends StatelessWidget {
                 DataColumn(label: Text('Date')),
               ],
               rows: stockTransfers.map((transfer) {
-                final product = transfer['product'] is Map
-                    ? Map<String, dynamic>.from(transfer['product'] as Map)
-                    : <String, dynamic>{};
+                final items = transfer['product_transfer_items'] as List? ?? [];
+                final products = items
+                    .map(
+                      (item) =>
+                          item['product']?['name']?.toString() ?? 'Product',
+                    )
+                    .join(', ');
+                final totalQty = items.fold<int>(
+                  0,
+                  (sum, item) =>
+                      sum + (int.tryParse(item['qty']?.toString() ?? '') ?? 0),
+                );
                 final fromWarehouse = transfer['from_warehouse'] is Map
                     ? Map<String, dynamic>.from(
                         transfer['from_warehouse'] as Map,
@@ -55,10 +64,10 @@ class StockTransferTableWidget extends StatelessWidget {
                 final toWarehouse = transfer['to_warehouse'] is Map
                     ? Map<String, dynamic>.from(transfer['to_warehouse'] as Map)
                     : <String, dynamic>{};
-                final openDetails = () =>
+                void openDetails() =>
                     controller.gotoStockTransferDetail(transfer);
-                final createdAt = DateTime.tryParse(
-                  transfer['created_at']?.toString() ?? '',
+                final transferDate = DateTime.tryParse(
+                  transfer['transfer_date']?.toString() ?? '',
                 );
 
                 return DataRow(
@@ -79,8 +88,8 @@ class StockTransferTableWidget extends StatelessWidget {
                       SizedBox(
                         width: 170,
                         child: Text(
-                          product['name']?.toString() ?? '-',
-                          maxLines: 1,
+                          products.isEmpty ? '-' : products,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -108,12 +117,9 @@ class StockTransferTableWidget extends StatelessWidget {
                       ),
                       onTap: openDetails,
                     ),
+                    DataCell(Text(totalQty.toString()), onTap: openDetails),
                     DataCell(
-                      Text(transfer['qty']?.toString() ?? '0'),
-                      onTap: openDetails,
-                    ),
-                    DataCell(
-                      Text(DateFormatter.formatDate(createdAt)),
+                      Text(DateFormatter.formatDate(transferDate)),
                       onTap: openDetails,
                     ),
                   ],

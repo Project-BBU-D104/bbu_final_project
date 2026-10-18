@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from app.models.purchase_requests import PurchaseRequest
 from app.models.purchase_request_items import PurchaseRequestItems
 from app.schemas.purchase.purchase_requests import PurchaseRequestCreate, PurchaseRequestUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 
 def generate_request_no(session: Session) -> str:
     # Get the latest request no
@@ -55,7 +55,7 @@ def update_purchase_request(session: Session, purchase_request_id: int, purchase
     for field, value in request_data.items():
         setattr(db_purchase_request, field, value)
 
-    db_purchase_request.updated_at = datetime.utcnow()
+    db_purchase_request.updated_at = datetime.now(timezone.utc)
     session.add(db_purchase_request)
     session.commit()
     session.refresh(db_purchase_request)

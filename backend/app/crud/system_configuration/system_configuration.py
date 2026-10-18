@@ -1,7 +1,7 @@
-from sqlmodel import Session, select, or_
+from sqlmodel import Session, select
 from app.models.system_configuration import SystemConfiguration
 from app.schemas.system_configuration.system_configuration import SystemConfigurationCreate, SystemConfigurationUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 
 def create_system_configuration(session: Session, system_configuration: SystemConfigurationCreate):
     db_system_configuration = SystemConfiguration.from_orm(system_configuration)
@@ -42,7 +42,7 @@ def update_system_configuration(session: Session, system_configuration_id: int, 
         if system_configuration.low_stock_warning is not None:
             db_system_configuration.low_stock_warning = system_configuration.low_stock_warning
 
-        db_system_configuration.updated_at = system_configuration.updated_at or datetime.utcnow()
+        db_system_configuration.updated_at = system_configuration.updated_at or datetime.now(timezone.utc)
         session.add(db_system_configuration)
         session.commit()
         session.refresh(db_system_configuration)

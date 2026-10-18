@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.sale_payment import SalePayment
 from app.schemas.sale.sale_payment import SalePaymentCreate, SalePaymentUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import selectinload
 
 def create_sale_payment(session: Session, sale: SalePaymentCreate):
@@ -54,7 +54,7 @@ def update_sale_payment(session: Session, sale_payment_id: int, sale_item: SaleP
         if sale_item.note is not None:
             db_sale_payment.note = sale_item.note
 
-        db_sale_payment.updated_at = sale_item.updated_at or datetime.utcnow()
+        db_sale_payment.updated_at = sale_item.updated_at or datetime.now(timezone.utc)
         session.add(db_sale_payment)
         session.commit()
         session.refresh(db_sale_payment)

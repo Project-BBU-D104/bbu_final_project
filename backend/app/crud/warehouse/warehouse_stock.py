@@ -1,7 +1,6 @@
 from sqlmodel import Session, select
 from app.models.warehouse_stock import WarehouseStock
 from app.schemas.warehouse.warehouse_stock import WarehouseStockCreate, WarehouseStockUpdate
-from datetime import datetime
 
 from fastapi import HTTPException
 

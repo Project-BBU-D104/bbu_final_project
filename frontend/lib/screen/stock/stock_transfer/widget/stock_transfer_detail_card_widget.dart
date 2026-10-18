@@ -35,10 +35,7 @@ class StockDetailCardWidget extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
           ),
         ],
@@ -48,20 +45,23 @@ class StockDetailCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final product = productTransfer["product"];
     final fromWarehouse = productTransfer["from_warehouse"];
     final toWarehouse = productTransfer["to_warehouse"];
+    final items = productTransfer['product_transfer_items'] as List? ?? [];
+    final totalQuantity = items.fold<int>(
+      0,
+      (total, item) =>
+          total + (int.tryParse(item['qty']?.toString() ?? '') ?? 0),
+    );
 
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: "Stock Transfer Detail",
-      ),
+      appBar: const CustomAppBar(title: "Stock Transfer Detail"),
       backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// Product Card
+            /// Transferred items
             SizedBox(
               width: double.infinity,
               child: Card(
@@ -72,26 +72,46 @@ class StockDetailCardWidget extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(18),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // CircleAvatar(
-                      //   radius: 40,
-                      //   backgroundImage: NetworkImage(product["photo"]),
-                      // ),
-                      const SizedBox(height: 12),
-                      // Text(
-                      //   product["name"],
-                      //   style: const TextStyle(
-                      //     fontWeight: FontWeight.bold,
-                      //     fontSize: 22,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 4),
-                      // Text(
-                      //   product["category"]["name"],
-                      //   style: TextStyle(
-                      //     color: Colors.grey.shade600,
-                      //   ),
-                      // ),
+                      Text(
+                        'Transferred items (${items.length} product lines · $totalQuantity total units)',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                        ),
+                      ),
+                      const Divider(height: 24),
+                      if (items.isEmpty)
+                        const Text('No transfer items recorded.'),
+                      for (final item in items)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.inventory_2_outlined,
+                                color: Colors.green,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  item['product']?['name']?.toString() ??
+                                      'Product',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                'Qty: ${item['qty'] ?? 0}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -138,33 +158,21 @@ class StockDetailCardWidget extends StatelessWidget {
                       icon: Icons.store,
                     ),
 
-                    // _item(
-                    //   "Quantity",
-                    //   "${productTransfer["qty"]} ${product["unit"]}",
-                    //   icon: Icons.inventory_2,
-                    // ),
-
-                    // _item(
-                    //   "Barcode",
-                    //   product["barcode"].toString(),
-                    //   icon: Icons.qr_code,
-                    // ),
-
-                    // _item(
-                    //   "Supplier",
-                    //   product["supplier"]["name"],
-                    //   icon: Icons.person,
-                    // ),
-
                     _item(
                       "Transfer Date",
-                      DateFormatter.formatDate(DateTime.tryParse(productTransfer['transfer_date'] ?? ''),),
+                      DateFormatter.formatDate(
+                        DateTime.tryParse(
+                          productTransfer['transfer_date'] ?? '',
+                        ),
+                      ),
                       icon: Icons.calendar_today,
                     ),
 
                     _item(
                       "Created At",
-                      DateFormatter.formatDate(DateTime.tryParse(productTransfer['created_at'] ?? ''),),
+                      DateFormatter.formatDate(
+                        DateTime.tryParse(productTransfer['created_at'] ?? ''),
+                      ),
                       icon: Icons.access_time,
                     ),
                   ],
@@ -184,8 +192,7 @@ class StockDetailCardWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ctr.onDeleteStockTransfer(
-                        context, productTransfer["id"]);
+                    ctr.onDeleteStockTransfer(context, productTransfer["id"]);
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: const Text("Delete"),
@@ -203,10 +210,7 @@ class StockDetailCardWidget extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ctr.editStockTransfer(
-                      context,
-                      productTransfer,
-                    );
+                    ctr.editStockTransfer(context, productTransfer);
                   },
                   icon: const Icon(Icons.edit_outlined),
                   label: const Text("Edit"),

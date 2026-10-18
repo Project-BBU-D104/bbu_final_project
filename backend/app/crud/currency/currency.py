@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.currency import Currency
 from app.schemas.currency.currency import CurrencyCreate, CurrencyUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 
 def create_currency(session: Session, currency: CurrencyCreate):
     existing = session.exec(
@@ -50,7 +50,7 @@ def update_currency(session: Session, currency_id: int, currency: CurrencyUpdate
         if currency.status is not None:
             db_currency.status = currency.status
 
-        db_currency.updated_at = currency.updated_at or datetime.utcnow()
+        db_currency.updated_at = datetime.now(timezone.utc)
         session.add(db_currency)
         session.commit()
         session.refresh(db_currency)

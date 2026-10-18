@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.role import Role
 from app.schemas.role.role import RoleCreate, RoleUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import HTTPException
 from app.models.user import User
 
@@ -28,7 +28,7 @@ def update_role(session: Session, role_id: int, role: RoleUpdate):
         if role.is_active is not None:
             db_role.is_active = role.is_active
 
-        db_role.updated_at = role.updated_at or datetime.utcnow()
+        db_role.updated_at = role.updated_at or datetime.now(timezone.utc)
         session.add(db_role)
         session.commit()
         session.refresh(db_role)

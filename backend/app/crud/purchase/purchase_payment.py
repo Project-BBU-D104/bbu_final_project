@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.purchase_payment import PurchasePayment
 from app.schemas.purchase.purchase_payment import PurchasePaymentCreate, PurchasePaymentUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from app.models.purchase import Purchase
 
@@ -158,7 +158,7 @@ def update_purchase_payment(session: Session, purchase_payment_id: int, purchase
     if purchase_payment.status is not None:
         db_purchase_payment.status = purchase_payment.status
 
-    db_purchase_payment.updated_at = purchase_payment.updated_at or datetime.utcnow()
+    db_purchase_payment.updated_at = purchase_payment.updated_at or datetime.now(timezone.utc)
     session.add(db_purchase_payment)
     session.flush()
 

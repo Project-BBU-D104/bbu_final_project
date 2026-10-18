@@ -2,7 +2,7 @@ from sqlmodel import Session, select
 from app.models.sale import Sale
 from app.models.product import Product
 from app.schemas.sale.sale import SaleCreate, SaleUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy.orm import selectinload
 from app.models.sale_items import SaleItems
@@ -109,7 +109,7 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
 
         _set_sale_totals(db_sale)
 
-        db_sale.updated_at = sale.updated_at or datetime.utcnow()
+        db_sale.updated_at = sale.updated_at or datetime.now(timezone.utc)
         session.add(db_sale)
         session.commit()
         return get_sale(session, sale_id)

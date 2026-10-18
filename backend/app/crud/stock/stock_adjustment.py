@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.stock_adjustment import StockAdjustment
 from app.schemas.stock.stock_adjustment import StockAdjustmentCreate, StockAdjustmentUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from app.crud.warehouse.warehouse_stock import get_stock_by_product_and_warehouse
@@ -232,7 +232,7 @@ def update_stock_adjustment(
     db_stock_adjustment.reason = new_reason
     db_stock_adjustment.reference_no = new_reference_no
     db_stock_adjustment.updated_at = (
-        stock_adjustment.updated_at or datetime.utcnow()
+        stock_adjustment.updated_at or datetime.now(timezone.utc)
     )
     session.add(old_stock)
 

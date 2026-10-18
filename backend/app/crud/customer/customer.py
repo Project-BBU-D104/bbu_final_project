@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.customer import Customer
 from app.schemas.customer.customer import CustomerCreate, CustomerUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 
 def create_customer(session: Session, customer: CustomerCreate):
     db_customer = Customer.from_orm(customer)
@@ -30,7 +30,7 @@ def update_customer(session: Session, customer_id: int, customer: CustomerUpdate
         if customer.address is not None:
             db_customer.address = customer.address
 
-        db_customer.updated_at = customer.updated_at or datetime.utcnow()
+        db_customer.updated_at = datetime.now(timezone.utc)
         session.add(db_customer)
         session.commit()
         session.refresh(db_customer)

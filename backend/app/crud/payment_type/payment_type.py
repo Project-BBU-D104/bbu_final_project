@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.payment_type import PaymentType
 from app.schemas.payment_type.payment_type import PaymentTypeCreate, PaymentTypeUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 
 def create_payment_type(session: Session, payment_type: PaymentTypeCreate):
     existing = session.exec(
@@ -44,7 +44,7 @@ def update_payment_type(session: Session, payment_type_id: int, payment_type: Pa
         if payment_type.status is not None:
             db_payment_type.status = payment_type.status
 
-        db_payment_type.updated_at = payment_type.updated_at or datetime.utcnow()
+        db_payment_type.updated_at = datetime.now(timezone.utc)
         session.add(db_payment_type)
         session.commit()
         session.refresh(db_payment_type)

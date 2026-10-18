@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from app.models.product import Product
 from app.schemas.product.product import ProductCreate, ProductUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import selectinload
  
 from app.models.purchase_item import PurchaseItem
@@ -72,7 +72,13 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
         if product.description is not None:
             db_product.description = product.description
 
-        db_product.updated_at = product.updated_at or datetime.utcnow()
+        updated_at = product.updated_at
+        if updated_at is not None and updated_at.tzinfo is None:
+            updated_at = updated_at.replace(tzinfo=timezone.utc)
+        elif updated_at is not None:
+            updated_at = updated_at.astimezone(timezone.utc)
+
+        db_product.updated_at = updated_at or datetime.now(timezone.utc)
         session.add(db_product)
         session.commit()
         session.refresh(db_product)

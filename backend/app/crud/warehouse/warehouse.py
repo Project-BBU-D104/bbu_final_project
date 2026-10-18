@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from app.models.warehouse import Warehouse
 from app.schemas.warehouse.warehouse import WarehouseCreate, WarehouseUpdate
-from datetime import datetime
+from datetime import datetime, timezone
 
 def generate_reference_no(session: Session) -> str:
     # Get the latest warehouse
@@ -52,7 +52,7 @@ def update_warehouse(session: Session, warehouse_id: int, warehouse: WarehouseUp
         if warehouse.reference_no is not None:
             db_warehouse.reference_no = warehouse.reference_no
 
-        db_warehouse.updated_at = warehouse.updated_at or datetime.utcnow()
+        db_warehouse.updated_at = warehouse.updated_at or datetime.now(timezone.utc)
         session.add(db_warehouse)
         session.commit()
         session.refresh(db_warehouse)
