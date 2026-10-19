@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
@@ -10,6 +9,17 @@ class AddProductWidget extends StatelessWidget {
   AddProductWidget({super.key});
 
   final ctr = Get.find<ProductController>();
+
+  String _selectedUnitShortName() {
+    final unitId = ctr.selectedUnit.value;
+    if (unitId == null) return '';
+    for (final unit in ctr.unitCtr.unitList) {
+      if (unit['id'].toString() == unitId) {
+        return unit['short_name']?.toString() ?? '';
+      }
+    }
+    return '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +121,8 @@ class AddProductWidget extends StatelessWidget {
                       }),
                        
                       const SizedBox(height: 10),
+                      Text("Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                      const SizedBox(height: 5),
                       Obx(() {
                         if (ctr.warehouseCtr.isLoading.value) {
                           return const Center(
@@ -118,56 +130,22 @@ class AddProductWidget extends StatelessWidget {
                           );
                         }
 
-                        return Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                                  const SizedBox(height: 5),
-                                  DropdownButtonFormField<String>(
-                                    value: ctr.selectedWarehouse.value,
-                                    decoration: InputDecoration(
-                                      hintText: "Select Warehouse".tr,
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                                    ),
-                                    items: ctr.warehouseCtr.warehouseList.map((warehouse) {
-                                      return DropdownMenuItem<String>(
-                                        value: warehouse['id'].toString(),
-                                        child: Text(warehouse['name'].toString()),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) {
-                                      ctr.selectedWarehouse.value = value;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                                  const SizedBox(height: 5),
-                                  TextField(
-                                    controller: ctr.productQtyController,
-                                    enabled: ctr.selectedWarehouse.value != null,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                    decoration: InputDecoration(
-                                      hintText: "0",
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        return DropdownButtonFormField<String>(
+                          value: ctr.selectedWarehouse.value,
+                          decoration: InputDecoration(
+                            hintText: "Select Warehouse".tr,
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          ),
+                          items: ctr.warehouseCtr.warehouseList.map((warehouse) {
+                            return DropdownMenuItem<String>(
+                              value: warehouse['id'].toString(),
+                              child: Text(warehouse['name'].toString()),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            ctr.selectedWarehouse.value = value;
+                          },
                         );
                       }),
                       const SizedBox(height: 10),
@@ -263,41 +241,39 @@ class AddProductWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
             
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Cost Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                              const SizedBox(height: 5),
-                                    
-                              TextField(
+                      Obx(() {
+                        final shortName = _selectedUnitShortName();
+                        final costLabel = shortName.isEmpty
+                            ? "Cost Price".tr
+                            : "${"Cost per".tr} $shortName";
+                        final saleLabel = shortName.isEmpty
+                            ? "Sale Price".tr
+                            : "${"Sale per".tr} $shortName";
+
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
                                 controller: ctr.productCostPriceController,
                                 decoration: InputDecoration(
-                                  hintText: "Enter Cost Price".tr,
+                                  labelText: costLabel,
                                   border: OutlineInputBorder(),
                                 ),
                               ),
-                            ],
-                          )),
-                           const SizedBox(width: 10),
-                           Expanded(child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Sale Price".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                              const SizedBox(height: 5),
-                              TextField(
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
                                 controller: ctr.productSalePriceController,
                                 decoration: InputDecoration(
-                                  hintText: "Enter Sale Price".tr,
+                                  labelText: saleLabel,
                                   border: OutlineInputBorder(),
                                 ),
                               ),
-                                ],
-                              )),
-                            ],
-                      ),
+                            ),
+                          ],
+                        );
+                      }),
                        
                       const SizedBox(height: 10),
                       Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
@@ -307,7 +283,7 @@ class AddProductWidget extends StatelessWidget {
                           maxLines: 8,
                           controller: ctr.productDescriptionController,
                           decoration: InputDecoration(
-                            hintText: "Enter Description".tr,
+                            hintText: "This is a sample description".tr,
                             border: OutlineInputBorder(),
                               alignLabelWithHint: true,
                           ),
