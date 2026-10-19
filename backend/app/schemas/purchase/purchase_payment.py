@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import SQLModel
 from typing import Optional
 from pydantic import field_validator
@@ -19,6 +19,13 @@ class PurchasePaymentCreate(SQLModel):
     status: str = "completed"
     note: Optional[str] = None
 
+    @field_validator("payment_date")
+    @classmethod
+    def ensure_payment_date_timezone(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
+
 class PurchasePaymentUpdate(SQLModel):
     payment_no: Optional[str] = None
     purchase_id: Optional[int] = None
@@ -30,6 +37,13 @@ class PurchasePaymentUpdate(SQLModel):
     status: Optional[str] = None
     note: Optional[str] = None
     updated_at: Optional[datetime] = None
+
+    @field_validator("payment_date")
+    @classmethod
+    def ensure_payment_date_timezone(cls, value: Optional[datetime]) -> Optional[datetime]:
+        if value is not None and (value.tzinfo is None or value.utcoffset() is None):
+            return value.replace(tzinfo=timezone.utc)
+        return value
 
 class PurchasePaymentRead(SQLModel):
     payment_no: str

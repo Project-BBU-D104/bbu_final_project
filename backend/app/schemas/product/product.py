@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import SQLModel
 from typing import Optional
 from decimal import Decimal

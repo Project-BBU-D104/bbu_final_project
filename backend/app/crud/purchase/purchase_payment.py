@@ -60,7 +60,7 @@ def calculate_purchase_payment(
     else:
         purchase.payment_status = "partial"
 
-    purchase.updated_at = datetime.utcnow()
+    purchase.updated_at = datetime.now(timezone.utc)
 
     session.add(purchase)
 
@@ -158,7 +158,7 @@ def update_purchase_payment(session: Session, purchase_payment_id: int, purchase
     if purchase_payment.status is not None:
         db_purchase_payment.status = purchase_payment.status
 
-    db_purchase_payment.updated_at = purchase_payment.updated_at or datetime.now(timezone.utc)
+    db_purchase_payment.updated_at = datetime.now(timezone.utc)
     session.add(db_purchase_payment)
     session.flush()
 
