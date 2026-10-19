@@ -12,7 +12,7 @@ class ManageController extends GetxController{
 
   final List<Map<String, dynamic>> sections = [
     {
-      "title": "Supplier & Customer Management",
+      "title": "Supplier Management",
       "items": [
         {
           "title": "Supplier",
@@ -20,12 +20,12 @@ class ManageController extends GetxController{
           "icon": Icons.local_shipping_outlined,
           "route": AppRoutes.supplier,
         },
-        {
-          "title": "Customer",
-          "subtitle": "Customer",
-          "icon": Icons.people_outline,
-          "route": AppRoutes.customer,
-        },
+        // {
+        //   "title": "Customer",
+        //   "subtitle": "Customer",
+        //   "icon": Icons.people_outline,
+        //   "route": AppRoutes.customer,
+        // },
       ]
     },
 
@@ -170,17 +170,17 @@ class ManageController extends GetxController{
         },
       ]
     },
-    {
-      "title": "History Management",
-      "items": [
-        {
-          "title": "Audit Logs",
-          "subtitle": "Audit Logs",
-          "icon": Icons.history_outlined,
-          "route": AppRoutes.auditLogs,
-        },
-      ]
-    },
+    // {
+    //   "title": "History Management",
+    //   "items": [
+    //     {
+    //       "title": "Audit Logs",
+    //       "subtitle": "Audit Logs",
+    //       "icon": Icons.history_outlined,
+    //       "route": AppRoutes.auditLogs,
+    //     },
+    //   ]
+    // },
   ];
 
    @override

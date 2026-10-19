@@ -68,6 +68,14 @@ class PurchaseRequestController extends GetxController {
     }).toList();
   }
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() {
     super.onInit();
@@ -78,7 +86,12 @@ class PurchaseRequestController extends GetxController {
     itemLines.add(PurchaseRequestLine());
     warehouseController.getWarehouses();
     productController.getProducts();
-    onGetPurchaseRequests();
+
+    if(_hasFreshCache){
+      requestList.assignAll(_cache);
+    }else{
+      onGetPurchaseRequests();
+    }
   }
 
   Future<void> onGetPurchaseRequests() async {
@@ -110,6 +123,9 @@ class PurchaseRequestController extends GetxController {
             };
           }),
         );
+
+        _cache.assignAll(requestList);
+        _cachedAt = DateTime.now();
       }
     } catch (error) {
       ToastWidget.show(message: error.toString(), type: ToastType.error);

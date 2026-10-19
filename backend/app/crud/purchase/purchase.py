@@ -90,6 +90,7 @@ def get_all_purchases(session: Session):
         .options(
             selectinload(Purchase.user),
             selectinload(Purchase.supplier),
+            selectinload(Purchase.warehouse),
             selectinload(Purchase.purchase_items)
             .selectinload(PurchaseItem.product)
         )
@@ -102,7 +103,10 @@ def get_purchase(session: Session, purchase_id: int):
         .where(Purchase.id == purchase_id)
         .options(
             selectinload(Purchase.user),
-            selectinload(Purchase.supplier)
+            selectinload(Purchase.supplier),
+            selectinload(Purchase.warehouse),
+            selectinload(Purchase.purchase_items)
+            .selectinload(PurchaseItem.product)
         )
     )
     return session.exec(statement).first()
@@ -110,6 +114,13 @@ def get_purchase(session: Session, purchase_id: int):
 def get_recent_purchases(session: Session):
     statement = (
         select(Purchase)
+        .options(
+            selectinload(Purchase.user),
+            selectinload(Purchase.supplier),
+            selectinload(Purchase.warehouse),
+            selectinload(Purchase.purchase_items)
+            .selectinload(PurchaseItem.product)
+        )
         .order_by(Purchase.created_at.desc())
         .limit(10)
     )

@@ -19,18 +19,35 @@ class UnitController extends GetxController{
   final unitDescriptionController = TextEditingController();
   final isActive = false.obs;
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() {
-    getUnitList();
-    super.onInit();
+
+    if(_hasFreshCache) {
+      unitList.value = List<Map<String, dynamic>>.from(_cache);
+      searchUnitList.value = unitList;
+    }else{
+      getUnitList();
+    }
 
     final search = Get.put(SearchController());
+    
     ever(
       search.keyword,
       (keyword) {
         searchUnit(keyword);
       },
     );
+
+    super.onInit();
+
   }
 
   void onClear() {
@@ -52,6 +69,11 @@ class UnitController extends GetxController{
         
         // search list
         searchUnitList.value = unitList;
+
+         _cache
+          ..clear()
+          ..addAll(unitList);
+        _cachedAt = DateTime.now();
       }
     }catch(e){
       ToastWidget.show(

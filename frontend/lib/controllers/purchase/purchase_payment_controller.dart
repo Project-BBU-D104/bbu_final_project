@@ -30,10 +30,24 @@ class PurchasePaymentController extends GetxController {
 
   final Rx<DateTime> purchaseDate = DateTime.now().obs;
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
+
   @override
   void onInit() {
     super.onInit();
-    onGetPaymentList();
+
+    if (_hasFreshCache) {
+      purchasePaymentList.value = List<Map<String, dynamic>>.from(_cache);
+    }else{
+      onGetPaymentList();
+    }
   }
 
   Future<void> onGetPaymentList() async {
@@ -44,6 +58,11 @@ class PurchasePaymentController extends GetxController {
 
       if (resp is List) {
         purchasePaymentList.value = List<Map<String, dynamic>>.from(resp);
+
+        _cache
+          ..clear()
+          ..addAll(purchasePaymentList);
+        _cachedAt = DateTime.now();
       }
 
       // print(purchasePaymentList);

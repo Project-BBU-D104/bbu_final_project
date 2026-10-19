@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy.orm import selectinload
 from app.models.sale_items import SaleItems
+from app.models.user import User
 from fastapi import HTTPException
 from app.schemas.sale.sale_item import SaleItemCreate
 
@@ -84,7 +85,7 @@ def get_all_sales(session: Session):
     statement = (
         select(Sale)
         .options(
-            selectinload(Sale.user),
+            selectinload(Sale.user).selectinload(User.role),
             selectinload(Sale.customer),
             selectinload(Sale.sale_items)
             .selectinload(SaleItems.product)
@@ -97,7 +98,7 @@ def get_sale(session: Session, sale_id: int):
         select(Sale)
         .where(Sale.id == sale_id)
         .options(
-            selectinload(Sale.user),
+            selectinload(Sale.user).selectinload(User.role),
             selectinload(Sale.customer),
             selectinload(Sale.sale_items).selectinload(SaleItems.product),
         )

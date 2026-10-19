@@ -19,10 +19,24 @@ class RoleController extends GetxController{
   final roleDescriptionController = TextEditingController();
   final isActive = false.obs;
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() {
     super.onInit();
-    getRoles();
+
+    if (_hasFreshCache) {
+      roleList.value = List<Map<String, dynamic>>.from(_cache);
+      searchRoleList.value = roleList;
+    } else {
+      getRoles();
+    }
 
     final search = Get.put(SearchController());
 
@@ -49,6 +63,11 @@ class RoleController extends GetxController{
         roleList.value = List<Map<String, dynamic>>.from(resp);
 
         searchRoleList.value = roleList;
+
+        _cache
+          ..clear()
+          ..addAll(roleList);
+        _cachedAt = DateTime.now();
 
       }
     } catch (e) {

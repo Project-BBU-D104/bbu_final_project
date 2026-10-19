@@ -138,7 +138,7 @@ class EditProductWidget extends StatelessWidget {
                                   );
                                 }).toList(),
                                 onChanged: (value) {
-                                  ctr.selectedCategory.value = value;
+                                  ctr.selectedUnit.value = value;
                                 },
                               ),
                             ],

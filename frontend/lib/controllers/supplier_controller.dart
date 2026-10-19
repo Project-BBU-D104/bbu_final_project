@@ -24,10 +24,24 @@ class SupplierController extends GetxController {
   final supplierAddressController = TextEditingController();
   final status = true.obs;
 
+  static final List<SupplierModel> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+    _cachedAt != null &&
+    DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() {
     super.onInit();
-    getSuppliers();
+
+    if(_hasFreshCache) {
+      suppliers.value = List<SupplierModel>.from(_cache);
+      searchSuppliers.value = suppliers;
+    }else{
+      getSuppliers();
+    }
 
     final searchController = Get.put(SearchController());
 
@@ -60,13 +74,13 @@ class SupplierController extends GetxController {
 
   void onRefresh(){
     getSuppliers();
-    print("Helo");
   }
 
   Future<void> getSuppliers() async {
     try{
       isLoading.value = true;
       final resp = await service.getSuppliers();
+
       if(resp is List){
         suppliers.value = resp
             .map((item) => SupplierModel.fromJson(item))
@@ -74,6 +88,11 @@ class SupplierController extends GetxController {
 
         // Show all suppliers initially
         searchSuppliers.value = suppliers;
+
+        _cache
+          ..clear()
+          ..addAll(suppliers);
+        _cachedAt = DateTime.now();
       }
     }catch(e){
         ToastWidget.show(

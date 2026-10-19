@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache import FastAPICache
+from fastapi_cache.decorator import cache
 from sqlmodel import Session
 from database import get_session
 from app.schemas.purchase.purchase_requests import PurchaseRequestCreate, PurchaseRequestRead, PurchaseRequestUpdate
@@ -6,22 +8,33 @@ from app.crud.purchase.purchase_requests import  create_purchase_request, get_al
 
 router = APIRouter(prefix="/purchase_request", tags=["purchase_request"])
 
+CACHE_NS = "purchase_request"
+CACHE_TTL = 60  # seconds
+
 @router.post("/", response_model=PurchaseRequestRead)
-def create_new_purchase_request(purchase_request: PurchaseRequestCreate, session: Session = Depends(get_session)):
-    return create_purchase_request(session, purchase_request)
+async def create_new_purchase_request(purchase_request: PurchaseRequestCreate, session: Session = Depends(get_session)):
+    result = create_purchase_request(session, purchase_request)
+    await FastAPICache.clear(namespace=CACHE_NS)
+    return result
 
 @router.get("/", response_model=list[PurchaseRequestRead])
-def read_all_purchase_request(session: Session = Depends(get_session)):
+@cache(expire=CACHE_TTL, namespace=CACHE_NS)
+async def read_all_purchase_request(session: Session = Depends(get_session)):
     return get_all_purchase_request(session)
 
 @router.get("/{purchase_request_id}", response_model=PurchaseRequestRead)
-def read_purchase_request(purchase_request_id: int, session: Session = Depends(get_session)):
+@cache(expire=CACHE_TTL, namespace=CACHE_NS)
+async def read_purchase_request(purchase_request_id: int, session: Session = Depends(get_session)):
     return get_purchase_request(session, purchase_request_id)
 
 @router.put("/{purchase_request_id}", response_model=PurchaseRequestRead)
-def update_purchase_request_route(purchase_request_id: int, purchase_request: PurchaseRequestUpdate, session: Session = Depends(get_session)):
-    return update_purchase_request(session, purchase_request_id, purchase_request)
+async def update_purchase_request_route(purchase_request_id: int, purchase_request: PurchaseRequestUpdate, session: Session = Depends(get_session)):
+    result = update_purchase_request(session, purchase_request_id, purchase_request)
+    await FastAPICache.clear(namespace=CACHE_NS)
+    return result
 
 @router.delete("/{purchase_request_id}")
-def delete_purchase_request_route(purchase_request_id: int, session: Session = Depends(get_session)):
-    return delete_purchase_request(session, purchase_request_id)
+async def delete_purchase_request_route(purchase_request_id: int, session: Session = Depends(get_session)):
+    result = delete_purchase_request(session, purchase_request_id)
+    await FastAPICache.clear(namespace=CACHE_NS)
+    return result

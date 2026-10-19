@@ -24,10 +24,23 @@ class SystemConfigurationController extends GetxController {
   var isOptionsLoading = false.obs;
   final isSaving = false.obs;
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+    _cachedAt != null &&
+    DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() {
     super.onInit();
-    getSystemConfigurations();
+
+    if(_hasFreshCache) {
+      systemConfigurationList.value = List<Map<String, dynamic>>.from(_cache);
+    }else{
+      getSystemConfigurations();
+    }
   }
 
   Future<void> getSystemConfigurations() async {
@@ -37,7 +50,13 @@ class SystemConfigurationController extends GetxController {
       final resp = await service.getSystemConfigurations();
 
       if (resp is List) {
+
         systemConfigurationList.value = List<Map<String, dynamic>>.from(resp);
+
+        _cache
+          ..clear()
+          ..addAll(systemConfigurationList);
+        _cachedAt = DateTime.now();
       }
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);

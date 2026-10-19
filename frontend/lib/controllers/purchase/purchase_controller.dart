@@ -50,6 +50,14 @@ class PurchaseController extends GetxController {
     paidCtrl.addListener(() => paid.value = double.tryParse(paidCtrl.text) ?? 0);
   }
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   void resetForm() {
 
     invoiceCtrl.clear();
@@ -90,7 +98,13 @@ class PurchaseController extends GetxController {
   void onInit() {
     super.onInit();
 
-    onGetPurchaseList();
+    if (_hasFreshCache) {
+      purchaseList.value = List<Map<String, dynamic>>.from(_cache);
+      searchPurchaseList.value = purchaseList;
+    }else{
+      onGetPurchaseList();
+    }
+
     Get.put(ProductController()).getProducts();
     Get.put(WarehouseController()).getWarehouses();
 
@@ -112,6 +126,11 @@ class PurchaseController extends GetxController {
 
         purchaseList.value = List<Map<String, dynamic>>.from(resp);
         searchPurchaseList.value = purchaseList;
+
+        _cache
+          ..clear()
+          ..addAll(purchaseList);
+        _cachedAt = DateTime.now();
 
       }
     } catch (e) {

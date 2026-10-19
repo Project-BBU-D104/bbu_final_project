@@ -19,11 +19,25 @@ class PaymentTypeController extends GetxController{
   final paymentTypeList = <Map<String, dynamic>>[].obs;
   final searchPaymentType = <Map<String, dynamic>>[].obs;
 
+    // Shared cache so re-opening the screen does not re-fetch every time.
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+    _cachedAt != null &&
+    DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() async {
     super.onInit();
 
-    getPaymentTypes();
+    if(_hasFreshCache){
+      paymentTypeList.value = List<Map<String, dynamic>>.from(_cache);
+      searchPaymentType.value = paymentTypeList;
+    }else{
+      getPaymentTypes();
+    }
 
     final search = Get.put(SearchController());
 
@@ -51,6 +65,11 @@ class PaymentTypeController extends GetxController{
         paymentTypeList.value = List<Map<String, dynamic>>.from(resp);
 
         searchPaymentType.value = paymentTypeList;
+
+        _cache
+          ..clear()
+          ..addAll(paymentTypeList);
+        _cachedAt = DateTime.now();
       }
     }catch(e){
       ToastWidget.show(

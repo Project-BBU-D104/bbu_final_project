@@ -28,12 +28,25 @@ class UserController extends GetxController{
 
   var isChecked = false.obs;
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
 
   @override
   void onInit() {
     super.onInit();
 
-    getUserList();
+    if(_hasFreshCache) {
+      userList.value = List<Map<String, dynamic>>.from(_cache);
+      searchUserList.value = userList;
+    }else{
+      getUserList();
+    }
 
     final search = Get.put(SearchController());
     ever(
@@ -64,6 +77,11 @@ class UserController extends GetxController{
         userList.value = List<Map<String, dynamic>>.from(resp);
 
         searchUserList.value = userList;
+
+        _cache
+          ..clear()
+          ..addAll(userList);
+        _cachedAt = DateTime.now();
       }
     }catch(e){
       ToastWidget.show(

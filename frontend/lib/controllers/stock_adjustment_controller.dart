@@ -28,6 +28,14 @@ class StockAdjustmentController extends GetxController{
   final searchStockAdjustmentList = <Map<String, dynamic>>[].obs;
   final newQtyController = TextEditingController();
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
 
   @override
   void onInit(){
@@ -35,7 +43,12 @@ class StockAdjustmentController extends GetxController{
 
     adjustmentQtyController.addListener(calculateNewQty);
 
-    getStockAdjustments();
+    if (_hasFreshCache) {
+      stockAdjustmentList.value = List<Map<String, dynamic>>.from(_cache);
+      searchStockAdjustmentList.value = stockAdjustmentList;
+    } else {
+      getStockAdjustments();
+    }
 
     final search = Get.put(SearchController());
     ever(
@@ -109,6 +122,11 @@ void calculateNewQty() {
 
         // search
         searchStockAdjustmentList.value = stockAdjustmentList;
+
+        _cache
+          ..clear()
+          ..addAll(stockAdjustmentList);
+        _cachedAt = DateTime.now();
       }
     }catch(e){
       ToastWidget.show(

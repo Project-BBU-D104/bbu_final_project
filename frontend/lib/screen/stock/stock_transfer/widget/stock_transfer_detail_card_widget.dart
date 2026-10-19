@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 class StockDetailCardWidget extends StatelessWidget {
   StockDetailCardWidget({super.key});
 
-  final ctr = Get.find<ProductTransferController>();
+  final ctr = Get.put(ProductTransferController());
 
   final Map<String, dynamic> productTransfer = Get.arguments;
 

@@ -7,11 +7,24 @@ import 'package:get/get.dart';
 class SaleListController extends GetxController{
   
   var isLoading = false.obs;
+
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
  @override
   void onInit() {
     super.onInit();
 
-    onGetSaleList();
+    if(_hasFreshCache){
+      saleList.value = List<Map<String, dynamic>>.from(_cache);
+    }else{
+      onGetSaleList();
+    }
   }
 
   final SaleService service = SaleService();
@@ -34,7 +47,13 @@ void onNewSale(){
     final resp =  await service.getSales();
 
       if(resp is List){
+
         saleList.value = List<Map<String, dynamic>>.from(resp);
+
+        _cache
+          ..clear()
+          ..addAll(saleList);
+        _cachedAt = DateTime.now();
       }
     }catch(e){
       ToastWidget.show(

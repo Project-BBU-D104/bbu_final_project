@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache import FastAPICache
+from fastapi_cache.decorator import cache
 from sqlmodel import Session
 from database import get_session
 from app.schemas.system_configuration.system_configuration import SystemConfigurationCreate, SystemConfigurationRead, SystemConfigurationUpdate
@@ -6,22 +8,33 @@ from app.crud.system_configuration.system_configuration import  create_system_co
 
 router = APIRouter(prefix="/system_configuration", tags=["system_configuration"])
 
+CACHE_NS = "system_configuration"
+CACHE_TTL = 60  # seconds
+
 @router.post("/", response_model=SystemConfigurationRead)
-def create_new_system_configuration(system_configuration: SystemConfigurationCreate, session: Session = Depends(get_session)):
-    return create_system_configuration(session, system_configuration)
+async def create_new_system_configuration(system_configuration: SystemConfigurationCreate, session: Session = Depends(get_session)):
+    result = create_system_configuration(session, system_configuration)
+    await FastAPICache.clear(namespace=CACHE_NS)
+    return result
 
 @router.get("/", response_model=list[SystemConfigurationRead])
-def read_all_system_configuration(session: Session = Depends(get_session)):
+@cache(expire=CACHE_TTL, namespace=CACHE_NS)
+async def read_all_system_configuration(session: Session = Depends(get_session)):
     return get_all_system_configuration(session)
 
 @router.get("/{system_configuration_id}", response_model=SystemConfigurationRead)
-def read_system_configuration(system_configuration_id: int, session: Session = Depends(get_session)):
+@cache(expire=CACHE_TTL, namespace=CACHE_NS)
+async def read_system_configuration(system_configuration_id: int, session: Session = Depends(get_session)):
     return get_system_configuration(session, system_configuration_id)
 
 @router.put("/{system_configuration_id}", response_model=SystemConfigurationRead)
-def update_system_configuration_route(system_configuration_id: int, system_configuration: SystemConfigurationUpdate, session: Session = Depends(get_session)):
-    return update_system_configuration(session, system_configuration_id, system_configuration)
+async def update_system_configuration_route(system_configuration_id: int, system_configuration: SystemConfigurationUpdate, session: Session = Depends(get_session)):
+    result = update_system_configuration(session, system_configuration_id, system_configuration)
+    await FastAPICache.clear(namespace=CACHE_NS)
+    return result
 
 @router.delete("/{system_configuration_id}")
-def delete_system_configuration_route(system_configuration_id: int, session: Session = Depends(get_session)):
-    return delete_system_configuration(session, system_configuration_id)
+async def delete_system_configuration_route(system_configuration_id: int, session: Session = Depends(get_session)):
+    result = delete_system_configuration(session, system_configuration_id)
+    await FastAPICache.clear(namespace=CACHE_NS)
+    return result

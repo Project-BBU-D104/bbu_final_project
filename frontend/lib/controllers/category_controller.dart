@@ -11,6 +11,15 @@ import 'package:frontend/controllers/search_controller.dart';
 class CategoryController extends GetxController {
   final CategoryService service = CategoryService();
 
+  // Shared cache so re-opening the screen does not re-fetch every time.
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   final categoryList = <Map<String, dynamic>>[].obs;
   final searchCategoryList = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
@@ -21,7 +30,13 @@ class CategoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getCategory();
+
+    if (_hasFreshCache) {
+      categoryList.value = List<Map<String, dynamic>>.from(_cache);
+      searchCategoryList.value = categoryList;
+    } else {
+      getCategory();
+    }
 
     final search = Get.put(SearchController());
     ever(
@@ -49,6 +64,12 @@ class CategoryController extends GetxController {
         categoryList.value = List<Map<String, dynamic>>.from(resp);
 
         searchCategoryList.value = categoryList;
+
+        // Update the shared cache so the next visit reuses this data.
+        _cache
+          ..clear()
+          ..addAll(categoryList);
+        _cachedAt = DateTime.now();
       }
     } catch (e) {
         ToastWidget.show(
@@ -191,9 +212,4 @@ class CategoryController extends GetxController {
       },
     );
   }
-
-  void onSearh(){
-    // Do nothing
-  }
-
 }

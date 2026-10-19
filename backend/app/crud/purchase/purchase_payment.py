@@ -5,6 +5,24 @@ from app.schemas.purchase.purchase_payment import PurchasePaymentCreate, Purchas
 from datetime import datetime, timezone
 from decimal import Decimal
 from app.models.purchase import Purchase
+from app.models.purchase_item import PurchaseItem
+from sqlalchemy.orm import selectinload
+
+
+def _purchase_payment_options():
+    """Load every relation required by PurchasePaymentRead."""
+    return (
+        selectinload(PurchasePayment.supplier),
+        selectinload(PurchasePayment.payment_type),
+        selectinload(PurchasePayment.currency),
+        selectinload(PurchasePayment.purchase).selectinload(Purchase.user),
+        selectinload(PurchasePayment.purchase).selectinload(Purchase.supplier),
+        selectinload(PurchasePayment.purchase).selectinload(Purchase.warehouse),
+        selectinload(PurchasePayment.purchase)
+        .selectinload(Purchase.purchase_items)
+        .selectinload(PurchaseItem.product),
+    )
+
 
 def get_completed_purchase_payment_total(session: Session, purchase_id: int) -> Decimal:
     payments = session.exec(
@@ -124,10 +142,16 @@ def create_purchase_payment(
     return db_payment
 
 def get_all_purchase_payment(session: Session):
-    return session.exec(select(PurchasePayment)).all()
+    return session.exec(
+        select(PurchasePayment).options(*_purchase_payment_options())
+    ).all()
 
 def get_purchase_payment(session: Session, purchase_payment_id: int):
-    return session.get(PurchasePayment, purchase_payment_id)
+    return session.exec(
+        select(PurchasePayment)
+        .where(PurchasePayment.id == purchase_payment_id)
+        .options(*_purchase_payment_options())
+    ).first()
 
 def update_purchase_payment(session: Session, purchase_payment_id: int, purchase_payment: PurchasePaymentUpdate):
     db_purchase_payment = session.get(PurchasePayment, purchase_payment_id)

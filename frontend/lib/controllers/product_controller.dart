@@ -37,6 +37,14 @@ class ProductController extends GetxController {
   final productSalePriceController = TextEditingController();
   final productDescriptionController = TextEditingController();
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   final RxList<Map<String, dynamic>> _masterList = <Map<String, dynamic>>[].obs;
 
   final searchProductList = <Map<String, dynamic>>[].obs;
@@ -46,8 +54,14 @@ class ProductController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getProducts();
 
+    if(_hasFreshCache){
+      _masterList.value = List<Map<String, dynamic>>.from(_cache);
+      searchProductList.value = _masterList;
+    }else{
+      getProducts();
+    }
+   
     final search = Get.put(SearchController());
 
     ever(
@@ -70,6 +84,12 @@ class ProductController extends GetxController {
       List<Map<String, dynamic>>.from(resp),
     );
     searchProductList.assignAll(_masterList);
+
+    // Update the shared cache so the next visit reuses this data.
+    _cache
+      ..clear()
+      ..addAll(_masterList);
+    _cachedAt = DateTime.now();
   }} catch (e) {
     ToastWidget.show(
       message: e.toString(),

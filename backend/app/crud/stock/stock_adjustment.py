@@ -1,10 +1,23 @@
 from sqlmodel import Session, select
 from app.models.stock_adjustment import StockAdjustment
+from app.models.product import Product
+from app.models.user import User
 from app.schemas.stock.stock_adjustment import StockAdjustmentCreate, StockAdjustmentUpdate
 from datetime import datetime, timezone
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from app.crud.warehouse.warehouse_stock import get_stock_by_product_and_warehouse
+
+
+def _stock_adjustment_options():
+    """Load every relation required by StockAdjustmentRead."""
+    return (
+        selectinload(StockAdjustment.user).selectinload(User.role),
+        selectinload(StockAdjustment.product).selectinload(Product.category),
+        selectinload(StockAdjustment.product).selectinload(Product.unit),
+        selectinload(StockAdjustment.product).selectinload(Product.currency),
+        selectinload(StockAdjustment.warehouse),
+    )
 
 
 def generate_reference_no(session: Session) -> str:
@@ -86,25 +99,14 @@ def create_stock_adjustment(
     return db_stock_adjustment
 
 def get_all_stock_adjustments(session: Session):
-    statement = (
-        select(StockAdjustment)
-        .options(
-            selectinload(StockAdjustment.product),
-            selectinload(StockAdjustment.warehouse),
-            selectinload(StockAdjustment.user),
-        )
-    )
+    statement = select(StockAdjustment).options(*_stock_adjustment_options())
     return session.exec(statement).all()
 
 def get_stock_adjustments(session: Session, stock_adjustment_id: int):
     statement = (
         select(StockAdjustment)
         .where(StockAdjustment.id == stock_adjustment_id)
-        .options(
-            selectinload(StockAdjustment.product),
-            selectinload(StockAdjustment.warehouse),
-            selectinload(StockAdjustment.user),
-        )
+        .options(*_stock_adjustment_options())
     )
     return session.exec(statement).first()
 

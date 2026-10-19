@@ -21,11 +21,20 @@ class WarehouseController extends GetxController{
   final warehouseLocationController = TextEditingController();
   final warehouseNoteController = TextEditingController();
 
+  static final List<Map<String, dynamic>> _cache = [];
+  static DateTime? _cachedAt;
+  static const Duration _cacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshCache =>
+      _cachedAt != null &&
+      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
   @override
   void onInit() {
     super.onInit();
 
     final search = Get.put(SearchController());
+
     ever(
       search.keyword,
       (keyword) {
@@ -33,8 +42,12 @@ class WarehouseController extends GetxController{
       },
     );
 
-    getWarehouses();
-    
+    if(_hasFreshCache){
+      warehouseList.value = List<Map<String, dynamic>>.from(_cache);
+      searchWarehouseList.value = warehouseList;
+    }else{
+      getWarehouses();
+    } 
   }
 
   void onClearWarehouse(){

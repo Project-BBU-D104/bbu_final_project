@@ -31,11 +31,40 @@ class ProductTransferController extends GetxController {
 
   final Rxn<Map<String, dynamic>> editingTransfer = Rxn<Map<String, dynamic>>();
 
+  // Separate caches: the transfer list and warehouse stock are different data.
+  static final List<Map<String, dynamic>> _transferCache = [];
+  static DateTime? _transferCachedAt;
+  static const Duration _transferCacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshTransferCache =>
+      _transferCachedAt != null &&
+      DateTime.now().difference(_transferCachedAt!) < _transferCacheTtl;
+
+  static final List<Map<String, dynamic>> _stockCache = [];
+  static DateTime? _stockCachedAt;
+  static const Duration _stockCacheTtl = Duration(seconds: 60);
+
+  static bool get _hasFreshStockCache =>
+      _stockCachedAt != null &&
+      DateTime.now().difference(_stockCachedAt!) < _stockCacheTtl;
+
   @override
   void onInit() {
     super.onInit();
-    onGetProductTransferList();
-    onGetWarehouseStock();
+
+    if (_hasFreshTransferCache) {
+      stockTransfer.value = List<Map<String, dynamic>>.from(_transferCache);
+      searchStockTransferList.value = stockTransfer;
+    } else {
+      onGetProductTransferList();
+    }
+
+    if (_hasFreshStockCache) {
+      warehouseStock.value = List<Map<String, dynamic>>.from(_stockCache);
+    } else {
+      onGetWarehouseStock();
+    }
+    
 
     final search = Get.put(SearchController());
     ever(search.keyword, (keyword) {
@@ -62,6 +91,11 @@ class ProductTransferController extends GetxController {
       final response = await warehouseStockService.getWarehouseStock();
       if (response is List) {
         warehouseStock.value = List<Map<String, dynamic>>.from(response);
+
+        _stockCache
+          ..clear()
+          ..addAll(warehouseStock);
+        _stockCachedAt = DateTime.now();
       }
     } catch (error) {
       ToastWidget.show(message: error.toString(), type: ToastType.error);
@@ -198,6 +232,11 @@ class ProductTransferController extends GetxController {
 
         // search
         searchStockTransferList.value = stockTransfer;
+
+        _transferCache
+          ..clear()
+          ..addAll(stockTransfer);
+        _transferCachedAt = DateTime.now();
       }
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
