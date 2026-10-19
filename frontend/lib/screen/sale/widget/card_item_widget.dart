@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 
 class CardItemWidget extends StatelessWidget {
   final Map<String, dynamic> product;
   final int quantity;
+  final Map<String, dynamic>? currency;
   final VoidCallback onTap;
 
   const CardItemWidget({
     super.key,
     required this.product,
     required this.quantity,
+    this.currency,
     required this.onTap,
   });
 
@@ -58,7 +61,7 @@ class CardItemWidget extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 4),
-                      Text('\$${price.toStringAsFixed(2)}'),
+                      Text(CurrencyFormatter.format(price, currency)),
                     ],
                   ),
                 ),

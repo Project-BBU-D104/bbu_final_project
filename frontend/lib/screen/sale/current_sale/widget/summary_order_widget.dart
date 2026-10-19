@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 
 class SummaryOrderWidget extends StatelessWidget {
   final double subtotal;
+  final Map<String, dynamic>? currency;
 
-  const SummaryOrderWidget({super.key, required this.subtotal});
+  const SummaryOrderWidget({super.key, required this.subtotal, this.currency});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class SummaryOrderWidget extends StatelessWidget {
 
             _buildRow(
               label: 'Items Subtotal',
-              value: '\$${subtotal.toStringAsFixed(2)}',
+              value: CurrencyFormatter.format(subtotal, currency),
               labelColor: labelColor,
               valueColor: valueColor,
             ),
@@ -47,7 +49,7 @@ class SummaryOrderWidget extends StatelessWidget {
 
             _buildRow(
               label: 'Tax',
-              value: '\$0.00',
+              value: CurrencyFormatter.format(0, currency),
               labelColor: labelColor,
               valueColor: valueColor,
             ),
@@ -57,7 +59,7 @@ class SummaryOrderWidget extends StatelessWidget {
 
             _buildRow(
               label: 'Discount',
-              value: '-\$0.00',
+              value: '-${CurrencyFormatter.format(0, currency)}',
               labelColor: labelColor,
               valueColor: greenColor,
               icon: Icons.local_offer_outlined,
@@ -86,7 +88,7 @@ class SummaryOrderWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '\$${subtotal.toStringAsFixed(2)}',
+                      CurrencyFormatter.format(subtotal, currency),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

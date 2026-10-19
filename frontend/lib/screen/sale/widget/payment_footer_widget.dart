@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 
 class PaymentFooterWidget extends StatelessWidget {
   final VoidCallback onTap;
   final int itemCount;
   final double total;
+  final Map<String, dynamic>? currency;
 
   const PaymentFooterWidget({
     super.key,
     required this.onTap,
     required this.itemCount,
     required this.total,
+    this.currency,
   });
 
   @override
@@ -83,7 +86,7 @@ class PaymentFooterWidget extends StatelessWidget {
               children: [
                 const SizedBox(height: 2),
                 Text(
-                  '\$${total.toStringAsFixed(2)}',
+                  CurrencyFormatter.format(total, currency),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,

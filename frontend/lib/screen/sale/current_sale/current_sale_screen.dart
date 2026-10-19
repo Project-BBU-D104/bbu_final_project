@@ -64,11 +64,15 @@ class CurrentSaleWidget extends StatelessWidget {
                         unitPrice: price,
                         quantity: quantity,
                         subtotal: price * quantity,
+                        currency: ctr.currency.value,
                         onIncrease: () => ctr.changeQuantity(id, 1),
                         onDecrease: () => ctr.changeQuantity(id, -1),
                       );
                     }),
-                    SummaryOrderWidget(subtotal: ctr.subtotal),
+                    SummaryOrderWidget(
+                      subtotal: ctr.subtotal,
+                      currency: ctr.currency.value,
+                    ),
                   ],
                 );
               }),

@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/services/main_service/customer_service.dart';
+import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class SaleController extends GetxController {
   final SaleService service = SaleService();
   final CustomerService customerService = CustomerService();
+  final CurrencyService currencyService = CurrencyService();
   final PaymentTypeService paymentTypeService = PaymentTypeService();
   final SalePaymentService salePaymentService = SalePaymentService();
   final categories = <Map<String, dynamic>>[].obs;
   final customers = <Map<String, dynamic>>[].obs;
   final paymentTypes = <Map<String, dynamic>>[].obs;
+  final currency = Rxn<Map<String, dynamic>>();
   final selectedCustomer = Rxn<Map<String, dynamic>>();
   final selectedPaymentType = Rxn<Map<String, dynamic>>();
   final cart = <int, Map<String, dynamic>>{}.obs;
@@ -30,6 +34,22 @@ class SaleController extends GetxController {
     loadProductCategories();
     loadCustomers();
     loadPaymentTypes();
+    loadCurrency();
+  }
+
+  /// The sale grid and cart total are priced in the shop's default currency.
+  Future<void> loadCurrency() async {
+    try {
+      final response = await currencyService.getCurrencies();
+      if (response is List) {
+        final currencies = List<Map<String, dynamic>>.from(response);
+        currency.value =
+            currencies.firstWhereOrNull((c) => c['is_default'] == true) ??
+            currencies.firstOrNull;
+      }
+    } catch (error) {
+      ToastWidget.show(message: error.toString(), type: ToastType.error);
+    }
   }
 
   Future<void> loadPaymentTypes() async {
@@ -155,7 +175,7 @@ class SaleController extends GetxController {
       AlertDialog(
         title: const Text('Confirm payment'),
         content: Text(
-          'Charge \$${subtotal.toStringAsFixed(2)} to '
+          'Charge ${CurrencyFormatter.format(subtotal, currency.value)} to '
           '${customer['name'] ?? 'customer'} using $method?',
         ),
         actions: [
@@ -219,6 +239,7 @@ class SaleController extends GetxController {
         'transaction_id': reference,
         'subtotal': saleResponse['subtotal'] ?? subtotal,
         'total': amount,
+        'currency': currency.value,
       };
       cart.clear();
       selectedCustomer.value = null;

@@ -10,7 +10,9 @@ class CurrencyFormatter {
     }
 
     final String symbol = currency['symbol'] ?? '';
-    final String code = currency['name'] ?? '';
+    // `code` is the ISO code ("KHR"); `name` is the display name. Some payloads
+    // (CurrencySimple) only send `name`.
+    final String code = (currency['code'] ?? currency['name'] ?? '').toString();
 
     final int decimalDigits =
         code.toUpperCase() == 'KHR' ? 0 : 2;

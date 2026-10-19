@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/utils/currency_formatter.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
@@ -111,6 +112,9 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
     final receipt = rawReceipt is Map
         ? Map<String, dynamic>.from(rawReceipt)
         : <String, dynamic>{};
+    final currency = receipt['currency'] is Map
+        ? Map<String, dynamic>.from(receipt['currency'] as Map)
+        : null;
     final paymentDate = DateTime.tryParse(
       receipt['payment_date']?.toString() ?? '',
     );
@@ -280,7 +284,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                       const SizedBox(height: 12),
                       _detailRow(
                         'Subtotal:',
-                        _formatAmount(receipt['subtotal']),
+                        _formatAmount(receipt['subtotal'], currency),
                       ),
                       const SizedBox(height: 12),
                       CustomPaint(
@@ -293,7 +297,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                       const SizedBox(height: 12),
                       _detailRow(
                         'Total:',
-                        _formatAmount(receipt['total']),
+                        _formatAmount(receipt['total'], currency),
                         boldValue: true,
                       ),
                     ],
@@ -413,9 +417,9 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
     );
   }
 
-  String _formatAmount(Object? value) {
+  String _formatAmount(Object? value, Map<String, dynamic>? currency) {
     final amount = double.tryParse(value?.toString() ?? '') ?? 0;
-    return '\$${amount.toStringAsFixed(2)}';
+    return CurrencyFormatter.format(amount, currency);
   }
 }
 
