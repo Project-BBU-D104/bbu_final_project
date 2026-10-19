@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 
 from sqlmodel import Session, select
+from sqlalchemy import exists, or_
 from app.models.product import Product
 from app.schemas.product.product import ProductCreate, ProductUpdate
 from datetime import datetime, timezone
@@ -85,23 +86,18 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
     return db_product
 
 # check if product is used
-def is_product_used(session: Session, product_id: int):
-
-    models = [
-        PurchaseItem,
-        SaleItems,
-        StockAdjustment,
-        WarehouseStock,
-        ProductTransferItem,
-        PurchaseRequestItems,
-    ]
-
-    return any(
-        session.exec(
-            select(model).where(model.product_id == product_id)
-        ).first()
-        for model in models
+def is_product_used(session: Session, product_id: int) -> bool:
+    statement = select(
+        or_(
+            exists().where(PurchaseItem.product_id == product_id),
+            exists().where(SaleItems.product_id == product_id),
+            exists().where(StockAdjustment.product_id == product_id),
+            exists().where(WarehouseStock.product_id == product_id),
+            exists().where(ProductTransferItem.product_id == product_id),
+            exists().where(PurchaseRequestItems.product_id == product_id),
+        )
     )
+    return bool(session.exec(statement).first())
 
 def delete_product(session: Session, product_id: int):
 

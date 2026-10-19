@@ -16,11 +16,26 @@ def _build_sale_items(
     items = []
     subtotal = Decimal("0.00")
 
-    for item in sale_items:
-        product = session.exec(select(Product).where(Product.id == item.product_id)).first()
-        if product is None:
-            raise HTTPException(status_code=404, detail=f"Product {item.product_id} not found")
+    if not sale_items:
+        return items, subtotal
 
+    product_ids = {item.product_id for item in sale_items}
+    products = {
+        product.id: product
+        for product in session.exec(
+            select(Product).where(Product.id.in_(product_ids))
+        ).all()
+    }
+
+    missing = product_ids - products.keys()
+    if missing:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Product(s) {sorted(missing)} not found",
+        )
+
+    for item in sale_items:
+        product = products[item.product_id]
         line_subtotal = product.sale_price * item.qty
         subtotal += line_subtotal
         items.append(SaleItems(

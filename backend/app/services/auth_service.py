@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlmodel import Session, select
+from sqlalchemy.orm import joinedload
 
 from app.models.user import User
 from app.schemas.auth.auth import LoginRequest
@@ -9,9 +10,9 @@ from app.security import verify_password, create_access_token
 def login(request: LoginRequest, session: Session):
 
     user = session.exec(
-        select(User).where(
-            User.name.collate("utf8mb4_bin") == request.name
-        )
+        select(User)
+        .where(User.name == request.name)
+        .options(joinedload(User.role))
     ).first()
 
     # User not found
@@ -37,8 +38,6 @@ def login(request: LoginRequest, session: Session):
             "sub": str(user.id)
         }
     )
-
-    print(f"User {user.name} logged in successfully. Token: {token}")
 
     # Return login response
     return {

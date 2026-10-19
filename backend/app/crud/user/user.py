@@ -1,4 +1,5 @@
 from sqlmodel import Session, select
+from sqlalchemy.orm import joinedload
 from app.models.user import User
 from app.schemas.user.user import UserCreate
 
@@ -20,7 +21,9 @@ def create_user(session: Session, user: UserCreate):
     return db_user
 
 def get_all_users(session: Session):
-    return session.exec(select(User)).all()
+    return session.exec(
+        select(User).options(joinedload(User.role))
+    ).all()
 
 def get_user(session: Session, user_id: int):
     return session.get(User, user_id)

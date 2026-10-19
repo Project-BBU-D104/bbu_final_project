@@ -4,7 +4,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from passlib.exc import UnknownHashError
-from sqlmodel import Session
+from sqlmodel import Session, select
+from sqlalchemy.orm import joinedload
 from database import get_session
 
 from dotenv import load_dotenv
@@ -67,7 +68,9 @@ def get_current_user(
     except (JWTError, ValueError):
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = session.get(User, user_id)
+    user = session.exec(
+        select(User).where(User.id == user_id).options(joinedload(User.role))
+    ).first()
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="Invalid user")
     return user
