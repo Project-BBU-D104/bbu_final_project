@@ -2,9 +2,11 @@ import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/controllers/currency_controller.dart';
 import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/product_service.dart';
+import 'package:frontend/services/main_service/warehouse_stock_service.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
@@ -16,6 +18,8 @@ class ProductController extends GetxController {
   final CategoryController categoryCtr = Get.put(CategoryController());
   final UnitController unitCtr = Get.put(UnitController());
   final CurrencyController currencyCtr = Get.put(CurrencyController());
+  final WarehouseController warehouseCtr = Get.put(WarehouseController());
+  final WarehouseStockService warehouseStockService = WarehouseStockService();
 
   var isLoading = false.obs;
   var searchQuery = ''.obs;
@@ -26,6 +30,7 @@ class ProductController extends GetxController {
   final selectedCategory = RxnString();
   final selectedUnit = RxnString();
   final selectedCurrency = RxnString();
+  final selectedWarehouse = RxnString();
 
   var scannedProduct = Rxn<Map<String, dynamic>>();
   var scanResultText = ''.obs;
@@ -36,6 +41,7 @@ class ProductController extends GetxController {
   final productCostPriceController = TextEditingController();
   final productSalePriceController = TextEditingController();
   final productDescriptionController = TextEditingController();
+  final productQtyController = TextEditingController();
 
   final RxList<Map<String, dynamic>> _masterList = <Map<String, dynamic>>[].obs;
 
@@ -117,9 +123,11 @@ void searchProduct(String keyword) {
     productSalePriceController.clear();
     productDescriptionController.clear();
     productPhotoController.clear();
+    productQtyController.clear();
     selectedCategory.value = null;
     selectedUnit.value = null;
     selectedCurrency.value = null;
+    selectedWarehouse.value = null;
   }
 
  List<Map<String, dynamic>> get filteredItems {
@@ -158,6 +166,9 @@ void searchProduct(String keyword) {
     try{
       isLoading .value = true;
 
+      final warehouseId = selectedWarehouse.value;
+      final qty = int.tryParse(productQtyController.text.trim()) ?? 0;
+
       final data = {
         'name': productNameController.text,
         'category_id': selectedCategory.value,
@@ -168,9 +179,25 @@ void searchProduct(String keyword) {
         'sale_price': productSalePriceController.text,
         'description': productDescriptionController.text,
         'photo': productPhotoController.text,
-        'allow_insert_qty': true
       };
-      await service.createProduct(data);
+      final product = await service.createProduct(data);
+
+      if (warehouseId != null) {
+        try {
+          await warehouseStockService.createWarehouseStock({
+            'warehouse_id': int.parse(warehouseId),
+            'items': [
+              {'product_id': product['id'], 'qty': qty},
+            ],
+          });
+        } catch (e) {
+          ToastWidget.show(
+            message: "Product created, but warehouse stock was not added: $e",
+            type: ToastType.warning,
+          );
+        }
+      }
+
       ToastWidget.show(
         message: "Product created successfully",
         type: ToastType.success,
@@ -184,7 +211,10 @@ void searchProduct(String keyword) {
       clearProducts();
 
     }catch(e){
-      // 
+      ToastWidget.show(
+        message: e.toString(),
+        type: ToastType.error,
+      );
     }
     finally{
       isLoading.value = false;

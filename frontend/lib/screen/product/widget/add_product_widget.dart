@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
@@ -109,6 +110,66 @@ class AddProductWidget extends StatelessWidget {
                         );
                       }),
                        
+                      const SizedBox(height: 10),
+                      Obx(() {
+                        if (ctr.warehouseCtr.isLoading.value) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        return Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                                  const SizedBox(height: 5),
+                                  DropdownButtonFormField<String>(
+                                    value: ctr.selectedWarehouse.value,
+                                    decoration: InputDecoration(
+                                      hintText: "Select Warehouse".tr,
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                    ),
+                                    items: ctr.warehouseCtr.warehouseList.map((warehouse) {
+                                      return DropdownMenuItem<String>(
+                                        value: warehouse['id'].toString(),
+                                        child: Text(warehouse['name'].toString()),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      ctr.selectedWarehouse.value = value;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Quantity".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                                  const SizedBox(height: 5),
+                                  TextField(
+                                    controller: ctr.productQtyController,
+                                    enabled: ctr.selectedWarehouse.value != null,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                    decoration: InputDecoration(
+                                      hintText: "0",
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                       const SizedBox(height: 10),
                          Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                         const SizedBox(height: 5),
