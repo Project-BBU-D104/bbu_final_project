@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/currency_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class CurrencyCardWidget extends StatelessWidget {
   final Map<String, dynamic> currency;

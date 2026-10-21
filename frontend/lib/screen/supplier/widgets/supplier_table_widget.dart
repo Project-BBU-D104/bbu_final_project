@@ -87,7 +87,7 @@ class SupplierTableWidget extends StatelessWidget {
                             }
                           },
                         ),
-                        DataCell(Text(item.phone?.toString() ?? '-')),
+                        DataCell(Text(item.phone)),
                         DataCell(
                           Container(
                             padding: const EdgeInsets.symmetric(

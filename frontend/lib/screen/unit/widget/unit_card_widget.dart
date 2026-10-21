@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/unit_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class UnitCardWidget extends StatelessWidget {
   final Map<String, dynamic> units;

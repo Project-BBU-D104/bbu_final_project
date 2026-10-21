@@ -48,4 +48,5 @@ class AppRoutes {
 
   // report
   static const saleReport = '/sale-report';
+  static const salePaymentReport = '/sale-payment-report';
 }

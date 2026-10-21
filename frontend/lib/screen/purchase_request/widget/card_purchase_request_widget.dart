@@ -24,10 +24,7 @@ class CardPurchaseRequestWidget extends StatelessWidget {
     final warehouse = controller.warehouseController.warehouseList
         .where((item) => int.tryParse(item["id"].toString()) == warehouseId)
         .firstOrNull;
-    final items = purchaseRequest["items"] is List
-        ? List<Map<String, dynamic>>.from(purchaseRequest["items"])
-        : <Map<String, dynamic>>[];
-
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       color: Theme.of(context).colorScheme.surface,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase/purchase_payment_controller.dart';
 import 'package:frontend/screen/purchase_payment/widget/purchase_payment_card_widget.dart';
-import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';

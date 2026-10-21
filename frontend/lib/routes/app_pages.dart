@@ -31,6 +31,7 @@ import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
 import 'package:frontend/screen/purchase_request/purchase_request_screen.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
+import 'package:frontend/screen/report/all_report/sale_payment_report_screen.dart';
 import 'package:frontend/screen/report/all_report/sales_report_screen.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
@@ -222,5 +223,9 @@ class AppPages {
 
     // report
     GetPage(name: AppRoutes.saleReport, page: () => SalesReportScreen()),
+    GetPage(
+      name: AppRoutes.salePaymentReport,
+      page: () => const SalePaymentReportScreen(),
+    ),
   ];
 }

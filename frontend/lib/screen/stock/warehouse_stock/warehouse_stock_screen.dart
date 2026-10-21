@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/warehouse_stock_controller.dart';
 import 'package:frontend/screen/stock/warehouse_stock/widget/warehouse_stock_card_widget.dart';
 import 'package:frontend/screen/stock/warehouse_stock/widget/warehouse_stock_table_widget.dart';
-import 'package:frontend/widget/chip_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/search_feature_controller.dart';
+import 'package:frontend/global.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +9,27 @@ class ManageController extends GetxController{
   final searchCtr = Get.put(SearchFeatureController());
   final RxList<Map<String, dynamic>> filteredSections =
       <Map<String, dynamic>>[].obs;
+
+  static const Map<String, Set<String>> _routeRoles = {
+    AppRoutes.supplier: {'stock manager'},
+    AppRoutes.unit: {},
+    AppRoutes.category: {'cashier', 'stock manager'},
+    AppRoutes.product: {'cashier', 'stock manager'},
+    AppRoutes.warehouse: {'stock manager'},
+    AppRoutes.warehouseStock: {'stock manager'},
+    AppRoutes.stockAdjustment: {'stock manager'},
+    AppRoutes.stockTransfer: {'stock manager'},
+    AppRoutes.purchase: {'stock manager'},
+    AppRoutes.purchaseReqest: {'stock manager'},
+    AppRoutes.purchasePayment: {'stock manager'},
+    AppRoutes.saleList: {'cashier'},
+    AppRoutes.sale: {'cashier'},
+    AppRoutes.role: {},
+    AppRoutes.user: {},
+    AppRoutes.systemConfiguration: {},
+    AppRoutes.currency: {},
+    AppRoutes.paymentType: {},
+  };
 
 
   final List<Map<String, dynamic>> sections = [
@@ -183,11 +205,32 @@ class ManageController extends GetxController{
     // },
   ];
 
+  bool canAccessRoute(String route) {
+    final role = storage.currentUserRole.trim().toLowerCase();
+    if (role == 'admin' || role == 'owner') return true;
+
+    return _routeRoles[route]?.contains(role) ?? false;
+  }
+
+  List<Map<String, dynamic>> get accessibleSections {
+    return sections
+        .map((section) {
+          final items = (section['items'] as List)
+              .where((item) => canAccessRoute(item['route'] as String))
+              .toList();
+          if (items.isEmpty) return null;
+
+          return {...section, 'items': items};
+        })
+        .whereType<Map<String, dynamic>>()
+        .toList();
+  }
+
    @override
   void onInit() {
     super.onInit();
 
-    filteredSections.assignAll(sections);
+    filteredSections.assignAll(accessibleSections);
 
     ever(searchCtr.keyword, (_) {
       _filter();
@@ -198,11 +241,11 @@ class ManageController extends GetxController{
     final keyword = searchCtr.keyword.value.trim().toLowerCase();
 
     if (keyword.isEmpty) {
-      filteredSections.assignAll(sections);
+      filteredSections.assignAll(accessibleSections);
       return;
     }
 
-    final result = sections
+    final result = accessibleSections
         .map((section) {
           final items = (section["items"] as List)
               .where((item) {
@@ -231,6 +274,11 @@ class ManageController extends GetxController{
   }
 
   void goTo(String route) {
+    if (!canAccessRoute(route)) {
+      Get.snackbar('Access denied', 'Your role cannot access this section');
+      return;
+    }
+
     Get.toNamed(route);
   }
 }

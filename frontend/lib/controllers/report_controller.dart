@@ -17,8 +17,53 @@ final searchCtr = Get.put(SearchFeatureController());
           "icon": Icons.access_time_outlined,
           "route": AppRoutes.saleReport,
         },
+        {
+          "title": "Sale Payment Report",
+          "subtitle": "Sale Payment Report",
+          "icon": Icons.access_time_outlined,
+          "route": AppRoutes.salePaymentReport,
+        },
       ]
-    } 
+    },
+    {
+      "title": "Purchase Report",
+      "items": [
+        {
+          "title": "Purchase Report",
+          "subtitle": "Purchase Report",
+          "icon": Icons.access_time_outlined,
+          "route": AppRoutes.saleReport,
+        },
+        {
+          "title": "Purchase Payment Report",
+          "subtitle": "Purchase Payment Report",
+          "icon": Icons.access_time_outlined,
+          "route": AppRoutes.saleReport,
+        },
+      ]
+    },
+    {
+      "title": "Stock Ledger Report",
+      "items": [
+        {
+          "title": "Stock Ledger Report",
+          "subtitle": "Stock Ledger Report",
+          "icon": Icons.access_time_outlined,
+          "route": AppRoutes.saleReport,
+        },
+      ]
+    },
+    {
+      "title": "Profit and Loss Report",
+      "items": [
+        {
+          "title": "Profit and Loss Report",
+          "subtitle": "Profit and Loss Report",
+          "icon": Icons.access_time_outlined,
+          "route": AppRoutes.saleReport,
+        },
+      ]
+    },
   ];
 
   @override

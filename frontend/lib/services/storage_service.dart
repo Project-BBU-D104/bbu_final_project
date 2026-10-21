@@ -21,6 +21,8 @@ abstract class IStorageService {
   Future<void> lastUserLoginWrite({required Map<String, dynamic> data});
   Future<void> lastUserLoginRemove();
   Map<String, dynamic> get lastUserLoginRead;
+  String get currentUserRole;
+  bool hasRole(String role);
 
 }
 
@@ -98,5 +100,18 @@ class StorageService implements IStorageService {
     }
     return {};
   }
+
+  @override
+  String get currentUserRole {
+    final user = lastUserLoginRead['user'];
+    if (user is Map) {
+      return user['role']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  @override
+  bool hasRole(String role) =>
+      currentUserRole.trim().toLowerCase() == role.trim().toLowerCase();
   
 }
