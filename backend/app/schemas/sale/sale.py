@@ -10,7 +10,7 @@ from typing import List
 class SaleCreate(SQLModel):
     user_id: int
     customer_id: int
-    invoice_no: str
+    invoice_no: Optional[str] = None
     sale_date: datetime
     subtotal: Decimal = Field(default=Decimal("0.00"), ge=0)
     tax_amount: Decimal = Field(default=Decimal("0.00"), ge=0)

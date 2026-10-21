@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/dashboard_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/dashboard/dashboard_screen.dart';
@@ -63,6 +64,11 @@ class HomeController extends GetxController{
       pageController.jumpToPage(
         index,
       );
+
+      // Refresh the dashboard whenever the user opens its tab.
+      if (index == 1) {
+        Get.find<DashboardController>().getDashboardData();
+      }
     }
   }
 

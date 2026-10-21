@@ -6,7 +6,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
 from app.core.cache import cache_key_builder, ORMJsonCoder
-from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router,warehouse_stock_router, stock_adjustment_router, product_transfer_router, purchase_router,purchase_item_router, sale_router, sale_payment_router, telegram_router,auth_router, currency_router, payment_type_router, unit_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router,product_category_router,system_configuration_router, purchase_requests_router, purchase_request_items_router
+from app.routes import users_router,category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router, warehouse_router,warehouse_stock_router, stock_adjustment_router, product_transfer_router, purchase_router,purchase_item_router, sale_router, sale_payment_router, telegram_router,auth_router, currency_router, payment_type_router, unit_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router,product_category_router,system_configuration_router, purchase_requests_router, purchase_request_items_router, dashboard_router
 from app.security import require_roles
 
 @asynccontextmanager
@@ -60,6 +60,8 @@ app.include_router(payment_type_router)
 app.include_router(unit_router)
 
 app.include_router(recent_purchase_router)
+
+app.include_router(dashboard_router)
 
 app.include_router(product_category_router)
 app.include_router(system_configuration_router)

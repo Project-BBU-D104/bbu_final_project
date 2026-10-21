@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/payment_type_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class PaymentTypeCardWidget extends StatelessWidget {
   final Map<String, dynamic> paymentType;
@@ -17,16 +17,6 @@ class PaymentTypeCardWidget extends StatelessWidget {
 
   final ctr = Get.find<PaymentTypeController>();
 
-  String formatDate(dynamic date) {
-    if (date == null) return "-";
-
-    try {
-      return DateFormat("dd MMM yyyy, hh:mm a")
-          .format(DateTime.parse(date.toString()));
-    } catch (e) {
-      return "-";
-    }
-  }
   @override
   Widget build(BuildContext context) {
     final bool isActive = paymentType['status'] ?? false;
@@ -204,8 +194,8 @@ class PaymentTypeCardWidget extends StatelessWidget {
                   child: _InfoItem(
                     icon: Icons.calendar_today,
                     title: "Created",
-                    value: formatDate(
-                      paymentType['created_at'],
+                    value: DateFormatter.formatDate(
+                      DateTime.parse(paymentType['created_at']),
                     ),
                   ),
                 ),
@@ -213,8 +203,8 @@ class PaymentTypeCardWidget extends StatelessWidget {
                   child: _InfoItem(
                     icon: Icons.update,
                     title: "Updated",
-                    value: formatDate(
-                      paymentType['updated_at'],
+                    value: DateFormatter.formatDate(
+                      DateTime.parse(paymentType['updated_at']),
                     ),
                   ),
                 ),

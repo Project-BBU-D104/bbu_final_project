@@ -105,11 +105,38 @@ def _set_sale_totals(db_sale: Sale) -> None:
         else "unpaid"
     )
 
+def generate_invoice_no(session: Session) -> str:
+    """Return the next sale invoice number: SALE-YYYYMMDD-NNN.
+
+    The sequence restarts at 001 each day.
+    """
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    prefix = f"SALE-{today}-"
+
+    last_sale = session.exec(
+        select(Sale)
+        .where(Sale.invoice_no.like(f"{prefix}%"))
+        .order_by(Sale.id.desc())
+    ).first()
+
+    if last_sale is None:
+        next_number = 1
+    else:
+        try:
+            next_number = int(last_sale.invoice_no.removeprefix(prefix)) + 1
+        except ValueError:
+            next_number = 1
+
+    return f"{prefix}{next_number:03d}"
+
+
 def create_sale(session: Session, sale: SaleCreate):
     sale_data = sale.model_dump(
         exclude={"sale_items"},
         exclude_none=True,
     )
+    if not sale_data.get("invoice_no"):
+        sale_data["invoice_no"] = generate_invoice_no(session)
     db_sale = Sale.model_validate(sale_data)
     try:
         session.add(db_sale)

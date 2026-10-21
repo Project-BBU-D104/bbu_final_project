@@ -3,41 +3,68 @@ import 'package:frontend/constants/constant.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StockInChartWidget extends StatelessWidget {
-  
-  const StockInChartWidget({super.key});
+  final List<Map<String, dynamic>> data;
+
+  const StockInChartWidget({super.key, required this.data});
+
+  static const List<String> _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  String _label(Map<String, dynamic> item) {
+    final month = int.tryParse(item['sale_month']?.toString() ?? '');
+    if (month == null || month < 1 || month > 12) return '';
+
+    final name = _months[month - 1];
+    final year = int.tryParse(item['sale_year']?.toString() ?? '');
+    if (year == null) return name;
+
+    return '$name ${year.toString().substring(2)}';
+  }
 
   @override
   Widget build(BuildContext context) {
-     final List<Map<String, dynamic>> data = [
-      {"month": "Jan", "amount": 1200},
-      {"month": "Feb", "amount": 1800},
-      {"month": "Mar", "amount": 1500},
-      {"month": "Apr", "amount": 2200},
-      {"month": "May", "amount": 3000},
-    ];
     return Card(
       margin: const EdgeInsets.all(0),
       color: titleColor,
-      child: SfCartesianChart(title: ChartTitle(
-        text: 'Monthly Sales',
-        alignment: ChartAlignment.near,
-        textStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-        primaryXAxis: CategoryAxis(),
-        tooltipBehavior: TooltipBehavior(enable: true),
-        series: <CartesianSeries>[
-          ColumnSeries<Map<String, dynamic>, String>(
-            dataSource: data,
-            xValueMapper: (item, _) => item["month"],
-            yValueMapper: (item, _) => item["amount"],
-            dataLabelSettings: const DataLabelSettings(
-              isVisible: true,
-            ),
-          ),
-        ],
+      child: SizedBox(
+        height: 300,
+        child: data.isEmpty
+            ? const Center(child: Text('No sales data yet'))
+            : SfCartesianChart(
+                title: ChartTitle(
+                  text: 'Monthly Sales',
+                  alignment: ChartAlignment.near,
+                  textStyle: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                primaryXAxis: CategoryAxis(),
+                tooltipBehavior: TooltipBehavior(enable: true),
+                series: <CartesianSeries>[
+                  ColumnSeries<Map<String, dynamic>, String>(
+                    dataSource: data,
+                    xValueMapper: (item, _) => _label(item),
+                    yValueMapper: (item, _) =>
+                        double.tryParse(item['amount']?.toString() ?? '') ?? 0,
+                    dataLabelSettings: const DataLabelSettings(
+                      isVisible: true,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

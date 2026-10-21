@@ -201,7 +201,6 @@ class SaleController extends GetxController {
       final saleResponse = await service.createSale({
         'user_id': userId,
         'customer_id': customer['id'],
-        'invoice_no': reference,
         'sale_date': now.toIso8601String(),
         'status': 'completed',
         'payment_method': method,

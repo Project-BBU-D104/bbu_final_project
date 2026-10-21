@@ -71,22 +71,14 @@ class RecentStockOutWidget extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        flex: 2,
+                        flex: 4,
                         child: Text(
                            textAlign: TextAlign.start,
                           'NO'.tr,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                           textAlign: TextAlign.start,
-                          'Customer'.tr,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      
+                   
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -112,20 +104,13 @@ class RecentStockOutWidget extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          flex: 2,
+                          flex: 4,
                           child: Text(
                              textAlign: TextAlign.start,
                             items[i]['invoice_no']?.toString() ?? '',
                           ),
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                             textAlign: TextAlign.start,
-                            items[i]['customer_name']?.toString() ?? '',
-                          ),
-                        ),
-                        
+                      
                         Expanded(
                           flex: 2,
                           child: Text(
