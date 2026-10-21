@@ -53,3 +53,10 @@ class Product(SQLModel, table=True):
     purchase_request_items: List["PurchaseRequestItems"] = Relationship(
         back_populates="product"
     )
+
+    @property
+    def warehouse(self):
+        """Warehouse this product belongs to, taken from its warehouse stock rows."""
+        if self.warehouse_stock:
+            return self.warehouse_stock[0].warehouse
+        return None

@@ -6,9 +6,51 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy.orm import selectinload
 from app.models.sale_items import SaleItems
+from app.models.warehouse_stock import WarehouseStock
 from app.models.user import User
 from fastapi import HTTPException
 from app.schemas.sale.sale_item import SaleItemCreate
+
+
+def _warehouse_stock_for_product(session: Session, product_id: int):
+    return session.exec(
+        select(WarehouseStock).where(WarehouseStock.product_id == product_id)
+    ).first()
+
+
+def _decrease_warehouse_stock(
+    session: Session, product: Product, quantity: int
+) -> None:
+    stock = _warehouse_stock_for_product(session, product.id)
+
+    if stock is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f'Product "{product.name}" is not in any warehouse stock.',
+        )
+
+    if stock.qty < quantity:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f'Not enough stock for "{product.name}". '
+                f'Only {stock.qty} left, but {quantity} requested.'
+            ),
+        )
+
+    stock.qty -= quantity
+    session.add(stock)
+
+
+def _restore_warehouse_stock(
+    session: Session, product_id: int, quantity: int
+) -> None:
+    stock = _warehouse_stock_for_product(session, product_id)
+    if stock is None:
+        return
+
+    stock.qty += quantity
+    session.add(stock)
 
 
 def _build_sale_items(
@@ -37,6 +79,7 @@ def _build_sale_items(
 
     for item in sale_items:
         product = products[item.product_id]
+        _decrease_warehouse_stock(session, product, item.qty)
         line_subtotal = product.sale_price * item.qty
         subtotal += line_subtotal
         items.append(SaleItems(
@@ -108,7 +151,10 @@ def get_sale(session: Session, sale_id: int):
 def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
     statement = select(Sale).where(Sale.id == sale_id).options(selectinload(Sale.sale_items))
     db_sale = session.exec(statement).first()
-    if db_sale:
+    if not db_sale:
+        return db_sale
+
+    try:
         updates = sale.model_dump(
             exclude_unset=True,
             exclude={"sale_items", "subtotal", "total_amount", "due_amount", "payment_status"},
@@ -118,6 +164,12 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
                 setattr(db_sale, field, value)
 
         if sale.sale_items is not None:
+            # Put the old quantities back before deducting the new ones.
+            for old_item in db_sale.sale_items:
+                _restore_warehouse_stock(
+                    session, old_item.product_id, old_item.qty
+                )
+
             items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
             for old_item in db_sale.sale_items:
                 session.delete(old_item)
@@ -128,8 +180,11 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
         db_sale.updated_at = sale.updated_at or datetime.now(timezone.utc)
         session.add(db_sale)
         session.commit()
-        return get_sale(session, sale_id)
-    return db_sale
+    except Exception:
+        session.rollback()
+        raise
+
+    return get_sale(session, sale_id)
 
 def delete_sale(session: Session, sale_id: int):
 
@@ -138,15 +193,24 @@ def delete_sale(session: Session, sale_id: int):
     if not sale:
         return None
 
-    # delete sale items first
-    for item in sale.sale_items:
-        session.delete(item)
+    try:
+        # Put the sold quantities back into warehouse stock.
+        for item in sale.sale_items:
+            _restore_warehouse_stock(session, item.product_id, item.qty)
 
-    # delete payments if exists
-    for payment in sale.sale_payments:
-        session.delete(payment)
+        # delete sale items first
+        for item in sale.sale_items:
+            session.delete(item)
 
-    # delete sale
-    session.delete(sale)
-    session.commit()
+        # delete payments if exists
+        for payment in sale.sale_payments:
+            session.delete(payment)
+
+        # delete sale
+        session.delete(sale)
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+
     return sale

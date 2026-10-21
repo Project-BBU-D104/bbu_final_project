@@ -251,7 +251,10 @@ class SaleController extends GetxController {
           await service.deleteSale(saleId);
         } catch (_) {}
       }
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      ToastWidget.show(
+        message: error.toString().replaceFirst('Exception: ', ''),
+        type: ToastType.error,
+      );
     } finally {
       isProcessingPayment.value = false;
     }

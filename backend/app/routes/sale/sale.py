@@ -10,11 +10,19 @@ router = APIRouter(prefix="/sale", tags=["sale"])
 
 CACHE_NS = "sale"
 CACHE_TTL = 60  # seconds
+STOCK_CACHE_NS = "warehouse"
+
+
+async def _clear_sale_caches():
+    # Sales change warehouse quantities, so the warehouse cache is stale too.
+    await FastAPICache.clear(namespace=CACHE_NS)
+    await FastAPICache.clear(namespace=STOCK_CACHE_NS)
+
 
 @router.post("/", response_model=SaleRead)
 async def create_new_sale(payment: SaleCreate, session: Session = Depends(get_session)):
     result = create_sale(session, payment)
-    await FastAPICache.clear(namespace=CACHE_NS)
+    await _clear_sale_caches()
     return result
 
 @router.get("/", response_model=list[SaleRead])
@@ -31,10 +39,11 @@ async def read_sale(sale_id: int, session: Session = Depends(get_session)):
     return sale
 
 @router.put("/{sale_id}", response_model=SaleRead)
-def update_sale_route(sale_id: int, sale: SaleUpdate, session: Session = Depends(get_session)):
+async def update_sale_route(sale_id: int, sale: SaleUpdate, session: Session = Depends(get_session)):
     updated_sale = update_sale(session, sale_id, sale)
     if updated_sale is None:
         raise HTTPException(status_code=404, detail="Sale not found")
+    await _clear_sale_caches()
     return updated_sale
 
 @router.delete("/{sale_id}")
@@ -43,5 +52,5 @@ async def delete_sale_route(sale_id: int, session: Session = Depends(get_session
     if deleted_sale is None:
         raise HTTPException(status_code=404, detail="Sale not found")
 
-    await FastAPICache.clear(namespace=CACHE_NS)
+    await _clear_sale_caches()
     return deleted_sale

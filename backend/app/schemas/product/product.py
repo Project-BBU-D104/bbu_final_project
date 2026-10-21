@@ -6,6 +6,7 @@ from decimal import Decimal
 from app.schemas.category.category import CategorySimple
 from app.schemas.unit.unit import UnitSimple
 from app.schemas.currency.currency import CurrencySimple
+from app.schemas.warehouse.warehouse_base import WarehouseSimple
 
 class ProductCreate(SQLModel):
     category_id: int
@@ -17,6 +18,7 @@ class ProductCreate(SQLModel):
     cost_price: Decimal
     sale_price: Decimal
     description: Optional[str] = None
+    warehouse_id: Optional[int] = None
 
 class ProductUpdate(SQLModel):
     category_id: Optional[int] = None
@@ -30,6 +32,7 @@ class ProductUpdate(SQLModel):
     qty: Optional[int] = None
     allow_insert_qty: Optional[bool] = None
     description: Optional[str] = None
+    warehouse_id: Optional[int] = None
     updated_at: Optional[datetime] = None
 
 class ProductRead(SQLModel):
@@ -43,6 +46,7 @@ class ProductRead(SQLModel):
     cost_price: Optional[Decimal] = None
     sale_price: Optional[Decimal] = None
     description: Optional[str] = None
+    warehouse: Optional[WarehouseSimple] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at : Optional[datetime] = None

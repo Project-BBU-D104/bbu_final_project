@@ -1,7 +1,33 @@
 from sqlmodel import Session, select
+from sqlalchemy.orm import selectinload
 from app.models.warehouse import Warehouse
+from app.models.warehouse_stock import WarehouseStock
+from app.models.product import Product
 from app.schemas.warehouse.warehouse import WarehouseCreate, WarehouseUpdate
 from datetime import datetime, timezone
+
+def _warehouse_with_stock():
+    """Eager-load the relationships used by WarehouseRead.
+
+    FastAPICache serializes the endpoint result before FastAPI's response
+    model runs, so lazy relationships would be missing from the cached copy.
+    """
+    return (
+        select(Warehouse).options(
+            selectinload(Warehouse.warehouse_stock).selectinload(
+                WarehouseStock.warehouse
+            ),
+            selectinload(Warehouse.warehouse_stock)
+            .selectinload(WarehouseStock.product)
+            .selectinload(Product.category),
+            selectinload(Warehouse.warehouse_stock)
+            .selectinload(WarehouseStock.product)
+            .selectinload(Product.unit),
+            selectinload(Warehouse.warehouse_stock)
+            .selectinload(WarehouseStock.product)
+            .selectinload(Product.currency),
+        )
+    )
 
 def generate_reference_no(session: Session) -> str:
     # Get the latest warehouse
@@ -35,10 +61,12 @@ def create_warehouse(session: Session, warehouse: WarehouseCreate):
     return db_warehouse
 
 def get_all_warehouse(session: Session):
-    return session.exec(select(Warehouse)).all()
+    return session.exec(_warehouse_with_stock()).all()
 
 def get_warehouse(session: Session, warehouse_id: int):
-    return session.get(Warehouse, warehouse_id)
+    return session.exec(
+        _warehouse_with_stock().where(Warehouse.id == warehouse_id)
+    ).first()
 
 def update_warehouse(session: Session, warehouse_id: int, warehouse: WarehouseUpdate):
     db_warehouse = session.get(Warehouse, warehouse_id)

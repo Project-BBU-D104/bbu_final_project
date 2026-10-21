@@ -89,6 +89,40 @@ class EditProductWidget extends StatelessWidget {
                       }),
                         
                       const SizedBox(height: 10),
+                      Text("Warehouse".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                      const SizedBox(height: 5),
+                      Obx(() {
+                        if (ctr.warehouseCtr.isLoading.value) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        return DropdownButtonFormField<String>(
+                          value: ctr.warehouseCtr.warehouseList.any(
+                            (warehouse) =>
+                                warehouse["id"].toString() == ctr.selectedWarehouse.value,
+                          )
+                              ? ctr.selectedWarehouse.value
+                              : null,
+                          decoration: InputDecoration(
+                            hintText: "Select Warehouse".tr,
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          ),
+                          items: ctr.warehouseCtr.warehouseList.map((warehouse) {
+                            return DropdownMenuItem<String>(
+                              value: warehouse['id'].toString(),
+                              child: Text(warehouse['name'].toString()),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            ctr.selectedWarehouse.value = value;
+                          },
+                        );
+                      }),
+                        
+                      const SizedBox(height: 10),
                          Text("Barcode".tr, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
                         const SizedBox(height: 5),
                   

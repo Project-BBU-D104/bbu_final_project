@@ -192,6 +192,9 @@ void searchProduct(String keyword) {
         'sale_price': productSalePriceController.text,
         'description': productDescriptionController.text,
         'photo': productPhotoController.text,
+        'warehouse_id': selectedWarehouse.value == null
+            ? null
+            : int.parse(selectedWarehouse.value!),
       };
       await service.createProduct(data);
 
@@ -249,6 +252,10 @@ void searchProduct(String keyword) {
               ? product["currency"]["id"].toString()
               : product["currency"].toString();
 
+      selectedWarehouse.value = product["warehouse"] is Map
+          ? product["warehouse"]["id"].toString()
+          : null;
+
       Get.toNamed(
         AppRoutes.editProduct,
         arguments: productId,
@@ -270,6 +277,9 @@ void searchProduct(String keyword) {
         "sale_price": double.tryParse(productSalePriceController.text) ?? 0,
         "description": productDescriptionController.text.trim(),
         "photo": productPhotoController.text,
+        "warehouse_id": selectedWarehouse.value == null
+            ? null
+            : int.parse(selectedWarehouse.value!),
       };
 
       await service.updateProduct(productId, data);

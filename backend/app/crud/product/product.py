@@ -11,12 +11,69 @@ from app.models.purchase_item import PurchaseItem
 from app.models.sale_items import SaleItems
 from app.models.stock_adjustment import StockAdjustment
 from app.models.warehouse_stock import WarehouseStock
+from app.models.warehouse import Warehouse
 from app.models.product_transfer_item import ProductTransferItem
 from app.models.purchase_request_items import PurchaseRequestItems
 
+def _ensure_warehouse_exists(session: Session, warehouse_id: int):
+    if session.get(Warehouse, warehouse_id) is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Warehouse not found."
+        )
+
+
+def _sync_product_warehouse(session: Session, product_id: int, warehouse_id: int):
+    """Keep the product's warehouse stock row in sync with the product form."""
+    _ensure_warehouse_exists(session, warehouse_id)
+
+    stock = session.exec(
+        select(WarehouseStock).where(WarehouseStock.product_id == product_id)
+    ).first()
+
+    if stock is None:
+        session.add(
+            WarehouseStock(
+                product_id=product_id,
+                warehouse_id=warehouse_id,
+                qty=0,
+            )
+        )
+        return
+
+    if stock.warehouse_id == warehouse_id:
+        return
+
+    already_in_warehouse = session.exec(
+        select(WarehouseStock).where(
+            WarehouseStock.product_id == product_id,
+            WarehouseStock.warehouse_id == warehouse_id,
+        )
+    ).first()
+    if already_in_warehouse:
+        return
+
+    stock.warehouse_id = warehouse_id
+    session.add(stock)
+
+
 def create_product(session: Session, product: ProductCreate):
+    if product.warehouse_id is not None:
+        _ensure_warehouse_exists(session, product.warehouse_id)
+
     db_product = Product.model_validate(product)
     session.add(db_product)
+    session.flush()
+
+    if product.warehouse_id is not None:
+        session.add(
+            WarehouseStock(
+                product_id=db_product.id,
+                warehouse_id=product.warehouse_id,
+                qty=0,
+            )
+        )
+
     session.commit()
     session.refresh(db_product)
     return db_product
@@ -28,7 +85,7 @@ def get_all_product(session: Session):
             selectinload(Product.category),
             selectinload(Product.unit),
             selectinload(Product.currency),
-
+            selectinload(Product.warehouse_stock).selectinload(WarehouseStock.warehouse),
         )
     )
     return session.exec(statement).all()
@@ -41,6 +98,7 @@ def get_product(session: Session, product_id: int):
             selectinload(Product.category),
             selectinload(Product.unit),
             selectinload(Product.currency),
+            selectinload(Product.warehouse_stock).selectinload(WarehouseStock.warehouse),
         )
     )
     return session.exec(statement).first()
@@ -72,6 +130,9 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
             db_product.unit_id = product.unit_id
         if product.description is not None:
             db_product.description = product.description
+
+        if product.warehouse_id is not None:
+            _sync_product_warehouse(session, product_id, product.warehouse_id)
 
         updated_at = product.updated_at
         if updated_at is not None and updated_at.tzinfo is None:
