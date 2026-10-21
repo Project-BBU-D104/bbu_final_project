@@ -26,6 +26,8 @@ class HomeController extends GetxController{
     onWelcome();
   }
 
+  bool get canViewReport => storage.hasRole('Admin');
+
   final RxList<Map<String, dynamic>> recentPurchaseList = <Map<String, dynamic>>[].obs;
   final RxList<Map<String, dynamic>> recentSaleList = <Map<String, dynamic>>[].obs;
 
@@ -78,7 +80,7 @@ class HomeController extends GetxController{
     HomeContent(),
     DashboardScreen(),
     ManageScreen(),
-    ReportScreen(),
+    if (canViewReport) ReportScreen(),
     ProfileScreen(),
   ];
 

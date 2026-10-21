@@ -12,6 +12,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
+      final canViewReport = controller.canViewReport;
+
     return Scaffold(
       body: SafeArea(
         child: Row(
@@ -40,11 +42,14 @@ class HomeScreen extends StatelessWidget {
                       selectedIcon: Icon(Icons.shopping_bag),
                       label: Text('Manage'.tr),
                     ),
+
+                    if(canViewReport)
                     NavigationRailDestination(
                       icon: Icon(Icons.receipt_long_outlined),
                       selectedIcon: Icon(Icons.receipt_long),
                       label: Text('Report'.tr),
                     ),
+
                     NavigationRailDestination(
                       icon: Icon(Icons.person_2_outlined),
                       selectedIcon: Icon(Icons.person),
@@ -90,6 +95,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icon(Icons.shopping_bag_outlined),
                     label: 'Manage'.tr,
                   ),
+                  if(canViewReport)
                   NavigationDestination(
                     icon: Icon(Icons.receipt_long_outlined),
                     label: 'Report'.tr,
