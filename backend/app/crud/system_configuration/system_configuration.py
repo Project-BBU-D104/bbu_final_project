@@ -51,9 +51,9 @@ def update_system_configuration(session: Session, system_configuration_id: int, 
             db_system_configuration.logo = system_configuration.logo
         if system_configuration.default_currency_id is not None:
             db_system_configuration.default_currency_id = system_configuration.default_currency_id
-        if system_configuration.default_warehouse_id is not None:
+        if "default_warehouse_id" in system_configuration.model_fields_set:
             db_system_configuration.default_warehouse_id = system_configuration.default_warehouse_id
-        if system_configuration.default_payment_type_id is not None:
+        if "default_payment_type_id" in system_configuration.model_fields_set:
             db_system_configuration.default_payment_type_id = system_configuration.default_payment_type_id
         if system_configuration.allow_discount is not None:
             db_system_configuration.allow_discount = system_configuration.allow_discount
