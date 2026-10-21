@@ -77,14 +77,7 @@ class LowStockWidget extends StatelessWidget {
                               ),
                             ),
                           ),
-                          DataColumn(
-                            label: Text(
-                              'Price',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          
                           DataColumn(
                             label: Text(
                               'Stock',
@@ -104,11 +97,7 @@ class LowStockWidget extends StatelessWidget {
                               DataCell(
                                 Text(product['product_name']?.toString() ?? '-'),
                               ),
-                              DataCell(
-                                Text(
-                                  '\$${money.format(_toDouble(product['price']))}',
-                                ),
-                              ),
+                               
                               DataCell(
                                 Text(
                                   stock.toStringAsFixed(0),
@@ -117,6 +106,7 @@ class LowStockWidget extends StatelessWidget {
                                         stock < 10 ? Colors.red : Colors.green,
                                     fontWeight: FontWeight.bold,
                                   ),
+                                  textAlign: TextAlign.end,
                                 ),
                               ),
                             ],

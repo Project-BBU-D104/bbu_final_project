@@ -12,6 +12,7 @@ def create_user(session: Session, user: UserCreate):
         password=hash_password(user.password),
         is_active=user.is_active,
         role_id=user.role_id,
+        system_configuration_id=user.system_configuration_id,
         phone=user.phone,
         photo=user.photo
     )
@@ -38,6 +39,8 @@ def update_user(session: Session, user_id: int, user: UserCreate):
         db_user.phone = user.phone
         db_user.photo = user.photo
         db_user.role_id = user.role_id
+        if user.system_configuration_id is not None:
+            db_user.system_configuration_id = user.system_configuration_id
 
         session.add(db_user)
         session.commit()

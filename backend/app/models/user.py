@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.models.sale import Sale
     from app.models.sale_payment import SalePayment
     from app.models.role import Role
+    from app.models.system_configuration import SystemConfiguration
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -17,6 +18,9 @@ class User(SQLModel, table=True):
     email: str
     password: str
     role_id: int = Field(foreign_key="role.id")
+    system_configuration_id: Optional[int] = Field(
+        default=None, foreign_key="system_configuration.id"
+    )
     phone: Optional[str]
     photo: Optional[str]
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -29,3 +33,6 @@ class User(SQLModel, table=True):
     sales: List["Sale"] = Relationship(back_populates="user")
     sale_payments: List["SalePayment"] = Relationship(back_populates="user")
     role: Optional["Role"] = Relationship(back_populates="users")
+    system_configuration: Optional["SystemConfiguration"] = Relationship(
+        back_populates="users"
+    )

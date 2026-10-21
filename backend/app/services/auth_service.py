@@ -48,6 +48,7 @@ def login(request: LoginRequest, session: Session):
             "name": user.name,
             "email": user.email,
             "role": user.role.name,
+            "system_configuration_id": user.system_configuration_id,
             "phone": user.phone,
             "photo": user.photo
         },

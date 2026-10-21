@@ -1,11 +1,12 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime, timezone
 
 if TYPE_CHECKING:
     from app.models.currency import Currency
     from app.models.warehouse import Warehouse
-    from app.models.payment_type import PaymentType 
+    from app.models.payment_type import PaymentType
+    from app.models.user import User
 
 
 class SystemConfiguration(SQLModel, table=True):
@@ -33,3 +34,4 @@ class SystemConfiguration(SQLModel, table=True):
     currency: Optional["Currency"] = Relationship(back_populates="system_configuration")
     warehouse: Optional["Warehouse"] = Relationship(back_populates="system_configuration")
     payment_type: Optional["PaymentType"] = Relationship(back_populates="system_configuration")
+    users: List["User"] = Relationship(back_populates="system_configuration")

@@ -10,6 +10,7 @@ class UserCreate(SQLModel):
     password: str
     is_active: bool
     role_id: int
+    system_configuration_id: Optional[int] = None
     phone: Optional[str]
     photo: Optional[str]
 
@@ -19,6 +20,7 @@ class UserRead(SQLModel):
     email: str
     is_active: bool
     role: RoleSimple
+    system_configuration_id: Optional[int] = None
     phone: Optional[str]
     photo: Optional[str]
     created_at: Optional[datetime] = None

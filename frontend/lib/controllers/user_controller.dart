@@ -9,15 +9,19 @@ import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/controllers/system_configuration_controller.dart';
 
 class UserController extends GetxController{
   final UserService service = UserService();
+  final SystemConfigurationController systemConfigurationCtr =
+      Get.put(SystemConfigurationController());
   var selectedUser = RxnString();
 
   final isLoading = false.obs;
 
   // final selectedRole = ''.obs;
   final selectedRole = RxnString(null);
+  final selectedSystemConfiguration = RxnString(null);
   final  userList = <Map<String, dynamic>>[].obs;
   final searchUserList = <Map<String, dynamic>>[].obs;
   final userPhotoController = TextEditingController();
@@ -59,6 +63,7 @@ class UserController extends GetxController{
 
   void clearUser(){
     selectedRole.value = null;
+    selectedSystemConfiguration.value = null;
     userPhotoController.clear();
     userNameController.clear();
     userEmailController.clear();
@@ -126,6 +131,9 @@ class UserController extends GetxController{
         'password': userPasswordController.text.trim(),
         'phone': userPhoneController.text.trim(),
         'role_id': selectedRole.value,
+        'system_configuration_id': int.tryParse(
+          selectedSystemConfiguration.value ?? '',
+        ),
         'is_active': !isChecked.value,
       };
 
@@ -176,6 +184,8 @@ class UserController extends GetxController{
       userPasswordController.text = user["password"] ?? "";
       selectedRole.value =
         user["role"]?["id"]?.toString();
+      selectedSystemConfiguration.value =
+        user["system_configuration_id"]?.toString();
       isChecked.value = user["is_active"] != true;
       AppBottomSheets.show(
       context,
@@ -204,6 +214,9 @@ class UserController extends GetxController{
       "phone": userPhoneController.text.trim(),
       "password": userPasswordController.text.trim(),
       "role_id": selectedRole.value,
+      "system_configuration_id": int.tryParse(
+        selectedSystemConfiguration.value ?? '',
+      ),
       "is_active": !isChecked.value,
     };
 

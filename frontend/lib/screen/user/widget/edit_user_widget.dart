@@ -96,6 +96,46 @@ class EditUserWidget extends StatelessWidget {
             );
           }),
             const SizedBox(height: 10),
+            Text(
+              "System Configuration".tr,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Obx(() {
+              if (ctr.systemConfigurationCtr.isLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return DropdownButtonFormField<String>(
+                value: ctr.systemConfigurationCtr.systemConfigurationList.any(
+                  (configuration) =>
+                      configuration["id"].toString() ==
+                      ctr.selectedSystemConfiguration.value,
+                )
+                    ? ctr.selectedSystemConfiguration.value
+                    : null,
+                decoration: InputDecoration(
+                  hintText: "Select System Configuration".tr,
+                  border: const OutlineInputBorder(),
+                ),
+                items: ctr.systemConfigurationCtr.systemConfigurationList.map((configuration){
+                  return DropdownMenuItem<String>(
+                    value: configuration["id"].toString(),
+                    child: Text(
+                      configuration["company_name"] ?? "",
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value){
+                  ctr.selectedSystemConfiguration.value = value;
+                },
+              );
+            }),
+            const SizedBox(height: 10),
             _field(
               title: "Username",
               controller: ctr.userNameController,

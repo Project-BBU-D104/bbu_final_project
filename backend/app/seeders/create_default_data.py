@@ -1,34 +1,32 @@
 from sqlmodel import Session, select
 
+from backend.app.models.warehouse import Warehouse
 from database import engine
-from app.models.category import Category
-from app.models.customer import Customer
 from app.models.payment_type import PaymentType
-from app.models.supplier import Supplier
 from app.models.unit import Unit
+from app.models.system_configuration import SystemConfiguration
+from app.models.currency import Currency
 
 
 DEFAULT_DATA = {
-    Category: [
-        {"name": name, "description": f"{name} products"}
-        for name in ("Beverages", "Snacks", "Dairy", "Bakery", "Produce", "Frozen", "Meat", "Seafood", "Household", "Personal Care")
-    ],
-    Customer: [
-        {"name": f"Customer {number}", "phone": f"01234567{number:02}", "address": "Phnom Penh", "is_active": True}
-        for number in range(1, 11)
-    ],
-    Supplier: [
-        {"name": f"Supplier {number}", "phone": f"0234567{number:03}", "email": f"supplier{number}@example.com", "map": "Phnom Penh", "address": "Phnom Penh", "status": True}
-        for number in range(1, 11)
-    ],
     Unit: [
         {"name": name, "short_name": short_name, "description": f"Measured by {name.lower()}"}
-        for name, short_name in (("Piece", "pc"), ("Box", "box"), ("Pack", "pack"), ("Bottle", "btl"), ("Can", "can"), ("Kilogram", "kg"), ("Gram", "g"), ("Liter", "l"), ("Meter", "m"), ("Dozen", "dz"))
+        for name, short_name in (("Piece", "pc"), ("Box", "box"), ("Pack", "pack"), ("Bottle", "btl"), ("Can", "can"), ("Kilogram", "kg"), ("Gram", "g"), ("Liter", "l"), ("Meter", "m"))
     ],
     PaymentType: [
         {"name": name, "description": f"{name} payment"}
-        for name in ("Cash", "Bank Transfer", "Credit Card", "Debit Card", "ABA Pay", "Wing", "ACLEDA", "Cheque", "QR Payment", "Credit")
+        for name in ("Cash", "Bank Transfer", "ABA Bank", "ACLEDA Bank", "Credit Card", "Wing", "Cheque", "QR Payment")
     ],
+    Warehouse:[
+        { "name": "ទីទីម៉ាត ផ្លូវ 60","reference_no": "WH001", "location": "30 street siem reap", "note":"this is warehost 30 street"}
+    ],
+    Currency:[
+        {"name": name, "code":code, "symbol": symbol, "exchange_rate": exchange_rate, "status": True}
+        for name, code, symbol, exchange_rate in (("Riel", "KHR", "៛", 4000), ("Dollar", "USD", "$", 1))
+    ],
+    SystemConfiguration: [
+        { "company_name": "ទីទីម៉ាត ផ្លូវ 60", "company_address":"ផ្លូវ 60", "phone":"012 345 678", "email":"titimart22@gmail.com", "default_currency_id": 1, "default_warehouse_id": 1, "default_payment_type_id": 1, "allow_discount": True, "tax_enabled": False, "low_stock_warning": 40}
+    ]
 }
 
 

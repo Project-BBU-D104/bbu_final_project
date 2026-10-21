@@ -3,6 +3,26 @@ from app.models.system_configuration import SystemConfiguration
 from app.schemas.system_configuration.system_configuration import SystemConfigurationCreate, SystemConfigurationUpdate
 from datetime import datetime, timezone
 
+# Used when no system configuration has set a low stock warning yet.
+DEFAULT_LOW_STOCK_WARNING = 50
+
+
+def get_low_stock_warning(session: Session, system_configuration_id: int | None = None) -> int:
+    configuration = None
+    if system_configuration_id is not None:
+        configuration = session.get(SystemConfiguration, system_configuration_id)
+
+    if configuration is None:
+        configuration = session.exec(
+            select(SystemConfiguration).order_by(SystemConfiguration.id)
+        ).first()
+
+    if configuration is None or configuration.low_stock_warning is None:
+        return DEFAULT_LOW_STOCK_WARNING
+
+    return configuration.low_stock_warning
+
+
 def create_system_configuration(session: Session, system_configuration: SystemConfigurationCreate):
     db_system_configuration = SystemConfiguration.from_orm(system_configuration)
     session.add(db_system_configuration)

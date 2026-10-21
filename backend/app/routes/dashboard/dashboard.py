@@ -1,14 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy import text
-from database import engine
+from sqlmodel import Session
+from database import engine, get_session
+from app.security import get_current_user
+from app.crud.system_configuration.system_configuration import get_low_stock_warning
 
 router = APIRouter(
     prefix="/api",
     tags=["Dashboard"],
 )
-
-# Used when no system configuration row has been saved yet.
-DEFAULT_LOW_STOCK_WARNING = 50
 
 
 def _rows(sql: str) -> list[dict]:
@@ -17,10 +17,12 @@ def _rows(sql: str) -> list[dict]:
 
 
 @router.get("/kpi-data")
-def get_kpi_data():
-    low_stock_threshold = (
-        "COALESCE((SELECT low_stock_warning FROM system_configuration "
-        f"ORDER BY id LIMIT 1), {DEFAULT_LOW_STOCK_WARNING})"
+def get_kpi_data(
+    session: Session = Depends(get_session),
+    user = Depends(get_current_user),
+):
+    low_stock_threshold = str(
+        int(get_low_stock_warning(session, user.system_configuration_id))
     )
 
     sql = f"""
@@ -102,10 +104,12 @@ def get_revenue_by_category():
 
 
 @router.get("/low-stock-products")
-def get_low_stock_products():
-    low_stock_threshold = (
-        "COALESCE((SELECT low_stock_warning FROM system_configuration "
-        f"ORDER BY id LIMIT 1), {DEFAULT_LOW_STOCK_WARNING})"
+def get_low_stock_products(
+    session: Session = Depends(get_session),
+    user = Depends(get_current_user),
+):
+    low_stock_threshold = str(
+        int(get_low_stock_warning(session, user.system_configuration_id))
     )
 
     sql = f"""

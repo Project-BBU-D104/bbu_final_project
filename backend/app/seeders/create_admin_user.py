@@ -1,9 +1,29 @@
+from typing import Optional
+
 from sqlmodel import Session, select
 
 from database import engine
 from app.models.role import Role
+from app.models.system_configuration import SystemConfiguration
 from app.models.user import User
 from app.security import hash_password
+
+
+def get_default_system_configuration(
+    session: Session,
+) -> SystemConfiguration:
+    """Return the first system configuration, which new users are attached to."""
+    configuration = session.exec(
+        select(SystemConfiguration).order_by(SystemConfiguration.id)
+    ).first()
+
+    if configuration is None:
+        raise RuntimeError(
+            "No system configuration found. Run "
+            "'python -m app.seeders.create_default_data' first."
+        )
+
+    return configuration
 
 
 def create_default_user(
@@ -13,6 +33,7 @@ def create_default_user(
     username: str,
     email: str,
     password: str,
+    system_configuration_id: int,
 ):
     # Check role
     role = session.exec(
@@ -40,17 +61,27 @@ def create_default_user(
             email=email,
             password=hash_password(password),
             role_id=role.id,
+            system_configuration_id=system_configuration_id,
+            is_active=True,
         )
         session.add(user)
         session.commit()
+    elif user.system_configuration_id is None:
+        # Keep existing assignments, but attach users created before
+        # configurations existed.
+        user.system_configuration_id = system_configuration_id
+        session.add(user)
+        session.commit()
+
+    return user
 
 
-def create_admin_user():
+def create_admin_user(system_configuration_id: Optional[int] = None):
     with Session(engine) as session:
+        if system_configuration_id is None:
+            system_configuration_id = get_default_system_configuration(session).id
 
-        # ==========================
         # Admin
-        # ==========================
         create_default_user(
             session=session,
             role_name="Admin",
@@ -58,6 +89,7 @@ def create_admin_user():
             username="admin",
             email="admin",
             password="123456",
+            system_configuration_id=system_configuration_id,
         )
 
         # Supervisor (below Admin)
@@ -69,9 +101,7 @@ def create_admin_user():
             ))
             session.commit()
 
-        # ==========================
         # Cashier
-        # ==========================
         create_default_user(
             session=session,
             role_name="Cashier",
@@ -79,11 +109,10 @@ def create_admin_user():
             username="cashier",
             email="cashier",
             password="123456",
+            system_configuration_id=system_configuration_id,
         )
 
-        # ==========================
         # Stock Manager
-        # ==========================
         create_default_user(
             session=session,
             role_name="Stock Manager",
@@ -91,6 +120,7 @@ def create_admin_user():
             username="stockmanager",
             email="stockmanager",
             password="123456",
+            system_configuration_id=system_configuration_id,
         )
 
 if __name__ == "__main__":
