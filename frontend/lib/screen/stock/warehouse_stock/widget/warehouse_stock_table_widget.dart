@@ -53,6 +53,8 @@ class WarehouseStockTableWidget extends StatelessWidget {
                 final category = product['category'] is Map
                     ? Map<String, dynamic>.from(product['category'] as Map)
                     : <String, dynamic>{};
+                final unitShort = (product['unit']?['short_name'] ?? '')
+                    .toString();
                 final stockId = int.tryParse(stock['id']?.toString() ?? '');
 
                 return DataRow(
@@ -79,7 +81,8 @@ class WarehouseStockTableWidget extends StatelessWidget {
                       ),
                     ),
                     DataCell(Text(category['name']?.toString() ?? '-')),
-                    DataCell(Text(stock['qty']?.toString() ?? '-')),
+                    DataCell(Text(
+                        '${stock['qty'] ?? '-'}${unitShort.isEmpty ? '' : ' $unitShort'}')),
                     DataCell(Text('\$${product['cost_price'] ?? '-'}')),
                     DataCell(Text('\$${product['sale_price'] ?? '-'}')),
                     DataCell(

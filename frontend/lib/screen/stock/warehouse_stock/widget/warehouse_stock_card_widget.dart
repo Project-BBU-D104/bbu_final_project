@@ -15,6 +15,7 @@ class WarehouseStockCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = warehouseStock["product"];
+    final unitShort = (product["unit"]?["short_name"] ?? "").toString();
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -129,21 +130,15 @@ class WarehouseStockCardWidget extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                  "${warehouseStock["qty"]}",
+                  unitShort.isEmpty
+                      ? "${warehouseStock["qty"]}"
+                      : "${warehouseStock["qty"]} $unitShort",
                   style: TextStyle(
                     color: Colors.green.shade700,
                     fontWeight: FontWeight.bold,
                     fontSize: 34,
                   ),
                 ),
-
-                // Text(
-                //   product["unit"] ?? "",
-                //   style: TextStyle(
-                //     color: Colors.green.shade700,
-                //     fontWeight: FontWeight.w600,
-                //   ),
-                // ),
               ],
             ),
           ),

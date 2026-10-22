@@ -167,6 +167,10 @@ class EditWarehouseStockWidget extends StatelessWidget {
                               decoration: InputDecoration(
                                 labelText: "Quantity",
                                 prefixIcon: const Icon(Icons.numbers),
+                                suffixText: unitShortFor(
+                                  productCtr.products,
+                                  (row["product"] as RxnString).value,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -236,4 +240,13 @@ class EditWarehouseStockWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+String unitShortFor(List<Map<String, dynamic>> products, String? productId) {
+  for (final p in products) {
+    if (p["id"].toString() == productId) {
+      return p["unit"]?["short_name"]?.toString() ?? "";
+    }
+  }
+  return "";
 }

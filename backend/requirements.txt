@@ -4,6 +4,8 @@ uvicorn==0.47.0
 
 # Database
 sqlmodel
+# pinned: 2.1.x compiled extensions (_processors_cy) are blocked by Windows App Control on some machines
+SQLAlchemy==2.0.45
 alembic==1.16.4
 PyMySQL==1.1.1
 
