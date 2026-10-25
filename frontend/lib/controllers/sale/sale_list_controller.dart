@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
+import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
@@ -29,6 +30,32 @@ class SaleListController extends GetxController{
 
   final SaleService service = SaleService();
     final saleList = <Map<String, dynamic>> [].obs;
+
+  final searchCtr = Get.put(SearchController());
+
+  List<Map<String, dynamic>> get filteredSaleList {
+    final keyword = searchCtr.keyword.value.trim().toLowerCase();
+
+    if (keyword.isEmpty) return saleList;
+
+    return saleList.where((sale) {
+      final customer = sale['customer'];
+      final customerName = customer is Map
+          ? (customer['name'] ?? '').toString()
+          : (customer ?? '').toString();
+
+      final searchable = [
+        customerName,
+        sale['invoice_no'],
+        sale['payment_status'],
+        sale['payment_method'],
+        sale['sale_date'],
+        sale['total_amount'],
+      ].map((value) => (value ?? '').toString().toLowerCase()).join(' ');
+
+      return searchable.contains(keyword);
+    }).toList();
+  }
 
   void gotoSaleListDetail(Map<String, dynamic> sale){
     Get.toNamed(AppRoutes.saleListDetail, arguments: sale);

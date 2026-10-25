@@ -135,8 +135,8 @@ def create_sale(session: Session, sale: SaleCreate):
         exclude={"sale_items"},
         exclude_none=True,
     )
-    if not sale_data.get("invoice_no"):
-        sale_data["invoice_no"] = generate_invoice_no(session)
+    invoice_no = (sale_data.get("invoice_no") or "").strip()
+    sale_data["invoice_no"] = invoice_no or generate_invoice_no(session)
     db_sale = Sale.model_validate(sale_data)
     try:
         session.add(db_sale)

@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from sqlmodel import Field, SQLModel
+from pydantic import field_validator
 from typing import Optional
 from app.schemas.user.user import UserRead
 from app.schemas.customer.customer import CustomerSimple
@@ -25,6 +26,13 @@ class SaleCreate(SQLModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at : Optional[datetime] = None
+
+    @field_validator("invoice_no", mode="before")
+    @classmethod
+    def empty_invoice_to_none(cls, value):
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
 class SaleUpdate(SQLModel):
     user_id: Optional[int] = None

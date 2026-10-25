@@ -17,7 +17,8 @@ def get_product_category():
             p.id AS product_id,
             p.name AS product_name,
             p.photo,
-            p.sale_price
+            p.sale_price,
+            p.barcode
            
         FROM categories c
         LEFT JOIN product p
@@ -46,6 +47,7 @@ def get_product_category():
                 "name": row["product_name"],
                 "photo": row["photo"],
                 "sale_price": row["sale_price"],
+                "barcode": row["barcode"]
             })
 
     return list(categories.values())

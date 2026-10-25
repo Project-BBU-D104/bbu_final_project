@@ -1,17 +1,21 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
+import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/services/main_service/customer_service.dart';
 import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/services/main_service/payment_type_service.dart';
+import 'package:frontend/services/main_service/product_service.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/utils/barcode_utils.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class SaleController extends GetxController {
   final SaleService service = SaleService();
+  final ProductService productService = ProductService();
   final CustomerService customerService = CustomerService();
   final CurrencyService currencyService = CurrencyService();
   final PaymentTypeService paymentTypeService = PaymentTypeService();
@@ -27,6 +31,37 @@ class SaleController extends GetxController {
   final isCustomersLoading = false.obs;
   final isPaymentTypesLoading = false.obs;
   final isProcessingPayment = false.obs;
+
+  final searchCtr = Get.put(SearchController());
+
+  /// Categories with products filtered by the search keyword.
+  /// Categories that have no matching products are hidden while searching.
+  List<Map<String, dynamic>> get filteredCategories {
+    final keyword = searchCtr.keyword.value.trim().toLowerCase();
+
+    if (keyword.isEmpty) return categories;
+
+    final result = <Map<String, dynamic>>[];
+
+    for (final category in categories) {
+      final products = (category['products'] as List? ?? [])
+          .cast<Map<String, dynamic>>()
+          .where((product) {
+            final name = (product['name'] ?? '').toString().toLowerCase();
+            final barcode = (product['barcode'] ?? '').toString().toLowerCase();
+
+            return name.contains(keyword) ||
+                BarcodeUtils.matches(barcode, keyword);
+          })
+          .toList();
+
+      if (products.isNotEmpty) {
+        result.add({...category, 'products': products});
+      }
+    }
+
+    return result;
+  }
 
   @override
   void onInit() {
@@ -101,12 +136,56 @@ class SaleController extends GetxController {
       isLoading.value = true;
       final response = await service.getProductCategories();
       if (response is List) {
-        categories.value = List<Map<String, dynamic>>.from(response);
+        final categoryList = List<Map<String, dynamic>>.from(response);
+        await _mergeProductBarcodes(categoryList);
+        categories.value = categoryList;
       }
     } catch (error) {
       ToastWidget.show(message: error.toString(), type: ToastType.error);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// The product-category endpoint does not always return the barcode.
+  /// Merge barcodes from the product endpoint so barcode search works.
+  Future<void> _mergeProductBarcodes(
+    List<Map<String, dynamic>> categoryList,
+  ) async {
+    try {
+      final response = await productService.getProducts();
+      if (response is! List) return;
+
+      final barcodes = <int, String>{};
+
+      for (final product in response) {
+        if (product is! Map) continue;
+
+        final id = int.tryParse(product['id']?.toString() ?? '');
+        final barcode = product['barcode']?.toString().trim() ?? '';
+
+        if (id != null && barcode.isNotEmpty) {
+          barcodes[id] = barcode;
+        }
+      }
+
+      for (final category in categoryList) {
+        final products = category['products'];
+        if (products is! List) continue;
+
+        for (final product in products) {
+          if (product is! Map) continue;
+
+          final id = int.tryParse(product['id']?.toString() ?? '');
+          final barcode = barcodes[id];
+
+          if (barcode != null) {
+            product['barcode'] = barcode;
+          }
+        }
+      }
+    } catch (_) {
+      // Barcode lookup is optional; keep the product list usable if it fails.
     }
   }
 
@@ -198,7 +277,7 @@ class SaleController extends GetxController {
     try {
       final now = DateTime.now().toUtc();
       final reference = 'SALE-${now.microsecondsSinceEpoch}';
-      final saleResponse = await service.createSale({
+      final saleResponse = await _createSale({
         'user_id': userId,
         'customer_id': customer['id'],
         'sale_date': now.toIso8601String(),
@@ -258,6 +337,34 @@ class SaleController extends GetxController {
       isProcessingPayment.value = false;
     }
   }
+
+  Future<dynamic> _createSale(Map<String, dynamic> data) async {
+    try {
+      return await service.createSale(data);
+    } catch (error) {
+      final message = error.toString();
+      final invoiceRequired =
+          message.contains('invoice_no') &&
+          (message.contains('Field required') || message.contains('missing'));
+
+      if (!invoiceRequired) rethrow;
+
+      // Older deployed backends require invoice_no even though the current
+      // backend generates it automatically. Send one only for that case.
+      final now = DateTime.now();
+      final date =
+          '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}';
+      final time =
+          '${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
+
+      return await service.createSale({
+        ...data,
+        'invoice_no': 'SALE-$date-$time',
+      });
+    }
+  }
+
+  String _twoDigits(int value) => value.toString().padLeft(2, '0');
 
   void onConfirm() {
     Get.offNamed(AppRoutes.paymentSuccess);

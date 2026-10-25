@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/controllers/currency_controller.dart';
+import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/controllers/unit_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/product_service.dart';
+import 'package:frontend/utils/barcode_utils.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
@@ -42,7 +44,7 @@ class ProductController extends GetxController {
 
   static final List<Map<String, dynamic>> _cache = [];
   static DateTime? _cachedAt;
-  static const Duration _cacheTtl = Duration(seconds: 60);
+  static const Duration _cacheTtl = Duration(seconds: 12000);
 
   static bool get _hasFreshCache =>
       _cachedAt != null &&
@@ -53,6 +55,30 @@ class ProductController extends GetxController {
   final searchProductList = <Map<String, dynamic>>[].obs;
 
    List<Map<String, dynamic>> get products => _masterList;
+
+  /// Category names used by the product filter, built from the loaded
+  /// products and the category master list.
+  List<String> get filterCategoryOptions {
+    final names = <String>{};
+
+    for (final category in categoryCtr.categoryList) {
+      final name = (category['name'] ?? '').toString().trim();
+      if (name.isNotEmpty) names.add(name);
+    }
+
+    for (final product in _masterList) {
+      final category = product['category'];
+      final name = category is Map
+          ? (category['name'] ?? '').toString().trim()
+          : (category ?? '').toString().trim();
+      if (name.isNotEmpty) names.add(name);
+    }
+
+    final sorted = names.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+    return ['All', ...sorted];
+  }
 
   @override
   void onInit() {
@@ -123,7 +149,7 @@ void searchProduct(String keyword) {
       final barcode =
           (product['barcode'] ?? '').toString().toLowerCase();
 
-      return name.contains(search) || barcode.contains(search);
+      return name.contains(search) || BarcodeUtils.matches(barcode, search);
     }).toList(),
   );
 }
@@ -204,6 +230,7 @@ void searchProduct(String keyword) {
       );
       // Reload Category
       await getProducts();
+      _refreshSaleProducts();
 
       Navigator.pop(context);
 
@@ -286,6 +313,7 @@ void searchProduct(String keyword) {
 
       // Reload Product
       await getProducts();
+      _refreshSaleProducts();
 
       Navigator.pop(context);
 
@@ -307,6 +335,7 @@ void searchProduct(String keyword) {
           await service.deleteProduct(productId);
           // Refresh category list
           await getProducts();
+          _refreshSaleProducts();
 
           Get.back();
 
@@ -328,10 +357,17 @@ void searchProduct(String keyword) {
     );
   }
 
+  /// Keeps an open Sale screen in sync after products are added/edited/deleted.
+  void _refreshSaleProducts() {
+    if (Get.isRegistered<SaleController>()) {
+      Get.find<SaleController>().loadProductCategories();
+    }
+  }
+
   Map<String, dynamic>? findByBarcode(String code) {
     try {
       return _masterList.firstWhere(
-        (p) => (p['barcode'] ?? '').toString() == code,
+        (p) => BarcodeUtils.equals((p['barcode'] ?? '').toString(), code),
       );
     } catch (_) {
       return null;

@@ -36,7 +36,7 @@ class SaleListScreen extends StatelessWidget {
                     );
                   }
 
-                  if (ctr.saleList.isEmpty) {
+                  if (ctr.filteredSaleList.isEmpty) {
                     return SizedBox(
                       height: MediaQuery.of(context).size.height * 0.6,
                       child: Center(
@@ -48,9 +48,9 @@ class SaleListScreen extends StatelessWidget {
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: ctr.saleList.length,
+                    itemCount: ctr.filteredSaleList.length,
                     itemBuilder: (context, index) {
-                      final sale = ctr.saleList[index];
+                      final sale = ctr.filteredSaleList[index];
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SaleCardWidget(sale: sale),

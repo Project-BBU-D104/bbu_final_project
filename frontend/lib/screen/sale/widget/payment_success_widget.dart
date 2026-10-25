@@ -91,9 +91,15 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
 
   Future<void> _runSequence() async {
     await _badgeController.forward();
+    if (!mounted) return;
+
     await _checkController.forward();
+    if (!mounted) return;
+
     _sparkleController.forward();
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
+
     _contentController.forward();
   }
 

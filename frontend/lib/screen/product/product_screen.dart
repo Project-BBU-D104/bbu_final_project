@@ -28,7 +28,9 @@ class ProductScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 4),
-                  SearchWidget(title: 'Search Product'),
+
+                  SearchWidget(title: 'Search Product', showScan: true),
+
                   const SizedBox(height: 16),
 
                   SingleChildScrollView(
@@ -46,21 +48,6 @@ class ProductScreen extends StatelessWidget {
                             onPressed: () => _openFilterBottomSheet(
                               context,
                               'category',
-                              productCtrl,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-
-                          FilterWidget(
-                            icon: Icons.sort,
-                            label: productCtrl.selectedStatus.value == 'All'
-                                ? 'Status'
-                                : productCtrl.selectedStatus.value,
-                            isSelected:
-                                productCtrl.selectedStatus.value != 'All',
-                            onPressed: () => _openFilterBottomSheet(
-                              context,
-                              'status',
                               productCtrl,
                             ),
                           ),
@@ -172,7 +159,7 @@ class ProductScreen extends StatelessWidget {
     List<String> options = [];
 
     if (type == 'category') {
-      options = ['All', 'Sting', 'Cocacola', 'Ize', 'Energy Drinks'];
+      options = ctrl.filterCategoryOptions;
     }
     if (type == 'status') {
       options = ['All', 'IN STOCK', 'LOW STOCK', 'OUT OF STOCK'];
@@ -180,42 +167,67 @@ class ProductScreen extends StatelessWidget {
 
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         decoration: BoxDecoration(
           color: lightColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Filter by ${type.capitalizeFirst}',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            ...options.map(
-              (opt) => ListTile(
-                title: Text(opt),
-                trailing:
-                    (type == 'category' &&
-                            ctrl.selectedCategory.value == opt) ||
-                        (type == 'status' &&
-                            ctrl.selectedStatus.value == opt) ||
-                        (type == 'recency' && ctrl.selectedRecency.value == opt)
-                    ? const Icon(Icons.check, color: Color(0xFF1DB584))
-                    : null,
-                onTap: () {
-                  if (type == 'category') ctrl.selectedCategory.value = opt;
-                  if (type == 'status') ctrl.selectedStatus.value = opt;
-                  if (type == 'recency') ctrl.selectedRecency.value = opt;
-                  Get.back();
-                },
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Filter by ${type.capitalizeFirst}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  children: options
+                      .map(
+                        (opt) => ListTile(
+                          title: Text(opt),
+                          trailing:
+                              (type == 'category' &&
+                                      ctrl.filterCategory.value == opt) ||
+                                  (type == 'status' &&
+                                      ctrl.selectedStatus.value == opt) ||
+                                  (type == 'recency' &&
+                                      ctrl.selectedRecency.value == opt)
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Color(0xFF1DB584),
+                                )
+                              : null,
+                          onTap: () {
+                            if (type == 'category') {
+                              ctrl.filterCategory.value = opt;
+                            }
+                            if (type == 'status') {
+                              ctrl.selectedStatus.value = opt;
+                            }
+                            if (type == 'recency') {
+                              ctrl.selectedRecency.value = opt;
+                            }
+                            Get.back();
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      isScrollControlled: true,
     );
   }
 }

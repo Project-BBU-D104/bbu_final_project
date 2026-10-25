@@ -137,12 +137,22 @@ class EditProductWidget extends StatelessWidget {
                               final code = await Navigator.push<String>(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const TestProductScannerPage(),
+                                  builder: (_) => const TestProductScannerPage(
+                                    returnImmediately: true,
+                                  ),
                                 ),
                               );
-                              if (code != null) {
-                                // print(code);
-                              }
+
+                              if (code == null || code.trim().isEmpty) return;
+
+                              final value = code.trim();
+                              ctr.productBarcodeController.value =
+                                  TextEditingValue(
+                                text: value,
+                                selection: TextSelection.collapsed(
+                                  offset: value.length,
+                                ),
+                              );
                             },
                           ),
                         ),
