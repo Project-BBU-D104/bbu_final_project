@@ -1,6 +1,8 @@
+# PS F:\ProjectSarona\bbu_final_project\backend> python -m app.seeders.create_default_data
+
 from sqlmodel import Session, select
 
-from backend.app.models.warehouse import Warehouse
+from app.models.warehouse import Warehouse
 from database import engine
 from app.models.payment_type import PaymentType
 from app.models.unit import Unit
@@ -33,12 +35,27 @@ DEFAULT_DATA = {
 def create_default_data():
     with Session(engine) as session:
         for model, rows in DEFAULT_DATA.items():
-            existing_names = {row.name for row in session.exec(select(model)).all()}
-            session.add_all(model(**row) for row in rows if row["name"] not in existing_names)
+
+            # SystemConfiguration uses company_name instead of name
+            key_field = (
+                "company_name"
+                if model == SystemConfiguration
+                else "name"
+            )
+
+            existing_names = {
+                getattr(item, key_field)
+                for item in session.exec(select(model)).all()
+            }
+
+            for row in rows:
+                if row[key_field] not in existing_names:
+                    session.add(model(**row))
+                    existing_names.add(row[key_field])
+
         session.commit()
 
 
 if __name__ == "__main__":
-    assert all(len(rows) == 10 for rows in DEFAULT_DATA.values())
     create_default_data()
     print("Default data seeded successfully!")

@@ -1,3 +1,5 @@
+# PS F:\ProjectSarona\bbu_final_project\backend> python -m app.seeders.create_admin_user
+
 from typing import Optional
 
 from sqlmodel import Session, select
