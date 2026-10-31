@@ -55,6 +55,14 @@ API_URL=http://127.0.0.1:8000
 
 Make sure the backend is running before using the frontend.
 
+## MCP configuration
+
+The root `.mcp.json` configures:
+
+- `dart` through `dart mcp-server`, with the working directory set to `frontend`.
+
+The Dart server requires a Dart SDK that provides `dart mcp-server`. Run `flutter pub get` in `frontend` before using Dart/Flutter MCP tools.
+
 ## Notes
 
 - The SQLite database file is created when the backend runs.
