@@ -14,110 +14,105 @@ class TopProudctWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final NumberFormat money = NumberFormat('#,##0.00');
 
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Label
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Top Products',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        elevation: 0,
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Label
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Top Products',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-          ),
 
-          if (products.isEmpty)
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text('No sales yet'),
-            )
-          else
-            // Table
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: constraints.maxWidth,
-                    ),
-                    child: DataTable(
-                      columnSpacing: 30,
-                      headingRowColor: WidgetStateProperty.all(
-                        Colors.grey.shade100,
+            if (products.isEmpty)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Text('No sales yet'),
+              )
+            else
+              // Table
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
                       ),
-                      columns: const [
-                        DataColumn(
-                          label: Text(
-                            'ID',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                      child: DataTable(
+                        columnSpacing: 30,
+                        headingRowColor: WidgetStateProperty.all(
+                          Colors.grey.shade100,
+                        ),
+                        columns: const [
+                          DataColumn(
+                            label: Text(
+                              'ID',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Product',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                          DataColumn(
+                            label: Text(
+                              'Product',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Sold',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                          DataColumn(
+                            label: Text(
+                              'Sold',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Revenue',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                          DataColumn(
+                            label: Text(
+                              'Revenue',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
-                      ],
-                      rows: products.map((product) {
-                        return DataRow(
-                          cells: [
-                            DataCell(
-                              Text(product['product_id']?.toString() ?? '-'),
-                            ),
-                            DataCell(
-                              Text(product['product_name']?.toString() ?? '-'),
-                            ),
-                            DataCell(
-                              Text(
-                                _toDouble(product['total_sold'])
-                                    .toStringAsFixed(0),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                        ],
+                        rows: products.map((product) {
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Text(product['product_id']?.toString() ?? '-'),
+                              ),
+                              DataCell(
+                                Text(
+                                  product['product_name']?.toString() ?? '-',
                                 ),
                               ),
-                            ),
-                            DataCell(
-                              Text(
-                                '\$${money.format(_toDouble(product['total_revenue']))}',
+                              DataCell(
+                                Text(
+                                  _toDouble(
+                                    product['total_sold'],
+                                  ).toStringAsFixed(0),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                              DataCell(
+                                Text(
+                                  '\$${money.format(_toDouble(product['total_revenue']))}',
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-        ],
+                  );
+                },
+              ),
+          ],
+        ),
       ),
     );
   }

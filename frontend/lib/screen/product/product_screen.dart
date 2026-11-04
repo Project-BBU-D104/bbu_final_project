@@ -16,92 +16,157 @@ class ProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Product'),
+      appBar: CustomAppBar(
+        title: 'Product',
+        showRefresh: true,
+        onRefresh: productCtrl.getProducts,
+      ),
 
-      body: CustomScrollView(
-        slivers: [
-          /// SEARCH + FILTER SECTION
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 4),
+      body: RefreshIndicator(
+        onRefresh: productCtrl.getProducts,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            /// SEARCH + FILTER SECTION
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
 
-                  SearchWidget(title: 'Search Product', showScan: true),
+                    SearchWidget(title: 'Search Product', showScan: true),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Obx(
-                      () => Row(
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Obx(
+                        () => Row(
+                          children: [
+                            FilterWidget(
+                              icon: Icons.tune,
+                              label: productCtrl.filterCategory.value == 'All'
+                                  ? 'Category'
+                                  : productCtrl.filterCategory.value,
+                              isSelected:
+                                  productCtrl.filterCategory.value != 'All',
+                              onPressed: () => _openFilterBottomSheet(
+                                context,
+                                'category',
+                                productCtrl,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 2)),
+
+            /// PRODUCT LIST
+            Obx(() {
+              if (productCtrl.isLoading.value) {
+                return const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              // final list = productCtrl.filteredItems;
+              final list = productCtrl.searchQuery.value.isNotEmpty
+                  ? productCtrl.searchProductList
+                  : productCtrl.filteredItems;
+
+              if (list.isEmpty) {
+                final hasError = productCtrl.loadError.value.isNotEmpty;
+                final isSearching = productCtrl.searchQuery.value.isNotEmpty;
+
+                return SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FilterWidget(
-                            icon: Icons.tune,
-                            label: productCtrl.filterCategory.value == 'All'
-                                ? 'Category'
-                                : productCtrl.filterCategory.value,
-                            isSelected:
-                                productCtrl.filterCategory.value != 'All',
-                            onPressed: () => _openFilterBottomSheet(
-                              context,
-                              'category',
-                              productCtrl,
+                          Icon(
+                            hasError ? Icons.cloud_off : Icons.inbox,
+                            size: 64,
+                            color: Colors.grey[300],
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Text(
+                            isSearching
+                                ? 'No products found'
+                                : hasError
+                                ? 'Could not load products'
+                                : 'No products available',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
                             ),
                           ),
+
+                          if (hasError && !isSearching) ...[
+                            const SizedBox(height: 8),
+
+                            Text(
+                              productCtrl.loadError.value,
+                              textAlign: TextAlign.center,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+
+                          if (!isSearching) ...[
+                            const SizedBox(height: 16),
+
+                            OutlinedButton.icon(
+                              onPressed: () => productCtrl.getProducts(),
+                              icon: const Icon(Icons.refresh, size: 18),
+                              label: const Text('Retry'),
+                            ),
+                          ],
                         ],
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                );
+              }
 
-          const SliverToBoxAdapter(child: SizedBox(height: 2)),
-
-          /// PRODUCT LIST
-          Obx(() {
-            if (productCtrl.isLoading.value) {
-              return const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            // final list = productCtrl.filteredItems;
-            final list = productCtrl.searchQuery.value.isNotEmpty
-                ? productCtrl.searchProductList
-                : productCtrl.filteredItems;
-
-            if (list.isEmpty) {
-              return SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.inbox, size: 64, color: Colors.grey[300]),
-
-                      const SizedBox(height: 16),
-
-                      Text(
-                        productCtrl.searchQuery.value.isNotEmpty
-                            ? 'No products found'
-                            : 'No products available',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+              return SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.crossAxisExtent >= 760) {
+                    return SliverPadding(
+                      padding: const EdgeInsets.only(
+                        bottom: 12,
+                        left: 12,
+                        right: 12,
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          if (index == 0) {
+                            return const _ProductTableHeader();
+                          }
+                          return ProductTableWidget(product: list[index - 1]);
+                        }, childCount: list.length + 1),
+                      ),
+                    );
+                  }
 
-            return SliverLayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.crossAxisExtent >= 760) {
                   return SliverPadding(
                     padding: const EdgeInsets.only(
                       bottom: 12,
@@ -109,35 +174,19 @@ class ProductScreen extends StatelessWidget {
                       right: 12,
                     ),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        if (index == 0) {
-                          return const _ProductTableHeader();
-                        }
-                        return ProductTableWidget(product: list[index - 1]);
-                      }, childCount: list.length + 1),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) =>
+                            ProductCardWidget(product: list[index]),
+                        childCount: list.length,
+                      ),
                     ),
                   );
-                }
-
-                return SliverPadding(
-                  padding: const EdgeInsets.only(
-                    bottom: 12,
-                    left: 12,
-                    right: 12,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) =>
-                          ProductCardWidget(product: list[index]),
-                      childCount: list.length,
-                    ),
-                  ),
-                );
-              },
-            );
-          }),
-          const SliverToBoxAdapter(child: SizedBox(height: 70)),
-        ],
+                },
+              );
+            }),
+            const SliverToBoxAdapter(child: SizedBox(height: 70)),
+          ],
+        ),
       ),
 
       floatingActionButton: FloatingActionButton(

@@ -13,15 +13,30 @@ import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
 
 class ProductController extends GetxController {
+  ProductController({ProductService? service})
+    : service = service ?? ProductService();
 
-  final ProductService service = ProductService();
+  final ProductService service;
 
-  final CategoryController categoryCtr = Get.put(CategoryController());
-  final UnitController unitCtr = Get.put(UnitController());
-  final CurrencyController currencyCtr = Get.put(CurrencyController());
-  final WarehouseController warehouseCtr = Get.put(WarehouseController());
+  CategoryController get categoryCtr => Get.isRegistered<CategoryController>()
+      ? Get.find<CategoryController>()
+      : Get.put(CategoryController());
+
+  UnitController get unitCtr => Get.isRegistered<UnitController>()
+      ? Get.find<UnitController>()
+      : Get.put(UnitController());
+
+  CurrencyController get currencyCtr => Get.isRegistered<CurrencyController>()
+      ? Get.find<CurrencyController>()
+      : Get.put(CurrencyController());
+
+  WarehouseController get warehouseCtr =>
+      Get.isRegistered<WarehouseController>()
+      ? Get.find<WarehouseController>()
+      : Get.put(WarehouseController());
 
   var isLoading = false.obs;
+  var loadError = ''.obs;
   var searchQuery = ''.obs;
   var filterCategory = 'All'.obs;
   var selectedStatus = 'All'.obs;
@@ -47,6 +62,7 @@ class ProductController extends GetxController {
   static const Duration _cacheTtl = Duration(seconds: 12000);
 
   static bool get _hasFreshCache =>
+      _cache.isNotEmpty &&
       _cachedAt != null &&
       DateTime.now().difference(_cachedAt!) < _cacheTtl;
 
@@ -54,7 +70,7 @@ class ProductController extends GetxController {
 
   final searchProductList = <Map<String, dynamic>>[].obs;
 
-   List<Map<String, dynamic>> get products => _masterList;
+  List<Map<String, dynamic>> get products => _masterList;
 
   /// Category names used by the product filter, built from the loaded
   /// products and the category master list.
@@ -84,75 +100,79 @@ class ProductController extends GetxController {
   void onInit() {
     super.onInit();
 
-    if(_hasFreshCache){
-      _masterList.value = List<Map<String, dynamic>>.from(_cache);
-      searchProductList.value = _masterList;
-    }else{
-      getProducts();
+    final fromCache = _hasFreshCache;
+    if (fromCache) {
+      // Show cached data straight away, but still refresh below so a stale
+      // cache can never leave the screen stuck without products.
+      _masterList.assignAll(_cache);
+      searchProductList.assignAll(_masterList);
     }
-   
+
+    // Always hit the API. Cached data only avoids the initial spinner.
+    getProducts(showLoading: !fromCache);
+
     final search = Get.put(SearchController());
 
-    ever(
-      search.keyword,
-      (keyword) {
-        searchProduct(keyword);
-      },
-    );
- 
+    ever(search.keyword, (keyword) {
+      searchProduct(keyword);
+    });
   }
 
-  Future<void> getProducts() async {
-  try {
-    isLoading.value = true;
+  Future<void> getProducts({bool showLoading = true}) async {
+    try {
+      if (showLoading) isLoading.value = true;
 
-    final resp = await service.getProducts();
+      final resp = await service.getProducts();
 
-  if (resp is List) {
-    _masterList.assignAll(
-      List<Map<String, dynamic>>.from(resp),
-    );
-    searchProductList.assignAll(_masterList);
+      if (resp is List) {
+        _masterList.assignAll(List<Map<String, dynamic>>.from(resp));
 
-    // Update the shared cache so the next visit reuses this data.
-    _cache
-      ..clear()
-      ..addAll(_masterList);
-    _cachedAt = DateTime.now();
-  }} catch (e) {
-    ToastWidget.show(
-      message: e.toString(),
-      type: ToastType.error,
-    );
-  } finally {
-    isLoading.value = false;
+        if (searchQuery.value.isEmpty) {
+          searchProductList.assignAll(_masterList);
+        } else {
+          // Keep the active search in sync with freshly loaded data.
+          searchProduct(searchQuery.value);
+        }
+
+        // Update the shared cache so the next visit reuses this data.
+        _cache
+          ..clear()
+          ..addAll(_masterList);
+        _cachedAt = DateTime.now();
+        loadError.value = '';
+      } else {
+        loadError.value = 'Unexpected response from the server.';
+      }
+    } catch (e) {
+      loadError.value = e.toString();
+      ToastWidget.show(message: e.toString(), type: ToastType.error);
+    } finally {
+      if (showLoading) isLoading.value = false;
+    }
   }
-}
 
   // search
-void searchProduct(String keyword) {
-  final search = keyword.trim().toLowerCase();
+  void searchProduct(String keyword) {
+    final search = keyword.trim().toLowerCase();
 
-  // Keep ProductController searchQuery in sync
-  searchQuery.value = search;
+    // Keep ProductController searchQuery in sync
+    searchQuery.value = search;
 
-  if (search.isEmpty) {
-    searchProductList.assignAll(_masterList);
-    return;
+    if (search.isEmpty) {
+      searchProductList.assignAll(_masterList);
+      return;
+    }
+
+    searchProductList.assignAll(
+      _masterList.where((product) {
+        final name = (product['name'] ?? '').toString().toLowerCase();
+
+        final barcode = (product['barcode'] ?? '').toString().toLowerCase();
+
+        return name.contains(search) || BarcodeUtils.matches(barcode, search);
+      }).toList(),
+    );
   }
-
-  searchProductList.assignAll(
-    _masterList.where((product) {
-      final name =
-          (product['name'] ?? '').toString().toLowerCase();
-
-      final barcode =
-          (product['barcode'] ?? '').toString().toLowerCase();
-
-      return name.contains(search) || BarcodeUtils.matches(barcode, search);
-    }).toList(),
-  );
-}
 
   /// Set data from API
   void setProducts(List<Map<String, dynamic>> data) {
@@ -172,41 +192,40 @@ void searchProduct(String keyword) {
     selectedWarehouse.value = null;
   }
 
- List<Map<String, dynamic>> get filteredItems {
-  return _masterList.where((item) {
-    // Category filter
-    final catMatch =
-        filterCategory.value == 'All' ||
-        (item['category']?['name'] ?? '') ==
-            filterCategory.value;
+  List<Map<String, dynamic>> get filteredItems {
+    return _masterList.where((item) {
+      // Category filter
+      final catMatch =
+          filterCategory.value == 'All' ||
+          (item['category']?['name'] ?? '') == filterCategory.value;
 
-    // Status filter
-    bool statusMatch = true;
+      // Status filter
+      bool statusMatch = true;
 
-    if (selectedStatus.value != 'All') {
-      final stockQty = item['stock_qty'] ?? 0;
+      if (selectedStatus.value != 'All') {
+        final stockQty = item['stock_qty'] ?? 0;
 
-      if (selectedStatus.value == 'IN STOCK') {
-        statusMatch = stockQty > 0;
-      } else if (selectedStatus.value == 'LOW STOCK') {
-        statusMatch = stockQty > 0 && stockQty <= 10;
-      } else if (selectedStatus.value == 'OUT OF STOCK') {
-        statusMatch = stockQty <= 0;
+        if (selectedStatus.value == 'IN STOCK') {
+          statusMatch = stockQty > 0;
+        } else if (selectedStatus.value == 'LOW STOCK') {
+          statusMatch = stockQty > 0 && stockQty <= 10;
+        } else if (selectedStatus.value == 'OUT OF STOCK') {
+          statusMatch = stockQty <= 0;
+        }
       }
-    }
 
-    return catMatch && statusMatch;
-  }).toList();
-}
+      return catMatch && statusMatch;
+    }).toList();
+  }
 
   void gotoAddProduct() {
     clearProducts();
     Get.toNamed(AppRoutes.addProduct);
   }
 
-  Future<void> onSaveProduct(BuildContext context) async{
-    try{
-      isLoading .value = true;
+  Future<void> onSaveProduct(BuildContext context) async {
+    try {
+      isLoading.value = true;
 
       final data = {
         'name': productNameController.text,
@@ -236,23 +255,15 @@ void searchProduct(String keyword) {
 
       // Clear textfields
       clearProducts();
-
-    }catch(e){
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
-    }
-    finally{
+    } catch (e) {
+      ToastWidget.show(message: e.toString(), type: ToastType.error);
+    } finally {
       isLoading.value = false;
     }
   }
 
   void gotoProductDetail(Map<String, dynamic> product) {
-    Get.toNamed(
-      AppRoutes.productCardDetail,
-      arguments: product,
-    );
+    Get.toNamed(AppRoutes.productCardDetail, arguments: product);
   }
 
   Future<void> onEditProduct(int productId, BuildContext context) async {
@@ -265,35 +276,30 @@ void searchProduct(String keyword) {
       productCostPriceController.text = product["cost_price"].toString();
       productSalePriceController.text = product["sale_price"].toString();
 
-      selectedCategory.value =
-          product["category"] is Map
-              ? product["category"]["id"].toString()
-              : product["category"].toString();
-      
+      selectedCategory.value = product["category"] is Map
+          ? product["category"]["id"].toString()
+          : product["category"].toString();
+
       selectedUnit.value = product["unit"] is Map
           ? product["unit"]["id"].toString()
           : product["unit"].toString();
 
-      selectedCurrency.value =
-          product["currency"] is Map
-              ? product["currency"]["id"].toString()
-              : product["currency"].toString();
+      selectedCurrency.value = product["currency"] is Map
+          ? product["currency"]["id"].toString()
+          : product["currency"].toString();
 
       selectedWarehouse.value = product["warehouse"] is Map
           ? product["warehouse"]["id"].toString()
           : null;
 
-      Get.toNamed(
-        AppRoutes.editProduct,
-        arguments: productId,
-      );
+      Get.toNamed(AppRoutes.editProduct, arguments: productId);
     } catch (e) {
       // print(e);
     }
   }
 
   Future<void> onUpdateProduct(int productId, BuildContext context) async {
-    try{
+    try {
       final data = {
         "name": productNameController.text.trim(),
         "category_id": selectedCategory.value,
@@ -321,7 +327,7 @@ void searchProduct(String keyword) {
         message: "Product updated successfully",
         type: ToastType.success,
       );
-    }catch(e){
+    } catch (e) {
       // Do nothing
     }
   }
@@ -331,7 +337,7 @@ void searchProduct(String keyword) {
       context: context,
       message: "Do you want to delete this product?".tr,
       onConfirm: () async {
-        try{
+        try {
           await service.deleteProduct(productId);
           // Refresh category list
           await getProducts();
@@ -343,12 +349,8 @@ void searchProduct(String keyword) {
             message: "Product deleted successfully".tr,
             type: ToastType.success,
           );
-
-        }catch(e){
-          ToastWidget.show(
-            message: e.toString(),
-            type: ToastType.error,
-          );
+        } catch (e) {
+          ToastWidget.show(message: e.toString(), type: ToastType.error);
         }
       },
       onCancel: () {
@@ -381,20 +383,14 @@ void searchProduct(String keyword) {
       scannedProduct.value = product;
       scanResultText.value = product['name'] ?? '';
 
-      Get.snackbar(
-        'Found',
-        product['name'] ?? '',
-      );
+      Get.snackbar('Found', product['name'] ?? '');
 
       gotoProductDetail(product);
     } else {
       scannedProduct.value = null;
       scanResultText.value = 'Not Found';
 
-      Get.snackbar(
-        'Error',
-        'Product not found',
-      );
+      Get.snackbar('Error', 'Product not found');
     }
   }
 
