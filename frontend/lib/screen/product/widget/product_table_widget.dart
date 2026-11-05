@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:get/get.dart';
 
 class ProductTableWidget extends StatelessWidget {
@@ -32,22 +33,12 @@ class ProductTableWidget extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      product['photo']?.toString() ?? '',
+                    child: AppCachedImage(
+                      url: product['photo']?.toString(),
                       width: 40,
                       height: 40,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        width: 40,
-                        height: 40,
-                        color: Colors.grey.shade100,
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.inventory_2_outlined,
-                          color: Colors.grey.shade500,
-                          size: 20,
-                        ),
-                      ),
+                      fallbackIcon: Icons.inventory_2_outlined,
+                      fallbackIconSize: 20,
                     ),
                   ),
                   const SizedBox(width: 12),

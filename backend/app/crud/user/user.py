@@ -27,7 +27,13 @@ def get_all_users(session: Session):
     ).all()
 
 def get_user(session: Session, user_id: int):
-    return session.get(User, user_id)
+    # Load the role eagerly: fastapi_cache encodes the returned ORM object
+    # before FastAPI's response_model runs, so a lazily-loaded relationship
+    # would be missing from the cached payload and the next cache hit would
+    # fail response validation ("role: Field required").
+    return session.exec(
+        select(User).options(joinedload(User.role)).where(User.id == user_id)
+    ).first()
 
 def update_user(session: Session, user_id: int, user: UserCreate):
     db_user = session.get(User, user_id)

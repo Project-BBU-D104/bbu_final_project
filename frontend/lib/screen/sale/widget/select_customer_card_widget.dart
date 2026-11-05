@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:get/get.dart';
 
@@ -27,14 +28,14 @@ class SelectCustomerCardWidget extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.white,
-                  backgroundImage: customer?['photo'] != null &&
-                          customer!['photo'].toString().isNotEmpty
-                      ? NetworkImage(customer['photo'].toString())
-                      : null,
-                  child: customer?['photo'] == null ||
-                          customer!['photo'].toString().isEmpty
-                      ? const Icon(Icons.person_outline)
-                      : null,
+                  child: ClipOval(
+                    child: AppCachedImage(
+                      url: customer?['photo']?.toString(),
+                      width: 40,
+                      height: 40,
+                      fallbackIcon: Icons.person_outline,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -102,14 +103,15 @@ class _CustomerPicker extends StatelessWidget {
                         customer['id'];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: customer['photo'] != null &&
-                                customer['photo'].toString().isNotEmpty
-                            ? NetworkImage(customer['photo'].toString())
-                            : null,
-                        child: customer['photo'] == null ||
-                                customer['photo'].toString().isEmpty
-                            ? const Icon(Icons.person_outline)
-                            : null,
+                        backgroundColor: Colors.white,
+                        child: ClipOval(
+                          child: AppCachedImage(
+                            url: customer['photo']?.toString(),
+                            width: 40,
+                            height: 40,
+                            fallbackIcon: Icons.person_outline,
+                          ),
+                        ),
                       ),
                       title: Text(customer['name']?.toString() ?? 'Customer'),
                       subtitle: Text(customer['phone']?.toString() ?? ''),

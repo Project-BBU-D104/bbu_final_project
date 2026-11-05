@@ -40,7 +40,7 @@ class CustomerScreen extends StatelessWidget {
                     ),
                     CustomerKpiWidget(
                       title : "Active Customers",
-                      value: "1,000",
+                      value: ctr.activeCustomerCount.toString(),
                     )
                 ],
               )),

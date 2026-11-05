@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
@@ -34,19 +35,17 @@ class CustomerCardWidget extends StatelessWidget {
             // TOP USER INFO
             Row(
               children: [
-                Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        customer['photo'] != null && customer['photo'].toString().isNotEmpty
-                        ? customer['photo']
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AppCachedImage(
+                    url: customer['photo'] != null &&
+                            customer['photo'].toString().isNotEmpty
+                        ? customer['photo'].toString()
                         : "https://i.pravatar.cc/150?img=12",
-                      ),
-                      fit: BoxFit.cover,
-                    ),
+                    width: 65,
+                    height: 65,
+                    fallbackIcon: Icons.person,
+                    fallbackIconSize: 32,
                   ),
                 ),
                   

@@ -35,6 +35,16 @@ class PurchasePaymentScreen extends StatelessWidget {
                     ),
                   );
                 }
+
+                if( ctr.purchasePaymentList.isEmpty){
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Center(
+                      child: Text("No Purchase Payment Found"),
+                    ),
+                  );
+                }
+
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

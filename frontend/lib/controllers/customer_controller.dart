@@ -11,8 +11,11 @@ import 'package:frontend/controllers/search_controller.dart';
 
 class CustomerController extends GetxController{
 
+  CustomerController({CustomerService? service})
+      : service = service ?? CustomerService();
+
   final customerList = <Map<String, dynamic>>[].obs;
-  final CustomerService service = CustomerService();
+  final CustomerService service;
   var isLoading = false.obs;
   final customerPhotoController = TextEditingController();
   final customerNameController = TextEditingController();
@@ -20,6 +23,9 @@ class CustomerController extends GetxController{
   final customerAddressController = TextEditingController();
   final isActive = false.obs;
   final searchCustomerList = <Map<String, dynamic>>[].obs;  
+
+  int get activeCustomerCount =>
+      customerList.where((customer) => customer['is_active'] == true).length;
   
   @override
   void onInit() {

@@ -42,12 +42,12 @@ class ManageController extends GetxController{
           "icon": Icons.local_shipping_outlined,
           "route": AppRoutes.supplier,
         },
-        // {
-        //   "title": "Customer",
-        //   "subtitle": "Customer",
-        //   "icon": Icons.people_outline,
-        //   "route": AppRoutes.customer,
-        // },
+        {
+          "title": "Customer",
+          "subtitle": "Customer",
+          "icon": Icons.people_outline,
+          "route": AppRoutes.customer,
+        },
       ]
     },
 

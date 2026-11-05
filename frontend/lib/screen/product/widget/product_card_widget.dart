@@ -3,6 +3,7 @@ import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 import 'package:frontend/utils/currency_formatter.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 
 class ProductCardWidget extends StatelessWidget {
  final Map<String, dynamic> product;
@@ -44,19 +45,12 @@ class ProductCardWidget extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  product['photo'] ?? '',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: Icon(
-                        Icons.fastfood,
-                        color: Colors.grey[400],
-                        size: 32,
-                      ),
-                    );
-                  },
+                child: AppCachedImage(
+                  url: product['photo']?.toString(),
+                  width: 80,
+                  height: 80,
+                  fallbackIcon: Icons.fastfood,
+                  fallbackIconSize: 32,
                 ),
               ),
             ),

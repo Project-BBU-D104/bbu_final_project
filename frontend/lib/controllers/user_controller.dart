@@ -12,9 +12,15 @@ import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/controllers/system_configuration_controller.dart';
 
 class UserController extends GetxController{
-  final UserService service = UserService();
-  final SystemConfigurationController systemConfigurationCtr =
-      Get.put(SystemConfigurationController());
+  UserController({
+    UserService? service,
+    SystemConfigurationController? systemConfigurationCtr,
+  })  : service = service ?? UserService(),
+        systemConfigurationCtr =
+            systemConfigurationCtr ?? Get.put(SystemConfigurationController());
+
+  final UserService service;
+  final SystemConfigurationController systemConfigurationCtr;
   var selectedUser = RxnString();
 
   final isLoading = false.obs;

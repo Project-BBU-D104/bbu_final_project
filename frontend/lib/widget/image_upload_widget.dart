@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/image_upload_controller.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:get/get.dart';
 
 class ImageUploadWidget extends StatelessWidget {
@@ -56,20 +57,12 @@ class ImageUploadWidget extends StatelessWidget {
                 borderRadius:
                     BorderRadius.circular(8),
 
-                child: Image.network(
-                  imageUrl!,
+                child: AppCachedImage(
+                  url: imageUrl,
                   height: 120,
                   width: double.infinity,
-                  fit: BoxFit.cover,
-
-                  errorBuilder:
-                      (context, error, stackTrace) {
-
-                    return const Icon(
-                      Icons.broken_image,
-                      size: 80,
-                    );
-                  },
+                  fallbackIcon: Icons.broken_image,
+                  fallbackIconSize: 80,
                 ),
               )
             else

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'package:frontend/utils/currency_formatter.dart';
@@ -73,33 +74,14 @@ class ProductCardDetailWidget extends StatelessWidget {
               decoration: _cardDecoration(),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(22),
-                child: photo.isEmpty
-                    ? Container(
-                        color: Colors.grey.shade100,
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            size: 80,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      )
-                    : Image.network(
-                        photo,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) {
-                          return Container(
-                            color: Colors.grey.shade100,
-                            child: const Center(
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                size: 80,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                child: AppCachedImage(
+                  url: photo,
+                  width: double.infinity,
+                  height: 230,
+                  fallbackIcon: Icons.image_not_supported_outlined,
+                  errorIcon: Icons.broken_image_outlined,
+                  fallbackIconSize: 80,
+                ),
               ),
             ),
 

@@ -10,7 +10,9 @@ import 'package:frontend/controllers/search_controller.dart';
 
 class RoleController extends GetxController{
 
-  final RoleService service = RoleService();
+  RoleController({RoleService? service}) : service = service ?? RoleService();
+
+  final RoleService service;
 
   var isLoading = false.obs;
   final roleList = <Map<String, dynamic>> [].obs;
