@@ -201,3 +201,9 @@ Future<void> openEmail(String email) async {
     await launchUrl(emailUri);
   }
 }
+
+Future<int?> getSystemConfigurationId() async {
+  final data = await storage.lastUserLoginRead;
+
+  return data["user"]["system_configuration_id"] as int?;
+}

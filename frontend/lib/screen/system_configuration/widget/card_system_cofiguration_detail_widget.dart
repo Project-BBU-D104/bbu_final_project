@@ -63,16 +63,16 @@ class CardSystemConfigurationDetailWidget extends StatelessWidget {
                   _detail('Email', configuration['email']),
                   _detail('Logo', configuration['logo']),
                   _detail(
-                    'Default currency ID',
-                    configuration['default_currency_id'],
+                    'Default currency',
+                    configuration['default_currency']?['name'],
                   ),
                   _detail(
-                    'Default warehouse ID',
-                    configuration['default_warehouse_id'],
+                    'Default warehouse',
+                    configuration['default_warehouse']?['name'],
                   ),
                   _detail(
-                    'Default payment type ID',
-                    configuration['default_payment_type_id'],
+                    'Default payment type',
+                    configuration['default_payment_type']?['name'],
                   ),
                   _detail(
                     'Allow discount',

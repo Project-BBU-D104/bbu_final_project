@@ -44,6 +44,8 @@ class LoginController extends GetxController {
           "user": response["user"],
         },
       );
+      
+       
 
       await storage.appStartUpWrite(route: "/home");
 

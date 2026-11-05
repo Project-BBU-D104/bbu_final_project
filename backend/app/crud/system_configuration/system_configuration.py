@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 from app.models.system_configuration import SystemConfiguration
 from app.schemas.system_configuration.system_configuration import SystemConfigurationCreate, SystemConfigurationUpdate
 from datetime import datetime, timezone
+from sqlalchemy.orm import selectinload
 
 # Used when no system configuration has set a low stock warning yet.
 DEFAULT_LOW_STOCK_WARNING = 50
@@ -31,11 +32,29 @@ def create_system_configuration(session: Session, system_configuration: SystemCo
     return db_system_configuration
 
 def get_all_system_configuration(session: Session):
-    return session.exec(select(SystemConfiguration)).all()
+    statement = (
+            select(SystemConfiguration)
+            .options(
+                selectinload(SystemConfiguration.currency),
+                selectinload(SystemConfiguration.warehouse),
+                selectinload(SystemConfiguration.payment_type),
+            )
+        )
+    return session.exec(statement).all()
 
-def get_system_configuration(session: Session, system_configuration_id: int):
-    return session.get(SystemConfiguration, system_configuration_id)
+def get_system_configuration(
+    session: Session,
+    system_configuration_id: int
+):
+    statement = (
+        select(SystemConfiguration)
+        .where(SystemConfiguration.id == system_configuration_id)
+        .options(
+            selectinload(SystemConfiguration.currency)
+        )
+    )
 
+    return session.exec(statement).first()
 def update_system_configuration(session: Session, system_configuration_id: int, system_configuration: SystemConfigurationUpdate):
     db_system_configuration = session.get(SystemConfiguration, system_configuration_id)
     if db_system_configuration:
