@@ -72,6 +72,12 @@ class ProductController extends GetxController {
 
   List<Map<String, dynamic>> get products => _masterList;
 
+  /// True when any list filter is narrowing the products shown on screen.
+  bool get hasActiveFilters =>
+      filterCategory.value != 'All' ||
+      selectedStatus.value != 'All' ||
+      selectedRecency.value != 'All';
+
   /// Category names used by the product filter, built from the loaded
   /// products and the category master list.
   List<String> get filterCategoryOptions {
@@ -341,6 +347,10 @@ class ProductController extends GetxController {
           await service.deleteProduct(productId);
           // Refresh category list
           await getProducts();
+          // If the deleted product was the last one matching the active
+          // filters, reset them so the remaining products stay visible instead
+          // of showing an empty "No products available" screen.
+          _resetFiltersIfNoMatches();
           _refreshSaleProducts();
 
           Get.back();
@@ -357,6 +367,16 @@ class ProductController extends GetxController {
         // Do nothing
       },
     );
+  }
+
+  /// Clears filters when they hide every product even though products exist.
+  void _resetFiltersIfNoMatches() {
+    if (searchQuery.value.isNotEmpty) return;
+    if (_masterList.isEmpty || filteredItems.isNotEmpty) return;
+
+    filterCategory.value = 'All';
+    selectedStatus.value = 'All';
+    selectedRecency.value = 'All';
   }
 
   /// Keeps an open Sale screen in sync after products are added/edited/deleted.

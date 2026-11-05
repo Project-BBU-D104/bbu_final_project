@@ -86,6 +86,7 @@ class ProductScreen extends StatelessWidget {
               if (list.isEmpty) {
                 final hasError = productCtrl.loadError.value.isNotEmpty;
                 final isSearching = productCtrl.searchQuery.value.isNotEmpty;
+                final hasFilters = productCtrl.hasActiveFilters;
 
                 return SliverFillRemaining(
                   hasScrollBody: false,
@@ -96,7 +97,11 @@ class ProductScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            hasError ? Icons.cloud_off : Icons.inbox,
+                            hasError
+                                ? Icons.cloud_off
+                                : hasFilters && !isSearching
+                                ? Icons.filter_alt_off
+                                : Icons.inbox,
                             size: 64,
                             color: Colors.grey[300],
                           ),
@@ -108,6 +113,8 @@ class ProductScreen extends StatelessWidget {
                                 ? 'No products found'
                                 : hasError
                                 ? 'Could not load products'
+                                : hasFilters
+                                ? 'No products match the selected filter'
                                 : 'No products available',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -134,10 +141,26 @@ class ProductScreen extends StatelessWidget {
                           if (!isSearching) ...[
                             const SizedBox(height: 16),
 
-                            OutlinedButton.icon(
-                              onPressed: () => productCtrl.getProducts(),
-                              icon: const Icon(Icons.refresh, size: 18),
-                              label: const Text('Retry'),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 12,
+                              runSpacing: 8,
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: () => productCtrl.getProducts(),
+                                  icon: const Icon(Icons.refresh, size: 18),
+                                  label: const Text('Retry'),
+                                ),
+                                if (hasFilters)
+                                  OutlinedButton.icon(
+                                    onPressed: productCtrl.clearFilters,
+                                    icon: const Icon(
+                                      Icons.filter_alt_off,
+                                      size: 18,
+                                    ),
+                                    label: const Text('Clear filters'),
+                                  ),
+                              ],
                             ),
                           ],
                         ],

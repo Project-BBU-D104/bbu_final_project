@@ -51,7 +51,7 @@ class UserTableListWidget extends StatelessWidget {
                     : <String, dynamic>{};
                 final photo = user['photo']?.toString() ?? '';
                 final userId = int.tryParse(user['id']?.toString() ?? '');
-                final openDetails = () => controller.gotoUserDetail(user);
+                void openDetails() => controller.gotoUserDetail(user);
                 final createdAt = DateTime.tryParse(
                   user['created_at']?.toString() ?? '',
                 );

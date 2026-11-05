@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class LowStockWidget extends StatelessWidget {
   final List<Map<String, dynamic>> products;
@@ -12,7 +11,6 @@ class LowStockWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat money = NumberFormat('#,##0.00');
 
     return Card(
       color: Colors.white,
