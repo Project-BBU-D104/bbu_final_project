@@ -28,125 +28,148 @@ class SupplierEditWidget extends StatelessWidget {
                 top: 16,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 50,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Edit Supplier".tr,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+              child: Form(
+                key: ctr.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Edit Supplier".tr,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                            
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                            
+                    const SizedBox(height: 10),
+                            
+                    Text("Supplier Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+                    SizedBox(height: 5,),
+                    TextFormField(
+                      controller: ctr.supplierNameController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Supplier Name".tr,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Supplier name is required".tr;
+                        }
+                        return null;
+                      },
+                    ),
+                            
+                    const SizedBox(height: 10),
+                            
+                    Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+                    SizedBox(height: 5,),
+                    TextFormField(
+                      controller: ctr.supplierPhoneNumberController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Phone Number".tr,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Phone number is required".tr;
+                        }
+                        return null;
+                      },
+                    ),
+                            
+                    const SizedBox(height: 10),
+                            
+                    Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+                    SizedBox(height: 5,),
+                    TextFormField(
+                      controller: ctr.supplierEmailController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Email".tr,
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Email is required".tr;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Text("Map".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+                    SizedBox(height: 5,),
+                    TextField(
+                      maxLines: 8,
+                      minLines: 3,
+                      controller: ctr.supplierMapController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Map".tr,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+                    SizedBox(height: 5,),
+                    TextField(
+                      maxLines: 8,
+                      minLines: 3,
+                      controller: ctr.supplierAddressController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Address".tr,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                     
+                    Obx(() {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: ctr.status.value,
+                          onChanged: (value) {
+                            ctr.status.value = value ?? false;
+                          },
+                        ),
+                        Text("Active".tr),
+                      ],
+                    );
+                  }),
+                            
+                    
+                    const SizedBox(height: 15),
+                            
+                    SizedBox(
+                      width: double.infinity,
+                      height: 45,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: successColor,
+                          foregroundColor: titleColor,
+                        ),
+                        onPressed: () {
+                          if (ctr.formKey.currentState!.validate()) {
+                            ctr.updateSupplier(supplierId, context);
+                          }
+                        },
+                        child: Text("Save".tr, 
+                          style: TextStyle(fontSize: 18)
                         ),
                       ),
-            
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-            
-                  const SizedBox(height: 10),
-            
-                  Text("Supplier Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                  SizedBox(height: 5,),
-                  TextField(
-                    controller: ctr.supplierNameController,
-                    decoration: InputDecoration(
-                      hintText: "Enter Supplier Name".tr,
-                      border: OutlineInputBorder(),
                     ),
-                  ),
-            
-                  const SizedBox(height: 10),
-            
-                  Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                  SizedBox(height: 5,),
-                  TextField(
-                    controller: ctr.supplierPhoneNumberController,
-                    decoration: InputDecoration(
-                      hintText: "Enter Phone Number".tr,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-            
-                  const SizedBox(height: 10),
-            
-                  Text("Email".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                  SizedBox(height: 5,),
-                  TextField(
-                    controller: ctr.supplierEmailController,
-                    decoration: InputDecoration(
-                      hintText: "Enter Email".tr,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text("Map".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                  SizedBox(height: 5,),
-                  TextField(
-                    maxLines: 8,
-                    minLines: 3,
-                    controller: ctr.supplierMapController,
-                    decoration: InputDecoration(
-                      hintText: "Enter Map".tr,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                  SizedBox(height: 5,),
-                  TextField(
-                    maxLines: 8,
-                    minLines: 3,
-                    controller: ctr.supplierAddressController,
-                    decoration: InputDecoration(
-                      hintText: "Enter Address".tr,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                   
-                  Obx(() {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Checkbox(
-                        value: ctr.status.value,
-                        onChanged: (value) {
-                          ctr.status.value = value ?? false;
-                        },
-                      ),
-                      Text("Active".tr),
-                    ],
-                  );
-                }),
-            
-                  
-                  const SizedBox(height: 15),
-            
-                  SizedBox(
-                    width: double.infinity,
-                    height: 45,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: successColor,
-                        foregroundColor: titleColor,
-                      ),
-                      onPressed: () {
-                        ctr.updateSupplier(supplierId, context);
-                      },
-                      child: Text("Save".tr, 
-                        style: TextStyle(fontSize: 18)
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

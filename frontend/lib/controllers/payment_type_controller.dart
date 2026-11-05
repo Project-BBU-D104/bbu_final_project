@@ -18,6 +18,7 @@ class PaymentTypeController extends GetxController{
   final paymentTypeDescription = TextEditingController();
   final paymentTypeList = <Map<String, dynamic>>[].obs;
   final searchPaymentType = <Map<String, dynamic>>[].obs;
+  final key = GlobalKey<FormState>();
 
     // Shared cache so re-opening the screen does not re-fetch every time.
   static final List<Map<String, dynamic>> _cache = [];

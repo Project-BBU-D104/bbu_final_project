@@ -24,6 +24,8 @@ class SupplierController extends GetxController {
   final supplierAddressController = TextEditingController();
   final status = true.obs;
 
+  final formKey = GlobalKey<FormState>();
+
   static final List<SupplierModel> _cache = [];
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(seconds: 60);

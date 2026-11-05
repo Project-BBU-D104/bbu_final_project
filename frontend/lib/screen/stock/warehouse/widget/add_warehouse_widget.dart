@@ -19,98 +19,144 @@ final ctr = Get.find<WarehouseController>();
         bottom: MediaQuery.of(context).viewInsets.bottom + 10,
       ),
       child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Add Warehouse",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+        child: Form(
+          key: ctr.key,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Add Warehouse",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+          
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+          
+              SizedBox(height: 10),
+          
+              Text("Warehouse Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+              SizedBox(height: 5,),
+              TextFormField(
+                controller: ctr.warehouseNameController,
+                decoration: InputDecoration(
+                  hintText: "Enter Warehouse Name".tr,
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter warehouse name".tr;
+                  }
+                  return null;
+                },
+              ),
+          
+              SizedBox(height: 10),
+          
+              Row(
+                children: [
+                  Text(
+                    "Reference No".tr,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      "Optional".tr,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.green,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              TextField(
+                controller: ctr.warehouseReferenceNoController,
+                decoration: InputDecoration(
+                  hintText: "Enter Reference No (Optional)".tr,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+          
+              SizedBox(height: 10),
+          
+              Text("Location".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+              SizedBox(height: 5),
+              TextFormField(
+                controller: ctr.warehouseLocationController,
+                decoration: InputDecoration(
+                  hintText: "Enter Location".tr,
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter location".tr;
+                  }
+                  return null;
+                },
+              ),
+          
+              SizedBox(height: 10),
+          
+              Text("Note".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+              SizedBox(height: 5),
+              TextField(
+                controller: ctr.warehouseNoteController,
+                maxLines: 5,
+                minLines: 2,
+                decoration: InputDecoration(
+                  hintText: "Enter Note".tr,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+          
+              const SizedBox(height: 15),
+          
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: successColor,
+                  ),
+                  onPressed: () {
+                    if (ctr.key.currentState?.validate() ?? false) {
+                      ctr.onSaveWarehouse();
+                    }
+                  },
+                  child: Text("Save",
+                   style: TextStyle(fontSize: 18, color: titleColor),
                   ),
                 ),
-        
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-
-            SizedBox(height: 10),
-
-            Text("Warehouse Name".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5,),
-            TextField(
-              controller: ctr.warehouseNameController,
-              decoration: InputDecoration(
-                hintText: "Enter Warehouse Name".tr,
-                border: OutlineInputBorder(),
               ),
-            ),
-
-            SizedBox(height: 10),
-
-            Text("Reference No".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5),
-            TextField(
-              controller: ctr.warehouseReferenceNoController,
-              decoration: InputDecoration(
-                hintText: "Enter Reference No".tr,
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            SizedBox(height: 10),
-
-            Text("Location".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5),
-            TextField(
-              controller: ctr.warehouseLocationController,
-              decoration: InputDecoration(
-                hintText: "Enter Location".tr,
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            SizedBox(height: 10),
-
-            Text("Note".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-            SizedBox(height: 5),
-            TextField(
-              controller: ctr.warehouseNoteController,
-              maxLines: 5,
-              minLines: 2,
-              decoration: InputDecoration(
-                hintText: "Enter Note".tr,
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-        
-            SizedBox(
-              width: double.infinity,
-              height: 45,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: successColor,
-                ),
-                onPressed: () {
-                  ctr.onSaveWarehouse();
-                },
-                child: Text("Save",
-                 style: TextStyle(fontSize: 18, color: titleColor),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

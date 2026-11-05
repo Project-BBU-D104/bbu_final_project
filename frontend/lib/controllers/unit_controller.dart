@@ -19,6 +19,8 @@ class UnitController extends GetxController{
   final unitDescriptionController = TextEditingController();
   final isActive = false.obs;
 
+  final key = GlobalKey<FormState>();
+
   static final List<Map<String, dynamic>> _cache = [];
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(seconds: 60);

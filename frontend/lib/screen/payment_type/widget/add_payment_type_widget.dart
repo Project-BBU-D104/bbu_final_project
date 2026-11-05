@@ -17,96 +17,107 @@ class AddPaymentTypeWidget extends StatelessWidget {
         top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom + 50,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Add Payment Type".tr,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      child: Form(
+        key: ctr.key,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Add Payment Type".tr,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+        
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+        
+            const SizedBox(height: 10),
+        
+            Text("Payment Type".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            SizedBox(height: 5,),
+            TextFormField(
+              controller: ctr.paymentTypeName,
+              decoration: InputDecoration(
+                hintText: "Enter Payment Type".tr,
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter payment type".tr;
+                }
+                return null;
+              },
+            ),
+         
+            const SizedBox(height: 10),
+        
+            Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+            SizedBox(height: 5,),
+            TextField(
+              controller: ctr.paymentTypeDescription,
+              maxLines: 8,
+              minLines: 3,
+              decoration: InputDecoration(
+                hintText: "Enter Description".tr,
+                border: OutlineInputBorder(),
+              ),
+            ),
+        
+            const SizedBox(height: 10),
+          
+             Obx(
+                () => Row(
+                  children: [
+                    Checkbox(
+                      value: ctr.isActive.value,
+                      onChanged: (value) {
+                        ctr.isActive.value = value ?? false;
+                      },
+                    ),
+                    const Text(
+                      "Status",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-              IconButton(
-                icon: const Icon(Icons.close),
+            const SizedBox(height: 15),
+            SizedBox(
+              width: double.infinity,
+              height: 45,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: successColor,
+                  foregroundColor: Colors.white,
+                ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  if (ctr.key.currentState!.validate()) {
+                    ctr.onSavePaymentType();
+                  }
                 },
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          Text("Payment Type".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            controller: ctr.paymentTypeName,
-            decoration: InputDecoration(
-              hintText: "Enter Payment Type".tr,
-              border: OutlineInputBorder(),
-            ),
-          ),
- 
-          const SizedBox(height: 10),
-
-          Text("Description".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-          SizedBox(height: 5,),
-          TextField(
-            controller: ctr.paymentTypeDescription,
-            maxLines: 8,
-            minLines: 3,
-            decoration: InputDecoration(
-              hintText: "Enter Description".tr,
-              border: OutlineInputBorder(),
-            ),
-          ),
-
-          const SizedBox(height: 10),
-        
-           Obx(
-              () => Row(
-                children: [
-                  Checkbox(
-                    value: ctr.isActive.value,
-                    onChanged: (value) {
-                      ctr.isActive.value = value ?? false;
-                    },
-                  ),
-                  const Text(
-                    "Status",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+                child: Text(
+                  "Save".tr,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
+                )
               ),
             ),
-          const SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            height: 45,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: successColor,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                ctr.onSavePaymentType();
-              },
-              child: Text(
-                "Save".tr,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
-              )
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

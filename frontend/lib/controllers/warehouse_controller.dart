@@ -21,6 +21,8 @@ class WarehouseController extends GetxController{
   final warehouseLocationController = TextEditingController();
   final warehouseNoteController = TextEditingController();
 
+  final key = GlobalKey<FormState>();
+
   static final List<Map<String, dynamic>> _cache = [];
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(seconds: 60);
