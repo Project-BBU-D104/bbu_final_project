@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/unit_controller.dart';
 import 'package:frontend/screen/unit/widget/unit_card_widget.dart';
 import 'package:frontend/screen/unit/widget/unit_table_widget.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,19 @@ class UnitScreen extends StatelessWidget {
                 if (ctr.unitList.isEmpty) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(child: Text("No Unit Found".tr)),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AppCachedImage(
+                            assetPath: 'assets/images/empty.png',
+                            width: 120,
+                            fit: BoxFit.contain,
+                          ),
+                          Text("No Unit Found".tr),
+                        ],
+                      ),
+                    ),
                   );
                 }
 

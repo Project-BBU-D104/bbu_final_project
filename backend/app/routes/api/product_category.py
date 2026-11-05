@@ -18,11 +18,22 @@ def get_product_category():
             p.name AS product_name,
             p.photo,
             p.sale_price,
-            p.barcode
+            p.barcode,
+            COALESCE(SUM(ws.qty), 0) AS qty
            
         FROM categories c
-        LEFT JOIN product p
+        JOIN product p
             ON p.category_id = c.id
+        JOIN warehouse_stock ws
+            ON ws.product_id = p.id
+        GROUP BY
+            c.id,
+            c.name,
+            p.id,
+            p.name,
+            p.photo,
+            p.sale_price,
+            p.barcode
         ORDER BY c.id, p.id
     """)
 
@@ -47,7 +58,8 @@ def get_product_category():
                 "name": row["product_name"],
                 "photo": row["photo"],
                 "sale_price": row["sale_price"],
-                "barcode": row["barcode"]
+                "barcode": row["barcode"],
+                "qty": int(row["qty"])
             })
 
     return list(categories.values())

@@ -19,6 +19,9 @@ class CardItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final photo = product['photo']?.toString() ?? '';
     final price = double.tryParse(product['sale_price']?.toString() ?? '') ?? 0;
+    final stockQty = product['qty'] is num
+        ? (product['qty'] as num).toInt()
+        : int.tryParse(product['qty']?.toString() ?? '') ?? 0;
 
     return Material(
       color: Colors.white,
@@ -67,6 +70,37 @@ class CardItemWidget extends StatelessWidget {
                 ),
               ],
             ),
+            if (stockQty <= 0)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE53935),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    'Sold out',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
             if (quantity > 0)
               Positioned(
                 top: 8,

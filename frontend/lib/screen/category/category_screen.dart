@@ -3,6 +3,7 @@ import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/screen/category/widget/card_category_widget.dart';
 import 'package:frontend/screen/category/widget/table_category_widget.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -76,7 +77,18 @@ class CategoryScreen extends StatelessWidget {
               /// Empty State
               else if (ctr.categoryList.isEmpty)
                 const SliverFillRemaining(
-                  child: Center(child: Text("No Category Found")),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        AppCachedImage(
+                          assetPath: 'assets/images/empty.png',
+                          width: 120,
+                          fit: BoxFit.contain,
+                        ),
+                        Text("No Category Found"),
+                      ],
+                    )
+                  ),
                 )
               else if (ctr.searchCategoryList.isEmpty)
                 const SliverFillRemaining(

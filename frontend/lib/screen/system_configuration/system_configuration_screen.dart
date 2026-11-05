@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/system_configuration_controller.dart';
 import 'package:frontend/screen/system_configuration/widget/card_system_configuration_widget.dart';
 import 'package:frontend/screen/system_configuration/widget/table_system_configuration_widget.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +21,19 @@ class SystemConfigurationScreen extends StatelessWidget {
         }
 
         if (ctr.systemConfigurationList.isEmpty) {
-          return const Center(child: Text('No system configuration found'));
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppCachedImage(
+                  assetPath: 'assets/images/empty.png',
+                  width: 120,
+                  fit: BoxFit.contain,
+                ),
+                Text('No system configuration found'),
+              ],
+            )
+          );
         }
 
         return RefreshIndicator(

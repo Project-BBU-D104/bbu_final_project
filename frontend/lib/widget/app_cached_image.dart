@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class AppCachedImage extends StatelessWidget {
   final String? url;
+  final String? assetPath;
   final double? width;
   final double? height;
   final BoxFit fit;
@@ -12,7 +13,8 @@ class AppCachedImage extends StatelessWidget {
 
   const AppCachedImage({
     super.key,
-    required this.url,
+    this.url,
+    this.assetPath,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
@@ -23,9 +25,23 @@ class AppCachedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Local asset image
+    if (assetPath != null && assetPath!.isNotEmpty) {
+      return Image.asset(
+        assetPath!,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, _, _) => _fallback(errorIcon ?? fallbackIcon),
+      );
+    }
+
+    // Empty URL
     if (url == null || url!.isEmpty) {
       return _fallback(fallbackIcon);
     }
+
+    // Network cached image
     return CachedNetworkImage(
       imageUrl: url!,
       width: width,
@@ -54,6 +70,10 @@ class AppCachedImage extends StatelessWidget {
         width: width,
         height: height,
         color: const Color(0xFFF5F5F5),
-        child: Icon(icon, color: Colors.grey[400], size: fallbackIconSize),
+        child: Icon(
+          icon,
+          color: Colors.grey[400],
+          size: fallbackIconSize,
+        ),
       );
 }

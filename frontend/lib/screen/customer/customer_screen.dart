@@ -3,6 +3,7 @@ import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/screen/customer/widget/customer_card_widget.dart';
 import 'package:frontend/screen/customer/widget/customer_kpi_widget.dart';
 import 'package:frontend/screen/customer/widget/customer_table_widget.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
@@ -60,12 +61,22 @@ class CustomerScreen extends StatelessWidget {
                     return SizedBox(
                       height: MediaQuery.of(context).size.height * 0.6,
                       child: Center(
-                        child: Text(
-                          "No customers found",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AppCachedImage(
+                              assetPath: 'assets/images/empty.png',
+                              width: 120,
+                              fit: BoxFit.contain,
+                            ),
+                            Text(
+                              "No customers found",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
