@@ -21,6 +21,8 @@ class CurrencyController extends GetxController{
   final isDefault = false.obs;
   final isActive = false.obs;
 
+  final key = GlobalKey<FormState>();
+
   var currencyList = <Map<String, dynamic>>[].obs;
   final searchCurrencyList = <Map<String, dynamic>>[].obs;
 

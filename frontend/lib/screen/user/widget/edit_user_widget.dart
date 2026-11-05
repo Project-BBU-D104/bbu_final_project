@@ -24,219 +24,259 @@ class EditUserWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: SingleChildScrollView(
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-
-          children: [
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-              children: [
-
-                Text(
-                  "Edit User".tr,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+        child: Form(
+          key: ctr.key,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+          
+            children: [
+          
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          
+                children: [
+          
+                  Text(
+                    "Edit User".tr,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+          
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: (){
+                      Navigator.pop(context);
+                    },
+                  )
+          
+                ],
+              ),
+          
+              ImageUploadWidget(
+                bucket: "user",
+                folder: "users",
+                imageUrl: ctr.userPhotoController.text,
+                onUploaded: (url){
+                  ctr.userPhotoController.text = url;
+                },
+              ),
+              const SizedBox(height: 15),
+              Text(
+                "Role".tr,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
                 ),
-
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: (){
-                    Navigator.pop(context);
-                  },
-                )
-
-              ],
-            ),
-
-            ImageUploadWidget(
-              bucket: "user",
-              folder: "users",
-              imageUrl: ctr.userPhotoController.text,
-              onUploaded: (url){
-                ctr.userPhotoController.text = url;
-              },
-            ),
-            const SizedBox(height: 15),
-            Text(
-              "Role".tr,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
               ),
-            ),
-            const SizedBox(height: 5),
-           Obx(() {
-            return DropdownButtonFormField<String>(
-              value: roleCtr.roleList.any(
-                (role) =>
-                    role["id"].toString() == ctr.selectedRole.value,
-              )
-                  ? ctr.selectedRole.value
-                  : null,
-              decoration: InputDecoration(
-                hintText: "Select Role".tr,
-                border: const OutlineInputBorder(),
-              ),
-              items: roleCtr.roleList.map((role){
-                return DropdownMenuItem<String>(
-                  value: role["id"].toString(),
-                  child: Text(
-                    role["name"],
-                  ),
-                );
-              }).toList(),
-              onChanged: (value){
-                ctr.selectedRole.value = value;
-              },
-            );
-          }),
-            const SizedBox(height: 10),
-            Text(
-              "System Configuration".tr,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Obx(() {
-              if (ctr.systemConfigurationCtr.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+              const SizedBox(height: 5),
+             Obx(() {
               return DropdownButtonFormField<String>(
-                value: ctr.systemConfigurationCtr.systemConfigurationList.any(
-                  (configuration) =>
-                      configuration["id"].toString() ==
-                      ctr.selectedSystemConfiguration.value,
+                value: roleCtr.roleList.any(
+                  (role) =>
+                      role["id"].toString() == ctr.selectedRole.value,
                 )
-                    ? ctr.selectedSystemConfiguration.value
+                    ? ctr.selectedRole.value
                     : null,
                 decoration: InputDecoration(
-                  hintText: "Select System Configuration".tr,
+                  hintText: "Select Role".tr,
                   border: const OutlineInputBorder(),
                 ),
-                items: ctr.systemConfigurationCtr.systemConfigurationList.map((configuration){
+                items: roleCtr.roleList.map((role){
                   return DropdownMenuItem<String>(
-                    value: configuration["id"].toString(),
+                    value: role["id"].toString(),
                     child: Text(
-                      configuration["company_name"] ?? "",
+                      role["name"],
                     ),
                   );
                 }).toList(),
                 onChanged: (value){
-                  ctr.selectedSystemConfiguration.value = value;
+                  ctr.selectedRole.value = value;
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please select a role".tr;
+                  }
+                  return null;
                 },
               );
             }),
-            const SizedBox(height: 10),
-            _field(
-              title: "Username",
-              controller: ctr.userNameController,
-              hint: "Enter Username",
-            ),
-
-            _field(
-              title: "Email",
-              controller: ctr.userEmailController,
-              hint: "Enter Email",
-            ),
-            _field(
-              title: "Phone Number",
-              controller: ctr.userPhoneController,
-              hint: "Enter Phone Number",
-            ),
-
-            _field(
-              title: "Password",
-              controller: ctr.userPasswordController,
-              hint: "Enter Password",
-            ),
-
-            const SizedBox(height: 10),
-            Obx(() {
-              return Row(
-                children: [
-                  Checkbox(
-                    value: ctr.isChecked.value,
-                    onChanged: (value){
-                      ctr.isChecked.value = value ?? false;
-                    },
-                  ),
-
-                  Text(
-                    "Disable User".tr,
-                  )
-                ],
-              );
-            }),
-
-            const SizedBox(height: 15),
-            SizedBox(
-              width: double.infinity,
-              height: 45,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: successColor,
-                  foregroundColor: titleColor,
+              const SizedBox(height: 10),
+              Text(
+                "System Configuration".tr,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
                 ),
-
-                onPressed: () async {
-                  await ctr.onUpdateUser(
-                    userId,
-                    context,
+              ),
+              const SizedBox(height: 5),
+              Obx(() {
+                if (ctr.systemConfigurationCtr.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                },
-
-                child: Text(
-                  "Update".tr,
-                  style: const TextStyle(
-                    fontSize: 18,
+                }
+                return DropdownButtonFormField<String>(
+                  value: ctr.systemConfigurationCtr.systemConfigurationList.any(
+                    (configuration) =>
+                        configuration["id"].toString() ==
+                        ctr.selectedSystemConfiguration.value,
+                  )
+                      ? ctr.selectedSystemConfiguration.value
+                      : null,
+                  decoration: InputDecoration(
+                    hintText: "Select System Configuration".tr,
+                    border: const OutlineInputBorder(),
+                  ),
+                  items: ctr.systemConfigurationCtr.systemConfigurationList.map((configuration){
+                    return DropdownMenuItem<String>(
+                      value: configuration["id"].toString(),
+                      child: Text(
+                        configuration["company_name"] ?? "",
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value){
+                    ctr.selectedSystemConfiguration.value = value;
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please select a system configuration".tr;
+                    }
+                    return null;
+                  },
+                );
+              }),
+              const SizedBox(height: 10),
+              _field(
+                title: "Username",
+                controller: ctr.userNameController,
+                hint: "Enter Username",
+                required: true,
+              ),
+          
+              _field(
+                title: "Email",
+                controller: ctr.userEmailController,
+                hint: "Enter Email",
+              ),
+              _field(
+                title: "Phone Number",
+                controller: ctr.userPhoneController,
+                hint: "Enter Phone Number",
+              ),
+          
+              _field(
+                title: "Password",
+                controller: ctr.userPasswordController,
+                hint: "Enter Password",
+                isPassword: true,
+              ),
+          
+              const SizedBox(height: 10),
+              Obx(() {
+                return Row(
+                  children: [
+                    Checkbox(
+                      value: ctr.isChecked.value,
+                      onChanged: (value){
+                        ctr.isChecked.value = value ?? false;
+                      },
+                    ),
+          
+                    Text(
+                      "Disable User".tr,
+                    )
+                  ],
+                );
+              }),
+          
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: successColor,
+                    foregroundColor: titleColor,
+                  ),
+          
+                  onPressed: () async {
+                    if(ctr.key.currentState?.validate() ?? false){
+                    await ctr.onUpdateUser(
+                      userId,
+                      context,
+                    );
+                  }},
+          
+                  child: Text(
+                    "Update".tr,
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 15),
-          ],
+          
+              const SizedBox(height: 15),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _field({
-    required String title,
-    required TextEditingController controller,
-    required String hint,
-  }){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title.tr,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
+ Widget _field({
+  required String title,
+  required TextEditingController controller,
+  required String hint,
+  bool required = false,
+  bool isEmail = false,
+  bool isPassword = false,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        title.tr,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
         ),
+      ),
 
-        const SizedBox(height:5),
+      const SizedBox(height: 5),
 
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hint.tr,
-            border: const OutlineInputBorder(),
-          ),
+      TextFormField(
+        controller: controller,
+        obscureText: isPassword,
+        keyboardType: isEmail
+            ? TextInputType.emailAddress
+            : TextInputType.text,
+        decoration: InputDecoration(
+          hintText: hint.tr,
+          border: const OutlineInputBorder(),
         ),
-        const SizedBox(height:10),
-      ],
-    );
-  }
+        validator: (value) {
+          if (required && (value == null || value.trim().isEmpty)) {
+            return "Please enter $title".tr;
+          }
+
+          if (isEmail &&
+              value != null &&
+              value.trim().isNotEmpty &&
+              !GetUtils.isEmail(value.trim())) {
+            return "Please enter a valid email".tr;
+          }
+
+          return null;
+        },
+      ),
+
+      const SizedBox(height: 10),
+    ],
+  );
+}
 }

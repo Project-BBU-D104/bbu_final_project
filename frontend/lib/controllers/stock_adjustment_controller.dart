@@ -28,6 +28,8 @@ class StockAdjustmentController extends GetxController{
   final searchStockAdjustmentList = <Map<String, dynamic>>[].obs;
   final newQtyController = TextEditingController();
 
+  final key = GlobalKey<FormState>();
+
   static final List<Map<String, dynamic>> _cache = [];
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(seconds: 60);

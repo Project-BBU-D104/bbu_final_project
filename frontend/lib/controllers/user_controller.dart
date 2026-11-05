@@ -36,6 +36,8 @@ class UserController extends GetxController{
   final userPasswordController = TextEditingController();
   final userPhoneController = TextEditingController();
 
+  final key = GlobalKey<FormState>();
+
   var isChecked = false.obs;
 
   static final List<Map<String, dynamic>> _cache = [];
