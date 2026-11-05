@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/global.dart';
 import 'package:get/get.dart';
 
 class SupplierAddWidget extends StatelessWidget {
@@ -107,18 +108,35 @@ class SupplierAddWidget extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 10),
-                    Text("Map".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                    SizedBox(height: 5,),
-                    TextField(
-                      maxLines: 8,
-                      minLines: 3,
-                      controller: ctr.supplierMapController,
-                      decoration: InputDecoration(
-                        hintText: "Enter Map".tr,
-                        border: OutlineInputBorder(),
+                   Text(
+                    "Map".tr,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  TextField(
+                    controller: ctr.supplierMapController,
+                    readOnly: true,
+                    onTap: () =>
+                        openSupplierMap(context, ctr.supplierMapController),
+                    decoration: InputDecoration(
+                      hintText: "Pick Location".tr,
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                        ),
+                        onPressed: () =>
+                            openSupplierMap(context, ctr.supplierMapController),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                  ),
+                    
                     const SizedBox(height: 10),
                     Text("Address".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
                     SizedBox(height: 5,),

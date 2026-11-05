@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/global.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:frontend/utils/location_utils.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
@@ -94,7 +96,11 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     children: [
                       _miniBox(Icons.phone, supplier.phone),
                       const SizedBox(width: 10),
-                      _miniBox(Icons.location_on, "Map"),
+                      _miniBox(
+                        Icons.location_on,
+                        "Map",
+                        onTap: () => _openSupplierMap(supplier),
+                      ),
                     ],
                   ),
                 ],
@@ -215,25 +221,44 @@ class SupplierDetailCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _miniBox(IconData icon, String text) {
+  Future<void> _openSupplierMap(SupplierModel supplier) async {
+    final value = usableMapValue(supplier.map);
+
+    if (value == null) {
+      showWarning("Location".tr, "No map location available".tr);
+      return;
+    }
+
+    await openGoogleMap(value);
+  }
+
+  Widget _miniBox(
+    IconData icon,
+    String text, {
+    VoidCallback? onTap,
+  }) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xffF7F8FA),
+      child: Material(
+        color: const Color(0xffF7F8FA),
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: const Color(0xff1DB584)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                text.tr,
-                overflow: TextOverflow.ellipsis,
-              ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(icon, size: 18, color: const Color(0xff1DB584)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    text.tr,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

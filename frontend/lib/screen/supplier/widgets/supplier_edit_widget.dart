@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
+import 'package:frontend/global.dart';
 import 'package:get/get.dart';
 
 class SupplierEditWidget extends StatelessWidget {
@@ -111,12 +112,23 @@ class SupplierEditWidget extends StatelessWidget {
                     Text("Map".tr, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
                     SizedBox(height: 5,),
                     TextField(
-                      maxLines: 8,
-                      minLines: 3,
                       controller: ctr.supplierMapController,
+                      readOnly: true,
+                      onTap: () =>
+                          openSupplierMap(context, ctr.supplierMapController),
                       decoration: InputDecoration(
-                        hintText: "Enter Map".tr,
-                        border: OutlineInputBorder(),
+                        hintText: "Pick Location".tr,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                          ),
+                          onPressed: () => openSupplierMap(
+                            context,
+                            ctr.supplierMapController,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),

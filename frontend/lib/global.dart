@@ -9,6 +9,12 @@ import 'package:get/get.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
+import 'package:geolocator/geolocator.dart';
+import 'package:frontend/screen/supplier/location_picker_page.dart';
+import 'package:frontend/utils/location_utils.dart';
+import 'package:latlong2/latlong.dart';
+
+
 //// Variables
 // final storage = GetStorage(".appsettings");
 // final app = locator<IAppService>();
@@ -147,14 +153,29 @@ Future<void> callPhone(String phone) async {
   }
 }
 
-// Future<void> openGoogleMap(String url) async {
-//   final Uri uri = Uri.parse(url);
+Future<void> openSupplierMap(
+  BuildContext context,
+  TextEditingController controller,
+) async {
+  try {
+    final initialPosition =
+        parseCoordinates(controller.text) ?? await _initialMapPosition();
 
-//   await launchUrl(
-//     uri,
-//     mode: LaunchMode.externalApplication,
-//   );
-// }
+    if (!context.mounted) {
+      return;
+    }
+
+    final picked = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        builder: (_) => LocationPickerPage(initialPosition: initialPosition),
+      ),
+    );
+
+    applyPickedLocation(controller, picked);
+  } catch (e) {
+    showError("Error", e.toString());
+  }
+}
 
 Future<void> openGoogleMap(String value) async {
   try {
@@ -206,4 +227,33 @@ Future<int?> getSystemConfigurationId() async {
   final data = await storage.lastUserLoginRead;
 
   return data["user"]["system_configuration_id"] as int?;
+}
+
+Future<LatLng> _initialMapPosition() async {
+  try {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      return defaultMapLocation;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return defaultMapLocation;
+    }
+
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
+    ).timeout(const Duration(seconds: 10));
+
+    return LatLng(position.latitude, position.longitude);
+  } catch (_) {
+    return defaultMapLocation;
+  }
 }
