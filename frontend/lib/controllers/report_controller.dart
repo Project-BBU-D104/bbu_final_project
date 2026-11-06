@@ -22,7 +22,7 @@ final searchCtr = Get.put(SearchFeatureController());
           "subtitle": "Sale Payment Report",
           "icon": Icons.access_time_outlined,
           "route": AppRoutes.salePaymentReport,
-        },
+        }
       ]
     },
     {

@@ -54,3 +54,4 @@ class ProductRead(SQLModel):
 class ProductSimple(SQLModel):
     id: int
     name: str
+    unit: Optional[UnitSimple] = None

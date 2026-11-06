@@ -159,6 +159,7 @@ def get_all_sales(session: Session):
             selectinload(Sale.customer),
             selectinload(Sale.sale_items)
             .selectinload(SaleItems.product)
+            .selectinload(Product.unit)
         )
     )
     return session.exec(statement).all()
@@ -170,7 +171,9 @@ def get_sale(session: Session, sale_id: int):
         .options(
             selectinload(Sale.user).selectinload(User.role),
             selectinload(Sale.customer),
-            selectinload(Sale.sale_items).selectinload(SaleItems.product),
+            selectinload(Sale.sale_items)
+            .selectinload(SaleItems.product)
+            .selectinload(Product.unit),
         )
     )
     return session.exec(statement).first()
