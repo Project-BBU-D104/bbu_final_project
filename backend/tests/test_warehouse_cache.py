@@ -1,11 +1,14 @@
-from app.core.cache import ORMJsonCoder
+import asyncio
+
+import pytest
+
+from app.core.cache import clear_stock_caches, ORMJsonCoder
 from app.crud.warehouse.warehouse import get_all_warehouse
 from app.models.product import Product
 from app.models.warehouse_stock import WarehouseStock
 from app.schemas.warehouse.warehouse import WarehouseRead
 
 from fastapi import FastAPI
-from fastapi.testclient import TestClient
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
@@ -53,7 +56,36 @@ def test_cached_warehouse_payload_keeps_stock(session, seed):
     assert read.warehouse_stock[0].product.name == "Coke"
 
 
+def test_clear_stock_caches_clears_product_and_warehouse_only():
+    FastAPICache.init(InMemoryBackend(), prefix="test-clear")
+    backend = FastAPICache.get_backend()
+
+    async def scenario():
+        # FastAPICache stores keys as "<prefix>:<namespace>:<key>".
+        await backend.set("test-clear:product:key", b"v")
+        await backend.set("test-clear:warehouse:key", b"v")
+        await backend.set("test-clear:sale:key", b"v")
+        await clear_stock_caches()
+        return (
+            await backend.get("test-clear:product:key"),
+            await backend.get("test-clear:warehouse:key"),
+            await backend.get("test-clear:sale:key"),
+        )
+
+    product, warehouse, sale = asyncio.run(scenario())
+
+    assert product is None
+    assert warehouse is None
+    assert sale is not None
+
+
 def test_warehouse_endpoint_returns_stock_on_cache_hit(session, seed):
+    # Starlette's TestClient needs httpx2, which is not always installed.
+    try:
+        from fastapi.testclient import TestClient
+    except RuntimeError:
+        pytest.skip("starlette TestClient needs httpx2")
+
     product = make_product(session, seed)
     session.add(
         WarehouseStock(

@@ -3,12 +3,15 @@ from sqlmodel import Session
 from database import get_session
 from app.schemas.purchase.purchase_item import PurchaseItemCreate,PurchaseItemRead
 from app.crud.purchase.purchase_item import  create_purchase_item, get_all_purchase_items, delete_purchase_item
+from app.core.cache import clear_stock_caches
 
 router = APIRouter(prefix="/purchase_item", tags=["purchase_item"])
 
 @router.post("/", response_model=PurchaseItemRead)
-def create_new_purchase_item(purchase_item: PurchaseItemCreate, session: Session = Depends(get_session)):
-    return create_purchase_item(session, purchase_item)
+async def create_new_purchase_item(purchase_item: PurchaseItemCreate, session: Session = Depends(get_session)):
+    result = create_purchase_item(session, purchase_item)
+    await clear_stock_caches()
+    return result
 
 @router.get("/", response_model=list[PurchaseItemRead])
 def read_purchase_items(session: Session = Depends(get_session)):

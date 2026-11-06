@@ -37,6 +37,7 @@ class UserController extends GetxController{
   final userPhoneController = TextEditingController();
 
   final key = GlobalKey<FormState>();
+  bool _editSheetOpen = false;
 
   var isChecked = false.obs;
 
@@ -182,6 +183,9 @@ class UserController extends GetxController{
   }
 
   void editUser(BuildContext context, int userId) async{
+    // The form key is shared, so a second sheet would duplicate the GlobalKey.
+    if (_editSheetOpen) return;
+    _editSheetOpen = true;
     try{
       final user =  await service.getUserById(userId);
 
@@ -195,7 +199,7 @@ class UserController extends GetxController{
       selectedSystemConfiguration.value =
         user["system_configuration_id"]?.toString();
       isChecked.value = user["is_active"] != true;
-      AppBottomSheets.show(
+      await AppBottomSheets.show(
       context,
       child: EditUserWidget(
         userId: userId
@@ -206,6 +210,8 @@ class UserController extends GetxController{
         message: e.toString(),
         type: ToastType.error,
       ) ;
+    } finally {
+      _editSheetOpen = false;
     }
   }
 

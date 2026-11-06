@@ -60,3 +60,8 @@ class Product(SQLModel, table=True):
         if self.warehouse_stock:
             return self.warehouse_stock[0].warehouse
         return None
+
+    @property
+    def stock_qty(self) -> int:
+        """Total quantity on hand across all warehouses."""
+        return sum(stock.qty for stock in self.warehouse_stock or [])

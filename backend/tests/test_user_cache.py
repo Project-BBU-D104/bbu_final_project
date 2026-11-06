@@ -1,5 +1,6 @@
+import pytest
+
 from fastapi import FastAPI
-from fastapi.testclient import TestClient
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
@@ -32,6 +33,12 @@ def make_user(session):
 
 
 def test_user_endpoint_returns_role_on_cache_hit(session):
+    # Starlette's TestClient needs httpx2, which is not always installed.
+    try:
+        from fastapi.testclient import TestClient
+    except RuntimeError:
+        pytest.skip("starlette TestClient needs httpx2")
+
     user = make_user(session)
 
     FastAPICache.init(
