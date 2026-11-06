@@ -119,6 +119,28 @@ def test_product_read_includes_warehouse(session, seed):
     assert read.warehouse.id == seed["warehouse_a"].id
 
 
+def test_product_read_sums_stock_qty(session, seed):
+    product = create_product(
+        session,
+        make_product(seed, warehouse_id=seed["warehouse_a"].id),
+    )
+    stock = stocks_of(session, product.id)[0]
+    stock.qty = 7
+    session.add(stock)
+    session.add(
+        WarehouseStock(
+            product_id=product.id,
+            warehouse_id=seed["warehouse_b"].id,
+            qty=3,
+        )
+    )
+    session.commit()
+
+    read = ProductRead.model_validate(get_product(session, product.id))
+
+    assert read.stock_qty == 10
+
+
 def test_warehouse_stock_read_still_serializes_product(session, seed):
     from app.schemas.warehouse.warehouse_stock import WarehouseStockRead
 

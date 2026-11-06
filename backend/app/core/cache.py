@@ -6,7 +6,18 @@ from starlette.requests import Request
 from starlette.responses import Response
 from sqlalchemy import inspect as sa_inspect
 
+from fastapi_cache import FastAPICache
 from fastapi_cache.coder import JsonCoder
+
+
+STOCK_CACHE_NS = "warehouse"
+PRODUCT_CACHE_NS = "product"
+
+
+async def clear_stock_caches():
+    """Clear every cache whose payload embeds warehouse quantities."""
+    await FastAPICache.clear(namespace=STOCK_CACHE_NS)
+    await FastAPICache.clear(namespace=PRODUCT_CACHE_NS)
 
 
 def _orm_columns(value: Any) -> Dict[str, Any]:

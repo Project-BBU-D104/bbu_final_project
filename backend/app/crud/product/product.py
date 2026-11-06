@@ -118,16 +118,10 @@ def update_product(session: Session, product_id: int, product: ProductUpdate):
             db_product.cost_price = product.cost_price
         if product.sale_price is not None:
             db_product.sale_price = product.sale_price
-        if product.qty is not None:
-            db_product.qty = product.qty
-        if product.allow_insert_qty is not None:
-            db_product.allow_insert_qty = product.allow_insert_qty
         if product.unit_id is not None:
             db_product.unit_id = product.unit_id
         if product.currency_id is not None:
             db_product.currency_id = product.currency_id
-        if product.unit_id is not None:
-            db_product.unit_id = product.unit_id
         if product.description is not None:
             db_product.description = product.description
 

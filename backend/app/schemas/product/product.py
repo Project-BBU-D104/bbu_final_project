@@ -29,8 +29,6 @@ class ProductUpdate(SQLModel):
     photo: Optional[str] = None
     cost_price: Optional[Decimal] = None
     sale_price: Optional[Decimal] = None
-    qty: Optional[int] = None
-    allow_insert_qty: Optional[bool] = None
     description: Optional[str] = None
     warehouse_id: Optional[int] = None
     updated_at: Optional[datetime] = None
@@ -46,6 +44,7 @@ class ProductRead(SQLModel):
     cost_price: Optional[Decimal] = None
     sale_price: Optional[Decimal] = None
     description: Optional[str] = None
+    stock_qty: int = 0
     warehouse: Optional[WarehouseSimple] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

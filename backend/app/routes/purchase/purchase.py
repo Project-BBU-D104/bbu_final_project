@@ -5,6 +5,7 @@ from sqlmodel import Session
 from database import get_session
 from app.schemas.purchase.purchase import PurchaseCreate,PurchaseRead,PurchaseUpdate,PurchaseSimple
 from app.crud.purchase.purchase import  create_purchase, get_all_purchases,get_recent_purchases, get_purchase, update_purchase, delete_purchase
+from app.core.cache import clear_stock_caches
 
 router = APIRouter(prefix="/purchase", tags=["purchase"])
 
@@ -15,6 +16,7 @@ CACHE_TTL = 60  # seconds
 async def create_new_purchase(purchase: PurchaseCreate, session: Session = Depends(get_session)):
     result = create_purchase(session, purchase)
     await FastAPICache.clear(namespace=CACHE_NS)
+    await clear_stock_caches()
     return result
 
 @router.get("/", response_model=list[PurchaseRead])
@@ -36,10 +38,12 @@ async def read_purchase(purchase_id: int, session: Session = Depends(get_session
 async def update_purchase_route(purchase_id: int, purchase: PurchaseUpdate, session: Session = Depends(get_session)):
     result = update_purchase(session, purchase_id, purchase)
     await FastAPICache.clear(namespace=CACHE_NS)
+    await clear_stock_caches()
     return result
 
 @router.delete("/{purchase_id}")
 async def delete_purchase_route(purchase_id: int, session: Session = Depends(get_session)):
     result = delete_purchase(session, purchase_id)
     await FastAPICache.clear(namespace=CACHE_NS)
+    await clear_stock_caches()
     return result
