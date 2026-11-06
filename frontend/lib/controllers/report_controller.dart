@@ -32,13 +32,13 @@ final searchCtr = Get.put(SearchFeatureController());
           "title": "Purchase Report",
           "subtitle": "Purchase Report",
           "icon": Icons.access_time_outlined,
-          "route": AppRoutes.saleReport,
+          "route": AppRoutes.purchaseReport,
         },
         {
           "title": "Purchase Payment Report",
           "subtitle": "Purchase Payment Report",
           "icon": Icons.access_time_outlined,
-          "route": AppRoutes.saleReport,
+          "route": AppRoutes.purchasePaymentReport,
         },
       ]
     },
@@ -49,7 +49,7 @@ final searchCtr = Get.put(SearchFeatureController());
           "title": "Stock Ledger Report",
           "subtitle": "Stock Ledger Report",
           "icon": Icons.access_time_outlined,
-          "route": AppRoutes.saleReport,
+          "route": AppRoutes.stockLedgerReport,
         },
       ]
     },
@@ -60,7 +60,7 @@ final searchCtr = Get.put(SearchFeatureController());
           "title": "Profit and Loss Report",
           "subtitle": "Profit and Loss Report",
           "icon": Icons.access_time_outlined,
-          "route": AppRoutes.saleReport,
+          "route": AppRoutes.profitAndLossReport,
         },
       ]
     },

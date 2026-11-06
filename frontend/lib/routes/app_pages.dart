@@ -31,8 +31,12 @@ import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
 import 'package:frontend/screen/purchase_request/purchase_request_screen.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
+import 'package:frontend/screen/report/all_report/profit_and_loss_report.dart';
+import 'package:frontend/screen/report/all_report/purchase_payment_report_screen.dart';
+import 'package:frontend/screen/report/all_report/purchase_report_screen.dart';
 import 'package:frontend/screen/report/all_report/sale_payment_report_screen.dart';
 import 'package:frontend/screen/report/all_report/sales_report_screen.dart';
+import 'package:frontend/screen/report/all_report/stock_ledger_report.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
 import 'package:frontend/screen/sale/sale_list/widget/sale_list_detail_widget.dart';
@@ -226,6 +230,22 @@ class AppPages {
     GetPage(
       name: AppRoutes.salePaymentReport,
       page: () => const SalePaymentReportScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.purchaseReport,
+      page: () => const PurchaseReportScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.purchasePaymentReport,
+      page: () => const PurchasePaymentReportScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.stockLedgerReport,
+      page: () => const StockLedgerReport(),
+    ),
+    GetPage(
+      name: AppRoutes.profitAndLossReport,
+      page: () => const ProfitAndLossReport(),
     ),
   ];
 }
