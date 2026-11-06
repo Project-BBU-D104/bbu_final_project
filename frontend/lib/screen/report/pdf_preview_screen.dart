@@ -13,14 +13,14 @@ class PdfPreviewScreen extends StatelessWidget {
   final String title;
   final List<String> headers;
   final List<List<dynamic>> rows;
-  final bool showSummary;
+  final double? summaryTotal;
 
   const PdfPreviewScreen({
     super.key,
     required this.title,
     required this.headers,
     required this.rows,
-    this.showSummary = false,
+    this.summaryTotal,
   });
 
   @override
@@ -48,7 +48,7 @@ class PdfPreviewScreen extends StatelessWidget {
             rows: rows,
             pageFormat: format,
             letterhead: defaultLetterHead,
-            showSummary: showSummary,
+            summaryTotal: summaryTotal,
           );
 
           return Uint8List.fromList(bytes);

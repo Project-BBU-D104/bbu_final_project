@@ -95,7 +95,7 @@ class ExportService {
     required List<List<dynamic>> rows,
     PdfPageFormat? pageFormat,
     LetterHeadData letterhead = defaultLetterHead,
-    bool showSummary = false,
+    double? summaryTotal,
   }) async {
     final pdf = pw.Document();
     final letterheadWidget = await buildPdfLetterHead(
@@ -155,7 +155,7 @@ class ExportService {
 
               cellPadding: const pw.EdgeInsets.all(8),
             ),
-            if (showSummary) _buildSummary(rows),
+            if (summaryTotal != null) _buildSummary(summaryTotal),
           ];
         },
       ),
@@ -182,14 +182,14 @@ class ExportService {
     required List<String> headers,
     required List<List<dynamic>> rows,
     PdfPageFormat? pageFormat,
-    bool showSummary = false,
+    double? summaryTotal,
   }) async {
     final bytes = await generatePdf(
       title: title,
       headers: headers,
       rows: rows,
       pageFormat: pageFormat,
-      showSummary: showSummary,
+      summaryTotal: summaryTotal,
     );
 
     return _saveFile(
@@ -246,14 +246,7 @@ class ExportService {
   // 6. PDF TOTAL SUMMARY
   // ==========================================
 
-  static pw.Widget _buildSummary(List<List<dynamic>> rows) {
-    var total = 0.0;
-    for (final row in rows) {
-      if (row.length > 6) {
-        total += _parseNumber(row[6]);
-      }
-    }
-
+  static pw.Widget _buildSummary(double total) {
     return pw.Align(
       alignment: pw.Alignment.centerRight,
       child: pw.Container(
@@ -296,13 +289,6 @@ class ExportService {
         ),
       ),
     );
-  }
-
-  static double _parseNumber(dynamic value) {
-    return double.tryParse(
-          value?.toString().replaceAll(',', '').trim() ?? '',
-        ) ??
-        0;
   }
 
   // ==========================================

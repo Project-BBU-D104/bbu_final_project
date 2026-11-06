@@ -525,7 +525,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         headers: headers,
         rows: rows,
         pageFormat: pageFormat,
-        showSummary: true,
+        summaryTotal: totalSales,
       );
       if (mounted && path != null) {
         ToastWidget.show(
@@ -539,7 +539,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           title: title,
           headers: headers,
           rows: rows,
-          showSummary: true,
+          summaryTotal: totalSales,
         ),
       );
     }

@@ -27,7 +27,7 @@ class ReportExportController extends GetxController {
     required List<String> headers,
     required List<List<dynamic>> rows,
     PdfPageFormat? pageFormat,
-    bool showSummary = false,
+    double? summaryTotal,
   }) async {
     String? savedPath;
     await _run(() async {
@@ -36,7 +36,7 @@ class ReportExportController extends GetxController {
         headers: headers,
         rows: rows,
         pageFormat: pageFormat,
-        showSummary: showSummary,
+        summaryTotal: summaryTotal,
       );
     });
     return savedPath;
