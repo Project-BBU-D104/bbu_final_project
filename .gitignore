@@ -4,3 +4,5 @@ Final Project.code-workspace
 .claude
 .idea
 .vscode
+# Local audit report
+AUDIT_REPORT.md
