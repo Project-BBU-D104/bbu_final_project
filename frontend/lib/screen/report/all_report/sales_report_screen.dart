@@ -590,6 +590,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                 ),
               ),
             ),
+            DataCell(Text(sale['customer'].toString())),
             DataCell(Text(dateFormat.format(sale['date'] as DateTime))),
             DataCell(
               Text('${items.length} item${items.length == 1 ? '' : 's'}'),
@@ -623,6 +624,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             cells: const [
               DataCell(Text('')),
               DataCell(Text('')),
+              DataCell(Text('')),
               DataCell(
                 Padding(
                   padding: EdgeInsets.only(left: 24),
@@ -650,6 +652,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               Colors.blue.withValues(alpha: 0.025),
             ),
             cells: [
+              const DataCell(Text('')),
               const DataCell(Text('')),
               const DataCell(Text('')),
               DataCell(
@@ -692,6 +695,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                     child: DataTable(
                       columns: const [
                         DataColumn(label: Text('Invoice')),
+                        DataColumn(label: Text('Customer')),
                         DataColumn(label: Text('Date')),
                         DataColumn(label: Text('Product')),
                         DataColumn(label: Text('Qty'), numeric: true),

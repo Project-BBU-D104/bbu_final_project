@@ -83,6 +83,16 @@ void main() {
       expect(items.first['amount'], 60.0);
     });
 
+    test('carries the customer name', () {
+      final row = saleReportRow(rawSale(customer: 'Dara Sok'))!;
+      expect(row['customer'], 'Dara Sok');
+    });
+
+    test('uses an empty customer when the API omits it', () {
+      final sale = rawSale()..remove('customer');
+      expect(saleReportRow(sale)!['customer'], '');
+    });
+
     test('returns null for cancelled sales', () {
       expect(saleReportRow(rawSale(status: 'cancelled')), isNull);
     });
@@ -156,6 +166,11 @@ void main() {
   });
 
   group('saleMatchesSearch', () {
+    test('matches the customer name', () {
+      final row = saleReportRow(rawSale(customer: 'Dara Sok'))!;
+      expect(saleMatchesSearch(row, 'dara'), isTrue);
+    });
+
     test('matches invoice and product name', () {
       final row = saleReportRow(rawSale())!;
 
@@ -286,6 +301,7 @@ void main() {
       expect(rows, hasLength(1));
       expect(rows.single, [
         'SALE-1',
+        'Walk-in',
         '05 Nov 2026',
         'Helmet',
         5,
@@ -301,8 +317,9 @@ void main() {
       final rows = saleExportRows([row]);
 
       expect(rows, hasLength(1));
-      expect(rows.single[2], '-');
-      expect(rows.single[6], '90.00');
+      expect(rows.single[1], 'Walk-in');
+      expect(rows.single[3], '-');
+      expect(rows.single[7], '90.00');
     });
   });
 

@@ -59,6 +59,9 @@ Map<String, dynamic>? saleReportRow(Map<String, dynamic> sale) {
 
   return {
     'invoice': (sale['invoice_no'] ?? '').toString(),
+    'customer': sale['customer'] is Map
+        ? (sale['customer']['name'] ?? '').toString()
+        : '',
     'date': date,
     'total': parseAmount(sale['total_amount']),
     'status': capitalizeLabel(sale['payment_status']?.toString()),
@@ -117,6 +120,7 @@ List<Map<String, dynamic>> saleItemRows(List<Map<String, dynamic>> sales) {
 /// units: each unit gets its own bucket.
 const List<String> salesExportHeaders = [
   'Invoice',
+  'Customer',
   'Date',
   'Product',
   'Qty',
@@ -144,6 +148,7 @@ List<List<dynamic>> saleExportRows(List<Map<String, dynamic>> sales) {
     if (items.isEmpty) {
       rows.add([
         sale['invoice'],
+        sale['customer'],
         date,
         '-',
         0,
@@ -159,6 +164,7 @@ List<List<dynamic>> saleExportRows(List<Map<String, dynamic>> sales) {
       final unit = (item['unit'] ?? '').toString().trim();
       rows.add([
         sale['invoice'],
+        sale['customer'],
         date,
         item['product'],
         item['qty'],
@@ -249,6 +255,11 @@ bool saleMatchesSearch(Map<String, dynamic> sale, String query) {
   final invoice = (sale['invoice'] ?? '').toString().toLowerCase();
 
   if (invoice.contains(normalized)) {
+    return true;
+  }
+
+  final customer = (sale['customer'] ?? '').toString().toLowerCase();
+  if (customer.contains(normalized)) {
     return true;
   }
 
