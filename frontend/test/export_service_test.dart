@@ -18,4 +18,18 @@ void main() {
     expect(saved.tables.keys, ['Report']);
     expect(saved.getDefaultSheet(), 'Report');
   });
+
+  test('writes numbers as numeric cells', () {
+    final excel = ExportService.buildExcelWorkbook(
+      title: 'Sales Report',
+      headers: const ['Qty', 'Amount'],
+      rows: [
+        [3, 20.5],
+      ],
+    );
+
+    final last = excel.tables['Report']!.rows.last;
+    expect(last[0]?.value, const IntCellValue(3));
+    expect(last[1]?.value, const DoubleCellValue(20.5));
+  });
 }

@@ -131,7 +131,6 @@ const List<String> salesExportHeaders = [
 ];
 
 final DateFormat _exportDateFormat = DateFormat('dd MMM yyyy');
-final NumberFormat _exportMoneyFormat = NumberFormat('#,##0.00');
 
 /// Flattens the report into export rows: one line per product, with
 /// duplicate products inside the same invoice already merged.
@@ -154,7 +153,7 @@ List<List<dynamic>> saleExportRows(List<Map<String, dynamic>> sales) {
         0,
         '-',
         '-',
-        _exportMoneyFormat.format(parseAmount(sale['total'])),
+        parseAmount(sale['total']),
         sale['status'],
       ]);
       continue;
@@ -169,8 +168,8 @@ List<List<dynamic>> saleExportRows(List<Map<String, dynamic>> sales) {
         item['product'],
         item['qty'],
         unit.isEmpty ? '-' : unit,
-        _exportMoneyFormat.format(parseAmount(item['price'])),
-        _exportMoneyFormat.format(parseAmount(item['amount'])),
+        parseAmount(item['price']),
+        parseAmount(item['amount']),
         sale['status'],
       ]);
     }

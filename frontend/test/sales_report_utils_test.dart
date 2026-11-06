@@ -306,8 +306,8 @@ void main() {
         'Helmet',
         5,
         'pcs',
-        '20.00',
-        '100.00',
+        20.0,
+        100.0,
         'Paid',
       ]);
     });
@@ -319,7 +319,7 @@ void main() {
       expect(rows, hasLength(1));
       expect(rows.single[1], 'Walk-in');
       expect(rows.single[3], '-');
-      expect(rows.single[7], '90.00');
+      expect(rows.single[7], 90.0);
     });
   });
 

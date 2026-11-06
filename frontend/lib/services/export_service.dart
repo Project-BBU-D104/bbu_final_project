@@ -58,9 +58,7 @@ class ExportService {
     
     // Company letterhead
     for (final row in excelLetterHeadRows(letterhead)) {
-      sheet.appendRow(
-        row.map((value) => TextCellValue(value?.toString() ?? '')).toList(),
-      );
+      sheet.appendRow(row.map(_cellValue).toList());
     }
 
     // Add title
@@ -75,16 +73,16 @@ class ExportService {
 
     // Add data
     for (final row in rows) {
-      sheet.appendRow(
-        row.map(
-          (value) => TextCellValue(
-            value?.toString() ?? '',
-          ),
-        ).toList(),
-      );
+      sheet.appendRow(row.map(_cellValue).toList());
     }
 
     return excel;
+  }
+
+  static CellValue _cellValue(dynamic value) {
+    if (value is int) return IntCellValue(value);
+    if (value is double) return DoubleCellValue(value);
+    return TextCellValue(value?.toString() ?? '');
   }
 
   // ==========================================
@@ -136,11 +134,7 @@ class ExportService {
             pw.TableHelper.fromTextArray(
               headers: headers,
 
-              data: rows.map((row) {
-                return row.map(
-                  (value) => value?.toString() ?? '',
-                ).toList();
-              }).toList(),
+              data: rows.map((row) => row.map(_pdfCellText).toList()).toList(),
 
               headerStyle: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
@@ -171,6 +165,12 @@ class ExportService {
     final bytes = await pdf.save();
 
     return Uint8List.fromList(bytes);
+  }
+
+  static String _pdfCellText(dynamic value) {
+    if (value is int) return value.toString();
+    if (value is double) return NumberFormat('#,##0.00').format(value);
+    return value?.toString() ?? '';
   }
 
   // ==========================================
