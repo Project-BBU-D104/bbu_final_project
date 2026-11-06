@@ -22,10 +22,40 @@ class ExportService {
     required List<List<dynamic>> rows,
     LetterHeadData letterhead = defaultLetterHead,
   }) async {
+    final excel = buildExcelWorkbook(
+      title: title,
+      headers: headers,
+      rows: rows,
+      letterhead: letterhead,
+    );
+
+    final bytes = excel.save();
+
+    if (bytes == null) {
+      throw Exception('Cannot generate Excel file');
+    }
+
+    return _saveFile(
+      fileName: '${_safeName(title)}.xlsx',
+      bytes: Uint8List.fromList(bytes),
+      dialogTitle: 'Save Excel Report',
+      extension: 'xlsx',
+    );
+  }
+
+  static Excel buildExcelWorkbook({
+    required String title,
+    required List<String> headers,
+    required List<List<dynamic>> rows,
+    LetterHeadData letterhead = defaultLetterHead,
+  }) {
     final excel = Excel.createExcel();
 
     final sheet = excel['Report'];
-
+    // Excel opens the first sheet; drop the empty default sheet after
+    // creating Report (delete() no-ops when only one sheet remains).
+    excel.delete('Sheet1');
+    
     // Company letterhead
     for (final row in excelLetterHeadRows(letterhead)) {
       sheet.appendRow(
@@ -54,18 +84,7 @@ class ExportService {
       );
     }
 
-    final bytes = excel.save();
-
-    if (bytes == null) {
-      throw Exception('Cannot generate Excel file');
-    }
-
-    return _saveFile(
-      fileName: '${_safeName(title)}.xlsx',
-      bytes: Uint8List.fromList(bytes),
-      dialogTitle: 'Save Excel Report',
-      extension: 'xlsx',
-    );
+    return excel;
   }
 
   // ==========================================
