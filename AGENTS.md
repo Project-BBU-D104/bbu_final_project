@@ -46,7 +46,7 @@ Run `flutter test` for Dart tests and `flutter analyze` for static checks. Add t
 
 ## Commit & Pull Request Guidelines
 
-Existing commits are short and inconsistent (for example, `update` and `add readme`). For new commits, use an imperative, specific subject such as `Add warehouse stock validation`, optionally prefixed by area (`backend:` or `frontend:`). Pull requests should explain the behavior change, list validation commands run, link an issue when applicable, and include screenshots or a short recording for UI changes. Call out migration, environment, or configuration changes explicitly.
+Existing commits are short and inconsistent (for example, `update` and `add readme`). For new commits, use an imperative, specific subject such as `Add warehouse stock validation`, optionally prefixed by area (`backend:` or `frontend:`). Never add `Co-Authored-By` trailers to commit messages. Pull requests should explain the behavior change, list validation commands run, link an issue when applicable, and include screenshots or a short recording for UI changes. Call out migration, environment, or configuration changes explicitly.
 
 ## Security & Configuration
 

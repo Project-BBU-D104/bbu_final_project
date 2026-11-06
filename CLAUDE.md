@@ -6,7 +6,9 @@ Inventory management system: `backend/` (FastAPI + SQLModel) and `frontend/` (Fl
 
 Any plan you write down must be saved in the repository root (`Final Project/`), never inside `backend/`, `frontend/`, or any other subdirectory.
 
-Never Push code to Github or similar without asking the user. 
+Never Push code to Github or similar without asking the user.
+
+Never add `Co-Authored-By` trailers to commit messages. 
 
 ## Commands
 
