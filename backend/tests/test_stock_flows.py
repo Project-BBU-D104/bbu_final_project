@@ -256,3 +256,16 @@ def test_decrease_below_stock_is_rejected(session, seed):
 
     assert error.value.status_code == 400
     assert stock_qty(session, product.id, seed["warehouse_a"].id) == 3
+
+
+from pydantic import ValidationError
+
+
+def test_fractional_purchase_quantity_is_rejected(session, seed):
+    user, supplier = make_user(session), make_supplier(session)
+    product = make_stocked_product(session, seed, qty=0)
+
+    with pytest.raises(ValidationError):
+        make_purchase(session, seed, user, supplier, product, qty=Decimal("2.5"))
+
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 0
