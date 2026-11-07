@@ -115,3 +115,91 @@ def test_selling_product_with_no_stock_row_is_rejected(session, seed):
 
     assert error.value.status_code == 400
     assert session.exec(select(Sale)).all() == []
+
+
+from app.crud.purchase.purchase import create_purchase
+from app.crud.purchase.purchase_payment import create_purchase_payment
+from app.models.payment_type import PaymentType
+from app.models.supplier import Supplier
+from app.schemas.purchase.purchase import PurchaseCreate
+from app.schemas.purchase.purchase_item import PurchaseItemCreate
+from app.schemas.purchase.purchase_payment import PurchasePaymentCreate
+
+
+def make_supplier(session):
+    supplier = Supplier(
+        name="Dara", phone="012345678", email="dara@example.com",
+        map="", address="Phnom Penh", status=True,
+    )
+    session.add(supplier)
+    session.commit()
+    session.refresh(supplier)
+    return supplier
+
+
+def make_purchase(session, seed, user, supplier, product, qty, total="100.00"):
+    return create_purchase(session, PurchaseCreate(
+        user_id=user.id, supplier_id=supplier.id,
+        warehouse_id=seed["warehouse_a"].id,
+        purchase_date=datetime.now(timezone.utc),
+        subtotal=Decimal(total), tax_amount=Decimal("0.00"),
+        discount_amount=Decimal("0.00"), total_amount=Decimal(total),
+        paid_amount=Decimal("0.00"), due_amount=Decimal(total),
+        items=[PurchaseItemCreate(
+            product_id=product.id, cost_price=Decimal("1.00"),
+            qty=Decimal(qty), subtotal=Decimal(qty),
+        )],
+    ))
+
+
+def make_payment_type(session):
+    payment_type = PaymentType(name="Bank")
+    session.add(payment_type)
+    session.commit()
+    session.refresh(payment_type)
+    return payment_type
+
+
+def test_purchase_increases_warehouse_stock(session, seed):
+    user, supplier = make_user(session), make_supplier(session)
+    product = make_stocked_product(session, seed, qty=0)
+
+    make_purchase(session, seed, user, supplier, product, qty=5)
+
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 5
+
+
+def test_purchase_payment_updates_paid_due_status(session, seed):
+    user, supplier = make_user(session), make_supplier(session)
+    product = make_stocked_product(session, seed, qty=0)
+    purchase = make_purchase(session, seed, user, supplier, product, qty=5)
+    payment_type = make_payment_type(session)
+
+    create_purchase_payment(session, PurchasePaymentCreate(
+        payment_no="PP-1", purchase_id=purchase.id, supplier_id=supplier.id,
+        payment_type_id=payment_type.id, currency_id=seed["currency"].id,
+        amount=40.0, payment_date=datetime.now(timezone.utc),
+    ))
+
+    session.refresh(purchase)
+    assert purchase.paid_amount == Decimal("40.00")
+    assert purchase.due_amount == Decimal("60.00")
+    assert purchase.payment_status == "partial"
+
+
+def test_pending_purchase_payment_does_not_count(session, seed):
+    user, supplier = make_user(session), make_supplier(session)
+    product = make_stocked_product(session, seed, qty=0)
+    purchase = make_purchase(session, seed, user, supplier, product, qty=5)
+    payment_type = make_payment_type(session)
+
+    create_purchase_payment(session, PurchasePaymentCreate(
+        payment_no="PP-2", purchase_id=purchase.id, supplier_id=supplier.id,
+        payment_type_id=payment_type.id, currency_id=seed["currency"].id,
+        amount=40.0, payment_date=datetime.now(timezone.utc), status="pending",
+    ))
+
+    session.refresh(purchase)
+    assert purchase.paid_amount == Decimal("0.00")
+    assert purchase.due_amount == Decimal("100.00")
+    assert purchase.payment_status == "unpaid"
