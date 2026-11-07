@@ -153,3 +153,31 @@ def test_payment_for_missing_sale_is_rejected(session):
 
     assert exc.value.status_code == 404
     assert session.exec(select(SalePayment)).all() == []
+
+import asyncio
+
+from app.routes.sale import sale_payment as sale_payment_routes
+
+
+def test_payment_routes_clear_sale_cache(session, monkeypatch):
+    sale = make_sale(session)
+    cleared = []
+
+    async def fake_clear(namespace=None):
+        cleared.append(namespace)
+
+    monkeypatch.setattr(sale_payment_routes.FastAPICache, "clear", fake_clear)
+
+    created = asyncio.run(
+        sale_payment_routes.create_new_sale(
+            payment(sale.id, "10.00", sale.user_id), session
+        )
+    )
+    asyncio.run(
+        sale_payment_routes.update_sale_payment_route(
+            created.id, SalePaymentUpdate(amount=Decimal("20.00")), session
+        )
+    )
+    asyncio.run(sale_payment_routes.delete_sale_payment_route(created.id, session))
+
+    assert cleared == ["sale", "sale", "sale"]
