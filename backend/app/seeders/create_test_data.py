@@ -155,14 +155,10 @@ def _payment_status(total: Decimal, paid: Decimal) -> str:
 def compute_stock_qty(base_qty: int, movements: list[int]) -> int:
     """On-hand quantity for one product in one warehouse.
 
-    `movements` are signed: positive means stock in (purchase, transfer in,
-    increase adjustment), negative means stock out (sale, transfer out,
-    decrease adjustment).
-
-    TODO(human): implement so the seeded WarehouseStock reconciles with the
-    seeded transactions. Decide whether the result is allowed to go negative.
+    `movements` are signed: positive means stock in, negative means stock
+    out. The result is clamped at zero — the app forbids negative stock.
     """
-    raise NotImplementedError
+    return max(0, base_qty + sum(movements))
 
 
 def _seed_master(session: Session) -> dict:
