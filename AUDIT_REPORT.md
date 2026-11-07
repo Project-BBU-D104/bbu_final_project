@@ -23,7 +23,7 @@ Also: `pytest==9.2.0` is in `backend/requirements.txt`, and the two `TestClient`
 
 **Verified 2026-11-06:** `pytest tests/` → 30 passed, 2 skipped; `flutter test` → 44 passed; `flutter analyze` → 0 errors.
 
-**Still open:** findings 6–10, 12–20; the UI half of finding 1; the login-side rejection of empty passwords (minor reviewer note); and the gap between `stock_qty` (all warehouses) and checkout (one warehouse row).
+**Still open:** findings 6–8, 12–15, 17–20; the UI half of finding 1; the login-side rejection of empty passwords (minor reviewer note); and the gap between `stock_qty` (all warehouses) and checkout (one warehouse row).
 
 ---
 
@@ -36,6 +36,38 @@ Also: `pytest==9.2.0` is in `backend/requirements.txt`, and the two `TestClient`
   `"sale"` cache namespace after mutations. The Flutter checkout no longer
   sends the compensating `PUT /sale/{id}`. Covered by
   `backend/tests/test_sale_payment.py`.
+
+---
+
+## Update — 2026-11-07: findings 9, 10, 16 fixed
+
+- **Finding 9 — fixed by deletion.** The standalone `/purchase_item` route and
+  its CRUD module are gone (`backend/app/routes/purchase/purchase_item.py`,
+  `backend/app/crud/purchase/purchase_item.py`). The frontend never called
+  them, and the create endpoint could not work (`PurchaseItemCreate` has no
+  `purchase_id`, so the CRUD read a missing attribute and every call 500'd).
+  Items are managed through `/purchase`, which already reverses stock on
+  delete. The `PurchaseItem` model and its Create/Read schemas stay — the
+  purchase schemas use them.
+- **Finding 10 — fixed.** `compute_stock_qty` returns
+  `max(0, base_qty + sum(movements))`; negative on-hand stock is clamped to
+  zero, matching the rest of the app (`backend/app/seeders/create_test_data.py`).
+- **Finding 16 — fixed.** `backend/tests/test_stock_flows.py` covers sale
+  stock deduction, overselling, and selling a product with no stock row;
+  purchase stock increase and payment recalculation (pending payments
+  excluded); transfer between warehouses; and stock adjustment increase and
+  decrease-below-stock rejection. `backend/tests/test_compute_stock_qty.py`
+  pins the seeder helper. Writing the purchase tests exposed a real defect:
+  `increase_stock` added a `Decimal` purchase quantity to the integer
+  `warehouse_stock.qty` column, which SQLite refuses to bind; the helper now
+  coerces `qty` to `int` (`backend/app/crud/warehouse/warehouse_stock.py`).
+
+**Verified 2026-11-07:** `pytest tests/` → 51 passed, 2 skipped.
+
+**Still open from this work:** update paths (`update_sale`,
+`update_stock_adjustment`, `update_product_transfer`) still have no stock
+tests; `delete_purchase` can drive stock negative; and invoice numbers can
+still collide (finding 13).
 
 ---
 
