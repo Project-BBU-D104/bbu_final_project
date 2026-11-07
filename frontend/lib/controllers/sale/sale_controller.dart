@@ -309,7 +309,6 @@ class SaleController extends GetxController {
         'created_at': now.toIso8601String(),
       });
 
-      await service.updateSale(saleId, {'paid_amount': amount});
       final receipt = {
         'customer': customer['name']?.toString() ?? '',
         'payment_method': method,
