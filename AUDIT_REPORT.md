@@ -23,7 +23,19 @@ Also: `pytest==9.2.0` is in `backend/requirements.txt`, and the two `TestClient`
 
 **Verified 2026-11-06:** `pytest tests/` → 30 passed, 2 skipped; `flutter test` → 44 passed; `flutter analyze` → 0 errors.
 
-**Still open:** findings 4, 6–10, 12–20; the UI half of finding 1; the login-side rejection of empty passwords (minor reviewer note); and the gap between `stock_qty` (all warehouses) and checkout (one warehouse row).
+**Still open:** findings 6–10, 12–20; the UI half of finding 1; the login-side rejection of empty passwords (minor reviewer note); and the gap between `stock_qty` (all warehouses) and checkout (one warehouse row).
+
+---
+
+## Update — 2026-11-07: finding 4 fixed
+
+- **Finding 4 — fixed.** `create`, `update`, and `delete` sale payments now
+  recalculate `paid_amount`, `due_amount`, and `payment_status` on the sale in
+  the same transaction (`backend/app/crud/sale/sale_payment.py`). Moving a
+  payment between sales recalculates both. The sale-payment router clears the
+  `"sale"` cache namespace after mutations. The Flutter checkout no longer
+  sends the compensating `PUT /sale/{id}`. Covered by
+  `backend/tests/test_sale_payment.py`.
 
 ---
 
