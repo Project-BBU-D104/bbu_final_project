@@ -61,8 +61,11 @@ Also: `pytest==9.2.0` is in `backend/requirements.txt`, and the two `TestClient`
   `increase_stock` added a `Decimal` purchase quantity to the integer
   `warehouse_stock.qty` column, which SQLite refuses to bind; the helper now
   coerces `qty` to `int` (`backend/app/crud/warehouse/warehouse_stock.py`).
+  Purchase item quantities must now be whole numbers — `PurchaseItemCreate`
+  rejects fractions, because the integer stock column cannot represent them;
+  truncating would make recorded purchases and on-hand stock silently diverge.
 
-**Verified 2026-11-07:** `pytest tests/` → 51 passed, 2 skipped.
+**Verified 2026-11-07:** `pytest tests/` → 52 passed, 2 skipped.
 
 **Still open from this work:** update paths (`update_sale`,
 `update_stock_adjustment`, `update_product_transfer`) still have no stock
