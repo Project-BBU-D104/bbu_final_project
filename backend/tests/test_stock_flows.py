@@ -203,3 +203,56 @@ def test_pending_purchase_payment_does_not_count(session, seed):
     assert purchase.paid_amount == Decimal("0.00")
     assert purchase.due_amount == Decimal("100.00")
     assert purchase.payment_status == "unpaid"
+
+
+from app.crud.product_transfer.product_transfer import create_product_transfer
+from app.crud.stock.stock_adjustment import create_stock_adjustment
+from app.schemas.product_transfer.product_transfer import ProductTransferCreate
+from app.schemas.product_transfer.product_transfer_item import ProductTransferItemInput
+from app.schemas.stock.stock_adjustment import StockAdjustmentCreate
+
+
+def test_transfer_moves_stock_between_warehouses(session, seed):
+    product = make_stocked_product(session, seed, qty=10)
+
+    create_product_transfer(session, ProductTransferCreate(
+        from_warehouse_id=seed["warehouse_a"].id,
+        to_warehouse_id=seed["warehouse_b"].id,
+        transfer_date=datetime.now(timezone.utc),
+        product_transfer_items=[
+            ProductTransferItemInput(product_id=product.id, qty=4)
+        ],
+    ))
+
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 6
+    assert stock_qty(session, product.id, seed["warehouse_b"].id) == 4
+
+
+def test_increase_adjustment_adds_stock(session, seed):
+    user = make_user(session)
+    product = make_stocked_product(session, seed, qty=10)
+
+    adjustment = create_stock_adjustment(session, StockAdjustmentCreate(
+        user_id=user.id, product_id=product.id,
+        warehouse_id=seed["warehouse_a"].id,
+        adjustment_type="increase", qty=5, reason="stocktake", reference_no="",
+    ))
+
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 15
+    assert adjustment.new_qty == 15
+    assert adjustment.reference_no == "SDJ001"
+
+
+def test_decrease_below_stock_is_rejected(session, seed):
+    user = make_user(session)
+    product = make_stocked_product(session, seed, qty=3)
+
+    with pytest.raises(HTTPException) as error:
+        create_stock_adjustment(session, StockAdjustmentCreate(
+            user_id=user.id, product_id=product.id,
+            warehouse_id=seed["warehouse_a"].id,
+            adjustment_type="decrease", qty=5, reason="lost", reference_no="",
+        ))
+
+    assert error.value.status_code == 400
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 3
