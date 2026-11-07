@@ -5,11 +5,13 @@ import pytest
 from fastapi import HTTPException
 from sqlmodel import select
 
+from app.crud.sale.sale import update_sale
 from app.crud.sale.sale_payment import (
     create_sale_payment,
     delete_sale_payment,
     update_sale_payment,
 )
+from app.schemas.sale.sale import SaleUpdate
 from app.models.customer import Customer
 from app.models.role import Role
 from app.models.sale import Sale
@@ -181,3 +183,14 @@ def test_payment_routes_clear_sale_cache(session, monkeypatch):
     asyncio.run(sale_payment_routes.delete_sale_payment_route(created.id, session))
 
     assert cleared == ["sale", "sale", "sale"]
+
+
+def test_update_sale_ignores_client_paid_amount(session):
+    sale = make_sale(session)
+    create_sale_payment(session, payment(sale.id, "40.00", sale.user_id))
+
+    update_sale(session, sale.id, SaleUpdate(paid_amount=Decimal("90.00")))
+
+    assert sale.paid_amount == Decimal("40.00")
+    assert sale.due_amount == Decimal("60.00")
+    assert sale.payment_status == "partial"

@@ -187,7 +187,7 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
     try:
         updates = sale.model_dump(
             exclude_unset=True,
-            exclude={"sale_items", "subtotal", "total_amount", "due_amount", "payment_status"},
+            exclude={"sale_items", "subtotal", "total_amount", "paid_amount", "due_amount", "payment_status"},
         )
         for field, value in updates.items():
             if value is not None:
