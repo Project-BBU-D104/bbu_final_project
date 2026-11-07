@@ -128,6 +128,8 @@ def increase_stock(
     Increase warehouse stock after purchase.
     """
 
+    qty = int(qty)
+
     stock = session.exec(
         select(WarehouseStock).where(
             WarehouseStock.product_id == product_id,
