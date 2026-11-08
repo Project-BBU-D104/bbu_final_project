@@ -27,6 +27,7 @@ class SalePaymentUpdate(SQLModel):
     updated_at: Optional[datetime] = None
 
 class SalePaymentRead(SQLModel):
+    id: Optional[int] = None
     user: UserRead
     sale: SaleRead
     amount: Decimal

@@ -46,6 +46,7 @@ class PurchasePaymentUpdate(SQLModel):
         return value
 
 class PurchasePaymentRead(SQLModel):
+    id: Optional[int] = None
     payment_no: str
     purchase: PurchaseRead
     supplier: SupplierSimple

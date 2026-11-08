@@ -10,11 +10,16 @@ router = APIRouter(prefix="/purchase_payment", tags=["purchase_payment"])
 
 CACHE_NS = "purchase_payment"
 CACHE_TTL = 60  # seconds
+PURCHASE_CACHE_NS = "purchase"
+
+async def _clear_payment_caches():
+    await FastAPICache.clear(namespace=CACHE_NS)
+    await FastAPICache.clear(namespace=PURCHASE_CACHE_NS)
 
 @router.post("/", response_model=PurchasePaymentRead)
 async def create_new_purchase_payment(purchase_payment: PurchasePaymentCreate, session: Session = Depends(get_session)):
     result = create_purchase_payment(session, purchase_payment)
-    await FastAPICache.clear(namespace=CACHE_NS)
+    await _clear_payment_caches()
     return result
 
 @router.get("/", response_model=list[PurchasePaymentRead])
@@ -30,11 +35,11 @@ async def read_purchase_payment(purchase_payment_id: int, session: Session = Dep
 @router.put("/{purchase_payment_id}", response_model=PurchasePaymentRead)
 async def update_purchase_payment_route(purchase_payment_id: int, purchase_payment: PurchasePaymentUpdate, session: Session = Depends(get_session)):
     result = update_purchase_payment(session, purchase_payment_id, purchase_payment)
-    await FastAPICache.clear(namespace=CACHE_NS)
+    await _clear_payment_caches()
     return result
 
 @router.delete("/{purchase_payment_id}")
 async def delete_purchase_payment_route(purchase_payment_id: int, session: Session = Depends(get_session)):
     result = delete_purchase_payment(session, purchase_payment_id)
-    await FastAPICache.clear(namespace=CACHE_NS)
+    await _clear_payment_caches()
     return result
