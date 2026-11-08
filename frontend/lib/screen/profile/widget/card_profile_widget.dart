@@ -20,12 +20,18 @@ class CardProfileWidget extends StatelessWidget {
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: ctr.photo.value.isNotEmpty &&
-                          ctr.photo.value.isNotEmpty
-                      ? NetworkImage(ctr.photo.value)
-                      : const NetworkImage('https://imgs.search.brave.com/Y20_Qf09jZ8KyraFayP-Bh7mXPopmU4Pc6JBLcB4CBY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMjcv/OTUxLzEzMC9zbWFs/bC9hZnJpY2EtZ3V5/LTNkLWF2YXRhci1j/aGFyYWN0ZXItaWxs/dXN0cmF0aW9ucy1w/bmcucG5n'),
+                Obx(
+                  () => CircleAvatar(
+                    radius: 40,
+                    backgroundImage: ctr.photo.value.isNotEmpty
+                        ? NetworkImage(ctr.photo.value)
+                        : null,
+                    onBackgroundImageError:
+                        ctr.photo.value.isNotEmpty ? (_, _) {} : null,
+                    child: ctr.photo.value.isEmpty
+                        ? const Icon(Icons.person, size: 40)
+                        : null,
+                  ),
                 ),
                 const SizedBox(height: 5,),
                 Obx(()=> Text(

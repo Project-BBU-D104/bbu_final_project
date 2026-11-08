@@ -8,7 +8,9 @@ import 'package:get/get.dart';
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
-  final ctr = Get.put(ProfileController());
+  final ctr = Get.isRegistered<ProfileController>()
+      ? Get.find<ProfileController>()
+      : Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,28 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(height: 10,),
                 
                 CardPersonalInfoWidget(),
+
+                SizedBox(height: 10,),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.edit_outlined),
+                        onPressed: () => ctr.openEditProfile(context),
+                        label: Text("Edit Profile".tr),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.lock_outline),
+                        onPressed: () => ctr.openChangePassword(context),
+                        label: Text("Change Password".tr),
+                      ),
+                    ),
+                  ],
+                ),
 
                 SizedBox(height: 10,),
 
