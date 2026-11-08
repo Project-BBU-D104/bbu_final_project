@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/profile_controller.dart';
 import 'package:get/get.dart';
 
@@ -14,7 +13,7 @@ class CardProfileWidget extends StatelessWidget {
       width: double.infinity,
       child: Card(  
         margin: const EdgeInsets.only(bottom: 10),
-        color: titleColor,
+        color: Theme.of(context).cardColor,
         child: SizedBox(
           child: Padding(
             padding: const EdgeInsets.all(15.0),
@@ -54,21 +53,26 @@ class CardProfileWidget extends StatelessWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: primaryColor.shade100,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.admin_panel_settings_rounded,
                           size: 18,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           ctr.role.value,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ],

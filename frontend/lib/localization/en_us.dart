@@ -148,7 +148,6 @@ const Map<String, String> enUS = {
   'App Preferences': 'App Preferences',
   'Dark Mode': 'Dark Mode',
   'Language': 'Language',
-  'Push Notifications': 'Push Notifications',
   'Product Management': 'Product Management',
   'Purchase Management': 'Purchase Management',
   'Supplier Management': 'Supplier Management',

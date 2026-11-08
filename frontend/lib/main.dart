@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/app_background.dart';
 import 'package:frontend/controllers/language_controller.dart';
+import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/locator.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:get/get.dart';
@@ -21,12 +22,13 @@ Future<void> main() async {
   await dotenv.load(fileName: "assets/.env");
   await _initConfig();
 
-  _initStorage();
+  await _initStorage();
   
   await GetStorage.init();
   setupLocator();
 
   Get.put(LanguageController());
+  Get.put(ThemeController());
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
@@ -78,6 +80,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
+    final themeController = Get.find<ThemeController>();
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -98,7 +101,9 @@ class MyApp extends StatelessWidget {
       defaultTransition: Transition.noTransition,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.light,
+      themeMode: themeController.isDark.value
+          ? ThemeMode.dark
+          : ThemeMode.light,
 
       builder: (context, child) {
         return DevicePreview.appBuilder(

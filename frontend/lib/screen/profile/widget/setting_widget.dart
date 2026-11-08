@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/widget/dailog_select_language_widget.dart';
 import 'package:get/get.dart';
@@ -7,12 +6,14 @@ import 'package:get/get.dart';
 class SettingWidget extends StatelessWidget {
   SettingWidget({super.key});
 
-   final themeController = Get.put(ThemeController());
+  final themeController = Get.isRegistered<ThemeController>()
+      ? Get.find<ThemeController>()
+      : Get.put(ThemeController());
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: titleColor,
+      color: Theme.of(context).cardColor,
       margin: const EdgeInsets.only(bottom: 10),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -26,18 +27,20 @@ class SettingWidget extends StatelessWidget {
               ],
             ),
             Divider(),
-            // Obx(
-            //   () => cardInfo(
-            //     active: themeController.isDark.value,
-            //     icon: Icons.dark_mode_outlined,
-            //     title: "Dark Mode".tr,
-            //     onSwitch: (value) {
-            //       themeController.toggleTheme();
-            //     },
-            //   ),
-            // ),
+            Obx(
+              () => cardInfo(
+                context,
+                active: themeController.isDark.value,
+                icon: Icons.dark_mode_outlined,
+                title: "Dark Mode".tr,
+                onSwitch: (value) {
+                  themeController.toggleTheme();
+                },
+              ),
+            ),
             SizedBox(height: 5,),
             cardInfo(
+              context,
               icon: Icons.language_outlined,
               title: "Language".tr,
               onTap: () {
@@ -46,12 +49,6 @@ class SettingWidget extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: 5,),
-            cardInfo(
-              active: true,
-              icon: Icons.lock_outlined,
-              title: "Push Notifications".tr,
-            ),
           ],
         ),
       )
@@ -59,30 +56,32 @@ class SettingWidget extends StatelessWidget {
   }
 }
 
-Widget cardInfo({
+Widget cardInfo(
+  BuildContext context, {
   required IconData icon,
   required String title,
   bool? active,
   VoidCallback? onTap,
   Function(bool value)? onSwitch,
 }) {
+  final theme = Theme.of(context);
   return InkWell(
     onTap: onTap,
     child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(Get.context!).cardColor,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: theme.dividerColor,
         ),
       ),
       child: Row(
         children: [
           Icon(
             icon,
-            color: Theme.of(Get.context!).iconTheme.color,
+            color: theme.iconTheme.color,
           ),
 
           const SizedBox(width: 10),
@@ -91,7 +90,7 @@ Widget cardInfo({
             child: Text(
               title,
               style: TextStyle(
-                color: Theme.of(Get.context!).textTheme.bodyLarge?.color,
+                color: theme.textTheme.bodyLarge?.color,
                 fontWeight: FontWeight.w500,
               ),
             ),

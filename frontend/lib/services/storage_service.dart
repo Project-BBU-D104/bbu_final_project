@@ -41,7 +41,7 @@ class StorageService implements IStorageService {
   @override
   Future<void> writeStorage(StorageKey key, dynamic value) async {
     final vkey = key.toString().split('.').last; // Output: active
-    _box.write(vkey, value);
+    await _box.write(vkey, value);
   }
 
   ///method remove storage key

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/profile_controller.dart';
 import 'package:get/get.dart';
 
@@ -15,7 +14,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
       width: double.infinity,
       child: Card(
         margin: const EdgeInsets.only(bottom: 12),
-        color: titleColor,
+        color: Theme.of(context).cardColor,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
@@ -33,6 +32,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
               Text("Full Name".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
               Obx(() => cardInfo(
+                  context,
                   title: ctr.username.value,
                 ),
               ),
@@ -41,6 +41,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
               Text("Email Address".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
               Obx(()=> cardInfo(
+                  context,
                   title: ctr.email.value,
                 ),
               ),
@@ -54,6 +55,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
                           Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
                           SizedBox(height: 5,),
                           cardInfo(
+                            context,
                             title: ctr.phone.value,
                           ),
                         ],
@@ -68,23 +70,25 @@ class CardPersonalInfoWidget extends StatelessWidget {
   }
 }
 
-Widget cardInfo({
+Widget cardInfo(
+  BuildContext context, {
   required String title,
 }) {
+  final theme = Theme.of(context);
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: const Color(0xFFF8FAFC),
+      color: theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(12),
       border: Border.all(
-        color: Colors.grey.shade300,
+        color: theme.dividerColor,
       ),
     ),
     child: Text(
       title,
-      style: const TextStyle(
-        color: Colors.black87,
+      style: TextStyle(
+        color: theme.textTheme.bodyLarge?.color,
         fontWeight: FontWeight.w500,
       ),
     ),

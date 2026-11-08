@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 
 class AppBottomSheets {
   static Future<T?> show<T>(
@@ -10,7 +9,9 @@ class AppBottomSheets {
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: lightColor,
+    backgroundColor:
+        Theme.of(context).bottomSheetTheme.backgroundColor ??
+            Theme.of(context).cardColor,
     builder: (_) {
       return child;
     },
