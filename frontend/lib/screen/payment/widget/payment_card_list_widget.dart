@@ -3,10 +3,14 @@ import 'package:intl/intl.dart';
 
 class PaymentCardListWidget extends StatelessWidget {
   final Map<String, dynamic> payment;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const PaymentCardListWidget({
     super.key,
     required this.payment,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -92,7 +96,19 @@ class PaymentCardListWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                )
+                ),
+
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) {
+                    if (value == 'edit') onEdit?.call();
+                    if (value == 'delete') onDelete?.call();
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                  ],
+                ),
               ],
             ),
 

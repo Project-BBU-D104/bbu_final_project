@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/payment/widget/payment_form_widget.dart';
 
-class EditPaymentScreen extends StatelessWidget {
-  const EditPaymentScreen({super.key});
+class EditPaymentWidget extends StatelessWidget {
+  const EditPaymentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Center(child: Text("Edit Payment Screen")),
-    );
+    return PaymentFormWidget(isEditing: true);
   }
 }

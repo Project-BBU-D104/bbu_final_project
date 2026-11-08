@@ -65,9 +65,19 @@ class PaymentScreen extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: ctr.paymentList.length,
-                  itemBuilder: (context, index) => 
-                     PaymentCardListWidget(payment: ctr.paymentList[index],),
-                  );
+                  itemBuilder: (context, index) {
+                    final payment = ctr.paymentList[index];
+                    final paymentId = int.tryParse(payment['id'].toString());
+
+                    return PaymentCardListWidget(
+                      payment: payment,
+                      onEdit: () => ctr.editPayment(context, payment),
+                      onDelete: paymentId == null
+                          ? null
+                          : () => ctr.onDeletePayment(context, paymentId),
+                    );
+                  },
+                );
                   }
                 ),
               SizedBox(height: 70,)
@@ -77,8 +87,8 @@ class PaymentScreen extends StatelessWidget {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          // ctr.addRole(context);
+        onPressed: () {
+          ctr.addPayment(context);
         },
         child: const Icon(Icons.add),
       ),
