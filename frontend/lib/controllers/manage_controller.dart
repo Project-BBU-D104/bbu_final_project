@@ -12,6 +12,7 @@ class ManageController extends GetxController{
 
   static const Map<String, Set<String>> _routeRoles = {
     AppRoutes.supplier: {'stock manager'},
+    AppRoutes.customer: {'cashier'},
     AppRoutes.unit: {},
     AppRoutes.category: {'cashier', 'stock manager'},
     AppRoutes.product: {'cashier', 'stock manager'},
@@ -24,6 +25,7 @@ class ManageController extends GetxController{
     AppRoutes.purchasePayment: {'stock manager'},
     AppRoutes.saleList: {'cashier'},
     AppRoutes.sale: {'cashier'},
+    AppRoutes.salePayment: {'cashier'},
     AppRoutes.role: {},
     AppRoutes.user: {},
     AppRoutes.systemConfiguration: {},
@@ -84,12 +86,12 @@ class ManageController extends GetxController{
           "icon": Icons.warehouse_outlined,
           "route": AppRoutes.warehouse,
         },
-        // {
-        //   "title": "Warehouse Stock",
-        //   "subtitle": "Warehouse Stock",
-        //   "icon": Icons.warehouse_outlined,
-        //   "route": AppRoutes.warehouseStock,
-        // },
+        {
+          "title": "Warehouse Stock",
+          "subtitle": "Warehouse Stock",
+          "icon": Icons.warehouse_outlined,
+          "route": AppRoutes.warehouseStock,
+        },
         {
           "title": "Stock Adjustment",
           "subtitle": "Stock Adjustment",
@@ -143,12 +145,12 @@ class ManageController extends GetxController{
           "icon": Icons.point_of_sale_outlined,
           "route": AppRoutes.sale,
         },
-        // {
-        //   "title": "Sale Payment",
-        //   "subtitle": "Payments",
-        //   "icon": Icons.payments_outlined,
-        //   "route": AppRoutes.salePayment,
-        // },
+        {
+          "title": "Sale Payment",
+          "subtitle": "Payments",
+          "icon": Icons.payments_outlined,
+          "route": AppRoutes.salePayment,
+        },
       ]
     },
 
@@ -192,17 +194,17 @@ class ManageController extends GetxController{
         },
       ]
     },
-    // {
-    //   "title": "History Management",
-    //   "items": [
-    //     {
-    //       "title": "Audit Logs",
-    //       "subtitle": "Audit Logs",
-    //       "icon": Icons.history_outlined,
-    //       "route": AppRoutes.auditLogs,
-    //     },
-    //   ]
-    // },
+    {
+      "title": "History Management",
+      "items": [
+        {
+          "title": "Audit Logs",
+          "subtitle": "Audit Logs",
+          "icon": Icons.history_outlined,
+          "route": AppRoutes.auditLogs,
+        },
+      ]
+    },
   ];
 
   bool canAccessRoute(String route) {
