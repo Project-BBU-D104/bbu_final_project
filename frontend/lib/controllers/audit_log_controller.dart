@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:frontend/routes/app_routes.dart';
-import 'package:frontend/screen/audit_logs/widget/add_audit_log_widget.dart';
-import 'package:frontend/screen/audit_logs/widget/edit_audit_log_widget.dart';
 import 'package:frontend/services/main_service/audit_log_service.dart';
-import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
@@ -40,28 +36,10 @@ class AuditLogController extends GetxController{
     }
   }
 
-  void addAuditLog(BuildContext context){
-    AppBottomSheets.show(
-      context,
-      child: AddAuditLogWidget()
-    );
-  }
-
   void gotoAuditLogDetail(Map<String, dynamic> auditLog) {
     Get.toNamed(
       AppRoutes.auditLogDetail,
       arguments: auditLog,
     );
-  }
-
-  void onEditAuditLog(BuildContext context) {
-    AppBottomSheets.show(
-      context,
-      child: EditAuditLogWidget()
-    );
-  }
-
-  void onDeleteAuditLog(){
-    // print("Delete audit log");
   }
 }

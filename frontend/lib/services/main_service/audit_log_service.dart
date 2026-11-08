@@ -17,34 +17,4 @@ class AuditLogService {
       id.toString(),
     );
   }
-
-  /// CREATE Audit Log
-  Future<dynamic> createAuditLog(
-    Map<String, dynamic> data,
-  ) async {
-    return await _api.post(
-      endpoint,
-      data,
-    );
-  }
-
-  /// UPDATE Audit Log
-  Future<dynamic> updateAuditLog(
-    int id,
-    Map<String, dynamic> data,
-  ) async {
-    return await _api.put(
-      endpoint,
-      id.toString(),
-      data,
-    );
-  }
-
-  /// DELETE Audit Log
-  Future<dynamic> deleteAuditLog(int id) async {
-    return await _api.delete(
-      endpoint,
-      id.toString(),
-    );
-  }
 }

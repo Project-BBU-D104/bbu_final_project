@@ -70,13 +70,6 @@ class AuditLogsScreen extends StatelessWidget {
           ),
         )
       ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          ctr.addAuditLog(context);
-        }, 
-        child: const Icon(Icons.add)
-      ),
     );
   }
 }
