@@ -70,6 +70,20 @@ def delete_user(session: Session, user_id: int):
     }
 
 def update_profile(session: Session, current_user: User, profile: ProfileUpdate):
+    # `name` is the login identifier (auth_service matches on it), so a
+    # self-service rename must not take an account that already exists.
+    duplicate = session.exec(
+        select(User).where(
+            User.name == profile.name,
+            User.id != current_user.id,
+        )
+    ).first()
+    if duplicate is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Name is already in use",
+        )
+
     current_user.name = profile.name
     current_user.email = profile.email
     current_user.phone = profile.phone

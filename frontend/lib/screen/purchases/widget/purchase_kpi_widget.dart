@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:get/get.dart';
 
 class PurchaseKpiWidget extends StatelessWidget {
@@ -11,7 +10,7 @@ class PurchaseKpiWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
         margin: const EdgeInsets.only(bottom: 8),
-        color: titleColor,
+        color: Theme.of(context).cardColor,
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(

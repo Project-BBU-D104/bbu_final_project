@@ -307,6 +307,35 @@ void main() {
     await closeToasts(tester);
   });
 
+  testWidgets('edit ceiling uses the refreshed sale balance', (tester) async {
+    final paymentService = FakeSalePaymentService(
+      payments: [paymentFixture(amount: 40.0, saleDue: 60.0)],
+    );
+    final ctr = await pumpScreen(
+      tester,
+      paymentService: paymentService,
+      sales: [saleFixture(due: 10.0)],
+    );
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+
+    ctr.amountCtrl.text = '50.01';
+    await tester.pump();
+    await tapSave(tester, 'Update');
+    expect(paymentService.updateCalls, isEmpty);
+
+    ctr.amountCtrl.text = '50';
+    await tester.pump();
+    await tapSave(tester, 'Update');
+    expect(paymentService.updateCalls, hasLength(1));
+    expect(paymentService.updateCalls.single['data']['amount'], 50.0);
+
+    await closeToasts(tester);
+  });
+
   testWidgets('service failure keeps the sheet open and resets isSaving',
       (tester) async {
     final paymentService = FakeSalePaymentService()

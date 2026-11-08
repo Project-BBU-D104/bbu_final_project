@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 
 class CardKpiWidget extends StatelessWidget {
   final IconData icon;
@@ -12,7 +11,7 @@ class CardKpiWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: titleColor,
+      color: Theme.of(context).cardColor,
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(12.0),

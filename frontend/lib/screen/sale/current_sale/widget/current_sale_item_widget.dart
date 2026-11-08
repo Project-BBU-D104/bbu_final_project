@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 
 class CurrentSaleItemWidget extends StatelessWidget {
@@ -26,12 +25,13 @@ class CurrentSaleItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
-      color: titleColor,
+      color: theme.cardColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E5E5), width: 0.5),
+        side: BorderSide(color: theme.dividerColor, width: 0.5),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -43,7 +43,7 @@ class CurrentSaleItemWidget extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: imageUrl.isEmpty
@@ -68,10 +68,10 @@ class CurrentSaleItemWidget extends StatelessWidget {
                 children: [
                   Text(
                     productName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
 
@@ -108,10 +108,10 @@ class CurrentSaleItemWidget extends StatelessWidget {
               children: [
                 Text(
                   CurrencyFormatter.format(subtotal, currency),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
               ],

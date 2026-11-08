@@ -84,7 +84,10 @@ class PaymentController extends GetxController {
   double get maxAmount {
     if (isEditing) {
       final originalAmount = _toDouble(_originalPayment?['amount']);
-      final currentDue = _toDouble(_originalPayment?['sale']?['due_amount']);
+      final refreshedSale = selectedSale;
+      final currentDue = refreshedSale != null
+          ? _toDouble(refreshedSale['due_amount'])
+          : _toDouble(_originalPayment?['sale']?['due_amount']);
       return currentDue + originalAmount;
     }
     return _toDouble(selectedSale?['due_amount']);
@@ -135,6 +138,18 @@ class PaymentController extends GetxController {
         DateTime.tryParse(payment['payment_date']?.toString() ?? '')?.toLocal() ??
             DateTime.now();
 
+    // The ceiling comes from the latest balance; a stale list could allow an
+    // overpayment after another terminal records a payment.
+    try {
+      final resp = await saleService.getSales();
+      if (resp is List) {
+        saleList.value = List<Map<String, dynamic>>.from(resp);
+      }
+    } catch (_) {
+      // Keep the current list; maxAmount falls back to the nested sale.
+    }
+
+    if (!context.mounted) return;
     AppBottomSheets.show(context, child: EditPaymentWidget());
   }
 

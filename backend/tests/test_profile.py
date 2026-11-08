@@ -92,6 +92,43 @@ def test_self_update_changes_only_profile_fields(
     assert cleared_namespaces == ["users"]
 
 
+def test_self_update_rejects_a_name_used_by_another_account(
+    session, cashier, cleared_namespaces
+):
+    other = User(
+        name="Taken",
+        email="taken@example.com",
+        password=hash_password("secret123"),
+        role_id=cashier.role_id,
+        phone="",
+        photo="",
+        is_active=True,
+    )
+    session.add(other)
+    session.commit()
+
+    profile = ProfileUpdate(
+        name="Taken",
+        email="taken@example.com",
+        phone="",
+        photo="",
+    )
+    with pytest.raises(HTTPException) as error:
+        asyncio.run(
+            profile_routes.update_my_profile(
+                profile,
+                session=session,
+                current_user=cashier,
+            )
+        )
+
+    assert error.value.status_code == 409
+    stored = session.get(User, cashier.id)
+    session.refresh(stored)
+    assert stored.name == "Cashier"
+    assert cleared_namespaces == []
+
+
 def test_self_update_rejects_blank_name(session, cashier):
     # FastAPI maps this ValidationError to HTTP 422.
     with pytest.raises(ValidationError):

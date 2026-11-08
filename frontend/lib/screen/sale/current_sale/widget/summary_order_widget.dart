@@ -10,17 +10,20 @@ class SummaryOrderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelColor = darkColor.shade100;
-    final valueColor = darkColor;
+    final theme = Theme.of(context);
+    final labelColor =
+        theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurface;
+    final valueColor =
+        theme.textTheme.bodyLarge?.color ?? theme.colorScheme.onSurface;
     final greenColor = successColor;
-    final dividerColor = lightColor.shade600;
+    final dividerColor = theme.dividerColor;
 
     return Card(
-      color: Colors.white,
+      color: theme.cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+        side: BorderSide(color: theme.dividerColor, width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

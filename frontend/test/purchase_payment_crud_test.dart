@@ -327,6 +327,34 @@ void main() {
     await closeToasts(tester);
   });
 
+  testWidgets('edit ceiling uses the refreshed purchase balance',
+      (tester) async {
+    final harness = await pumpScreen(
+      tester,
+      payments: [
+        purchasePaymentFixture(amount: 40.0, status: 'completed'),
+      ],
+      purchases: [purchaseFixture(due: 10.0)],
+    );
+
+    await openEdit(tester);
+    harness.ctr.amountCtrl.text = '50.01';
+    await tester.pump();
+    await tapUpdate(tester);
+    expect(harness.paymentService.updateCalls, isEmpty);
+
+    harness.ctr.amountCtrl.text = '50';
+    await tester.pump();
+    await tapUpdate(tester);
+    expect(harness.paymentService.updateCalls, hasLength(1));
+    expect(
+      harness.paymentService.updateCalls.single['data']['amount'],
+      50.0,
+    );
+
+    await closeToasts(tester);
+  });
+
   testWidgets('update failure keeps the sheet open and resets isSaving',
       (tester) async {
     final harness = await pumpScreen(

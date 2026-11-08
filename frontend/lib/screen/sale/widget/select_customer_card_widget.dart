@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
@@ -12,8 +11,9 @@ class SelectCustomerCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
-      color: titleColor,
+      color: theme.cardColor,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => AppBottomSheets.show<void>(
@@ -27,7 +27,7 @@ class SelectCustomerCardWidget extends StatelessWidget {
             return Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.white,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   child: ClipOval(
                     child: AppCachedImage(
                       url: customer?['photo']?.toString(),
@@ -53,7 +53,10 @@ class SelectCustomerCardWidget extends StatelessWidget {
                       Text(
                         customer?['phone']?.toString() ??
                             'Please select a customer for this sale.',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.textTheme.bodySmall?.color,
+                        ),
                       ),
                     ],
                   ),
@@ -103,7 +106,8 @@ class _CustomerPicker extends StatelessWidget {
                         customer['id'];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: Colors.white,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.surfaceContainerHighest,
                         child: ClipOval(
                           child: AppCachedImage(
                             url: customer['photo']?.toString(),

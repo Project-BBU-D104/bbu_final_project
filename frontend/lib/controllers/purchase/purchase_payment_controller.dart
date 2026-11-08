@@ -132,7 +132,10 @@ class PurchasePaymentController extends GetxController {
   double get maxAmount {
     if (!isEditing) return selectedPurchaseDue;
 
-    final currentDue = _toDouble(_originalPayment?['purchase']?['due_amount']);
+    final refreshedPurchase = selectedPurchase;
+    final currentDue = refreshedPurchase != null
+        ? _toDouble(refreshedPurchase['due_amount'])
+        : _toDouble(_originalPayment?['purchase']?['due_amount']);
     final originalAmount = _toDouble(_originalPayment?['amount']);
     final originalStatus =
         _originalPayment?['status']?.toString().trim().toLowerCase();
