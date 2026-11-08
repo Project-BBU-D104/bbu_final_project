@@ -64,8 +64,18 @@ class PurchasePaymentScreen extends StatelessWidget {
                   //   bottom: 20
                   // ),
                   itemBuilder: (context, index) {
+                    final payment = ctr.purchasePaymentList[index];
+                    final paymentId = int.tryParse(payment['id'].toString());
+
                     return PurchasePaymentCardWidget(
-                      payment: ctr.purchasePaymentList[index],
+                      payment: payment,
+                      onEdit: () => ctr.editPurchasePayment(context, payment),
+                      onDelete: paymentId == null
+                          ? null
+                          : () => ctr.onDeletePurchasePayment(
+                                context,
+                                paymentId,
+                              ),
                     );
                   }
                 );

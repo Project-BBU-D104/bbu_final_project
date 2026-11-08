@@ -3,10 +3,14 @@ import 'package:intl/intl.dart';
 
 class PurchasePaymentCardWidget extends StatelessWidget {
   final Map<String, dynamic> payment;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const PurchasePaymentCardWidget({
     super.key,
     required this.payment,
+    this.onEdit,
+    this.onDelete,
   });
 
   String formatDate(String? date) {
@@ -116,6 +120,18 @@ class PurchasePaymentCardWidget extends StatelessWidget {
                           : Colors.orange,
                     ),
                   ),
+                ),
+
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) {
+                    if (value == 'edit') onEdit?.call();
+                    if (value == 'delete') onDelete?.call();
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                  ],
                 ),
               ],
             ),

@@ -255,19 +255,21 @@ class AddPurchasePaymentWidget extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 height: 45,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: successColor,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: ctr.isSaving.value
-                      ? null
-                      : () => ctr.onSavePurchasePayment(context),
-                  child: Text(
-                    ctr.isSaving.value ? "Saving...".tr : "Save".tr,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                child: Obx(
+                  () => ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: successColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: ctr.isSaving.value
+                        ? null
+                        : () => ctr.onSavePurchasePayment(context),
+                    child: Text(
+                      ctr.isSaving.value ? "Saving...".tr : "Save".tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
