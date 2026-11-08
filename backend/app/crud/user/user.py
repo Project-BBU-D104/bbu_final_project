@@ -1,9 +1,12 @@
+from datetime import datetime, timezone
+
+from fastapi import HTTPException
 from sqlmodel import Session, select
 from sqlalchemy.orm import joinedload
 from app.models.user import User
-from app.schemas.user.user import UserCreate
+from app.schemas.user.user import PasswordChange, ProfileUpdate, UserCreate
 
-from app.security import hash_password
+from app.security import hash_password, verify_password
 
 def create_user(session: Session, user: UserCreate):
     db_user = User(
@@ -65,3 +68,30 @@ def delete_user(session: Session, user_id: int):
         "message": "User deleted successfully.",
         "user": user
     }
+
+def update_profile(session: Session, current_user: User, profile: ProfileUpdate):
+    current_user.name = profile.name
+    current_user.email = profile.email
+    current_user.phone = profile.phone
+    current_user.photo = profile.photo
+    current_user.updated_at = datetime.now(timezone.utc)
+
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+    return current_user
+
+def change_password(session: Session, current_user: User, passwords: PasswordChange):
+    if not verify_password(passwords.current_password, current_user.password):
+        raise HTTPException(
+            status_code=400,
+            detail="Current password is incorrect",
+        )
+
+    current_user.password = hash_password(passwords.new_password)
+    current_user.updated_at = datetime.now(timezone.utc)
+
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+    return {"message": "Password changed successfully."}

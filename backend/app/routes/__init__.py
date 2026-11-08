@@ -15,6 +15,7 @@ from .sale.sale import router as sale_router
 from .sale.sale_payment import router as sale_payment_router
 from .telegram.telegram_router import router as telegram_router
 from .auth.auth import router as auth_router
+from .profile.profile import router as profile_router
 
 from .currency.currency import router as currency_router
 from .payment_type.payment_type import router as payment_type_router
@@ -31,4 +32,4 @@ from .system_configuration.system_configuration import router as system_configur
 
 from .dashboard.dashboard import router as dashboard_router
 
-__all__ = ["users_router",category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router,warehouse_router,warehouse_stock_router,stock_adjustment_router, product_transfer_router,purchase_router, sale_router, sale_payment_router,telegram_router, auth_router, currency_router, payment_type_router, unit_router, purchase_requests_router, purchase_request_items_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router,product_category_router,system_configuration_router, dashboard_router]
+__all__ = ["users_router",category_router,product_router,supplier_router,customer_router,role_router,audit_logs_router,warehouse_router,warehouse_stock_router,stock_adjustment_router, product_transfer_router,purchase_router, sale_router, sale_payment_router,telegram_router, auth_router, profile_router, currency_router, payment_type_router, unit_router, purchase_requests_router, purchase_request_items_router, purchase_payments_router,product_transfer_item_router,recent_purchase_router,product_category_router,system_configuration_router, dashboard_router]
