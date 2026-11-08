@@ -21,7 +21,6 @@ import 'package:frontend/screen/category/category_screen.dart';
 import 'package:frontend/screen/currency/currency_screen.dart';
 import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
-import 'package:frontend/screen/payment/sale_with_payment/sale_with_payment_screen.dart';
 import 'package:frontend/screen/payment_type/payment_type_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/add_product_widget.dart';
@@ -163,10 +162,6 @@ class AppPages {
       page: () => EditProductWidget(productId: Get.arguments as int),
     ),
     GetPage(name: AppRoutes.currentSale, page: () => CurrentSaleWidget()),
-    GetPage(
-      name: AppRoutes.saleWithPayment,
-      page: () => SaleWithPaymentScreen(),
-    ),
     GetPage(name: AppRoutes.paymentSuccess, page: () => PaymentSuccessWidget()),
 
     GetPage(

@@ -13,14 +13,12 @@ class AppRoutes {
   static const supplier = '/supplier';
   static const supplierDetail = '/supplier-detail';
   static const customer = '/customer';
-  static const stockMovement = '/stock-movement';
   static const stockAdjustment = '/stock-adjustment';
   static const stockTransfer = '/stock-transfer';
 
   static const sale = '/sale';
   static const saleList = '/sale-list';
   static const salePayment = '/sale-payment';
-  static const saleWithPayment = '/sale-with-payment';
   static const role = '/role';
   static const user = '/user';
   static const warehouse = '/warehouse';
