@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/report_export_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class PaymentSuccessWidget extends StatefulWidget {
-  const PaymentSuccessWidget({super.key});
+  const PaymentSuccessWidget({super.key, this.exportController});
+
+  final ReportExportController? exportController;
 
   @override
   State<PaymentSuccessWidget> createState() => _PaymentSuccessWidgetState();
@@ -16,6 +20,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
   static const primaryBlue = Color(0xFF1479F2);
   static const darkNavy = Color(0xFF16215B);
   static const lightGrey = Color(0xFFF3F4F8);
+
+  late final ReportExportController _exportController =
+      widget.exportController ?? ReportExportController();
+  final RxBool _exporting = false.obs;
 
   late final AnimationController _badgeController;
   late final AnimationController _checkController;
@@ -318,33 +326,45 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                 width: double.infinity,
                 child: Column(
                   children: [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: primaryBlue,
-                          elevation: 0,
-                          side: const BorderSide(
-                            color: primaryBlue,
-                            width: 1.5,
+                    if (receipt.isNotEmpty) ...[
+                      Obx(() {
+                        final busy = _exporting.value;
+
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: busy
+                                ? null
+                                : () => _exportReceipt(
+                                    receipt,
+                                    currency,
+                                    paymentDate,
+                                  ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: primaryBlue,
+                              elevation: 0,
+                              side: const BorderSide(
+                                color: primaryBlue,
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
+                              ),
+                            ),
+                            child: Text(
+                              busy ? 'Exporting...' : 'Export Receipt',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                        ),
-                        child: const Text(
-                          'Export Receipt',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                        );
+                      }),
+                      const SizedBox(height: 10),
+                    ],
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -421,6 +441,58 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
         ),
       ],
     );
+  }
+
+  Future<void> _exportReceipt(
+    Map<String, dynamic> receipt,
+    Map<String, dynamic>? currency,
+    DateTime? paymentDate,
+  ) async {
+    if (_exporting.value) return;
+
+    _exporting.value = true;
+    try {
+      final transactionId = receipt['transaction_id']?.toString() ?? '';
+      final path = await _exportController.exportPdf(
+        title: 'Sale Receipt $transactionId'.trim(),
+        headers: const ['Field', 'Value'],
+        rows: _receiptRows(receipt, currency, paymentDate),
+        pageFormat: null,
+        summaryTotal: null,
+      );
+
+      if (!mounted) return;
+      if (path != null) {
+        ToastWidget.show(
+          message: 'PDF saved to:\n$path',
+          type: ToastType.success,
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+      ToastWidget.show(
+        title: 'Export Error',
+        message: error.toString(),
+        type: ToastType.error,
+      );
+    } finally {
+      _exporting.value = false;
+    }
+  }
+
+  List<List<dynamic>> _receiptRows(
+    Map<String, dynamic> receipt,
+    Map<String, dynamic>? currency,
+    DateTime? paymentDate,
+  ) {
+    return [
+      ['Customer', receipt['customer']?.toString() ?? '—'],
+      ['Payment Method', receipt['payment_method']?.toString() ?? '—'],
+      ['Date', DateFormatter.formatDateTime(paymentDate?.toLocal())],
+      ['Transaction ID', receipt['transaction_id']?.toString() ?? '—'],
+      ['Subtotal', _formatAmount(receipt['subtotal'], currency)],
+      ['Total', _formatAmount(receipt['total'], currency)],
+    ];
   }
 
   String _formatAmount(Object? value, Map<String, dynamic>? currency) {
