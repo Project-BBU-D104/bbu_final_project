@@ -11,10 +11,14 @@ import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
 
 class SupplierController extends GetxController {
+  SupplierController({SupplierService? service}) : service = service ?? SupplierService();
+  final loadError = ''.obs;
+  String _query = '';
+  Worker? _searchWorker;
 
   var isLoading = false.obs;
   final selectedTab = "All".obs;
-  final SupplierService service = SupplierService();
+  final SupplierService service;
   final suppliers = <SupplierModel>[].obs;
   final searchSuppliers = <SupplierModel>[].obs;
   final supplierNameController = TextEditingController();
@@ -38,25 +42,21 @@ class SupplierController extends GetxController {
   void onInit() {
     super.onInit();
 
-    if(_hasFreshCache) {
-      suppliers.value = List<SupplierModel>.from(_cache);
-      searchSuppliers.value = suppliers;
-    }else{
+    final searchController = Get.isRegistered<SearchController>()
+        ? Get.find<SearchController>() : Get.put(SearchController());
+    _query = searchController.keyword.value.trim().toLowerCase();
+    _searchWorker = ever(searchController.keyword, searchSupplier);
+    if (_hasFreshCache) {
+      suppliers.assignAll(_cache);
+      searchSupplier(_query);
+    } else {
       getSuppliers();
     }
-
-    final searchController = Get.put(SearchController());
-
-    ever(
-      searchController.keyword,
-      (keyword) {
-        searchSupplier(keyword);
-      },
-    );
   }
 
   @override
   void onClose() {
+    _searchWorker?.dispose();
     super.onClose();
     supplierNameController.dispose();
     supplierPhoneNumberController.dispose();
@@ -74,51 +74,31 @@ class SupplierController extends GetxController {
     status.value = true;
   }
 
-  void onRefresh(){
-    getSuppliers();
-  }
+  Future<void> onRefresh() => getSuppliers();
 
   Future<void> getSuppliers() async {
-    try{
-      isLoading.value = true;
+    if (isLoading.value || isClosed) return;
+    isLoading.value = true;
+    loadError.value = '';
+    try {
       final resp = await service.getSuppliers();
-
-      if(resp is List){
-        suppliers.value = resp
-            .map((item) => SupplierModel.fromJson(item))
-            .toList();
-
-        // Show all suppliers initially
-        searchSuppliers.value = suppliers;
-
-        _cache
-          ..clear()
-          ..addAll(suppliers);
-        _cachedAt = DateTime.now();
-      }
-    }catch(e){
-        ToastWidget.show(
-          message: e.toString(),
-          type: ToastType.error,
-        );
-    }
-    finally {
-      isLoading.value = false;
+      if (isClosed) return;
+      if (resp is! List) throw const FormatException('Expected supplier list');
+      final records = resp.map((item) => SupplierModel.fromJson(item)).toList();
+      suppliers.assignAll(records);
+      searchSupplier(_query);
+      _cache..clear()..addAll(records);
+      _cachedAt = DateTime.now();
+    } catch (_) {
+      if (!isClosed) loadError.value = 'Unable to load suppliers. Please try again.'.tr;
+    } finally {
+      if (!isClosed) isLoading.value = false;
     }
   }
 
-  // search supplier
-  void searchSupplier(String keyword){
-    final search = keyword.toLowerCase();
-
-    if(search.isEmpty){
-      searchSuppliers.value = suppliers;
-      return;
-    }
-
-    searchSuppliers.value = suppliers.where((supplier) {
-      return supplier.name.toLowerCase().contains(search);
-    }).toList();
+  void searchSupplier(String keyword) {
+    _query = keyword.trim().toLowerCase();
+    searchSuppliers.assignAll(suppliers.where((s) => s.name.toLowerCase().contains(_query)));
   }
 
   void gotoSupplierDetail(SupplierModel supplier){
