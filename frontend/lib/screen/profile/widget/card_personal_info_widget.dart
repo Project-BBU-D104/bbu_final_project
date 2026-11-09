@@ -1,69 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/profile_controller.dart';
-import 'package:frontend/widget/info_card_widget.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:get/get.dart';
 
 class CardPersonalInfoWidget extends StatelessWidget {
   CardPersonalInfoWidget({super.key});
-
-  final ctr = Get.find<ProfileController>(); 
-  
+  final ctr = Get.find<ProfileController>();
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        color: Theme.of(context).cardColor,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.person_outline_outlined),
-                  SizedBox(width: 10,),
-                  Text("Personal Info Widget".tr, style: TextStyle(fontWeight: FontWeight.bold),),
-                ],
+  Widget build(BuildContext context) => HomeSectionCard(
+    title: 'Personal information',
+    child: Obx(() {
+      final details = [
+        (label: 'Full Name', value: ctr.username.value),
+        (label: 'Email Address', value: ctr.email.value),
+        if (ctr.phone.value.isNotEmpty)
+          (label: 'Phone Number', value: ctr.phone.value),
+      ];
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < details.length; i++) ...[
+            if (i > 0) const Divider(height: 32),
+            Text(
+              details[i].label.tr,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-              Divider(),
-              
-              Text("Full Name".tr, style: TextStyle(fontWeight: FontWeight.w600),),
-              SizedBox(height: 5,),
-              Obx(() => InfoCardWidget(
-                  title: ctr.username.value,
-                ),
-              ),
-              SizedBox(height: 10,),
-
-              Text("Email Address".tr, style: TextStyle(fontWeight: FontWeight.w600),),
-              SizedBox(height: 5,),
-              Obx(()=> InfoCardWidget(
-                  title: ctr.email.value,
-                ),
-              ),
-              
-              Obx(
-                () => ctr.phone.value.isNotEmpty
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 10,),
-                          Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
-                          SizedBox(height: 5,),
-                          InfoCardWidget(
-                            title: ctr.phone.value,
-                          ),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
+            const SizedBox(height: 8),
+            SelectableText(
+              details[i].value,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ],
+      );
+    }),
+  );
 }

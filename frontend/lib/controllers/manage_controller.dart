@@ -4,9 +4,9 @@ import 'package:frontend/global.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
-class ManageController extends GetxController{
-
-  final searchCtr = Get.put(SearchFeatureController());
+class ManageController extends GetxController {
+  final searchCtr = Get.put(SearchFeatureController(), tag: 'manage-search');
+  late final Worker _searchWorker;
   final RxList<Map<String, dynamic>> filteredSections =
       <Map<String, dynamic>>[].obs;
 
@@ -33,7 +33,6 @@ class ManageController extends GetxController{
     AppRoutes.paymentType: {},
   };
 
-
   final List<Map<String, dynamic>> sections = [
     {
       "title": "Supplier Management",
@@ -50,7 +49,7 @@ class ManageController extends GetxController{
           "icon": Icons.people_outline,
           "route": AppRoutes.customer,
         },
-      ]
+      ],
     },
 
     {
@@ -73,8 +72,8 @@ class ManageController extends GetxController{
           "subtitle": "Product Management",
           "icon": Icons.inventory_2_outlined,
           "route": AppRoutes.product,
-        }
-      ]
+        },
+      ],
     },
 
     {
@@ -104,7 +103,7 @@ class ManageController extends GetxController{
           "icon": Icons.compare_arrows,
           "route": AppRoutes.stockTransfer,
         },
-      ]
+      ],
     },
     {
       "title": "Purchase Management",
@@ -126,8 +125,8 @@ class ManageController extends GetxController{
           "subtitle": "Purchase Payment Management",
           "icon": Icons.shopping_cart_outlined,
           "route": AppRoutes.purchasePayment,
-        }
-      ]
+        },
+      ],
     },
 
     {
@@ -151,7 +150,7 @@ class ManageController extends GetxController{
           "icon": Icons.payments_outlined,
           "route": AppRoutes.salePayment,
         },
-      ]
+      ],
     },
 
     {
@@ -169,7 +168,7 @@ class ManageController extends GetxController{
           "icon": Icons.person_outline,
           "route": AppRoutes.user,
         },
-      ]
+      ],
     },
     {
       "title": "Configuration Management",
@@ -192,7 +191,7 @@ class ManageController extends GetxController{
           "icon": Icons.payment_sharp,
           "route": AppRoutes.paymentType,
         },
-      ]
+      ],
     },
     {
       "title": "History Management",
@@ -203,7 +202,7 @@ class ManageController extends GetxController{
           "icon": Icons.history_outlined,
           "route": AppRoutes.auditLogs,
         },
-      ]
+      ],
     },
   ];
 
@@ -228,15 +227,22 @@ class ManageController extends GetxController{
         .toList();
   }
 
-   @override
+  @override
   void onInit() {
     super.onInit();
 
     filteredSections.assignAll(accessibleSections);
 
-    ever(searchCtr.keyword, (_) {
+    _searchWorker = ever(searchCtr.keyword, (_) {
       _filter();
     });
+  }
+
+  @override
+  void onClose() {
+    _searchWorker.dispose();
+    Get.delete<SearchFeatureController>(tag: 'manage-search');
+    super.onClose();
   }
 
   void _filter() {
@@ -249,25 +255,16 @@ class ManageController extends GetxController{
 
     final result = accessibleSections
         .map((section) {
-          final items = (section["items"] as List)
-              .where((item) {
-                return item["title"]
-                        .toString()
-                        .toLowerCase()
-                        .contains(keyword) ||
-                    item["subtitle"]
-                        .toString()
-                        .toLowerCase()
-                        .contains(keyword);
-              })
-              .toList();
+          final items = (section["items"] as List).where((item) {
+            return item["title"].toString().tr.toLowerCase().contains(
+                  keyword,
+                ) ||
+                item["subtitle"].toString().tr.toLowerCase().contains(keyword);
+          }).toList();
 
           if (items.isEmpty) return null;
 
-          return {
-            "title": section["title"],
-            "items": items,
-          };
+          return {"title": section["title"], "items": items};
         })
         .whereType<Map<String, dynamic>>()
         .toList();

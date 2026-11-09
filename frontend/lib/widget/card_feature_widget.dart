@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:get/get.dart';
 
 class CardFeatureWidget extends StatelessWidget {
-  final String title;
-  final String? subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
-
   const CardFeatureWidget({
     super.key,
     required this.title,
@@ -15,57 +9,73 @@ class CardFeatureWidget extends StatelessWidget {
     required this.icon,
     required this.onTap,
   });
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: titleColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 8,
-              color: Colors.black12,
-              offset: const Offset(0, 3),
-            )
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-
-            Icon(icon, size: 28),
-
-            const SizedBox(height: 8),
-
-            Text(
-              title.tr,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: colors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.dividerColor),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: colors.primary, size: 24),
+                ),
               ),
-            ),
-
-            const SizedBox(height: 4),
-
-            if(subtitle != null && subtitle!.isNotEmpty)
-            Text(
-              subtitle?.tr ?? '',
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.grey,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title.tr,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (subtitle != null &&
+                        subtitle!.isNotEmpty &&
+                        subtitle != title) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle!.tr,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 20,
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

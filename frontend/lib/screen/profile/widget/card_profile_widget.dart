@@ -1,88 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/profile_controller.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:get/get.dart';
 
 class CardProfileWidget extends StatelessWidget {
-
   CardProfileWidget({super.key});
-    final ctr = Get.find<ProfileController>(); 
+  final ctr = Get.find<ProfileController>();
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Card(  
-        margin: const EdgeInsets.only(bottom: 10),
-        color: Theme.of(context).cardColor,
-        child: SizedBox(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                Obx(
-                  () => CircleAvatar(
-                    radius: 40,
-                    backgroundImage: ctr.photo.value.isNotEmpty
-                        ? NetworkImage(ctr.photo.value)
-                        : null,
-                    onBackgroundImageError:
-                        ctr.photo.value.isNotEmpty ? (_, _) {} : null,
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return HomeSectionCard(
+      child: Obx(
+        () => Column(
+          children: [
+            ExcludeSemantics(
+              child: ClipOval(
+                child: SizedBox(
+                  width: 88,
+                  height: 88,
+                  child: ColoredBox(
+                    color: colors.primary.withValues(alpha: 0.1),
                     child: ctr.photo.value.isEmpty
-                        ? const Icon(Icons.person, size: 40)
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 5,),
-                Obx(()=> Text(
-                    ctr.username.value,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 23,   
-                    ),
-                  ),
-                ),
-                // Text(ctr.role.value, style: TextStyle(
-                //     fontWeight: FontWeight.w500,
-                //     fontSize: 20,   
-                //   ),),
-
-                Obx(
-                  () => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.admin_panel_settings_rounded,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          ctr.role.value,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
+                        ? Icon(
+                            Icons.person_outline,
+                            size: 40,
+                            color: colors.primary,
+                          )
+                        : Image.network(
+                            ctr.photo.value,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Icon(
+                              Icons.person_outline,
+                              size: 40,
+                              color: colors.primary,
+                            ),
+                            frameBuilder: (_, child, frame, synchronous) =>
+                                synchronous || frame != null
+                                ? child
+                                : Icon(
+                                    Icons.person_outline,
+                                    size: 40,
+                                    color: colors.primary,
+                                  ),
                           ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        )
+            const SizedBox(height: 20),
+            Text(
+              ctr.username.value,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                ctr.role.value.tr,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colors.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

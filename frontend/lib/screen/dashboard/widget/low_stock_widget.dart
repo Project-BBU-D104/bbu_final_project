@@ -1,123 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class LowStockWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-
   const LowStockWidget({super.key, required this.products});
-
-  static double _toDouble(dynamic value) {
-    return double.tryParse(value?.toString() ?? '') ?? 0;
-  }
+  final List<Map<String, dynamic>> products;
 
   @override
   Widget build(BuildContext context) {
-
-    return Card(
-      color: Colors.white,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Label
-            const Padding(
-              padding: EdgeInsets.only(
-                left: 16,
-                top: 16,
-                right: 16,
-              ),
+    final theme = Theme.of(context);
+    return HomeSectionCard(
+      title: 'Low Stock Products',
+      child: products.isEmpty
+          ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
               child: Text(
-                'Low Stock Products',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                'No low stock products'.tr,
+                textAlign: TextAlign.center,
               ),
-            ),
-
-            const SizedBox(height: 12),
-
-            if (products.isEmpty)
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Text('No low stock products'),
-              )
-            else
-              // DataTable
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
+            )
+          : Column(
+              children: [
+                for (var i = 0; i < products.length; i++) ...[
+                  if (i > 0) const Divider(height: 32),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: theme.colorScheme.error,
                       ),
-                      child: DataTable(
-                        columnSpacing: 30,
-                        headingRowColor: WidgetStateProperty.all(
-                          Colors.grey.shade100,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              products[i]['product_name']?.toString() ?? '-',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${'ID'.tr}: ${products[i]['id'] ?? '-'}',
+                              style: theme.textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${'Stock'.tr}: ${NumberFormat.decimalPattern().format(num.tryParse(products[i]['stock_quantity']?.toString() ?? '') ?? 0)}',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'ID',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Product',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          
-                          DataColumn(
-                            label: Text(
-                              'Stock',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                        rows: products.map((product) {
-                          final stock = _toDouble(product['stock_quantity']);
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Text(product['id']?.toString() ?? '-'),
-                              ),
-                              DataCell(
-                                Text(product['product_name']?.toString() ?? '-'),
-                              ),
-                               
-                              DataCell(
-                                Text(
-                                  stock.toStringAsFixed(0),
-                                  style: TextStyle(
-                                    color:
-                                        stock < 10 ? Colors.red : Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
                       ),
-                    ),
-                  );
-                },
-              ),
-          ],
-        ),
-      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }

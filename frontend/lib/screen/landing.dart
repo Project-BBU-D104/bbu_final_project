@@ -31,12 +31,15 @@ class LandingScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    'InventoryFlow',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colors.onSurface,
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      'InventoryFlow',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colors.onSurface,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -69,25 +72,31 @@ class LandingScreen extends StatelessWidget {
                               ),
                             ],
                           )
-                        : Column(
-                            children: [
-                              SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  semanticsLabel: 'Opening your workspace…'.tr,
+                        : Semantics(
+                            liveRegion: true,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    semanticsLabel:
+                                        'Opening your workspace…'.tr,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Opening your workspace…'.tr,
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: colors.onSurfaceVariant,
+                                const SizedBox(height: 16),
+                                ExcludeSemantics(
+                                  child: Text(
+                                    'Opening your workspace…'.tr,
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                   ),
                 ],

@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/login_controller.dart';
 import 'package:frontend/controllers/landing_controller.dart';
+import 'package:frontend/controllers/language_controller.dart';
+import 'package:frontend/controllers/theme_controller.dart';
+import 'package:frontend/constants/enum.dart';
 import 'package:frontend/screen/landing.dart';
 import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/screen/auth/login_screen.dart';
@@ -61,6 +65,34 @@ class StartupStorage extends FakeStorageService {
   }
 }
 
+class AuthPreferencesStorage extends FakeStorageService {
+  final preferences = <StorageKey, dynamic>{};
+  @override
+  T? readStorage<T>(StorageKey key) => preferences[key] as T?;
+  @override
+  Future<void> writeStorage(StorageKey key, dynamic value) async {
+    preferences[key] = value;
+  }
+}
+
+class AuthLanguage extends GetxController implements LanguageController {
+  @override
+  final locale = const Locale('en', 'US').obs;
+  @override
+  String get fontFamily =>
+      locale.value.languageCode == 'km' ? 'NotoSansKhmer' : 'NotoSans';
+  @override
+  void changeLanguage(String code) {
+    locale.value = code == 'km'
+        ? const Locale('km', 'KH')
+        : const Locale('en', 'US');
+    Get.updateLocale(locale.value);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   setUpAll(() async {
     for (final family in ['NotoSans', 'NotoSansKhmer']) {
@@ -71,12 +103,14 @@ void main() {
   });
   late FakeAuth auth;
   late LoginController controller;
-  late FakeStorageService storage;
+  late AuthPreferencesStorage storage;
   setUp(() {
     Get.testMode = true;
     auth = FakeAuth();
-    storage = FakeStorageService();
+    storage = AuthPreferencesStorage();
     controller = LoginController(authService: auth, sessionStorage: storage);
+    Get.put<LanguageController>(AuthLanguage());
+    Get.put(ThemeController(storageService: storage));
   });
   tearDown(() {
     Get.reset();
@@ -90,24 +124,35 @@ void main() {
   }) async {
     Get.put(controller);
     await tester.pumpWidget(
-      GetMaterialApp(
-        translations: AppTranslation(),
-        locale: locale ?? const Locale('en', 'US'),
-        theme: theme ?? AppTheme.light(),
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.linear(scale)),
-          child: child!,
-        ),
-        home: LoginScreen(),
-        getPages: [
-          GetPage(
-            name: '/home',
-            page: () => const Scaffold(body: Text('Workspace')),
+      Obx(() {
+        final language = Get.find<LanguageController>();
+        final activeLocale = language.locale.value;
+        final dark = Get.find<ThemeController>().isDark.value;
+        return GetMaterialApp(
+          translations: AppTranslation(),
+          locale: locale ?? activeLocale,
+          theme: theme ?? AppTheme.light(fontFamily: language.fontFamily),
+          darkTheme: AppTheme.dark(fontFamily: language.fontFamily),
+          themeMode: theme != null
+              ? ThemeMode.light
+              : dark
+              ? ThemeMode.dark
+              : ThemeMode.light,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(scale)),
+            child: child!,
           ),
-        ],
-      ),
+          home: LoginScreen(),
+          getPages: [
+            GetPage(
+              name: '/home',
+              page: () => const Scaffold(body: Text('Workspace')),
+            ),
+          ],
+        );
+      }),
     );
     await tester.pump();
   }
@@ -167,6 +212,12 @@ void main() {
       expect(
         tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
         isNull,
+      );
+      expect(
+        tester
+            .widgetList<TextFormField>(find.byType(TextFormField))
+            .every((field) => field.enabled == false),
+        isTrue,
       );
       auth.gate!.complete({
         'access_token': 'token',
@@ -342,6 +393,211 @@ void main() {
     expect(find.text('Login destination'), findsOneWidget);
     await tester.pump(const Duration(seconds: 2));
   });
+
+  testWidgets(
+    'theme preference works before sign-in without losing credentials',
+    (tester) async {
+      await showLogin(tester);
+      controller.usernameController.text = 'staff';
+      controller.passwordController.text = ' secret ';
+      await tester.tap(find.byTooltip('Switch to dark mode'));
+      await tester.pumpAndSettle();
+      expect(
+        Theme.of(tester.element(find.byType(LoginScreen))).brightness,
+        Brightness.dark,
+      );
+      expect(storage.preferences[StorageKey.darkMode], isTrue);
+      expect(controller.usernameController.text, 'staff');
+      expect(controller.passwordController.text, ' secret ');
+      await tester.tap(find.byTooltip('Switch to light mode'));
+      await tester.pumpAndSettle();
+      expect(storage.preferences[StorageKey.darkMode], isFalse);
+      expect(auth.calls, 0);
+    },
+  );
+
+  testWidgets('language can change before sign-in without losing credentials', (
+    tester,
+  ) async {
+    await showLogin(tester);
+    controller.usernameController.text = 'staff';
+    controller.passwordController.text = ' secret ';
+    await tester.tap(find.text('Language'));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(find.text('ខ្មែរ'));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    await tester.pumpAndSettle();
+    expect(Get.locale?.languageCode, 'km');
+    expect(find.text('ភ្លេចពាក្យសម្ងាត់?'), findsOneWidget);
+    expect(controller.usernameController.text, 'staff');
+    expect(controller.passwordController.text, ' secret ');
+    expect(auth.calls, 0);
+  });
+
+  testWidgets('password recovery explains the supported administrator flow', (
+    tester,
+  ) async {
+    await showLogin(tester);
+    await tester.ensureVisible(find.text('Forgot password?'));
+    await tester.tap(find.text('Forgot password?'));
+    await tester.pumpAndSettle();
+    expect(find.text('Password recovery'), findsOneWidget);
+    expect(
+      find.text(
+        'Contact your administrator to reset your password in User Management.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Close'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(auth.calls, 0);
+  });
+
+  testWidgets(
+    'autofill hints and keyboard submit commit credentials only on success',
+    (tester) async {
+      await showLogin(tester);
+      await tester.ensureVisible(find.byType(TextFormField).first);
+      await tester.tap(find.byType(TextFormField).first);
+      await tester.pump();
+      final usernameAutofill =
+          tester.testTextInput.setClientArgs!['autofill'] as Map;
+      expect(usernameAutofill['hints'], contains(AutofillHints.username));
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(text: 'saved_user'),
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.next);
+      await tester.pump();
+      expect(controller.passwordFocus.hasFocus, isTrue);
+      final passwordConfig = tester.testTextInput.setClientArgs!;
+      expect(
+        (passwordConfig['autofill'] as Map)['hints'],
+        contains(AutofillHints.password),
+      );
+      expect(passwordConfig['obscureText'], isTrue);
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(text: ' saved_password '),
+      );
+      auth.failure = ApiException(401, 'private');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(auth.calls, 1);
+      expect(auth.password, ' saved_password ');
+      expect(
+        tester.testTextInput.log.where(
+          (call) =>
+              call.method == 'TextInput.finishAutofillContext' &&
+              call.arguments == true,
+        ),
+        isEmpty,
+      );
+      expect(controller.passwordController.text, ' saved_password ');
+      auth.failure = null;
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Workspace'), findsOneWidget);
+      expect(
+        tester.testTextInput.log.where(
+          (call) =>
+              call.method == 'TextInput.finishAutofillContext' &&
+              call.arguments == true,
+        ),
+        hasLength(1),
+      );
+    },
+  );
+
+  testWidgets('password accepts paste without altering whitespace', (
+    tester,
+  ) async {
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.getData') {
+          return {'text': ' pasted secret '};
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+    await showLogin(tester);
+    await tester.ensureVisible(find.byType(TextFormField).last);
+    await tester.tap(find.byType(TextFormField).last);
+    await tester.pump();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyV);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pump();
+    expect(controller.passwordController.text, ' pasted secret ');
+    expect(auth.calls, 0);
+  });
+
+  testWidgets('keyboard traversal operates password visibility and recovery', (
+    tester,
+  ) async {
+    await showLogin(tester);
+    await tester.ensureVisible(find.byType(TextFormField).last);
+    await tester.tap(find.byType(TextFormField).last);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+    expect(controller.obscurePassword.value, isFalse);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(auth.calls, 0);
+  });
+
+  for (final dark in [false, true]) {
+    testWidgets(
+      'auth controls have accessible names and touch targets in ${dark ? 'dark' : 'light'} mode',
+      (tester) async {
+        tester.view.physicalSize = const Size(1440, 1100);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final semantics = tester.ensureSemantics();
+        await showLogin(
+          tester,
+          theme: dark ? AppTheme.dark() : AppTheme.light(),
+        );
+        await tester.pumpAndSettle();
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        final visibility = tester
+            .getSemantics(find.byTooltip('Show password'))
+            .getSemanticsData();
+        expect(visibility.tooltip, 'Show password');
+        expect(visibility.flagsCollection.isButton, isTrue);
+        expect(visibility.flagsCollection.isSelected, ui.Tristate.isFalse);
+        expect(
+          tester
+              .getSemantics(find.text('Welcome back'))
+              .getSemanticsData()
+              .flagsCollection
+              .isHeader,
+          isTrue,
+        );
+        expect(find.bySemanticsLabel('Forgot password?'), findsOneWidget);
+        expect(find.bySemanticsLabel('Language'), findsOneWidget);
+        semantics.dispose();
+      },
+    );
+  }
 
   test('auth semantic colors meet normal-text contrast in both themes', () {
     for (final theme in [AppTheme.light(), AppTheme.dark()]) {

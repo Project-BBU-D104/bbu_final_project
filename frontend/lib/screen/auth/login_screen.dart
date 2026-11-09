@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/login_controller.dart';
+import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/screen/auth/widget/input_login_widget.dart';
+import 'package:frontend/widget/dailog_select_language_widget.dart';
 import 'package:get/get.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -46,6 +48,8 @@ class LoginScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const _AuthPreferences(),
+                      const SizedBox(height: 24),
                       if (!wide) ...[
                         const _BrandIdentity(),
                         const SizedBox(height: 32),
@@ -81,6 +85,47 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
+class _AuthPreferences extends StatelessWidget {
+  const _AuthPreferences();
+
+  @override
+  Widget build(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Wrap(
+        spacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: () => Get.dialog(const DialogSelectLanguageWidget()),
+            icon: const Icon(Icons.language_outlined),
+            label: Text('Language'.tr),
+            style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+          ),
+          Obx(
+            () => IconButton(
+              onPressed: themeController.toggleTheme,
+              tooltip:
+                  (themeController.isDark.value
+                          ? 'Switch to light mode'
+                          : 'Switch to dark mode')
+                      .tr,
+              isSelected: themeController.isDark.value,
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              icon: Icon(
+                themeController.isDark.value
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LoginForm extends StatelessWidget {
   const _LoginForm({required this.controller, required this.formKey});
   final LoginController controller;
@@ -109,13 +154,16 @@ class _LoginForm extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Welcome back'.tr,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontSize: 28,
-                height: 34 / 28,
-                fontWeight: FontWeight.w700,
-                color: colors.onSurface,
+            Semantics(
+              header: true,
+              child: Text(
+                'Welcome back'.tr,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontSize: 28,
+                  height: 34 / 28,
+                  fontWeight: FontWeight.w700,
+                  color: colors.onSurface,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -129,6 +177,7 @@ class _LoginForm extends StatelessWidget {
             Obx(
               () => InputLoginWidget(
                 controller: controller.usernameController,
+                enabled: !controller.isLoading.value,
                 focusNode: controller.usernameFocus,
                 label: 'Username'.tr,
                 hint: 'Enter your username'.tr,
@@ -148,6 +197,8 @@ class _LoginForm extends StatelessWidget {
             Obx(
               () => InputLoginWidget(
                 controller: controller.passwordController,
+                enabled: !controller.isLoading.value,
+                keyboardType: TextInputType.visiblePassword,
                 focusNode: controller.passwordFocus,
                 label: 'Password'.tr,
                 hint: 'Enter your password'.tr,
@@ -162,6 +213,36 @@ class _LoginForm extends StatelessWidget {
                 validator: (value) =>
                     (value ?? '').isEmpty ? 'Enter your password'.tr : null,
                 onSubmitted: (_) => _submit(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Obx(
+                () => TextButton(
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () => showDialog<void>(
+                          context: context,
+                          builder: (dialogContext) => AlertDialog(
+                            scrollable: true,
+                            title: Text('Password recovery'.tr),
+                            content: Text(
+                              'Contact your administrator to reset your password in User Management.'
+                                  .tr,
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(),
+                                child: Text('Close'.tr),
+                              ),
+                            ],
+                          ),
+                        ),
+                  style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                  child: Text('Forgot password?'.tr),
+                ),
               ),
             ),
             Obx(
@@ -228,9 +309,11 @@ class _LoginForm extends StatelessWidget {
                         SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: colors.onSurface,
+                          child: ExcludeSemantics(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colors.onSurface,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),

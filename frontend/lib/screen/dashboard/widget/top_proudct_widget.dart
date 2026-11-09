@@ -1,119 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class TopProudctWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-
   const TopProudctWidget({super.key, required this.products});
-
-  static double _toDouble(dynamic value) {
-    return double.tryParse(value?.toString() ?? '') ?? 0;
-  }
+  final List<Map<String, dynamic>> products;
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat money = NumberFormat('#,##0.00');
-
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        elevation: 0,
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Label
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                'Top Products',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            if (products.isEmpty)
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Text('No sales yet'),
-              )
-            else
-              // Table
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
-                      ),
-                      child: DataTable(
-                        columnSpacing: 30,
-                        headingRowColor: WidgetStateProperty.all(
-                          Colors.grey.shade100,
+    final theme = Theme.of(context);
+    final money = NumberFormat('#,##0.00');
+    return HomeSectionCard(
+      title: 'Top Products',
+      child: products.isEmpty
+          ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Text('No sales yet'.tr, textAlign: TextAlign.center),
+            )
+          : Column(
+              children: [
+                for (var i = 0; i < products.length; i++) ...[
+                  if (i > 0) const Divider(height: 32),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.12,
                         ),
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'ID',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Product',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Sold',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Revenue',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                        rows: products.map((product) {
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Text(product['product_id']?.toString() ?? '-'),
-                              ),
-                              DataCell(
-                                Text(
-                                  product['product_name']?.toString() ?? '-',
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  _toDouble(
-                                    product['total_sold'],
-                                  ).toStringAsFixed(0),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  '\$${money.format(_toDouble(product['total_revenue']))}',
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
+                        child: Text(
+                          '${i + 1}',
+                          style: TextStyle(color: theme.colorScheme.primary),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-          ],
-        ),
-      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              products[i]['product_name']?.toString() ?? '-',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 16,
+                              runSpacing: 8,
+                              children: [
+                                Text(
+                                  '${'Sold'.tr}: ${products[i]['total_sold'] ?? 0}',
+                                ),
+                                Text(
+                                  '${'Revenue'.tr}: ${money.format(num.tryParse(products[i]['total_revenue']?.toString() ?? '') ?? 0)}',
+                                ),
+                                Text(
+                                  '${'ID'.tr}: ${products[i]['product_id'] ?? '-'}',
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }

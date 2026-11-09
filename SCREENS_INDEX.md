@@ -6,27 +6,27 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 
 | Group | File | Number of screens | Short description |
 |---|---|---:|---|
-| Auth | [screen/SCREENS_AUTH.md](screen/SCREENS_AUTH.md) | 2 | Done: responsive startup and sign-in, interaction states, localization, and accessibility improvements. |
-| Home | [screen/SCREENS_HOME.md](screen/SCREENS_HOME.md) | 6 | Done: Home tab redesign and persistent desktop sidebar with logo and bottom Profile action. Other tab redesigns remain pending. |
-| Catalog | [screen/SCREENS_CATALOG.md](SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
-| Suppliers | [screen/SCREENS_SUPPLIERS.md](SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
-| Customers | [screen/SCREENS_CUSTOMERS.md](SCREENS_CUSTOMERS.md) | 4 | Customer list and CRUD forms, plus sale customer selection. |
-| Sales | [screen/SCREENS_SALES.md](SCREENS_SALES.md) | 6 | Sale creation, checkout, and sales history. |
-| Purchases | [screen/SCREENS_PURCHASES.md](SCREENS_PURCHASES.md) | 4 | Purchase list, details, and purchase forms. |
-| Purchase Requests | [screen/SCREENS_PURCHASE_REQUESTS.md](SCREENS_PURCHASE_REQUESTS.md) | 4 | Purchase request list and forms/details. |
-| Purchase Payments | [screen/SCREENS_PURCHASE_PAYMENTS.md](SCREENS_PURCHASE_PAYMENTS.md) | 4 | Purchase payment list, details, and forms. |
-| Stock | [screen/SCREENS_STOCK.md](SCREENS_STOCK.md) | 15 | Warehouses, warehouse stock, adjustments, and transfers. |
-| People & Access | [screen/SCREENS_PEOPLE.md](SCREENS_PEOPLE.md) | 7 | User and role management. |
-| Configuration | [screen/SCREENS_CONFIGURATION.md](SCREENS_CONFIGURATION.md) | 10 | Payment types, currencies, and system configuration. |
-| Audit | [screen/SCREENS_AUDIT.md](SCREENS_AUDIT.md) | 2 | Audit history and event detail. |
-| Reports | [screen/SCREENS_REPORTS.md](SCREENS_REPORTS.md) | 8 | Six report pages, PDF preview, and page-format dialog. |
-| Profile | [screen/SCREENS_PROFILE.md](SCREENS_PROFILE.md) | 2 | Account edit flows; the Profile tab is grouped under Home. |
+| Auth | [screen/SCREENS_AUTH.md](screen/SCREENS_AUTH.md) | 2 | Implementation complete: startup/sign-in, pre-sign-in preferences, recovery guidance, and browser autofill fixes. Manual device, screen-reader, and password-manager QA pending. |
+| Home | [screen/SCREENS_HOME.md](screen/SCREENS_HOME.md) | 6 | Done: all six screens redesigned—Home shell, Home content, Dashboard, Manage, Report index, and Profile. |
+| Catalog | [screen/SCREENS_CATALOG.md](screen/SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
+| Suppliers | [screen/SCREENS_SUPPLIERS.md](screen/SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
+| Customers | [screen/SCREENS_CUSTOMERS.md](screen/SCREENS_CUSTOMERS.md) | 4 | Customer list and CRUD forms, plus sale customer selection. |
+| Sales | [screen/SCREENS_SALES.md](screen/SCREENS_SALES.md) | 6 | Sale creation, checkout, and sales history. |
+| Purchases | [screen/SCREENS_PURCHASES.md](screen/SCREENS_PURCHASES.md) | 4 | Purchase list, details, and purchase forms. |
+| Purchase Requests | [screen/SCREENS_PURCHASE_REQUESTS.md](screen/SCREENS_PURCHASE_REQUESTS.md) | 4 | Purchase request list and forms/details. |
+| Purchase Payments | [screen/SCREENS_PURCHASE_PAYMENTS.md](screen/SCREENS_PURCHASE_PAYMENTS.md) | 4 | Purchase payment list, details, and forms. |
+| Stock | [screen/SCREENS_STOCK.md](screen/SCREENS_STOCK.md) | 15 | Warehouses, warehouse stock, adjustments, and transfers. |
+| People & Access | [screen/SCREENS_PEOPLE.md](screen/SCREENS_PEOPLE.md) | 7 | User and role management. |
+| Configuration | [screen/SCREENS_CONFIGURATION.md](screen/SCREENS_CONFIGURATION.md) | 10 | Payment types, currencies, and system configuration. |
+| Audit | [screen/SCREENS_AUDIT.md](screen/SCREENS_AUDIT.md) | 2 | Audit history and event detail. |
+| Reports | [screen/SCREENS_REPORTS.md](screen/SCREENS_REPORTS.md) | 8 | Six report pages, PDF preview, and page-format dialog. |
+| Profile | [screen/SCREENS_PROFILE.md](screen/SCREENS_PROFILE.md) | 2 | Account edit flows; the Profile tab is grouped under Home. |
 
 ## Redesign
 
-The Auth redesign is done. Startup and sign-in now include responsive layouts, accessible form feedback, safe error messages, localization, and automated validation. Physical-device, screen-reader, and password-manager checks remain pending.
+Auth implementation is complete. Startup and sign-in include responsive layouts, safe feedback, pre-sign-in language/theme controls, administrator password-recovery guidance, and corrected web autofill hints with accessibility enabled. All 180 Flutter tests, two web-autofill tests, targeted analysis, the standard web build, and headless Chrome checks passed. Physical-device, spoken screen-reader, and real password-manager save/retrieval checks remain pending; see the Auth inventory for the exact checklist.
 
-The Home tab and navigation shell redesign is done. It includes theme-aware surfaces, responsive shortcuts and recent-order cards, labeled navigation, and loading/error/retry states. The desktop sidebar persists across feature and detail routes, shows the app logo at the top, and pins Profile to the bottom. All 150 Flutter tests and the web build passed. Live-browser testing remains pending. Dashboard, Manage, Report, and Profile layouts remain separate work.
+The complete Home group redesign is done: Home shell, Home content, Dashboard, Manage, Report index, and Profile. All six screens use consistent responsive layouts and theme-aware surfaces. The desktop sidebar persists across feature and detail routes, with the logo at the top and Profile at the bottom. Dashboard includes redesigned KPIs, charts, and product lists; Manage and Report have independent searchable directories; Profile includes redesigned account, personal-information, and preferences panels. All 172 Flutter tests, targeted analysis, and the standard web build passed. Manual live-browser, physical-device, and screen-reader checks remain pending.
 
 ## Screens
 

@@ -14,6 +14,8 @@ class InputLoginWidget extends StatelessWidget {
   final TextInputAction? textInputAction;
   final Iterable<String>? autofillHints;
   final ValueChanged<String>? onSubmitted;
+  final bool enabled;
+  final TextInputType? keyboardType;
 
   const InputLoginWidget({
     super.key,
@@ -29,6 +31,8 @@ class InputLoginWidget extends StatelessWidget {
     this.textInputAction,
     this.autofillHints,
     this.onSubmitted,
+    this.enabled = true,
+    this.keyboardType,
   });
 
   @override
@@ -43,6 +47,8 @@ class InputLoginWidget extends StatelessWidget {
 
     return TextFormField(
       controller: controller,
+      enabled: enabled,
+      keyboardType: keyboardType,
       focusNode: focusNode,
       autovalidateMode: autovalidateMode,
       obscureText: obscureText,
@@ -71,6 +77,7 @@ class InputLoginWidget extends StatelessWidget {
                 constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 tooltip: obscureText ? 'Show password'.tr : 'Hide password'.tr,
                 onPressed: onTogglePassword,
+                isSelected: !obscureText,
                 icon: Icon(
                   obscureText
                       ? Icons.visibility_off_outlined

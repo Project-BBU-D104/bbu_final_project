@@ -1,34 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CardKpiWidget extends StatelessWidget {
+  const CardKpiWidget({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.value,
+    this.status,
+  });
   final IconData icon;
   final String title;
   final String value;
   final String? status;
 
-  const CardKpiWidget({super.key, required this.icon, required this.title, required this.value, this.status});
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
-      color: Theme.of(context).cardColor,
-      margin: const EdgeInsets.only(bottom: 12),
+      color: theme.cardColor,
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: theme.dividerColor),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon),
-                const SizedBox(width: 10,),
-                Text(status ?? "", style: const TextStyle(fontWeight: FontWeight.bold),),
-              ],
+            Icon(icon, color: theme.colorScheme.primary, size: 28),
+            const SizedBox(height: 24),
+            Text(
+              title.tr,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-            SizedBox(height: 15,),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold),),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (status != null) ...[
+              const SizedBox(height: 12),
+              Text(status!.tr, style: theme.textTheme.bodyMedium),
+            ],
           ],
         ),
       ),
