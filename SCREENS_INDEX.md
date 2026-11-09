@@ -6,7 +6,7 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 
 | Group | File | Number of screens | Short description |
 |---|---|---:|---|
-| Auth | [SCREENS_AUTH.md](SCREENS_AUTH.md) | 2 | Startup and sign-in. |
+| Auth | [SCREENS_AUTH.md](SCREENS_AUTH.md) | 2 | Startup and sign-in; proposed responsive auth redesign, interaction states, and accessibility criteria. |
 | Home | [SCREENS_HOME.md](SCREENS_HOME.md) | 6 | Main shell and its five tab pages. |
 | Catalog | [SCREENS_CATALOG.md](SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
 | Suppliers | [SCREENS_SUPPLIERS.md](SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
@@ -21,6 +21,10 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 | Audit | [SCREENS_AUDIT.md](SCREENS_AUDIT.md) | 2 | Audit history and event detail. |
 | Reports | [SCREENS_REPORTS.md](SCREENS_REPORTS.md) | 8 | Six report pages, PDF preview, and page-format dialog. |
 | Profile | [SCREENS_PROFILE.md](SCREENS_PROFILE.md) | 2 | Account edit flows; the Profile tab is grouped under Home. |
+
+## Redesign
+
+The proposes a focused, accessible startup and sign-in experience for InventoryFlow, using UI/UX Pro Max guidance adapted to the existing Flutter/GetX app. It covers mobile and desktop layouts, theme roles, validation, loading and failure states, localization, and implementation checks. This is a design specification; the current Flutter screens have not been changed.
 
 ## Screens
 

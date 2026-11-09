@@ -18,15 +18,21 @@ void main() {
               label: 'Username',
               hint: 'Enter username',
               icon: Icons.person_outline,
-              validator: (value) => (value ?? '').trim().isEmpty
-                  ? 'Username is required'
-                  : null,
+              validator: (value) =>
+                  (value ?? '').trim().isEmpty ? 'Username is required' : null,
             ),
           ),
         ),
       ),
     );
 
+    final semantics = tester.ensureSemantics();
+    expect(find.bySemanticsLabel(RegExp('Username')), findsWidgets);
+    semantics.dispose();
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).decoration?.labelText,
+      'Username',
+    );
     expect(find.text('Username'), findsOneWidget);
     expect(find.text('Username is required'), findsNothing);
 

@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/constants/enum.dart';
 import 'package:frontend/locator.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:frontend/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -99,6 +101,32 @@ void main() {
       ),
     );
     expect(handled, isFalse);
+  });
+
+  test('login preserves endpoint, payload and token persistence', () async {
+    SharedPreferences.setMockInitialValues({});
+    final api = ApiService(
+      baseUrl: 'http://localhost:8000',
+      client: MockClient((request) async {
+        expect(request.url.path, '/auth/login/');
+        expect(jsonDecode(request.body), {
+          'name': 'staff',
+          'password': ' pass ',
+        });
+        return http.Response(jsonEncode({'access_token': 'token'}), 200);
+      }),
+    );
+    await AuthService(api: api).login(name: 'staff', password: ' pass ');
+    expect((await SharedPreferences.getInstance()).getString('token'), 'token');
+  });
+
+  test('login rejects a successful response with no access token', () async {
+    await expectLater(
+      AuthService(
+        api: _apiReturning(200, '{}'),
+      ).login(name: 'staff', password: 'pass'),
+      throwsFormatException,
+    );
   });
 
   test('a successful response is decoded normally', () async {

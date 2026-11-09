@@ -18,7 +18,10 @@ class AppTheme {
     ),
 
     colorScheme: const ColorScheme.light(
-      primary: Color(0xff007bff),
+      primary: Color(0xff0064d2),
+      onPrimary: Colors.white,
+      primaryContainer: Color(0xff003e80),
+      onPrimaryContainer: Colors.white,
       secondary: Color(0xffffc107),
       surface: Colors.white,
     ),
@@ -41,7 +44,10 @@ class AppTheme {
     ),
 
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xff007bff),
+      primary: Color(0xff80b6ff),
+      onPrimary: Color(0xff002e69),
+      primaryContainer: Color(0xff003e80),
+      onPrimaryContainer: Colors.white,
       secondary: Color(0xffffc107),
       surface: Color(0xff1e1e1e),
     ),

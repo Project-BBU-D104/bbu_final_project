@@ -21,6 +21,16 @@ class UnauthorizedException implements Exception {
   String toString() => message;
 }
 
+class ApiException implements Exception {
+  ApiException(this.statusCode, this.message);
+
+  final int statusCode;
+  final String message;
+
+  @override
+  String toString() => 'Exception: $message';
+}
+
 class ApiService {
   ApiService({
     http.Client? client,
@@ -138,9 +148,10 @@ class ApiService {
       throw UnauthorizedException();
     }
 
-    throw Exception(
+    throw ApiException(
+      response.statusCode,
       body is Map<String, dynamic>
-          ? body["detail"] ?? "API Error (${response.statusCode})"
+          ? (body["detail"] ?? "API Error (${response.statusCode})").toString()
           : "API Error (${response.statusCode})",
     );
   }
