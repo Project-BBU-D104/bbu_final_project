@@ -6,8 +6,8 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 
 | Group | File | Number of screens | Short description |
 |---|---|---:|---|
-| Auth | [screen/SCREENS_AUTH.md](screen/SCREENS_AUTH.md) | 2 | Implementation complete: startup/sign-in, pre-sign-in preferences, recovery guidance, and browser autofill fixes. Manual device, screen-reader, and password-manager QA pending. |
-| Home | [screen/SCREENS_HOME.md](screen/SCREENS_HOME.md) | 6 | Done: all six screens redesigned—Home shell, Home content, Dashboard, Manage, Report index, and Profile. |
+| Auth (done) | [screen/SCREENS_AUTH.md](screen/SCREENS_AUTH.md) | 2 | Implementation complete: startup/sign-in, pre-sign-in preferences, recovery guidance, and browser autofill fixes. Manual device, screen-reader, and password-manager QA pending. |
+| Home (done) | [screen/SCREENS_HOME.md](screen/SCREENS_HOME.md) | 6 | Done: all six screens redesigned—Home shell, Home content, Dashboard, Manage, Report index, and Profile. |
 | Catalog | [screen/SCREENS_CATALOG.md](screen/SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
 | Suppliers | [screen/SCREENS_SUPPLIERS.md](screen/SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
 | Customers | [screen/SCREENS_CUSTOMERS.md](screen/SCREENS_CUSTOMERS.md) | 4 | Customer list and CRUD forms, plus sale customer selection. |
