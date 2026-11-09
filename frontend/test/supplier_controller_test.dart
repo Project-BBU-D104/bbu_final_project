@@ -22,7 +22,8 @@ void main() {
   });
   test('initial shared query applies to cached records', () async {
     final seed = SupplierController(service: FakeSupplierService());
-    await seed.getSuppliers(); seed.onClose();
+    await seed.getSuppliers();
+    seed.onClose();
     final search = Get.put(SearchController());
     search.keyword.value = 'beta';
     final c = Get.put(SupplierController(service: FakeSupplierService()));
@@ -31,11 +32,14 @@ void main() {
     search.keyword.value = 'alpha';
     expect(c.searchSuppliers.map((s) => s.id), [2]);
   });
-  testWidgets('failed refresh retains records and exposes retry state', (tester) async {
+  testWidgets('failed refresh retains records and exposes retry state', (
+    tester,
+  ) async {
     final service = FakeSupplierService();
     final c = SupplierController(service: service);
     await tester.pumpWidget(const GetMaterialApp(home: Scaffold()));
-    await c.getSuppliers(); service.failGet = true;
+    await c.getSuppliers();
+    service.failGet = true;
     await c.getSuppliers();
     expect(c.loadError.value, isNotEmpty);
     expect(c.isLoading.value, false);
@@ -48,8 +52,13 @@ void main() {
   });
   test('optional dates tolerate invalid input', () {
     for (final value in [null, '', 'invalid']) {
-      final m = SupplierModel.fromJson({...supplierJson(1, 'Alpha'), 'created_at': value, 'updated_at': value});
-      expect(m.createdAt, isNull); expect(m.updatedAt, isNull);
+      final m = SupplierModel.fromJson({
+        ...supplierJson(1, 'Alpha'),
+        'created_at': value,
+        'updated_at': value,
+      });
+      expect(m.createdAt, isNull);
+      expect(m.updatedAt, isNull);
     }
   });
 }

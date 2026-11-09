@@ -11,7 +11,8 @@ import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
 
 class SupplierController extends GetxController {
-  SupplierController({SupplierService? service}) : service = service ?? SupplierService();
+  SupplierController({SupplierService? service})
+    : service = service ?? SupplierService();
   final loadError = ''.obs;
   String _query = '';
   Worker? _searchWorker;
@@ -35,15 +36,15 @@ class SupplierController extends GetxController {
   static const Duration _cacheTtl = Duration(seconds: 60);
 
   static bool get _hasFreshCache =>
-    _cachedAt != null &&
-    DateTime.now().difference(_cachedAt!) < _cacheTtl;
+      _cachedAt != null && DateTime.now().difference(_cachedAt!) < _cacheTtl;
 
   @override
   void onInit() {
     super.onInit();
 
     final searchController = Get.isRegistered<SearchController>()
-        ? Get.find<SearchController>() : Get.put(SearchController());
+        ? Get.find<SearchController>()
+        : Get.put(SearchController());
     _query = searchController.keyword.value.trim().toLowerCase();
     _searchWorker = ever(searchController.keyword, searchSupplier);
     if (_hasFreshCache) {
@@ -65,7 +66,7 @@ class SupplierController extends GetxController {
     supplierAddressController.dispose();
   }
 
-  void clearSupplier(){
+  void clearSupplier() {
     supplierNameController.clear();
     supplierPhoneNumberController.clear();
     supplierEmailController.clear();
@@ -87,10 +88,13 @@ class SupplierController extends GetxController {
       final records = resp.map((item) => SupplierModel.fromJson(item)).toList();
       suppliers.assignAll(records);
       searchSupplier(_query);
-      _cache..clear()..addAll(records);
+      _cache
+        ..clear()
+        ..addAll(records);
       _cachedAt = DateTime.now();
     } catch (_) {
-      if (!isClosed) loadError.value = 'Unable to load suppliers. Please try again.'.tr;
+      if (!isClosed)
+        loadError.value = 'Unable to load suppliers. Please try again.'.tr;
     } finally {
       if (!isClosed) isLoading.value = false;
     }
@@ -98,22 +102,21 @@ class SupplierController extends GetxController {
 
   void searchSupplier(String keyword) {
     _query = keyword.trim().toLowerCase();
-    searchSuppliers.assignAll(suppliers.where((s) => s.name.toLowerCase().contains(_query)));
-  }
-
-  void gotoSupplierDetail(SupplierModel supplier){
-    Get.toNamed(AppRoutes.supplierDetail, arguments: supplier);
-  }
-
-  void addSupplier(BuildContext context){
-    clearSupplier();
-    AppBottomSheets.show(
-      context,
-      child: SupplierAddWidget()
+    searchSuppliers.assignAll(
+      suppliers.where((s) => s.name.toLowerCase().contains(_query)),
     );
   }
 
-  void saveSupplier(BuildContext context) async{
+  void gotoSupplierDetail(SupplierModel supplier) {
+    Get.toNamed(AppRoutes.supplierDetail, arguments: supplier);
+  }
+
+  void addSupplier(BuildContext context) {
+    clearSupplier();
+    AppBottomSheets.show(context, child: SupplierAddWidget());
+  }
+
+  void saveSupplier(BuildContext context) async {
     if (supplierPhoneNumberController.text.trim().isEmpty) {
       ToastWidget.show(
         message: "Phone number is required".tr,
@@ -121,15 +124,15 @@ class SupplierController extends GetxController {
       );
       return;
     }
-    
-    try{
+
+    try {
       final data = {
         "name": supplierNameController.text.trim(),
         "phone": supplierPhoneNumberController.text.trim(),
         "email": supplierEmailController.text.trim(),
         "map": supplierMapController.text.trim(),
         "address": supplierAddressController.text.trim(),
-        "status": status.value
+        "status": status.value,
       };
 
       await service.createSupplier(data);
@@ -142,22 +145,18 @@ class SupplierController extends GetxController {
         type: ToastType.success,
       );
 
-    // Clear textfields
-    clearSupplier();
+      // Clear textfields
+      clearSupplier();
 
-    // Close BottomSheet
-    Navigator.pop(context);
-
-    }catch(e){
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
+      // Close BottomSheet
+      Navigator.pop(context);
+    } catch (e) {
+      ToastWidget.show(message: e.toString(), type: ToastType.error);
     }
   }
 
-  Future<void> editSupplier(int supplierId,BuildContext context) async {
-    try{
+  Future<void> editSupplier(int supplierId, BuildContext context) async {
+    try {
       final supplier = await service.getSupplierById(supplierId);
 
       supplierNameController.text = supplier["name"] ?? "";
@@ -169,27 +168,22 @@ class SupplierController extends GetxController {
 
       AppBottomSheets.show(
         context,
-        child: SupplierEditWidget(
-          supplierId: supplierId
-        )
+        child: SupplierEditWidget(supplierId: supplierId),
       );
-    }catch(e){
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
+    } catch (e) {
+      ToastWidget.show(message: e.toString(), type: ToastType.error);
     }
   }
 
   Future<void> updateSupplier(int supplierId, BuildContext context) async {
-    try{
+    try {
       final data = {
         "name": supplierNameController.text.trim(),
         "phone": supplierPhoneNumberController.text.trim(),
         "email": supplierEmailController.text.trim(),
         "map": supplierMapController.text.trim(),
         "address": supplierAddressController.text.trim(),
-        "status": status.value
+        "status": status.value,
       };
 
       await service.updateSupplier(supplierId, data);
@@ -206,17 +200,20 @@ class SupplierController extends GetxController {
         message: "Supplier updated successfully",
         type: ToastType.success,
       );
-    }catch(e){
+    } catch (e) {
       // Do nothing
     }
   }
 
-  Future<void> deleteSupplier({required int supplierId, required BuildContext context}) async {
+  Future<void> deleteSupplier({
+    required int supplierId,
+    required BuildContext context,
+  }) async {
     showConfirmDialog(
       context: context,
       message: "Do you want to delete this supplier?".tr,
       onConfirm: () async {
-        try{
+        try {
           await service.deleteSupplier(supplierId);
 
           Get.back();
@@ -228,12 +225,8 @@ class SupplierController extends GetxController {
             message: "Supplier deleted successfully".tr,
             type: ToastType.success,
           );
-
-        }catch(e){
-          ToastWidget.show(
-            message: e.toString(),
-            type: ToastType.error,
-          );
+        } catch (e) {
+          ToastWidget.show(message: e.toString(), type: ToastType.error);
         }
       },
       onCancel: () {
@@ -241,5 +234,4 @@ class SupplierController extends GetxController {
       },
     );
   }
-
 }

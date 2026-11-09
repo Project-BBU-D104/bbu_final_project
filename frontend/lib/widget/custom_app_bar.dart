@@ -5,16 +5,18 @@ import 'package:get/get.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final bool useTheme;
   final bool showBack;
   final VoidCallback? onBack;
   final List<Widget>? actions;
-  final bool centerTitle ;
+  final bool centerTitle;
   final VoidCallback? onRefresh;
   final bool showRefresh;
 
   const CustomAppBar({
     super.key,
     required this.title,
+    this.useTheme = false,
     this.showBack = true,
     this.onBack,
     this.actions,
@@ -26,7 +28,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: titleColor,
+      backgroundColor: useTheme
+          ? Theme.of(context).colorScheme.surface
+          : titleColor,
       elevation: 0,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
@@ -35,8 +39,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? IconButton(
               icon: Icon(
                 CupertinoIcons.back,
-                color: darkColor,
+                color: useTheme
+                    ? Theme.of(context).colorScheme.onSurface
+                    : darkColor,
               ),
+              tooltip: 'Back'.tr,
               onPressed: onBack ?? () => Get.back(),
             )
           : null,
@@ -44,7 +51,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         title.tr,
         style: TextStyle(
-          color: darkColor,
+          color: useTheme ? Theme.of(context).colorScheme.onSurface : darkColor,
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
@@ -55,7 +62,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             tooltip: 'Refresh',
             icon: Icon(
               Icons.refresh,
-              color: darkColor,
+              color: useTheme
+                  ? Theme.of(context).colorScheme.onSurface
+                  : darkColor,
             ),
             onPressed: onRefresh,
           ),

@@ -3,160 +3,109 @@ import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/models/supplier_model.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:frontend/utils/location_utils.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class SupplierCardWidget extends StatelessWidget {
-
-final SupplierModel item;
-
-  const SupplierCardWidget({
-    super.key,
-    required this.item
-  });
+  const SupplierCardWidget({super.key, required this.item});
+  final SupplierModel item;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Get.find<SupplierController>().gotoSupplierDetail(item),
-      child: Container(
-        margin:
-        const EdgeInsets.only(bottom:16),
-        decoration:BoxDecoration(
-          color:Colors.white,
-          borderRadius:
-          BorderRadius.circular(20),
-      
-          border:Border.all(
-            color:Colors.grey.shade300
-          )
-      
-        ),
-        child:Column(
-          children:[
-            Padding(
-              padding:
-              const EdgeInsets.all(18),
-              child:Row(
-                children:[
-                  Container(
-                    width:48,
-                    height:48,
-      
-                    decoration:BoxDecoration(
-                      color:Colors.grey.shade100,
-                      borderRadius:
-                      BorderRadius.circular(14)
-                    ),
-      
-                    child: Center(
-                      child: item.name.isNotEmpty
-                        ? Text(
-                            item.name[0].toUpperCase(),
-                          )
-                        : const Icon(
-                            Icons.business,
-                          ),
-                    ),
+    final theme = Theme.of(context);
+    return Card(
+      color: theme.cardColor,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: theme.dividerColor),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Get.find<SupplierController>().gotoSupplierDetail(item),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.business_outlined,
+                    color: theme.colorScheme.primary,
                   ),
-      
-                  const SizedBox(width:14),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child:Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children:[
-                        Text(
-                          item.name,
-                          style:const TextStyle(
-                            fontSize:18,
-                            fontWeight:
-                            FontWeight.bold
-                          ),
-                        ),
-                       InkWell(
-                          onTap: () {
-                            final email = (item.email ?? "").toString();
-                            if (email.isNotEmpty) {
-                              openEmail(email);
-                            }
-                          },
-                          child: Text(
-                            (item.email ?? "").toString(),
-                            style: TextStyle(
-                            
-                            
-                            ),
-                          ),
-                        )
-                      ],
+                    child: Tooltip(
+                      message: item.name,
+                      child: Text(
+                        item.name.isEmpty ? '-' : item.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleLarge,
+                      ),
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(item.phone.isEmpty ? '-' : item.phone),
+              const SizedBox(height: 8),
+              Tooltip(
+                message: item.email ?? '',
+                child: Text(
+                  (item.email ?? '').isEmpty ? '-' : item.email!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
                   StatusWidget(
-                    text: item.status == true
-                        ? "Active"
-                        : "Inactive",
-                  )
-                ],
-              ),
-            ),
-            Divider(
-              height:1,
-              color:Colors.grey.shade200
-            ),
-            Padding(
-              padding:
-              const EdgeInsets.all(12),
-              child:Row(
-                children:[
-                  iconBox(Icons.phone,
-                   onTap:(){
-                    callPhone(
-                      item.phone
-                    );
-                  }),
-                  const SizedBox(width:10),
-                
-                  iconBox(Icons.location_on,
-                    onTap:(){
-                       openGoogleMap(
-                        item.map ?? "",
-                      );
-                    }
+                    text: (item.status == true ? 'Active' : 'Inactive').tr,
+                    color: item.status == true
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.error,
                   ),
-                  const Spacer(),
-                    Text(
-                      DateFormatter.formatDate(item.createdAt),
-                      style: const TextStyle(
-                        color: Color(0xff00a884),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
+                  Text(
+                    item.createdAt == null
+                        ? '-'
+                        : DateFormatter.formatDate(item.createdAt),
+                  ),
+                  IconButton(
+                    tooltip: 'Call supplier'.tr,
+                    onPressed: item.phone.trim().isEmpty
+                        ? null
+                        : () => callPhone(item.phone),
+                    icon: const Icon(Icons.phone_outlined),
+                  ),
+                  IconButton(
+                    tooltip: 'Email supplier'.tr,
+                    onPressed: (item.email ?? '').trim().isEmpty
+                        ? null
+                        : () => openEmail(item.email!),
+                    icon: const Icon(Icons.email_outlined),
+                  ),
+                  IconButton(
+                    tooltip: 'Open location'.tr,
+                    onPressed: usableMapValue(item.map) == null
+                        ? null
+                        : () => openGoogleMap(item.map!),
+                    icon: const Icon(Icons.location_on_outlined),
+                  ),
                 ],
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-Widget iconBox(IconData icon,{ VoidCallback? onTap}){
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width:45,
-        height:42,
-        decoration:BoxDecoration(
-          color:Colors.grey.shade100,
-          borderRadius:
-          BorderRadius.circular(12)
-        ),
-        child:Icon(icon),
-      ),
-    );
-  }
-
-  

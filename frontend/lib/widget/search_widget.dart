@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide SearchController;
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/widget/test_product_scanner_page.dart';
 import 'package:get/get.dart';
@@ -66,7 +65,7 @@ class _SearchWidgetState extends State<SearchWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: whiteColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -88,6 +87,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                     ? const SizedBox()
                     : IconButton(
                         onPressed: _clear,
+                        tooltip: 'Clear search'.tr,
                         icon: const Icon(Icons.close),
                       );
               }),
