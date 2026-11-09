@@ -4,12 +4,11 @@ from sqlmodel import Session
 
 from app.crud.user.user import change_password, update_profile
 from app.schemas.user.user import PasswordChange, ProfileRead, ProfileUpdate
+from app.routes.users.users import CACHE_NS as USERS_CACHE_NS
 from app.security import get_current_user
 from database import get_session
 
 router = APIRouter(prefix="/profile", tags=["profile"])
-
-USERS_CACHE_NS = "users"
 
 
 @router.put("/me", response_model=ProfileRead)

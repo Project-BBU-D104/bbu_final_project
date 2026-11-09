@@ -6,14 +6,10 @@ import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/purchase_payment/widget/add_purchase_payment_widget.dart';
 import 'package:frontend/screen/purchase_payment/widget/edit_purchase_payment_widget.dart';
 import 'package:frontend/services/main_service/purchase/purchase_payment_service.dart';
+import 'package:frontend/utils/sales_report_utils.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
-
-double _toDouble(dynamic value) {
-  if (value is num) return value.toDouble();
-  return double.tryParse(value?.toString() ?? '') ?? 0;
-}
 
 class PurchasePaymentController extends GetxController {
   PurchasePaymentController({
@@ -53,23 +49,10 @@ class PurchasePaymentController extends GetxController {
 
   bool get isEditing => editingPaymentId.value != null;
 
-  static final List<Map<String, dynamic>> _cache = [];
-  static DateTime? _cachedAt;
-  static const Duration _cacheTtl = Duration(seconds: 60);
-
-  static bool get _hasFreshCache =>
-      _cachedAt != null &&
-      DateTime.now().difference(_cachedAt!) < _cacheTtl;
-
   @override
   void onInit() {
     super.onInit();
-
-    if (_hasFreshCache) {
-      purchasePaymentList.value = List<Map<String, dynamic>>.from(_cache);
-    } else {
-      onGetPaymentList();
-    }
+    onGetPaymentList();
   }
 
   Future<void> onGetPaymentList() async {
@@ -80,11 +63,6 @@ class PurchasePaymentController extends GetxController {
 
       if (resp is List) {
         purchasePaymentList.value = List<Map<String, dynamic>>.from(resp);
-
-        _cache
-          ..clear()
-          ..addAll(purchasePaymentList);
-        _cachedAt = DateTime.now();
       }
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
@@ -127,16 +105,16 @@ class PurchasePaymentController extends GetxController {
   }
 
   double get selectedPurchaseDue =>
-      _toDouble(selectedPurchase?["due_amount"]);
+      parseAmount(selectedPurchase?["due_amount"]);
 
   double get maxAmount {
     if (!isEditing) return selectedPurchaseDue;
 
     final refreshedPurchase = selectedPurchase;
     final currentDue = refreshedPurchase != null
-        ? _toDouble(refreshedPurchase['due_amount'])
-        : _toDouble(_originalPayment?['purchase']?['due_amount']);
-    final originalAmount = _toDouble(_originalPayment?['amount']);
+        ? parseAmount(refreshedPurchase['due_amount'])
+        : parseAmount(_originalPayment?['purchase']?['due_amount']);
+    final originalAmount = parseAmount(_originalPayment?['amount']);
     final originalStatus =
         _originalPayment?['status']?.toString().trim().toLowerCase();
 
@@ -168,84 +146,34 @@ class PurchasePaymentController extends GetxController {
     AppBottomSheets.show(context, child: EditPurchasePaymentWidget());
   }
 
-  Future<void> onSavePurchasePayment(BuildContext context) async {
-    if (isSaving.value) return;
-    if (!(formKey.currentState?.validate() ?? false)) return;
+  Future<void> onSavePurchasePayment(BuildContext context) =>
+      _persistPurchasePayment(context, editing: false);
 
-    final purchase = selectedPurchase;
-    final purchaseId = selectedPurchaseId.value;
-    final supplierId = int.tryParse(
-      purchase?["supplier"]?["id"].toString() ?? "",
-    );
-    final paymentTypeId = selectedPaymentTypeId.value;
-    final currencyId = selectedCurrencyId.value;
-    final amount = double.tryParse(amountCtrl.text.trim());
+  Future<void> onUpdatePurchasePayment(BuildContext context) =>
+      _persistPurchasePayment(context, editing: true);
 
-    if (purchase == null ||
-        purchaseId == null ||
-        supplierId == null ||
-        paymentTypeId == null ||
-        currencyId == null ||
-        amount == null ||
-        amount > selectedPurchaseDue) {
-      ToastWidget.show(
-        message: "Check the payment details and purchase balance".tr,
-        type: ToastType.error,
-      );
-      return;
-    }
-
-    final payload = {
-      "payment_no": paymentNoCtrl.text.trim(),
-      "purchase_id": purchaseId,
-      "supplier_id": supplierId,
-      "payment_type_id": paymentTypeId,
-      "currency_id": currencyId,
-      "amount": amount,
-      "payment_date": purchaseDate.value.toUtc().toIso8601String(),
-      "status": paymentStatus.value,
-      "note": noteCtrl.text.trim(),
-    };
-
-    isSaving.value = true;
-    try {
-      await service.createPurchasePayment(payload);
-      await Future.wait([onGetPaymentList(), purchaseCtr.onGetPurchaseList()]);
-      if (!context.mounted) return;
-
-      ToastWidget.show(
-        message: "Purchase payment created successfully".tr,
-        type: ToastType.success,
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  Future<void> onUpdatePurchasePayment(BuildContext context) async {
+  Future<void> _persistPurchasePayment(
+    BuildContext context, {
+    required bool editing,
+  }) async {
     if (isSaving.value) return;
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     final paymentId = editingPaymentId.value;
     final purchaseId = selectedPurchaseId.value;
-    final supplierId = int.tryParse(
-      _originalPayment?['supplier']?['id']?.toString() ?? '',
-    );
+    final supplier =
+        _originalPayment?['supplier'] ?? selectedPurchase?['supplier'];
+    final supplierId = int.tryParse(supplier?['id']?.toString() ?? '');
     final paymentTypeId = selectedPaymentTypeId.value;
     final currencyId = selectedCurrencyId.value;
     final amount = double.tryParse(amountCtrl.text.trim());
 
-    if (paymentId == null ||
-        purchaseId == null ||
+    if (purchaseId == null ||
         supplierId == null ||
         paymentTypeId == null ||
         currencyId == null ||
         amount == null ||
-        amount <= 0 ||
-        amount > maxAmount) {
+        (editing && paymentId == null)) {
       ToastWidget.show(
         message: "Check the payment details and purchase balance".tr,
         type: ToastType.error,
@@ -267,12 +195,18 @@ class PurchasePaymentController extends GetxController {
 
     isSaving.value = true;
     try {
-      await service.updatePurchasePayment(paymentId, payload);
+      if (editing) {
+        await service.updatePurchasePayment(paymentId!, payload);
+      } else {
+        await service.createPurchasePayment(payload);
+      }
       await Future.wait([onGetPaymentList(), purchaseCtr.onGetPurchaseList()]);
       if (!context.mounted) return;
 
       ToastWidget.show(
-        message: "Purchase payment updated successfully".tr,
+        message: editing
+            ? "Purchase payment updated successfully".tr
+            : "Purchase payment created successfully".tr,
         type: ToastType.success,
       );
       if (Navigator.of(context).canPop()) Navigator.of(context).pop();

@@ -132,6 +132,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
     final paymentDate = DateTime.tryParse(
       receipt['payment_date']?.toString() ?? '',
     );
+    final rows = _receiptRows(receipt, currency, paymentDate);
 
     return Scaffold(
       backgroundColor: lightGrey,
@@ -276,44 +277,24 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget>
                   position: _contentSlide,
                   child: Column(
                     children: [
-                      _detailRow(
-                        'Customer:',
-                        receipt['customer']?.toString() ?? '—',
-                      ),
-                      const SizedBox(height: 12),
-                      _detailRow(
-                        'Payment Method:',
-                        receipt['payment_method']?.toString() ?? '—',
-                      ),
-                      const SizedBox(height: 12),
-                      _detailRow(
-                        'Date:',
-                        DateFormatter.formatDateTime(paymentDate?.toLocal()),
-                      ),
-                      const SizedBox(height: 12),
-                      _detailRow(
-                        'Transaction ID:',
-                        receipt['transaction_id']?.toString() ?? '—',
-                      ),
-                      const SizedBox(height: 12),
-                      _detailRow(
-                        'Subtotal:',
-                        _formatAmount(receipt['subtotal'], currency),
-                      ),
-                      const SizedBox(height: 12),
-                      CustomPaint(
-                        painter: _DashedLinePainter(),
-                        child: const SizedBox(
-                          width: double.infinity,
-                          height: 1,
+                      for (var i = 0; i < rows.length; i++) ...[
+                        if (i > 0) const SizedBox(height: 12),
+                        if (i == rows.length - 1) ...[
+                          CustomPaint(
+                            painter: _DashedLinePainter(),
+                            child: const SizedBox(
+                              width: double.infinity,
+                              height: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                        _detailRow(
+                          '${rows[i][0]}:',
+                          rows[i][1].toString(),
+                          boldValue: i == rows.length - 1,
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      _detailRow(
-                        'Total:',
-                        _formatAmount(receipt['total'], currency),
-                        boldValue: true,
-                      ),
+                      ],
                     ],
                   ),
                 ),

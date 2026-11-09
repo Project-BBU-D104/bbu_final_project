@@ -5,14 +5,10 @@ import 'package:frontend/screen/payment/widget/add_payment_widget.dart';
 import 'package:frontend/screen/payment/widget/edit_payment_widget.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/utils/sales_report_utils.dart';
 import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
-
-double _toDouble(dynamic value) {
-  if (value is num) return value.toDouble();
-  return double.tryParse(value?.toString() ?? '') ?? 0;
-}
 
 class PaymentController extends GetxController {
   PaymentController({SalePaymentService? service, SaleService? saleService})
@@ -78,19 +74,19 @@ class PaymentController extends GetxController {
   }
 
   List<Map<String, dynamic>> get salesWithDue => saleList
-      .where((sale) => _toDouble(sale['due_amount']) > 0)
+      .where((sale) => parseAmount(sale['due_amount']) > 0)
       .toList();
 
   double get maxAmount {
     if (isEditing) {
-      final originalAmount = _toDouble(_originalPayment?['amount']);
+      final originalAmount = parseAmount(_originalPayment?['amount']);
       final refreshedSale = selectedSale;
       final currentDue = refreshedSale != null
-          ? _toDouble(refreshedSale['due_amount'])
-          : _toDouble(_originalPayment?['sale']?['due_amount']);
+          ? parseAmount(refreshedSale['due_amount'])
+          : parseAmount(_originalPayment?['sale']?['due_amount']);
       return currentDue + originalAmount;
     }
-    return _toDouble(selectedSale?['due_amount']);
+    return parseAmount(selectedSale?['due_amount']);
   }
 
   void pickPaymentDate(DateTime date) {
@@ -157,42 +153,10 @@ class PaymentController extends GetxController {
     if (isSaving.value) return;
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    final amount = double.tryParse(amountCtrl.text.trim());
+    final amount = double.tryParse(amountCtrl.text.trim())!;
     final method = methodCtrl.text.trim();
     final reference = referenceCtrl.text.trim();
     final saleId = selectedSaleId.value;
-
-    if (amount == null || amount <= 0) {
-      ToastWidget.show(
-        message: "Enter a valid amount".tr,
-        type: ToastType.error,
-      );
-      return;
-    }
-
-    if (!isEditing && saleId == null) {
-      ToastWidget.show(
-        message: "Please select a sale".tr,
-        type: ToastType.error,
-      );
-      return;
-    }
-
-    if (amount > maxAmount) {
-      ToastWidget.show(
-        message: "Amount cannot exceed sale due".tr,
-        type: ToastType.error,
-      );
-      return;
-    }
-
-    if (method.isEmpty || reference.isEmpty) {
-      ToastWidget.show(
-        message: "Payment method and reference are required".tr,
-        type: ToastType.error,
-      );
-      return;
-    }
 
     isSaving.value = true;
     try {

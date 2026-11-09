@@ -8,14 +8,15 @@ class EditProfileWidget extends StatelessWidget {
 
   final ctr = Get.find<ProfileController>();
 
+  static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
   String? requiredField(String? value, String message) {
     return (value?.trim().isEmpty ?? true) ? message : null;
   }
 
   String? validEmail(String? value) {
     final email = value?.trim() ?? '';
-    final pattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    return pattern.hasMatch(email) ? null : "Enter a valid email".tr;
+    return _emailPattern.hasMatch(email) ? null : "Enter a valid email".tr;
   }
 
   @override

@@ -82,40 +82,42 @@ class MyApp extends StatelessWidget {
     final languageController = Get.find<LanguageController>();
     final themeController = Get.find<ThemeController>();
 
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+    return Obx(
+      () => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
 
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.isEnabled(context)
-          ? DevicePreview.locale(context)
-          : languageController.locale.value,
-      fallbackLocale: const Locale("en", "US"),
+        useInheritedMediaQuery: true,
+        locale: DevicePreview.isEnabled(context)
+            ? DevicePreview.locale(context)
+            : languageController.locale.value,
+        fallbackLocale: const Locale("en", "US"),
 
-      scrollBehavior: _CustomScrollBehavior(),
-      initialRoute: AppRoutes.landing,
-      getPages: AppPages.pages,
+        scrollBehavior: _CustomScrollBehavior(),
+        initialRoute: AppRoutes.landing,
+        getPages: AppPages.pages,
 
-      translations: AppTranslation(),
+        translations: AppTranslation(),
 
-      transitionDuration: const Duration(milliseconds: 0),
-      defaultTransition: Transition.noTransition,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: themeController.isDark.value
-          ? ThemeMode.dark
-          : ThemeMode.light,
+        transitionDuration: const Duration(milliseconds: 0),
+        defaultTransition: Transition.noTransition,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: themeController.isDark.value
+            ? ThemeMode.dark
+            : ThemeMode.light,
 
-      builder: (context, child) {
-        return DevicePreview.appBuilder(
-          context,
-          Stack(
-            children: [
-              const AppBackground(child: SizedBox.expand()),
-              child ?? const SizedBox(),
-            ],
-          ),
-        );
-      },
+        builder: (context, child) {
+          return DevicePreview.appBuilder(
+            context,
+            Stack(
+              children: [
+                const AppBackground(child: SizedBox.expand()),
+                child ?? const SizedBox(),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -5,9 +5,8 @@ import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
 class PaymentFormWidget extends StatelessWidget {
-  PaymentFormWidget({super.key, required this.isEditing});
+  PaymentFormWidget({super.key});
 
-  final bool isEditing;
   final ctr = Get.find<PaymentController>();
 
   Future<void> pickDate(BuildContext context) async {
@@ -22,6 +21,8 @@ class PaymentFormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = ctr.isEditing;
+
     return Padding(
       padding: EdgeInsets.only(
         left: 16,

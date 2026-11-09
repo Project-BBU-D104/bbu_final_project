@@ -40,18 +40,19 @@ class ProfileController extends GetxController {
   }
 
   void loadUserLogin() {
-    final data = storage.lastUserLoginRead;
-    final user = data["user"];
-    if (user is Map) {
-      username.value = user["name"]?.toString() ?? "";
-      email.value = user["email"]?.toString() ?? "";
-      phone.value = user["phone"]?.toString() ?? "";
-      photo.value = user["photo"]?.toString() ?? "";
-      final storedRole = user["role"];
-      role.value = storedRole is Map
-          ? (storedRole["name"]?.toString() ?? "")
-          : (storedRole?.toString() ?? "");
-    }
+    final user = storage.lastUserLoginRead["user"];
+    if (user is Map) _applyUser(user);
+  }
+
+  void _applyUser(Map user) {
+    username.value = user["name"]?.toString() ?? "";
+    email.value = user["email"]?.toString() ?? "";
+    phone.value = user["phone"]?.toString() ?? "";
+    photo.value = user["photo"]?.toString() ?? "";
+    final storedRole = user["role"];
+    role.value = storedRole is Map
+        ? (storedRole["name"]?.toString() ?? "")
+        : (storedRole?.toString() ?? "");
   }
 
   void openEditProfile(BuildContext context) {
@@ -101,7 +102,7 @@ class ProfileController extends GetxController {
       login['user'] = user;
       await storage.lastUserLoginWrite(data: login);
 
-      loadUserLogin();
+      _applyUser(user);
 
       ToastWidget.show(
         message: "Profile updated successfully".tr,

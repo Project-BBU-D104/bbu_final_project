@@ -6,6 +6,6 @@ class AddPaymentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PaymentFormWidget(isEditing: false);
+    return PaymentFormWidget();
   }
 }

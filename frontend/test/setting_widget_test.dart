@@ -60,14 +60,18 @@ void main() {
   testWidgets('dark mode switch toggles the theme and persists it',
       (tester) async {
     final storage = FakeStorageService();
-    Get.put<ThemeController>(ThemeController(storageService: storage));
+    final ctr = Get.put<ThemeController>(
+      ThemeController(storageService: storage),
+    );
 
     await tester.pumpWidget(
-      GetMaterialApp(
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.light,
-        home: Scaffold(body: SettingWidget()),
+      Obx(
+        () => GetMaterialApp(
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: ctr.isDark.value ? ThemeMode.dark : ThemeMode.light,
+          home: Scaffold(body: SettingWidget()),
+        ),
       ),
     );
 

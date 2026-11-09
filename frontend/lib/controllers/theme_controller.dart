@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:frontend/constants/enum.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/services/storage_service.dart';
@@ -22,11 +21,6 @@ class ThemeController extends GetxController {
 
   Future<void> toggleTheme() async {
     isDark.value = !isDark.value;
-
-    Get.changeThemeMode(
-      isDark.value ? ThemeMode.dark : ThemeMode.light,
-    );
-
     await _storage.writeStorage(StorageKey.darkMode, isDark.value);
   }
 }

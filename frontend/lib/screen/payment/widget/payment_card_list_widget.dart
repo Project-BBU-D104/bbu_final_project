@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widget/record_actions_menu.dart';
 import 'package:intl/intl.dart';
 
 class PaymentCardListWidget extends StatelessWidget {
@@ -98,16 +99,9 @@ class PaymentCardListWidget extends StatelessWidget {
                   ),
                 ),
 
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert),
-                  onSelected: (value) {
-                    if (value == 'edit') onEdit?.call();
-                    if (value == 'delete') onDelete?.call();
-                  },
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'edit', child: Text('Edit')),
-                    PopupMenuItem(value: 'delete', child: Text('Delete')),
-                  ],
+                RecordActionsMenu(
+                  onEdit: onEdit,
+                  onDelete: onDelete,
                 ),
               ],
             ),

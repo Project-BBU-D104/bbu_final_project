@@ -107,5 +107,4 @@ def change_password(session: Session, current_user: User, passwords: PasswordCha
 
     session.add(current_user)
     session.commit()
-    session.refresh(current_user)
     return {"message": "Password changed successfully."}

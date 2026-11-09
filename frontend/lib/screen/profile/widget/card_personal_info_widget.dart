@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/profile_controller.dart';
+import 'package:frontend/widget/info_card_widget.dart';
 import 'package:get/get.dart';
 
 class CardPersonalInfoWidget extends StatelessWidget {
@@ -31,8 +32,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
               
               Text("Full Name".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
-              Obx(() => cardInfo(
-                  context,
+              Obx(() => InfoCardWidget(
                   title: ctr.username.value,
                 ),
               ),
@@ -40,8 +40,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
 
               Text("Email Address".tr, style: TextStyle(fontWeight: FontWeight.w600),),
               SizedBox(height: 5,),
-              Obx(()=> cardInfo(
-                  context,
+              Obx(()=> InfoCardWidget(
                   title: ctr.email.value,
                 ),
               ),
@@ -54,8 +53,7 @@ class CardPersonalInfoWidget extends StatelessWidget {
                           SizedBox(height: 10,),
                           Text("Phone Number".tr, style: TextStyle(fontWeight: FontWeight.w600),),
                           SizedBox(height: 5,),
-                          cardInfo(
-                            context,
+                          InfoCardWidget(
                             title: ctr.phone.value,
                           ),
                         ],
@@ -68,29 +66,4 @@ class CardPersonalInfoWidget extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget cardInfo(
-  BuildContext context, {
-  required String title,
-}) {
-  final theme = Theme.of(context);
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(
-        color: theme.dividerColor,
-      ),
-    ),
-    child: Text(
-      title,
-      style: TextStyle(
-        color: theme.textTheme.bodyLarge?.color,
-        fontWeight: FontWeight.w500,
-      ),
-    ),
-  );
 }
