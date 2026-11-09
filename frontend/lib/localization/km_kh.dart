@@ -1,4 +1,10 @@
 const Map<String, String> kmKH = {
+  "Cannot call supplier": "មិនអាចហៅអ្នកផ្គត់ផ្គង់បានទេ",
+  "Cannot email supplier": "មិនអាចផ្ញើអ៊ីមែលទៅអ្នកផ្គត់ផ្គង់បានទេ",
+  "Unable to open location picker": "មិនអាចបើកផែនទីជ្រើសរើសទីតាំងបានទេ",
+  "Selected location": "ទីតាំងដែលបានជ្រើសរើស",
+  "Latitude,longitude": "រយៈទទឹង,រយៈបណ្ដោយ",
+  "Enter valid latitude,longitude coordinates.": "សូមបញ្ចូលរយៈទទឹង និងរយៈបណ្ដោយត្រឹមត្រូវ។",
   "Unable to save supplier. Please try again.": "មិនអាចរក្សាទុកអ្នកផ្គត់ផ្គង់បានទេ។ សូមព្យាយាមម្តងទៀត។",
   "Unable to open supplier. Please try again.": "មិនអាចបើកអ្នកផ្គត់ផ្គង់បានទេ។ សូមព្យាយាមម្តងទៀត។",
   "Unable to delete supplier. Please try again.": "មិនអាចលុបអ្នកផ្គត់ផ្គង់បានទេ។ សូមព្យាយាមម្តងទៀត។",

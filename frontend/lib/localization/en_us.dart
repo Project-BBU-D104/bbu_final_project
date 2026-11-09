@@ -1,4 +1,10 @@
 const Map<String, String> enUS = {
+  "Cannot call supplier": "Cannot call supplier",
+  "Cannot email supplier": "Cannot email supplier",
+  "Unable to open location picker": "Unable to open location picker",
+  "Selected location": "Selected location",
+  "Latitude,longitude": "Latitude,longitude",
+  "Enter valid latitude,longitude coordinates.": "Enter valid latitude,longitude coordinates.",
   "Unable to save supplier. Please try again.": "Unable to save supplier. Please try again.",
   "Unable to open supplier. Please try again.": "Unable to open supplier. Please try again.",
   "Unable to delete supplier. Please try again.": "Unable to delete supplier. Please try again.",

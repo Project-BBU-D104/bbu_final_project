@@ -7,12 +7,11 @@ import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:frontend/screen/supplier/location_picker_page.dart';
 import 'package:frontend/utils/location_utils.dart';
 import 'package:latlong2/latlong.dart';
-
 
 //// Variables
 // final storage = GetStorage(".appsettings");
@@ -23,7 +22,6 @@ final storage = locator<IStorageService>();
 String appName = "ePOS App";
 String deviceID = "";
 String appVersion = "0.0.0";
-
 
 String serverUrl = "";
 
@@ -72,9 +70,7 @@ getSnackbar_({
     overlayBlur: 0,
     shouldIconPulse: true,
     barBlur: 20,
-    duration: const Duration(
-      seconds: 3,
-    ),
+    duration: const Duration(seconds: 3),
     isDismissible: false,
   );
 }
@@ -100,10 +96,7 @@ showWarning(String title, String description) async {
       title: title,
       description: description,
       background: const Color.fromARGB(148, 255, 153, 0),
-      icon: const Icon(
-        Icons.report_problem_outlined,
-        color: Colors.white,
-      ),
+      icon: const Icon(Icons.report_problem_outlined, color: Colors.white),
     );
   }
 }
@@ -122,31 +115,31 @@ showError(String title, String description) async {
     );
   }
 }
- 
+
 ///get background blur/glass
 Widget get bgBlur {
   return BackdropFilter(
     filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-    child: Container(
-      color: Colors.transparent,
-    ),
+    child: Container(color: Colors.transparent),
   );
 }
- 
-Future<void> callPhone(String phone) async {
-  if (Platform.isAndroid || Platform.isIOS) {
-    final Uri uri = Uri(
-      scheme: 'tel',
-      path: phone,
-    );
 
-    await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
+Future<void> callPhone(String phone) async {
+  try {
+    final value = phone.trim();
+    if (value.isEmpty ||
+        !await launchUrl(
+          Uri(scheme: 'tel', path: value),
+          mode: LaunchMode.externalApplication,
+        )) {
+      throw const FormatException('Phone unavailable');
+    }
+  } catch (_) {
+    ToastWidget.show(
+      title: 'Error'.tr,
+      message: 'Cannot call supplier'.tr,
+      type: ToastType.error,
     );
-  } else if (Platform.isWindows) {
-    // Windows: open browser/search or copy number
-    // print("Phone call not supported on Windows: $phone");
   }
 }
 
@@ -168,55 +161,61 @@ Future<void> openSupplierMap(
       ),
     );
 
-    applyPickedLocation(controller, picked);
+    if (context.mounted) applyPickedLocation(controller, picked);
   } catch (e) {
-    showError("Error", e.toString());
+    if (context.mounted) {
+      ToastWidget.show(
+        title: 'Error'.tr,
+        message: 'Unable to open location picker'.tr,
+        type: ToastType.error,
+      );
+    }
   }
 }
 
 Future<void> openGoogleMap(String value) async {
   try {
-    String url = value;
-
-    // Check if value is latitude,longitude
-    final coordinate = RegExp(
-      r'^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$',
-    );
-
-    if (coordinate.hasMatch(value)) {
-      url = "https://www.google.com/maps/search/?api=1&query=$value";
+    final text = value.trim();
+    final coordinate = parseCoordinates(text);
+    final uri = coordinate != null
+        ? Uri.parse(
+            'https://www.google.com/maps/search/?api=1&query=${coordinate.latitude},${coordinate.longitude}',
+          )
+        : Uri.tryParse(text);
+    if (uri == null ||
+        (uri.scheme != 'https' && uri.scheme != 'http') ||
+        uri.host.isEmpty) {
+      throw const FormatException('Unsupported map location');
     }
-
-    final Uri uri = Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-    } else {
-      showError(
-        "Error",
-        "Cannot open map",
-      );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw const FormatException('Map unavailable');
     }
-  } catch (e) {
-    showError(
-      "Error",
-      e.toString(),
+  } catch (_) {
+    ToastWidget.show(
+      title: 'Error'.tr,
+      message: 'Cannot open map'.tr,
+      type: ToastType.error,
     );
   }
 }
 
 Future<void> openEmail(String email) async {
-  final Uri emailUri = Uri(
-    scheme: 'mailto',
-    path: email,
-    query: 'subject=Hello&body=I want to contact you',
-  );
-
-  if (await canLaunchUrl(emailUri)) {
-    await launchUrl(emailUri);
+  try {
+    final value = email.trim();
+    final uri = Uri(
+      scheme: 'mailto',
+      path: value,
+      query: 'subject=Hello&body=I want to contact you',
+    );
+    if (value.isEmpty || !await launchUrl(uri)) {
+      throw const FormatException('Email unavailable');
+    }
+  } catch (_) {
+    ToastWidget.show(
+      title: 'Error'.tr,
+      message: 'Cannot email supplier'.tr,
+      type: ToastType.error,
+    );
   }
 }
 
@@ -244,9 +243,7 @@ Future<LatLng> _initialMapPosition() async {
     }
 
     final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     ).timeout(const Duration(seconds: 10));
 
     return LatLng(position.latitude, position.longitude);
