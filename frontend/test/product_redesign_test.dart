@@ -10,6 +10,7 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/filter_widget.dart';
+import 'package:frontend/screen/product/widget/product_card_detail_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_widget.dart';
 import 'package:frontend/screen/product/widget/product_table_widget.dart';
 import 'package:frontend/services/storage_service.dart';
@@ -43,6 +44,26 @@ class _FlakyProductService extends FakeProductService {
   }
 }
 
+/// Records delete calls and edit-fetch ids for the detail action tests.
+class _RecordingProductService extends FakeProductService {
+  _RecordingProductService(super.items);
+
+  int deleteCalls = 0;
+  int? lastFetchedId;
+
+  @override
+  Future<dynamic> deleteProduct(int id) async {
+    deleteCalls++;
+    return super.deleteProduct(id);
+  }
+
+  @override
+  Future<dynamic> getProductById(int id) async {
+    lastFetchedId = id;
+    return super.getProductById(id);
+  }
+}
+
 /// Mounts ProductScreen on a GetMaterialApp with the Home-group theme, locale,
 /// and shell setup. Seeds the static product cache through the fake service
 /// before mounting so each pump is independent of prior cache contents.
@@ -54,6 +75,7 @@ Future<ProductController> pumpProductScreen(
   bool khmer = false,
   double scale = 1,
   bool shell = false,
+  bool realDetail = false,
   void Function(Object? arguments)? onDetail,
 }) async {
   tester.view.physicalSize = size;
@@ -80,12 +102,18 @@ Future<ProductController> pumpProductScreen(
           name: AppRoutes.productCardDetail,
           page: () {
             onDetail?.call(Get.arguments);
-            return const Scaffold(body: Text('detail-stub'));
+            return realDetail
+                ? ProductCardDetailWidget()
+                : const Scaffold(body: Text('detail-stub'));
           },
         ),
         GetPage(
           name: AppRoutes.addProduct,
           page: () => const Scaffold(body: Text('add-stub')),
+        ),
+        GetPage(
+          name: AppRoutes.editProduct,
+          page: () => const Scaffold(body: Text('edit-stub')),
         ),
       ],
       builder: (context, child) => MediaQuery(
@@ -356,5 +384,215 @@ void main() {
     await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     handle.dispose();
+  });
+
+  group('product detail', () {
+    const longName =
+        'Premium Imported Sparkling Mineral Water Family Size 1500ml';
+    const longBarcode = '12345678901234567890';
+
+    Map<String, dynamic> longProduct() => productFixture(1, longName)
+      ..['barcode'] = longBarcode;
+
+    Future<ThemeData> openDetail(
+      WidgetTester tester,
+      Size size, {
+      bool dark = false,
+      bool khmer = false,
+      double scale = 1,
+    }) async {
+      // Unmount the previous GetMaterialApp before resetting GetX, otherwise
+      // its deferred teardown clears the freshly registered controller.
+      await tester.pumpWidget(const SizedBox.shrink());
+      Get.reset();
+      await pumpProductScreen(
+        tester,
+        service: _RecordingProductService([
+          longProduct(),
+          productFixture(2, 'Milk'),
+        ]),
+        size: size,
+        dark: dark,
+        khmer: khmer,
+        scale: scale,
+        realDetail: true,
+      );
+      await tester.tap(find.text(longName));
+      await tester.pumpAndSettle();
+      return Theme.of(tester.element(find.byType(ProductCardDetailWidget)));
+    }
+
+    testWidgets('detail reflows long translated content', (tester) async {
+      final detail = find.byType(ProductCardDetailWidget);
+
+      Rect imageRect() => tester
+          .getRect(
+            find.descendant(of: detail, matching: find.byType(AppCachedImage))
+                .first,
+          );
+      Rect infoRect() => tester.getRect(
+        find.descendant(of: detail, matching: find.text('Product Information')),
+      );
+
+      // 899 pixels of available detail width: image stacks above information.
+      await openDetail(tester, const Size(931, 900));
+      expect(infoRect().top, greaterThanOrEqualTo(imageRect().bottom));
+      expect(find.descendant(of: detail, matching: find.byType(Card)),
+          findsWidgets);
+      expect(tester.takeException(), isNull);
+
+      // 900 pixels: image beside information.
+      await openDetail(tester, const Size(932, 900));
+      expect(infoRect().left, greaterThanOrEqualTo(imageRect().right));
+      expect(tester.takeException(), isNull);
+
+      // Themed surfaces follow the active theme.
+      var theme = Theme.of(tester.element(detail));
+      final card = tester.widget<Card>(
+        find.descendant(of: detail, matching: find.byType(Card)).first,
+      );
+      expect(card.color, theme.cardColor);
+      var scaffold = tester.widget<Scaffold>(
+        find.descendant(of: detail, matching: find.byType(Scaffold)).first,
+      );
+      expect(scaffold.backgroundColor, theme.scaffoldBackgroundColor);
+
+      // Long values stay fully readable, not ellipsized.
+      final nameFinder = find.descendant(of: detail, matching: find.text(longName));
+      expect(nameFinder, findsOneWidget);
+      expect(tester.widget<Text>(nameFinder).maxLines, isNull);
+      final barcodeFinder = find.descendant(
+        of: detail,
+        matching: find.text(longBarcode),
+      );
+      expect(barcodeFinder, findsOneWidget);
+      expect(tester.widget<Text>(barcodeFinder).maxLines, isNull);
+
+      // Dark, Khmer, 200% scaling on a narrow screen: nothing overflows and
+      // the footer actions stay reachable.
+      theme = await openDetail(
+        tester,
+        const Size(390, 844),
+        dark: true,
+        khmer: true,
+        scale: 2,
+      );
+      expect(tester.takeException(), isNull);
+      expect(
+        find.descendant(of: detail, matching: find.byType(ElevatedButton)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: detail, matching: find.byType(OutlinedButton)),
+        findsOneWidget,
+      );
+      scaffold = tester.widget<Scaffold>(
+        find.descendant(of: detail, matching: find.byType(Scaffold)).first,
+      );
+      expect(scaffold.backgroundColor, theme.scaffoldBackgroundColor);
+      final khmerName = find.descendant(of: detail, matching: find.text(longName));
+      expect(khmerName, findsOneWidget);
+      expect(tester.widget<Text>(khmerName).maxLines, isNull);
+    });
+
+    testWidgets('detail tolerates absent optional fields', (tester) async {
+      final product =
+          productFixture(1, 'Water')
+            ..['unit'] = null
+            ..['category'] = null
+            ..['currency'] = null
+            ..['photo'] = null
+            ..['description'] = null
+            ..['created_at'] = null;
+
+      await pumpProductScreen(
+        tester,
+        service: _RecordingProductService([product]),
+        size: const Size(390, 844),
+        realDetail: true,
+      );
+      await tester.tap(find.text('Water'));
+      await tester.pumpAndSettle();
+
+      final detail = find.byType(ProductCardDetailWidget);
+      final theme = Theme.of(tester.element(detail));
+      expect(tester.takeException(), isNull);
+      // Unit and category fall back to '-'.
+      expect(find.descendant(of: detail, matching: find.text('-')),
+          findsNWidgets(2));
+      expect(
+        find.descendant(
+          of: detail,
+          matching: find.text(CurrencyFormatter.format(1.5, null)),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: detail,
+          matching: find.text('No description available.'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: detail, matching: find.byType(AppCachedImage)),
+        findsWidgets,
+      );
+      final scaffold = tester.widget<Scaffold>(
+        find.descendant(of: detail, matching: find.byType(Scaffold)).first,
+      );
+      expect(scaffold.backgroundColor, theme.scaffoldBackgroundColor);
+    });
+
+    testWidgets('detail actions preserve product navigation and confirmation', (
+      tester,
+    ) async {
+      final product = productFixture(1, 'Water');
+      final service = _RecordingProductService([
+        product,
+        productFixture(2, 'Milk'),
+      ]);
+      final controller = await pumpProductScreen(
+        tester,
+        service: service,
+        size: const Size(390, 844),
+        realDetail: true,
+      );
+      await tester.tap(find.text('Water'));
+      await tester.pumpAndSettle();
+
+      final detail = find.byType(ProductCardDetailWidget);
+      expect(Get.find<ProductController>(), same(controller));
+      expect(
+        find.descendant(of: detail, matching: find.text('Water')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: detail, matching: find.byType(AppCachedImage)),
+        findsWidgets,
+      );
+      expect(tester.takeException(), isNull);
+
+      // Delete then Cancel sends no delete request and stays on detail.
+      await tester.tap(
+        find.descendant(of: detail, matching: find.text('Delete')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Cancel'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(service.deleteCalls, 0);
+      expect(Get.currentRoute, AppRoutes.productCardDetail);
+
+      // Edit fetches the same id and passes an int to /edit-product.
+      await tester.tap(
+        find.descendant(of: detail, matching: find.text('Edit')),
+      );
+      await tester.pumpAndSettle();
+      expect(service.lastFetchedId, product['id']);
+      expect(Get.currentRoute, '/edit-product');
+      expect(Get.arguments, product['id']);
+      expect(Get.arguments, isA<int>());
+    });
   });
 }

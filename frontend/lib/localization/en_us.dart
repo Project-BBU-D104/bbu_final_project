@@ -321,4 +321,6 @@ const Map<String, String> enUS = {
   'Filter by Category':'Filter by Category',
   'Scan Barcode':'Scan Barcode',
   'Back':'Back',
+  'Product Information':'Product Information',
+  'No description available.':'No description available.',
 };

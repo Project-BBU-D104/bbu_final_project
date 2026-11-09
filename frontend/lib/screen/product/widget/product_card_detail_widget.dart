@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
@@ -8,241 +9,204 @@ import 'package:frontend/utils/currency_formatter.dart';
 class ProductCardDetailWidget extends StatelessWidget {
   ProductCardDetailWidget({super.key});
 
-  final ctr = Get.put(ProductController());
+  // Reuse the controller registered by the product list workflow.
+  final ctr = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final product = Get.arguments as Map<String, dynamic>;
 
-    final String photo = product['photo']?.toString() ?? "";
+    final String photo = product['photo']?.toString() ?? '';
+    final String description = product['description']?.toString() ?? '';
+
+    final imageSection = Container(
+      height: 230,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: AppCachedImage(
+          url: photo,
+          width: double.infinity,
+          height: 230,
+          fallbackIcon: Icons.image_not_supported_outlined,
+          errorIcon: Icons.broken_image_outlined,
+          fallbackIconSize: 80,
+        ),
+      ),
+    );
+
+    final infoSection = HomeSectionCard(
+      title: 'Product Information',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _infoRow(context, Icons.inventory_2_outlined, 'Product Name',
+              _field(product['name'])),
+          _infoRow(context, Icons.qr_code, 'Barcode', _field(product['barcode'])),
+          _infoRow(
+            context,
+            Icons.sell,
+            'Sale Price',
+            CurrencyFormatter.format(
+              double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
+              product['currency'] as Map<String, dynamic>?,
+            ),
+          ),
+          _infoRow(context, Icons.straighten, 'Unit', _field(product['unit'])),
+          _infoRow(
+            context,
+            Icons.category_outlined,
+            'Category',
+            _field(product['category']),
+          ),
+        ],
+      ),
+    );
+
+    final descriptionSection = HomeSectionCard(
+      title: 'Description',
+      child: Text(
+        description.isNotEmpty ? description : 'No description available.'.tr,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+          height: 1.6,
+        ),
+      ),
+    );
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
-      appBar: const CustomAppBar(title: "Product Detail"),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: const CustomAppBar(title: 'Product Detail'),
 
       bottomNavigationBar: SafeArea(
-        child: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
+        child: Material(
+          color: theme.colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
                   onPressed: () => ctr.onDeleteProduct(product['id'], context),
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text("Delete"),
+                  label: Text('Delete'.tr),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    minimumSize: const Size.fromHeight(52),
-                    side: const BorderSide(color: Colors.red),
+                    foregroundColor: theme.colorScheme.error,
+                    minimumSize: const Size(140, 52),
+                    side: BorderSide(color: theme.colorScheme.error),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
+                ElevatedButton.icon(
                   onPressed: () => ctr.onEditProduct(product['id'], context),
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text("Edit"),
+                  label: Text('Edit'.tr),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff1DB584),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(52),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    minimumSize: const Size(140, 52),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-
-            /// PRODUCT IMAGE
-            Container(
-              width: double.infinity,
-              height: 230,
-              decoration: _cardDecoration(),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: AppCachedImage(
-                  url: photo,
-                  width: double.infinity,
-                  height: 230,
-                  fallbackIcon: Icons.image_not_supported_outlined,
-                  errorIcon: Icons.broken_image_outlined,
-                  fallbackIconSize: 80,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// PRODUCT INFORMATION
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: _cardDecoration(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  const Text(
-                    "Product Information",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 1.5,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1240),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth >= 900) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      _infoCard(
-                        Icons.inventory_2_outlined,
-                        "Product Name",
-                        product['name']?.toString() ?? "-",
-                      ),
-                      _infoCard(
-                        Icons.qr_code,
-                        "Barcode",
-                        product['barcode']?.toString() ?? "-",
-                      ),
-
-                      _infoCard(
-                        Icons.sell,
-                        "Sale Price",
-                        CurrencyFormatter.format(
-                           double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
-                          product['currency'],
+                      Expanded(child: imageSection),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            infoSection,
+                            const SizedBox(height: 20),
+                            descriptionSection,
+                          ],
                         ),
                       ),
-
-                      _infoCard(
-                        Icons.straighten,
-                        "Unit",
-                        product['unit']?['name'] ?? "-",
-                      ),
-
-                      _infoCard(
-                        Icons.category_outlined,
-                        "Category",
-                        product['category']?['name'] ?? "-",
-                      ),
                     ],
-                  ),
-                ],
-              ),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    imageSection,
+                    const SizedBox(height: 20),
+                    infoSection,
+                    const SizedBox(height: 20),
+                    descriptionSection,
+                  ],
+                );
+              },
             ),
-
-            const SizedBox(height: 20),
-
-            /// DESCRIPTION
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: _cardDecoration(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  const Text(
-                    "Description",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Text(
-                    (product['description']?.toString().isNotEmpty ?? false)
-                        ? product['description']
-                        : "No description available.",
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      height: 1.6,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  static BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(22),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: .05),
-          blurRadius: 15,
-          offset: const Offset(0, 6),
-        ),
-      ],
-    );
+  /// Optional lookup fields arrive as embedded maps or plain values.
+  static String _field(dynamic value) {
+    if (value == null) return '-';
+    if (value is Map) {
+      final name = value['name']?.toString().trim() ?? '';
+      return name.isEmpty ? '-' : name;
+    }
+    final text = value.toString().trim();
+    return text.isEmpty ? '-' : text;
   }
 
-  static Widget _infoCard(
+  static Widget _infoRow(
+    BuildContext context,
     IconData icon,
-    String title,
+    String label,
     String value,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xffF8F9FC),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          Icon(
-            icon,
-            color: const Color(0xff1DB584),
-          ),
-
-          const Spacer(),
-
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
+          Icon(icon, size: 20, color: theme.colorScheme.primary),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 110,
+            child: Text(
+              label.tr,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
-
-          const SizedBox(height: 4),
-
-          Text(
-            value,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ),
         ],

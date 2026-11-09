@@ -322,5 +322,7 @@ const Map<String, String> kmKH = {
   'Filter by Category': 'ត្រងតាមប្រភេទផលិតផល',
   'Scan Barcode': 'ស្កេនបារកូដ',
   'Back': 'ត្រឡប់',
+  'Product Information': 'ព័ត៌មានផលិតផល',
+  'No description available.': 'គ្មានការពិពណ៌នាទេ។',
 
 };
