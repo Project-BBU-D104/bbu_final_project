@@ -1,4 +1,8 @@
 const Map<String, String> enUS = {
+  "Logo": "Logo",
+  "New sale": "New sale",
+  "Loading orders": "Loading orders",
+  "Unable to load orders": "Unable to load orders",
   "Retry": "Retry",
   "Welcome back": "Welcome back",
   "Sign in to manage your inventory.": "Sign in to manage your inventory.",

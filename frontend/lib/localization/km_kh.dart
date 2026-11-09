@@ -1,4 +1,8 @@
 const Map<String, String> kmKH = {
+  "Logo": "និមិត្តសញ្ញា",
+  "New sale": "ការលក់ថ្មី",
+  "Loading orders": "កំពុងផ្ទុកការបញ្ជាទិញ",
+  "Unable to load orders": "មិនអាចផ្ទុកការបញ្ជាទិញបានទេ",
   "Retry": "ព្យាយាមម្តងទៀត",
   "Welcome back": "ស្វាគមន៍ការត្រឡប់មកវិញ",
   "Sign in to manage your inventory.": "ចូលដើម្បីគ្រប់គ្រងសារពើភណ្ឌរបស់អ្នក។",

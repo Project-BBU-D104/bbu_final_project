@@ -7,12 +7,13 @@ import 'package:frontend/controllers/language_controller.dart';
 import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/locator.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:get/get.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 import 'localization/app_translation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter/gestures.dart'; 
+import 'package:flutter/gestures.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:device_preview/device_preview.dart';
@@ -23,7 +24,7 @@ Future<void> main() async {
   await _initConfig();
 
   await _initStorage();
-  
+
   await GetStorage.init();
   setupLocator();
 
@@ -74,8 +75,29 @@ class _CustomScrollBehavior extends MaterialScrollBehavior {
   };
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _route = ValueNotifier<String>(AppRoutes.landing);
+
+  void _onRouting(Routing? routing) {
+    final current = routing?.current;
+    if (current == null || current.isEmpty) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _route.value = current;
+    });
+  }
+
+  @override
+  void dispose() {
+    _route.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +117,7 @@ class MyApp extends StatelessWidget {
         scrollBehavior: _CustomScrollBehavior(),
         initialRoute: AppRoutes.landing,
         getPages: AppPages.pages,
+        routingCallback: _onRouting,
 
         translations: AppTranslation(),
 
@@ -113,7 +136,12 @@ class MyApp extends StatelessWidget {
             Stack(
               children: [
                 const AppBackground(child: SizedBox.expand()),
-                child ?? const SizedBox(),
+                ValueListenableBuilder<String>(
+                  valueListenable: _route,
+                  child: child ?? const SizedBox(),
+                  builder: (context, route, navigator) =>
+                      DesktopAppShell(route: route, child: navigator!),
+                ),
               ],
             ),
           );

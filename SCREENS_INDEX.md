@@ -6,25 +6,27 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 
 | Group | File | Number of screens | Short description |
 |---|---|---:|---|
-| Auth | [SCREENS_AUTH.md](SCREENS_AUTH.md) | 2 | Startup and sign-in; proposed responsive auth redesign, interaction states, and accessibility criteria. |
-| Home | [SCREENS_HOME.md](SCREENS_HOME.md) | 6 | Main shell and its five tab pages. |
-| Catalog | [SCREENS_CATALOG.md](SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
-| Suppliers | [SCREENS_SUPPLIERS.md](SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
-| Customers | [SCREENS_CUSTOMERS.md](SCREENS_CUSTOMERS.md) | 4 | Customer list and CRUD forms, plus sale customer selection. |
-| Sales | [SCREENS_SALES.md](SCREENS_SALES.md) | 6 | Sale creation, checkout, and sales history. |
-| Purchases | [SCREENS_PURCHASES.md](SCREENS_PURCHASES.md) | 4 | Purchase list, details, and purchase forms. |
-| Purchase Requests | [SCREENS_PURCHASE_REQUESTS.md](SCREENS_PURCHASE_REQUESTS.md) | 4 | Purchase request list and forms/details. |
-| Purchase Payments | [SCREENS_PURCHASE_PAYMENTS.md](SCREENS_PURCHASE_PAYMENTS.md) | 4 | Purchase payment list, details, and forms. |
-| Stock | [SCREENS_STOCK.md](SCREENS_STOCK.md) | 15 | Warehouses, warehouse stock, adjustments, and transfers. |
-| People & Access | [SCREENS_PEOPLE.md](SCREENS_PEOPLE.md) | 7 | User and role management. |
-| Configuration | [SCREENS_CONFIGURATION.md](SCREENS_CONFIGURATION.md) | 10 | Payment types, currencies, and system configuration. |
-| Audit | [SCREENS_AUDIT.md](SCREENS_AUDIT.md) | 2 | Audit history and event detail. |
-| Reports | [SCREENS_REPORTS.md](SCREENS_REPORTS.md) | 8 | Six report pages, PDF preview, and page-format dialog. |
-| Profile | [SCREENS_PROFILE.md](SCREENS_PROFILE.md) | 2 | Account edit flows; the Profile tab is grouped under Home. |
+| Auth | [screen/SCREENS_AUTH.md](screen/SCREENS_AUTH.md) | 2 | Done: responsive startup and sign-in, interaction states, localization, and accessibility improvements. |
+| Home | [screen/SCREENS_HOME.md](screen/SCREENS_HOME.md) | 6 | Done: Home tab redesign and persistent desktop sidebar with logo and bottom Profile action. Other tab redesigns remain pending. |
+| Catalog | [screen/SCREENS_CATALOG.md](SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
+| Suppliers | [screen/SCREENS_SUPPLIERS.md](SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
+| Customers | [screen/SCREENS_CUSTOMERS.md](SCREENS_CUSTOMERS.md) | 4 | Customer list and CRUD forms, plus sale customer selection. |
+| Sales | [screen/SCREENS_SALES.md](SCREENS_SALES.md) | 6 | Sale creation, checkout, and sales history. |
+| Purchases | [screen/SCREENS_PURCHASES.md](SCREENS_PURCHASES.md) | 4 | Purchase list, details, and purchase forms. |
+| Purchase Requests | [screen/SCREENS_PURCHASE_REQUESTS.md](SCREENS_PURCHASE_REQUESTS.md) | 4 | Purchase request list and forms/details. |
+| Purchase Payments | [screen/SCREENS_PURCHASE_PAYMENTS.md](SCREENS_PURCHASE_PAYMENTS.md) | 4 | Purchase payment list, details, and forms. |
+| Stock | [screen/SCREENS_STOCK.md](SCREENS_STOCK.md) | 15 | Warehouses, warehouse stock, adjustments, and transfers. |
+| People & Access | [screen/SCREENS_PEOPLE.md](SCREENS_PEOPLE.md) | 7 | User and role management. |
+| Configuration | [screen/SCREENS_CONFIGURATION.md](SCREENS_CONFIGURATION.md) | 10 | Payment types, currencies, and system configuration. |
+| Audit | [screen/SCREENS_AUDIT.md](SCREENS_AUDIT.md) | 2 | Audit history and event detail. |
+| Reports | [screen/SCREENS_REPORTS.md](SCREENS_REPORTS.md) | 8 | Six report pages, PDF preview, and page-format dialog. |
+| Profile | [screen/SCREENS_PROFILE.md](SCREENS_PROFILE.md) | 2 | Account edit flows; the Profile tab is grouped under Home. |
 
 ## Redesign
 
-The proposes a focused, accessible startup and sign-in experience for InventoryFlow, using UI/UX Pro Max guidance adapted to the existing Flutter/GetX app. It covers mobile and desktop layouts, theme roles, validation, loading and failure states, localization, and implementation checks. This is a design specification; the current Flutter screens have not been changed.
+The Auth redesign is done. Startup and sign-in now include responsive layouts, accessible form feedback, safe error messages, localization, and automated validation. Physical-device, screen-reader, and password-manager checks remain pending.
+
+The Home tab and navigation shell redesign is done. It includes theme-aware surfaces, responsive shortcuts and recent-order cards, labeled navigation, and loading/error/retry states. The desktop sidebar persists across feature and detail routes, shows the app logo at the top, and pins Profile to the bottom. All 150 Flutter tests and the web build passed. Live-browser testing remains pending. Dashboard, Manage, Report, and Profile layouts remain separate work.
 
 ## Screens
 

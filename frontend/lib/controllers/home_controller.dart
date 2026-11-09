@@ -10,14 +10,20 @@ import 'package:frontend/screen/report/report_screen.dart';
 import 'package:frontend/services/main_service/home_service.dart';
 import 'package:get/get.dart';
 
-class HomeController extends GetxController{
+class HomeController extends GetxController {
+  HomeController({HomeService? homeService})
+    : service = homeService ?? HomeService();
 
   RxInt selectedIndex = 0.obs;
   final PageController pageController = PageController();
 
   final Rxn<Map<String, dynamic>> welcomePage = Rxn<Map<String, dynamic>>();
 
-    final HomeService service = HomeService();
+  final HomeService service;
+  final purchasesLoading = true.obs;
+  final salesLoading = true.obs;
+  final purchasesError = false.obs;
+  final salesError = false.obs;
 
   @override
   void onInit() {
@@ -29,41 +35,58 @@ class HomeController extends GetxController{
 
   bool get canViewReport => storage.hasRole('Admin');
 
-  final RxList<Map<String, dynamic>> recentPurchaseList = <Map<String, dynamic>>[].obs;
-  final RxList<Map<String, dynamic>> recentSaleList = <Map<String, dynamic>>[].obs;
+  @override
+  void onReady() {
+    super.onReady();
+    final tab = Get.arguments;
+    if (tab is int && tab >= 0 && tab < (canViewReport ? 5 : 4)) {
+      onTabChanged(tab);
+    }
+  }
+
+  final RxList<Map<String, dynamic>> recentPurchaseList =
+      <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> recentSaleList =
+      <Map<String, dynamic>>[].obs;
 
   Future<void> getRecentPurchase() async {
-    final resp = await service.getRecentPrucases();
-
-    if (resp is List) {
-      recentPurchaseList.value =
-          List<Map<String, dynamic>>.from(resp);
+    purchasesLoading.value = true;
+    purchasesError.value = false;
+    try {
+      final resp = await service.getRecentPrucases();
+      recentPurchaseList.value = List<Map<String, dynamic>>.from(resp as List);
+    } catch (_) {
+      purchasesError.value = true;
+    } finally {
+      purchasesLoading.value = false;
     }
   }
 
   Future<void> getRecentSale() async {
-    final resp = await service.getRecentSales();
-
-    if (resp is List) {
-      recentSaleList.value =
-          List<Map<String, dynamic>>.from(resp);
+    salesLoading.value = true;
+    salesError.value = false;
+    try {
+      final resp = await service.getRecentSales();
+      recentSaleList.value = List<Map<String, dynamic>>.from(resp as List);
+    } catch (_) {
+      salesError.value = true;
+    } finally {
+      salesLoading.value = false;
     }
   }
-  
+
   void onWelcome() {
     final welcome = storage.lastUserLoginRead;
 
     if (welcome.isEmpty) return;
 
     welcomePage.value = welcome["user"] as Map<String, dynamic>?;
-}
+  }
 
   void onTabChanged(int index) {
     if (index != selectedIndex.value) {
       selectedIndex.value = index;
-      pageController.jumpToPage(
-        index,
-      );
+      pageController.jumpToPage(index);
 
       // Refresh the dashboard whenever the user opens its tab.
       if (index == 1) {
@@ -91,17 +114,19 @@ class HomeController extends GetxController{
   ];
 
   // quick action
-  void gotoCategory(){
+  void gotoCategory() {
     Get.toNamed(AppRoutes.category);
   }
-  void gotoProduct(){
+
+  void gotoProduct() {
     Get.toNamed(AppRoutes.product);
   }
-  void gotoSupplier(){
+
+  void gotoSupplier() {
     Get.toNamed(AppRoutes.supplier);
   }
-  void gotoSale(){
+
+  void gotoSale() {
     Get.toNamed(AppRoutes.sale);
   }
-
 }

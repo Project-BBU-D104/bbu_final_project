@@ -1,5 +1,7 @@
 # Auth
 
+**Status: Done** (implementation completed 2026-11-09). Automated validation passed; physical-device, screen-reader, and password-manager checks remain pending.
+
 ## Landing — `frontend/lib/screen/landing.dart`
 - **Route:** `/landing`
 - **Purpose:** Displays the startup/loading page while choosing the next app route.

@@ -1,22 +1,24 @@
 # Home
 
+**Status: Done** for the Home content tab and navigation shell, including the persistent desktop sidebar, app logo, and bottom Profile action. Dashboard, Manage, Report, and Profile tab redesigns remain pending.
+
 ## Home shell — `frontend/lib/screen/home/home_screen.dart`
 - **Route:** `/home`
 - **Purpose:** Provides responsive navigation among the app’s primary sections.
 - **Navigation:** Login success or startup route; tabs open Home content, Dashboard, Manage, Report (role-gated), and Profile.
-- **UI:** Scaffold, `PageView`, desktop NavigationRail, mobile NavigationBar.
+- **UI:** Scaffold and `PageView`; app-level persistent desktop NavigationRail and mobile NavigationBar on Home. The desktop sidebar shows the app logo at the top and Profile at the bottom.
 - **State/data:** `HomeController`, `HomeBinding`, selected tab, role data.
 - **Custom widgets:** Tab pages listed below.
-- **Current design issues:** `titleColor` is used directly; desktop/mobile navigation labels behave differently.
+- **Redesign status:** Done. Theme-aware navigation persists across feature and detail routes, including direct page pushes. Sign-in and startup remain outside the sidebar.
 
 ## Home content — `frontend/lib/screen/home/home_content.dart`
 - **Route:** Embedded Home tab; none.
 - **Purpose:** Shows welcome context, recent purchases/sales, and shortcuts.
 - **Navigation:** Home shell tab; quick actions and recent activity navigate into features. Next destinations include `/category`, `/product`, `/supplier`, `/sale`, `/sale-list`, `/purchase`.
-- **UI:** Scaffold, welcome section, quick-action cards, recent lists.
+- **UI:** Responsive scrollable layout, welcome card with New sale action, quick-action cards, and recent sales/purchases with loading, empty, error, and retry states.
 - **State/data:** `HomeController`; `HomeService` recent sales/purchases; stored login user data.
 - **Custom widgets:** `screen/home/widget/welcome_widget.dart`, `quick_action_widget.dart`, `recent_sale_widget.dart`, `recent_purchase_order_widget.dart`.
-- **Current design issues:** Exact styling issues unclear.
+- **Redesign status:** Done. Supports light/dark themes, Khmer, and enlarged text.
 
 ## Dashboard — `frontend/lib/screen/dashboard/dashboard_screen.dart`
 - **Route:** Embedded Home tab; none.
@@ -55,4 +57,8 @@
 - **Current design issues:** Logout uses explicit colors and several literal spacing values.
 
 ## Redesign notes
+
+- Validation: all 150 Flutter tests and `flutter build web --no-pub` passed.
+- Navigation tests cover sidebar persistence, named and direct routes, dialogs, back navigation, resizing without losing draft text, role-gated reports, and Profile placement.
+- Live-browser testing remains pending. Analysis reports the existing Supabase `anonKey` deprecation notice.
 

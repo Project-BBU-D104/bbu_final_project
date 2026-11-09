@@ -1,77 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/home_controller.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:get/get.dart';
 
 class WelcomeWidget extends StatelessWidget {
   WelcomeWidget({super.key});
-
-  final ctr = Get.put(HomeController());
+  final ctr = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(255, 79, 70, 229),
-            Color(0xFF7C3AED),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: colors.primaryContainer,
+        borderRadius: BorderRadius.circular(24),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: ctr.welcomePage.value?["photo"] != null &&
-                    ctr.welcomePage.value?["photo"]!.isNotEmpty
-                ? NetworkImage(ctr.welcomePage.value?["photo"]!)
-                : const NetworkImage('https://imgs.search.brave.com/Y20_Qf09jZ8KyraFayP-Bh7mXPopmU4Pc6JBLcB4CBY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMjcv/OTUxLzEzMC9zbWFs/bC9hZnJpY2EtZ3V5/LTNkLWF2YXRhci1j/aGFyYWN0ZXItaWxs/dXN0cmF0aW9ucy1w/bmcucG5n'),
-          ),
-
-          const SizedBox(width: 16),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Good Morning 👋".tr,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome Back'.tr,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colors.onPrimaryContainer,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Obx(
+                      () => Text(
+                        ctr.welcomePage.value?['name']?.toString() ?? '',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: colors.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4),
-                Obx(
-                  () => Text(
-                    ctr.welcomePage.value?["name"] ?? "",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              ),
+              const SizedBox(width: 16),
+              ExcludeSemantics(
+                child: ClipOval(
+                  child: Obx(
+                    () => AppCachedImage(
+                      url: ctr.welcomePage.value?['photo']?.toString(),
+                      width: 56,
+                      height: 56,
+                      fallbackIcon: Icons.person_outline,
                     ),
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  "Welcome Back".tr,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: colors.onPrimaryContainer,
+              foregroundColor: colors.primaryContainer,
+              minimumSize: const Size(0, 48),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
+            onPressed: ctr.gotoSale,
+            icon: const Icon(Icons.add_shopping_cart_outlined),
+            label: Text('New sale'.tr),
           ),
         ],
       ),
