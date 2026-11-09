@@ -4,6 +4,8 @@ Plans must be written to files in the repository root only. Never save plan or d
 
 Never Push code to Github or similar without asking the user.
 
+Never add Co-Authored-By trailers to commit messages.
+
 ## Project Structure & Module Organization
 
 This repository contains an inventory management system with two applications:
