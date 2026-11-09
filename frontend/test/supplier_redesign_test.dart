@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/models/supplier_model.dart';
 import 'package:frontend/localization/km_kh.dart';
+import 'package:frontend/localization/en_us.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_card_widget.dart';
@@ -14,6 +15,12 @@ import 'supplier_test_support.dart';
 void main() {
   setUp(setUpSupplierTests);
   tearDown(Get.reset);
+  test('existing Unicode translation keys and labels remain intact', () {
+    expect(enUS['Signing in…'], 'Signing in…');
+    expect(enUS['Opening your workspace…'], 'Opening your workspace…');
+    expect(enUS['Good Morning 👋'], 'Good Morning 👋');
+    expect(enUS['Active Users'], 'អ្នកប្រើប្រាស់សកម្ម');
+  });
   test('supplier text colors meet contrast requirements in both themes', () {
     double contrast(Color a, Color b) {
       final x = a.computeLuminance(), y = b.computeLuminance();

@@ -147,11 +147,12 @@ Future<void> openSupplierMap(
   BuildContext context,
   TextEditingController controller,
 ) async {
+  final route = ModalRoute.of(context);
   try {
     final initialPosition =
         parseCoordinates(controller.text) ?? await _initialMapPosition();
 
-    if (!context.mounted) {
+    if (!context.mounted || route?.isCurrent != true) {
       return;
     }
 
@@ -161,9 +162,11 @@ Future<void> openSupplierMap(
       ),
     );
 
-    if (context.mounted) applyPickedLocation(controller, picked);
+    if (context.mounted && route?.isCurrent == true) {
+      applyPickedLocation(controller, picked);
+    }
   } catch (e) {
-    if (context.mounted) {
+    if (context.mounted && route?.isCurrent == true) {
       ToastWidget.show(
         title: 'Error'.tr,
         message: 'Unable to open location picker'.tr,

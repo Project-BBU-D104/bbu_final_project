@@ -63,6 +63,63 @@ void main() {
     GeolocatorPlatform.instance = originalLocation;
     Get.reset();
   });
+  testWidgets('map launch failure has Khmer feedback', (tester) async {
+    await pumpSupplierHost(
+      tester,
+      home: const Scaffold(),
+      locale: const Locale('km', 'KH'),
+    );
+    await openGoogleMap('javascript:alert(1)');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('មិនអាចបើកផែនទីបានទេ'), findsOneWidget);
+    Get.closeAllSnackbars();
+    await tester.pumpAndSettle();
+  });
+  testWidgets(
+    'location lookup completing during sheet dismissal never opens a picker',
+    (tester) async {
+      final location = FakeLocation()
+        ..enabled = true
+        ..permission = LocationPermission.whileInUse
+        ..position = Completer<Position>();
+      GeolocatorPlatform.instance = location;
+      final text = TextEditingController();
+      addTearDown(text.dispose);
+      late BuildContext host, sheet;
+      await tester.pumpWidget(
+        GetMaterialApp(
+          home: Builder(
+            builder: (context) {
+              host = context;
+              return const Scaffold();
+            },
+          ),
+        ),
+      );
+      showModalBottomSheet<void>(
+        context: host,
+        builder: (context) {
+          sheet = context;
+          return const SizedBox(height: 200);
+        },
+      );
+      await tester.pumpAndSettle();
+      final pending = openSupplierMap(sheet, text);
+      await tester.pump();
+      Navigator.of(sheet).pop();
+      expect(sheet.mounted, true);
+      location.position!.completeError(Exception('location unavailable'));
+      await tester.pump();
+      await tester.pump();
+      final opened = find.byType(LocationPickerPage).evaluate().length;
+      if (opened > 0) Navigator.of(host).pop();
+      await tester.pumpAndSettle();
+      await pending;
+      expect(opened, 0);
+      expect(text.text, isEmpty);
+    },
+  );
   testWidgets('contact launch handles supported and rejected values', (
     tester,
   ) async {

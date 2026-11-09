@@ -2,10 +2,12 @@
 
 Date: 2026-11-09 (Asia/Bangkok). Branch: `suppliers-redesign`, isolated worktree `.superpowers/worktrees/suppliers-redesign`. No push or merge performed.
 
+**Environment:** Installed Flutter 3.44.0 / Dart 3.12.0 and cached dependencies. SDK-generated registrants and lockfile resolution changes are excluded from the final diff.
+
 ## Automated results
 
 - Baseline `flutter test`: **180 passed**.
-- Final `flutter test`: **220 passed**.
+- Final `flutter test`: **223 passed**.
 - `flutter analyze`: **70 existing diagnostics**, down from the 72-issue baseline; comparison by diagnostic message/path found **no new diagnostics**.
 - Standard `flutter build web`: **passed**. Existing dependency wasm dry-run warnings remain; this is a successful standard JavaScript web build, not a claim of wasm support.
 - Focused controller/widget suites passed, including supplier search/cache/refresh, malformed responses, stale-refresh protection, validated/guarded writes, preserved drafts, route and sheet behavior, lifecycle checks, map coordinates, permission fallbacks, launcher failures and unsupported URI rejection.
@@ -28,4 +30,8 @@ Physical devices, live-browser contact handlers/popups, spoken screen readers, a
 
 No backend, endpoint/payload, migration, environment, permission, dependency or generated-platform changes are included. Routes and typed supplier arguments remain compatible; purchase dropdowns retain the unfiltered supplier list. Existing Products planning documents in the main checkout are untouched.
 
-Independent whole-branch review: pending.
+## Independent review
+
+A fresh-context reviewer inspected the complete branch and connected routing/services. Review found a location-lookup race during sheet dismissal, four accidentally corrupted existing Unicode entries, and missing Khmer map-launch failure copy. All three were treated as required corrections and fixed in one pass, with each regression observed failing before the fix and passing afterward. The complete suite then passed all 223 tests. No review findings remain deferred.
+
+The location helper now captures its originating route and checks that it remains current both before pushing the picker and before applying its result. The Unicode entries are restored exactly from the base revision, and map-launch feedback has matching locale entries.

@@ -1,4 +1,5 @@
 const Map<String, String> kmKH = {
+  "Cannot open map": "មិនអាចបើកផែនទីបានទេ",
   "Actions": "សកម្មភាព",
   "Active": "សកម្ម",
   "Inactive": "អសកម្ម",
