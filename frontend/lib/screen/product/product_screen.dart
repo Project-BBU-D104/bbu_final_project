@@ -78,10 +78,7 @@ class ProductScreen extends StatelessWidget {
                 );
               }
 
-              // final list = productCtrl.filteredItems;
-              final list = productCtrl.searchQuery.value.isNotEmpty
-                  ? productCtrl.searchProductList
-                  : productCtrl.filteredItems;
+              final list = productCtrl.filteredItems;
 
               if (list.isEmpty) {
                 final hasError = productCtrl.loadError.value.isNotEmpty;

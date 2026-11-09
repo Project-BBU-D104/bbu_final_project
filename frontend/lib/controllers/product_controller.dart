@@ -199,6 +199,8 @@ class ProductController extends GetxController {
   }
 
   List<Map<String, dynamic>> get filteredItems {
+    final query = searchQuery.value;
+
     return _masterList.where((item) {
       // Category filter
       final catMatch =
@@ -220,7 +222,16 @@ class ProductController extends GetxController {
         }
       }
 
-      return catMatch && statusMatch;
+      // Query filter — same matching as searchProduct.
+      bool queryMatch = true;
+
+      if (query.isNotEmpty) {
+        final name = (item['name'] ?? '').toString().toLowerCase();
+        final barcode = (item['barcode'] ?? '').toString().toLowerCase();
+        queryMatch = name.contains(query) || BarcodeUtils.matches(barcode, query);
+      }
+
+      return catMatch && statusMatch && queryMatch;
     }).toList();
   }
 
@@ -414,13 +425,11 @@ class ProductController extends GetxController {
     }
   }
 
+  /// Clears list filters only; the search field's clear button owns the query
+  /// and form selections (category/unit/currency) are left untouched.
   void clearFilters() {
-    searchQuery.value = '';
     filterCategory.value = 'All';
     selectedStatus.value = 'All';
     selectedRecency.value = 'All';
-    selectedCategory.value = null;
-    selectedUnit.value = null;
-    selectedCurrency.value = null;
   }
 }

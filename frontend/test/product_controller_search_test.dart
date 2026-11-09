@@ -30,6 +30,25 @@ class _FakeProductService implements ProductService {
   Future<dynamic> deleteProduct(int id) async => true;
 }
 
+List<Map<String, dynamic>> composedFixture() => <Map<String, dynamic>>[
+  {'id': 1, 'name': 'Water', 'barcode': '111', 'category': {'name': 'Drinks'}},
+  {'id': 2, 'name': 'Bread', 'barcode': '222', 'category': {'name': 'Bakery'}},
+  {
+    'id': 3,
+    'name': 'Bread roll',
+    'barcode': '333',
+    'category': {'name': 'Drinks'},
+  },
+];
+
+/// Loads a controller from the fake service, which also seeds the static
+/// product cache so each test is independent of prior cache contents.
+Future<ProductController> seeded(_FakeProductService service) async {
+  final controller = ProductController(service: service);
+  await controller.getProducts(showLoading: false);
+  return controller;
+}
+
 void main() {
   tearDown(Get.reset);
 
@@ -98,5 +117,71 @@ void main() {
     expect(service.getCalls, greaterThan(1));
     expect(controller.products.length, items.length);
     expect(controller.loadError.value, isEmpty);
+  });
+
+  test('query and category return their intersection', () async {
+    final service = _FakeProductService(composedFixture());
+    final controller = await seeded(service);
+
+    // Barcode queries match through the existing BarcodeUtils behavior.
+    controller.searchProduct('111');
+    expect(controller.filteredItems.map((p) => p['id']), [1]);
+
+    controller.filterCategory.value = 'Drinks';
+    controller.searchProduct('bread');
+    expect(controller.filteredItems.map((p) => p['id']), [3]);
+  });
+
+  test('clearing query keeps category', () async {
+    final service = _FakeProductService(composedFixture());
+    final controller = await seeded(service);
+
+    controller.filterCategory.value = 'Drinks';
+    controller.searchProduct('bread');
+    expect(controller.filteredItems.map((p) => p['id']), [3]);
+    controller.searchProduct('');
+    expect(controller.filteredItems.map((p) => p['id']), [1, 3]);
+  });
+
+  test('refresh preserves combined filtering', () async {
+    final service = _FakeProductService(composedFixture());
+    final controller = await seeded(service);
+
+    controller.filterCategory.value = 'Drinks';
+    controller.searchProduct('bread');
+
+    service.items = <Map<String, dynamic>>[
+      {
+        'id': 4,
+        'name': 'Bread loaf',
+        'barcode': '444',
+        'category': {'name': 'Drinks'},
+      },
+      {
+        'id': 5,
+        'name': 'Milk',
+        'barcode': '555',
+        'category': {'name': 'Drinks'},
+      },
+    ];
+    await controller.getProducts(showLoading: false);
+
+    expect(controller.filteredItems.map((p) => p['id']), [4]);
+  });
+
+  test('clearFilters preserves search and form selections', () async {
+    final service = _FakeProductService(composedFixture());
+    final controller = await seeded(service);
+
+    controller.selectedCategory.value = '7';
+    controller.searchProduct('bread');
+
+    controller.clearFilters();
+
+    expect(controller.searchQuery.value, 'bread');
+    expect(controller.selectedCategory.value, '7');
+    expect(controller.filterCategory.value, 'All');
+    expect(controller.selectedStatus.value, 'All');
+    expect(controller.selectedRecency.value, 'All');
   });
 }
