@@ -73,4 +73,31 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('clear action empties the field and shared keyword', (
+    tester,
+  ) async {
+    final controller = Get.put(SearchController());
+
+    await tester.pumpWidget(
+      const GetMaterialApp(home: Scaffold(body: SearchWidget(title: 'Search'))),
+    );
+
+    await tester.enterText(find.byType(TextField), 'water');
+    await tester.pump();
+    expect(controller.keyword.value, 'water');
+
+    final clear = find.byTooltip('Clear search');
+    expect(clear, findsOneWidget);
+
+    await tester.tap(clear);
+    await tester.pump();
+
+    expect(find.text('water'), findsNothing);
+    expect(controller.keyword.value, '');
+    expect(tester.takeException(), isNull);
+
+    // Flush the shared keyword debounce timer before the test ends.
+    await tester.pump(const Duration(milliseconds: 600));
+  });
 }

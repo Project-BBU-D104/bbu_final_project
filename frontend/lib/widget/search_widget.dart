@@ -63,6 +63,7 @@ class _SearchWidgetState extends State<SearchWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: const BoxConstraints(minHeight: 48),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -89,6 +90,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                         onPressed: _clear,
                         tooltip: 'Clear search'.tr,
                         icon: const Icon(Icons.close),
+                        tooltip: 'Clear search'.tr,
                       );
               }),
             ],

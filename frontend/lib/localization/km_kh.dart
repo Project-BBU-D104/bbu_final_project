@@ -313,6 +313,14 @@ const Map<String, String> kmKH = {
   'ID':'លេខអត្តសញ្ញាណ',
   'Edit User': 'កែប្រែអ្នកប្រើប្រាស់',
   'Password': 'ពាក្យសម្ងាត់',
-  
+  'All': 'ទាំងអស់',
+  'No products found': 'រកមិនឃើញផលិតផល',
+  'Could not load products': 'មិនអាចទាញយកផលិតផលបានទេ',
+  'No products match the selected filter': 'គ្មានផលិតផលត្រូវនឹងតម្រងដែលបានជ្រើសរើស',
+  'No products available': 'គ្មានផលិតផលទេ',
+  'Clear filters': 'សម្អាតតម្រង',
+  'Filter by Category': 'ត្រងតាមប្រភេទផលិតផល',
+  'Scan Barcode': 'ស្កេនបារកូដ',
+  'Back': 'ត្រឡប់',
 
 };

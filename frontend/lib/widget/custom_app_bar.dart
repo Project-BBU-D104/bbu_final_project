@@ -37,6 +37,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
       leading: showBack
           ? IconButton(
+              tooltip: 'Back'.tr,
               icon: Icon(
                 CupertinoIcons.back,
                 color: useTheme

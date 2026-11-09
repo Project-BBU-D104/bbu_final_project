@@ -312,4 +312,13 @@ const Map<String, String> enUS = {
   'Transfer Date':'Transfer Date',
   'Select Transfer Date':'Select Transfer Date',
   'Select Date':'Select Date',
+  'All':'All',
+  'No products found':'No products found',
+  'Could not load products':'Could not load products',
+  'No products match the selected filter':'No products match the selected filter',
+  'No products available':'No products available',
+  'Clear filters':'Clear filters',
+  'Filter by Category':'Filter by Category',
+  'Scan Barcode':'Scan Barcode',
+  'Back':'Back',
 };
