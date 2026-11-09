@@ -67,8 +67,8 @@ void main() {
     await tester.pumpWidget(
       Obx(
         () => GetMaterialApp(
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
           themeMode: ctr.isDark.value ? ThemeMode.dark : ThemeMode.light,
           home: Scaffold(body: SettingWidget()),
         ),

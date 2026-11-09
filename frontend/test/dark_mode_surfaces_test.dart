@@ -19,8 +19,8 @@ class TestSaleController extends SaleController {
 Future<void> pumpDark(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(
     GetMaterialApp(
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.dark,
       home: Scaffold(body: SingleChildScrollView(child: child)),
     ),

@@ -89,8 +89,8 @@ void main() {
     );
     await tester.pumpWidget(
       GetMaterialApp(
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
         home: const SizedBox(),
       ),
     );

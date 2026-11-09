@@ -100,8 +100,9 @@ class MyApp extends StatelessWidget {
 
         transitionDuration: const Duration(milliseconds: 0),
         defaultTransition: Transition.noTransition,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
+        // Apply the bundled font for the active language; the Obx rebuilds on locale change.
+        theme: AppTheme.light(fontFamily: languageController.fontFamily),
+        darkTheme: AppTheme.dark(fontFamily: languageController.fontFamily),
         themeMode: themeController.isDark.value
             ? ThemeMode.dark
             : ThemeMode.light,

@@ -61,6 +61,7 @@ final Color skeletonizerContainerColor = Colors.grey.shade300;
 final double circularRadius = 8.0;
 final EdgeInsets padding = EdgeInsets.all(8.0);
 final EdgeInsets margin = EdgeInsets.all(8.0);
+final String logoPath = "assets/icon/logo.jpg";
 final String backgroundPath = "assets/images/background.png";
 final String bannerPath = "assets/images/banner.jpg";
 final String logoNoBackgroundPath = "assets/images/logo_no_background.png";
