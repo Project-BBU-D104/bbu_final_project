@@ -125,4 +125,6 @@ Future<void> pumpSupplierHost(
     ),
   );
   await tester.pumpAndSettle();
+  Get.updateLocale(locale);
+  await tester.pumpAndSettle();
 }

@@ -25,6 +25,12 @@ class DelayedSupplierService extends FakeSupplierService {
   }
 }
 
+class DelayedRefreshService extends FakeSupplierService {
+  Completer<dynamic>? refresh;
+  @override
+  Future<dynamic> getSuppliers() => refresh?.future ?? super.getSuppliers();
+}
+
 void main() {
   setUp(setUpSupplierTests);
   tearDown(Get.reset);
@@ -276,5 +282,34 @@ void main() {
       tester.getTopLeft(fields.at(1)).dx,
       greaterThan(tester.getTopLeft(fields.at(0)).dx),
     );
+  });
+  testWidgets('detail remains visible behind its edit sheet', (tester) async {
+    final c = await seed(tester, FakeSupplierService());
+    c.gotoSupplierDetail(c.suppliers.first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byWidgetPredicate((w) => w is Text && w.data == 'Alpha'),
+      findsOneWidget,
+    );
+  });
+  testWidgets('an older refresh cannot overwrite a committed supplier', (
+    tester,
+  ) async {
+    final s = DelayedRefreshService();
+    final c = await seed(tester, s);
+    s.refresh = Completer<dynamic>();
+    final pending = c.getSuppliers();
+    await tester.pump();
+    c.addSupplier(tester.element(find.byType(SupplierScreen)));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    fill(c);
+    await c.saveSupplier(tester.element(find.byType(SupplierAddWidget)));
+    s.refresh!.complete([supplierJson(1, 'Alpha'), supplierJson(2, 'Beta')]);
+    await pending;
+    await tester.pumpAndSettle();
+    expect(c.suppliers.map((v) => v.id), [1, 2, 3]);
   });
 }

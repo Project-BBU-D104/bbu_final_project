@@ -14,6 +14,10 @@ class SupplierCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final activeColor = theme.brightness == Brightness.light
+        ? theme.colorScheme.primaryContainer
+        : theme.colorScheme.primary;
+    final inactiveColor = theme.colorScheme.onSurface;
     return Card(
       color: theme.cardColor,
       elevation: 0,
@@ -71,8 +75,8 @@ class SupplierCardWidget extends StatelessWidget {
                   StatusWidget(
                     text: (item.status == true ? 'Active' : 'Inactive').tr,
                     color: item.status == true
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.error,
+                        ? activeColor
+                        : inactiveColor,
                   ),
                   Text(
                     item.createdAt == null

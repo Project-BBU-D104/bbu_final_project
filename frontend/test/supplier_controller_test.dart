@@ -6,6 +6,11 @@ import 'package:frontend/models/supplier_model.dart';
 import 'package:get/get.dart';
 import 'supplier_test_support.dart';
 
+class NonListSupplierService extends FakeSupplierService {
+  @override
+  Future<dynamic> getSuppliers() async => {'unexpected': true};
+}
+
 void main() {
   setUp(setUpSupplierTests);
   tearDown(Get.reset);
@@ -61,4 +66,17 @@ void main() {
       expect(m.updatedAt, isNull);
     }
   });
+  test(
+    'non-list response retains existing records and exposes an error',
+    () async {
+      final c = SupplierController(service: NonListSupplierService());
+      c.suppliers.assignAll([SupplierModel.fromJson(supplierJson(1, 'Alpha'))]);
+      c.searchSupplier('alpha');
+      await c.getSuppliers();
+      expect(c.loadError.value, isNotEmpty);
+      expect(c.searchSuppliers.single.name, 'Alpha');
+      expect(c.isLoading.value, false);
+      c.onClose();
+    },
+  );
 }

@@ -10,13 +10,16 @@ import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class SupplierDetailCardWidget extends StatelessWidget {
-  SupplierDetailCardWidget({super.key});
+  SupplierDetailCardWidget({super.key})
+    : _supplier = Get.arguments is SupplierModel
+          ? Get.arguments as SupplierModel
+          : null;
+  final SupplierModel? _supplier;
   final ctr = Get.find<SupplierController>();
 
   @override
   Widget build(BuildContext context) {
-    final argument = Get.arguments;
-    final original = argument is SupplierModel ? argument : null;
+    final original = _supplier;
     return Scaffold(
       appBar: const CustomAppBar(title: 'Supplier Detail', useTheme: true),
       body: original == null
@@ -27,6 +30,10 @@ class SupplierDetailCardWidget extends StatelessWidget {
                 orElse: () => original,
               );
               final theme = Theme.of(context);
+              final activeColor = theme.brightness == Brightness.light
+                  ? theme.colorScheme.primaryContainer
+                  : theme.colorScheme.primary;
+              final inactiveColor = theme.colorScheme.onSurface;
               final error = ctr.formError.value;
               Widget info(String label, String? value) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -67,8 +74,8 @@ class SupplierDetailCardWidget extends StatelessWidget {
                               (supplier.status == true ? 'Active' : 'Inactive')
                                   .tr,
                           color: supplier.status == true
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.error,
+                              ? activeColor
+                              : inactiveColor,
                         ),
                         const SizedBox(height: 20),
                         if (error.isNotEmpty)
@@ -181,7 +188,9 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     children: [
                       OutlinedButton.icon(
                         onPressed:
-                            ctr.isSaving.value || ctr.isOpeningEdit.value || original.id == null
+                            ctr.isSaving.value ||
+                                ctr.isOpeningEdit.value ||
+                                original.id == null
                             ? null
                             : () => ctr.deleteSupplier(
                                 supplierId: original.id!,
@@ -196,7 +205,9 @@ class SupplierDetailCardWidget extends StatelessWidget {
                       ),
                       FilledButton.icon(
                         onPressed:
-                            ctr.isSaving.value || ctr.isOpeningEdit.value || original.id == null
+                            ctr.isSaving.value ||
+                                ctr.isOpeningEdit.value ||
+                                original.id == null
                             ? null
                             : () => ctr.editSupplier(original.id!, context),
                         icon: const Icon(Icons.edit_outlined),

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/models/supplier_model.dart';
+import 'package:frontend/localization/km_kh.dart';
+import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/screen/supplier/supplier_screen.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_card_widget.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_table_widget.dart';
@@ -12,6 +14,56 @@ import 'supplier_test_support.dart';
 void main() {
   setUp(setUpSupplierTests);
   tearDown(Get.reset);
+  test('supplier text colors meet contrast requirements in both themes', () {
+    double contrast(Color a, Color b) {
+      final x = a.computeLuminance(), y = b.computeLuminance();
+      return ((x > y ? x : y) + 0.05) / ((x < y ? x : y) + 0.05);
+    }
+
+    for (final theme in [AppTheme.light(), AppTheme.dark()]) {
+      for (final color in [
+        theme.colorScheme.onSurface,
+        theme.colorScheme.onSurfaceVariant,
+        theme.colorScheme.primary,
+        theme.colorScheme.error,
+      ]) {
+        expect(contrast(color, theme.cardColor), greaterThanOrEqualTo(4.5));
+      }
+      final activeColor = theme.brightness == Brightness.light
+          ? theme.colorScheme.primaryContainer
+          : theme.colorScheme.primary;
+      final inactiveColor = theme.colorScheme.onSurface;
+      for (final color in [activeColor, inactiveColor]) {
+        expect(
+          contrast(
+            color,
+            Color.alphaBlend(color.withValues(alpha: 0.15), theme.cardColor),
+          ),
+          greaterThanOrEqualTo(4.5),
+          reason: '${theme.brightness} $color',
+        );
+      }
+    }
+  });
+  test('supplier statuses and form feedback have Khmer translations', () {
+    for (final key in [
+      'Active',
+      'Inactive',
+      'Cancel',
+      'Confirm',
+      'Do you want to delete this supplier?',
+      'Email is required',
+      'Ok',
+      'Phone',
+      'Phone number is required',
+      'Pick Location',
+      'Supplier name is required',
+      'Actions',
+    ]) {
+      expect(kmKH[key], isNotNull, reason: key);
+      expect(kmKH[key], isNot(key), reason: key);
+    }
+  });
   Future<SupplierController> seed() async {
     final c = SupplierController(service: FakeSupplierService());
     await c.getSuppliers();

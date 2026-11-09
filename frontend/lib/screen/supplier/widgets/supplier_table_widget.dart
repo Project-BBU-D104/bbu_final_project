@@ -71,7 +71,7 @@ class SupplierTableWidget extends StatelessWidget {
                         style: TextStyle(
                           color: item.status == true
                               ? theme.colorScheme.primary
-                              : theme.colorScheme.error,
+                          : theme.colorScheme.onSurface,
                         ),
                       ),
                     ),
