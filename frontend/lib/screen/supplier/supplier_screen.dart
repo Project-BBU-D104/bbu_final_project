@@ -22,44 +22,54 @@ class SupplierScreen extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 1240),
               child: Padding(
                 padding: EdgeInsets.all(padding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 12,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          'Suppliers'.tr,
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        FilledButton.icon(
-                          onPressed: () => controller.addSupplier(context),
-                          icon: const Icon(Icons.add),
-                          label: Text('Add Supplier'.tr),
-                        ),
-                        IconButton(
-                          tooltip: 'Refresh'.tr,
-                          onPressed: controller.onRefresh,
-                          icon: const Icon(Icons.refresh),
-                        ),
-                      ],
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 12,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                'Suppliers'.tr,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineMedium,
+                              ),
+                              FilledButton.icon(
+                                onPressed: () =>
+                                    controller.addSupplier(context),
+                                icon: const Icon(Icons.add),
+                                label: Text('Add Supplier'.tr),
+                              ),
+                              IconButton(
+                                tooltip: 'Refresh'.tr,
+                                onPressed: controller.onRefresh,
+                                icon: const Icon(Icons.refresh),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text('Manage supplier contacts and locations.'.tr),
+                          const SizedBox(height: 16),
+                          const SearchWidget(title: 'Search Suppliers'),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Text('Manage supplier contacts and locations.'.tr),
-                    const SizedBox(height: 16),
-                    const SearchWidget(title: 'Search Suppliers'),
-                    const SizedBox(height: 16),
-                    Expanded(
+                    SliverFillRemaining(
                       child: Obx(() {
                         final loading = controller.isLoading.value;
                         final error = controller.loadError.value;
                         final items = controller.searchSuppliers.toList();
-                        if (loading && controller.suppliers.isEmpty)
+                        if (loading && controller.suppliers.isEmpty) {
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
+                        }
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [

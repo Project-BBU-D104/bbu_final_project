@@ -27,6 +27,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
                 orElse: () => original,
               );
               final theme = Theme.of(context);
+              final error = ctr.formError.value;
               Widget info(String label, String? value) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Column(
@@ -70,6 +71,14 @@ class SupplierDetailCardWidget extends StatelessWidget {
                               : theme.colorScheme.error,
                         ),
                         const SizedBox(height: 20),
+                        if (error.isNotEmpty)
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              error,
+                              style: TextStyle(color: theme.colorScheme.error),
+                            ),
+                          ),
                         info('Phone Number', supplier.phone),
                         info('Email', supplier.email),
                         Wrap(
@@ -161,39 +170,43 @@ class SupplierDetailCardWidget extends StatelessWidget {
             }),
       bottomNavigationBar: original == null
           ? null
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: original.id == null
-                          ? null
-                          : () => ctr.deleteSupplier(
-                              supplierId: original.id!,
-                              context: context,
-                            ),
-                      icon: const Icon(Icons.delete_outline),
-                      label: Text('Delete'.tr),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.error,
-                        minimumSize: const Size(100, 48),
+          : Obx(
+              () => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed:
+                            ctr.isSaving.value || ctr.isOpeningEdit.value || original.id == null
+                            ? null
+                            : () => ctr.deleteSupplier(
+                                supplierId: original.id!,
+                                context: context,
+                              ),
+                        icon: const Icon(Icons.delete_outline),
+                        label: Text('Delete'.tr),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                          minimumSize: const Size(100, 48),
+                        ),
                       ),
-                    ),
-                    FilledButton.icon(
-                      onPressed: original.id == null
-                          ? null
-                          : () => ctr.editSupplier(original.id!, context),
-                      icon: const Icon(Icons.edit_outlined),
-                      label: Text('Edit'.tr),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(100, 48),
+                      FilledButton.icon(
+                        onPressed:
+                            ctr.isSaving.value || ctr.isOpeningEdit.value || original.id == null
+                            ? null
+                            : () => ctr.editSupplier(original.id!, context),
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text('Edit'.tr),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(100, 48),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

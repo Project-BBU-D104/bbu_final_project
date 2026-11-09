@@ -1,4 +1,8 @@
 const Map<String, String> enUS = {
+  "Unable to save supplier. Please try again.": "Unable to save supplier. Please try again.",
+  "Unable to open supplier. Please try again.": "Unable to open supplier. Please try again.",
+  "Unable to delete supplier. Please try again.": "Unable to delete supplier. Please try again.",
+  "Saving...": "Saving...",
   "Manage supplier contacts and locations.": "Manage supplier contacts and locations.",
   "No suppliers yet": "No suppliers yet",
   "No matching suppliers": "No matching suppliers",

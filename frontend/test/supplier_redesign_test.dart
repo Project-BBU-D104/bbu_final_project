@@ -134,13 +134,13 @@ void main() {
     (tester) async {
       await seed();
       final semantics = tester.ensureSemantics();
-        await pumpSupplierHost(tester, home: SupplierScreen(), dark: true);
+      await pumpSupplierHost(tester, home: SupplierScreen(), dark: true);
       final card = tester.widget<Card>(find.byType(Card).first);
       final theme = Theme.of(tester.element(find.byType(SupplierScreen)));
       expect(card.color, theme.cardColor);
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-    semantics.dispose();
+      semantics.dispose();
     },
   );
 }
