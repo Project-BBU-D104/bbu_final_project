@@ -34,7 +34,7 @@ Implementation covers all five screens. The list and detail retain the desktop s
 
 Final automated counts and limits are recorded in [the validation record](../2026-11-09-suppliers-redesign-validation.md). Controller/widget coverage includes required-field validation, duplicate writes, failed writes and refreshes, delayed results, stale refresh protection, route/sheet preservation, keyboard activation, 48-pixel tap targets, both themes, Khmer, 200% scaling, coordinate validation and permission fallbacks. Supplier text/status contrast is checked against the 4.5:1 minimum.
 
-Fixture screenshots of desktop/mobile lists, Add/Edit, detail, dark Khmer and the picker are retained in the worktree's ignored `.superpowers/supplier-preview/` directory. Picker previews use in-memory tiles; they do not demonstrate live map availability.
+Fixture screenshots of desktop/mobile lists, Add/Edit, detail, dark Khmer and the picker are retained in the main checkout's ignored `.superpowers/supplier-preview/` directory. Picker previews use in-memory tiles; they do not demonstrate live map availability.
 
 The Chrome test suite could not start because the Flutter test server failed to load its local CanvasKit JS/WASM resources. No browser test pass is claimed. The standard web build is verified separately.
 

@@ -1,6 +1,6 @@
 # Suppliers Redesign Design
 
-**Status:** Implemented on the isolated `suppliers-redesign` branch; final review and manual-QA limits are recorded in the validation document.
+**Status:** Implemented and merged locally into `main`; final review and manual-QA limits are recorded in the validation document.
 **Request:** Full Suppliers group redesign matching Home, confirmed on 2026-11-09.
 **Inventory:** [SCREENS_INDEX.md](SCREENS_INDEX.md), [screen/SCREENS_SUPPLIERS.md](screen/SCREENS_SUPPLIERS.md).
 

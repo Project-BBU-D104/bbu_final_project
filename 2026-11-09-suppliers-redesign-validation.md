@@ -1,6 +1,6 @@
 # Suppliers Redesign Validation
 
-Date: 2026-11-09 (Asia/Bangkok). Branch: `suppliers-redesign`, isolated worktree `.superpowers/worktrees/suppliers-redesign`. No push or merge performed.
+Date: 2026-11-09 (Asia/Bangkok). Developed on `suppliers-redesign` and merged locally into `main` at `a5c2ecc`. Post-merge `flutter test --no-pub`: **223 passed**. No remote push performed.
 
 **Environment:** Installed Flutter 3.44.0 / Dart 3.12.0 and cached dependencies. SDK-generated registrants and lockfile resolution changes are excluded from the final diff.
 
@@ -13,7 +13,7 @@ Date: 2026-11-09 (Asia/Bangkok). Branch: `suppliers-redesign`, isolated worktree
 - Focused controller/widget suites passed, including supplier search/cache/refresh, malformed responses, stale-refresh protection, validated/guarded writes, preserved drafts, route and sheet behavior, lifecycle checks, map coordinates, permission fallbacks, launcher failures and unsupported URI rejection.
 - Accessibility checks include keyboard card activation, labeled targets, Android-sized touch targets, both themes, long Khmer text and 200% text scaling. Supplier text and badge contrast tests meet **4.5:1**.
 - A regression reproduced the detail page disappearing behind Edit; it passes after capturing the original supplier argument. A separate regression caught missing Khmer status/validation copy.
-- Fixture screenshot render passed for desktop/mobile list, detail, Edit, Add, dark Khmer and picker. Previews are in ignored `.superpowers/supplier-preview/` inside this worktree. Picker screenshots use in-memory tiles.
+- Fixture screenshot render passed for desktop/mobile list, detail, Edit, Add, dark Khmer and picker. Previews are preserved in the main checkout's ignored `.superpowers/supplier-preview/` directory. Picker screenshots use in-memory tiles.
 
 ## Browser and manual limits
 
