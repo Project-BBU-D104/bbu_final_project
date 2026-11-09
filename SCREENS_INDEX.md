@@ -9,7 +9,7 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 | Auth (done) | [screen/SCREENS_AUTH.md](screen/SCREENS_AUTH.md) | 2 | Implementation complete: startup/sign-in, pre-sign-in preferences, recovery guidance, and browser autofill fixes. Manual device, screen-reader, and password-manager QA pending. |
 | Home (done) | [screen/SCREENS_HOME.md](screen/SCREENS_HOME.md) | 6 | Done: all six screens redesigned—Home shell, Home content, Dashboard, Manage, Report index, and Profile. |
 | Catalog | [screen/SCREENS_CATALOG.md](screen/SCREENS_CATALOG.md) | 10 | Categories, products, units, and product scanning/forms. |
-| Suppliers | [screen/SCREENS_SUPPLIERS.md](screen/SCREENS_SUPPLIERS.md) | 5 | Supplier list, forms, details, and map picker. |
+| Suppliers (done) | [screen/SCREENS_SUPPLIERS.md](screen/SCREENS_SUPPLIERS.md) | 5 | All five redesigned: responsive list/detail, shared forms, and accessible map picker. Manual device/browser QA pending. |
 | Customers | [screen/SCREENS_CUSTOMERS.md](screen/SCREENS_CUSTOMERS.md) | 4 | Customer list and CRUD forms, plus sale customer selection. |
 | Sales | [screen/SCREENS_SALES.md](screen/SCREENS_SALES.md) | 6 | Sale creation, checkout, and sales history. |
 | Purchases | [screen/SCREENS_PURCHASES.md](screen/SCREENS_PURCHASES.md) | 4 | Purchase list, details, and purchase forms. |
@@ -27,6 +27,8 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 Auth implementation is complete. Startup and sign-in include responsive layouts, safe feedback, pre-sign-in language/theme controls, administrator password-recovery guidance, and corrected web autofill hints with accessibility enabled. All 180 Flutter tests, two web-autofill tests, targeted analysis, the standard web build, and headless Chrome checks passed. Physical-device, spoken screen-reader, and real password-manager save/retrieval checks remain pending; see the Auth inventory for the exact checklist.
 
 The complete Home group redesign is done: Home shell, Home content, Dashboard, Manage, Report index, and Profile. All six screens use consistent responsive layouts and theme-aware surfaces. The desktop sidebar persists across feature and detail routes, with the logo at the top and Profile at the bottom. Dashboard includes redesigned KPIs, charts, and product lists; Manage and Report have independent searchable directories; Profile includes redesigned account, personal-information, and preferences panels. All 172 Flutter tests, targeted analysis, and the standard web build passed. Manual live-browser, physical-device, and screen-reader checks remain pending.
+
+The Suppliers group redesign is implemented across all five screens: list, Add, Edit, detail and location picker. It matches Home surfaces and desktop navigation, preserves search through refresh/writes, guards supplier submissions, retains failed drafts, and adds keyboard coordinate entry. English/Khmer and light/dark states are covered by focused tests, with contrast and tap-target checks. See the [Suppliers inventory](screen/SCREENS_SUPPLIERS.md) and [validation record](2026-11-09-suppliers-redesign-validation.md) for results and remaining manual checks.
 
 ## Screens
 
