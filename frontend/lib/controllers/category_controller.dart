@@ -20,8 +20,7 @@ class CategoryController extends GetxController {
   static const Duration _cacheTtl = Duration(seconds: 60);
 
   static bool get _hasFreshCache =>
-      _cachedAt != null &&
-      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+      _cachedAt != null && DateTime.now().difference(_cachedAt!) < _cacheTtl;
 
   final categoryList = <Map<String, dynamic>>[].obs;
   final searchCategoryList = <Map<String, dynamic>>[].obs;
@@ -232,10 +231,11 @@ class CategoryController extends GetxController {
     await getCategory();
     if (!isClosed) {
       ToastWidget.show(
-        message: (categoryId == null
-                ? 'Category created successfully'
-                : 'Category updated successfully')
-            .tr,
+        message:
+            (categoryId == null
+                    ? 'Category created successfully'
+                    : 'Category updated successfully')
+                .tr,
         type: ToastType.success,
       );
     }

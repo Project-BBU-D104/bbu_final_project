@@ -31,7 +31,10 @@ class FakeCategoryService implements CategoryService {
     categoryJson(2, 'Beta'),
   ];
   Map<String, dynamic>? lastCreatedData, lastUpdatedData;
-  int getCalls = 0, getByIdCalls = 0, createCalls = 0, updateCalls = 0,
+  int getCalls = 0,
+      getByIdCalls = 0,
+      createCalls = 0,
+      updateCalls = 0,
       deleteCalls = 0;
   bool failGet = false, failWrite = false;
 
@@ -64,7 +67,10 @@ class FakeCategoryService implements CategoryService {
     lastUpdatedData = data;
     if (failWrite) throw Exception('failed');
     final item = {...categoryJson(id, ''), ...data};
-    items = [for (final c in items) if (c['id'] == id) item else c];
+    items = [
+      for (final c in items)
+        if (c['id'] == id) item else c,
+    ];
     return item;
   }
 

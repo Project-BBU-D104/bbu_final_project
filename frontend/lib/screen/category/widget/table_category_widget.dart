@@ -14,11 +14,8 @@ class CategoryTableWidget extends StatelessWidget {
     final colors = theme.colorScheme;
     final line = colors.onSurface.withValues(alpha: 0.08);
     final controller = Get.find<CategoryController>();
-    Widget heading(String label) => Text(
-      label.tr,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
+    Widget heading(String label) =>
+        Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis);
     Widget value(String text) => Tooltip(
       message: text,
       child: Text(
@@ -115,8 +112,9 @@ class CategoryTableWidget extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Tooltip(
-                                    message:
-                                        (item['name'] ?? '').toString().trim(),
+                                    message: (item['name'] ?? '')
+                                        .toString()
+                                        .trim(),
                                     child: Text(
                                       (item['name'] ?? '')
                                               .toString()
@@ -149,8 +147,7 @@ class CategoryTableWidget extends StatelessWidget {
                           DataCell(
                             Text(
                               DateTime.tryParse(
-                                        (item['created_at'] ?? '')
-                                            .toString(),
+                                        (item['created_at'] ?? '').toString(),
                                       ) ==
                                       null
                                   ? '-'
@@ -218,7 +215,10 @@ class CategoryTableWidget extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    (item['name'] ?? '').toString().trim().isEmpty
+                                    (item['name'] ?? '')
+                                            .toString()
+                                            .trim()
+                                            .isEmpty
                                         ? '-'
                                         : item['name'].toString().trim(),
                                     maxLines: 1,

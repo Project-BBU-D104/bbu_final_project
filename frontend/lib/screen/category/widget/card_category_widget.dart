@@ -15,9 +15,7 @@ class CategoryCardWidget extends StatelessWidget {
     final categoryId = item['id'] is int ? item['id'] as int : null;
     final name = (item['name'] ?? '').toString().trim();
     final description = (item['description'] ?? '').toString().trim();
-    final createdAt = DateTime.tryParse(
-      (item['created_at'] ?? '').toString(),
-    );
+    final createdAt = DateTime.tryParse((item['created_at'] ?? '').toString());
     return Card(
       color: theme.cardColor,
       elevation: 0,

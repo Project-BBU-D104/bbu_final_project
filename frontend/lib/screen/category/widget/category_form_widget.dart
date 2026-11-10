@@ -157,8 +157,7 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
                           'Category Name',
                           hint: 'Enter Category Name',
                         ),
-                        validator: (value) =>
-                            (value ?? '').trim().isEmpty
+                        validator: (value) => (value ?? '').trim().isEmpty
                             ? 'Category name is required'.tr
                             : null,
                       ),
