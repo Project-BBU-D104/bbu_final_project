@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -223,10 +222,9 @@ void main() {
     List<Map<String, dynamic>> scenario() {
       final water = productFixture(1, 'Water')..remove('created_at');
       final milk = productFixture(2, 'Milk')..['created_at'] = 'not-a-date';
-      final coffee =
-          productFixture(3, 'Coffee')
-            ..['currency'] = {'symbol': '៛', 'code': 'KHR'}
-            ..['created_at'] = null;
+      final coffee = productFixture(3, 'Coffee')
+        ..['currency'] = {'symbol': '៛', 'code': 'KHR'}
+        ..['created_at'] = null;
       final tea = productFixture(4, 'Tea')..['currency'] = null;
       return [water, milk, coffee, tea];
     }
@@ -324,7 +322,10 @@ void main() {
       find.ancestor(of: title, matching: find.byType(Material)).first,
     );
     expect(sheetMaterial.color, theme.colorScheme.surface);
-    expect(tester.widget<Text>(title).style?.color, theme.colorScheme.onSurface);
+    expect(
+      tester.widget<Text>(title).style?.color,
+      theme.colorScheme.onSurface,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -353,7 +354,7 @@ void main() {
 
     final handle = tester.ensureSemantics();
     final filterSemantics = tester.getSemantics(find.byType(FilterWidget));
-    expect(filterSemantics.hasFlag(SemanticsFlag.isButton), isTrue);
+    expect(filterSemantics.flagsCollection.isButton, isTrue);
     expect(filterSemantics.label, isNotEmpty);
     handle.dispose();
 
@@ -391,8 +392,8 @@ void main() {
         'Premium Imported Sparkling Mineral Water Family Size 1500ml';
     const longBarcode = '12345678901234567890';
 
-    Map<String, dynamic> longProduct() => productFixture(1, longName)
-      ..['barcode'] = longBarcode;
+    Map<String, dynamic> longProduct() =>
+        productFixture(1, longName)..['barcode'] = longBarcode;
 
     Future<ThemeData> openDetail(
       WidgetTester tester,
@@ -425,11 +426,11 @@ void main() {
     testWidgets('detail reflows long translated content', (tester) async {
       final detail = find.byType(ProductCardDetailWidget);
 
-      Rect imageRect() => tester
-          .getRect(
-            find.descendant(of: detail, matching: find.byType(AppCachedImage))
-                .first,
-          );
+      Rect imageRect() => tester.getRect(
+        find
+            .descendant(of: detail, matching: find.byType(AppCachedImage))
+            .first,
+      );
       Rect infoRect() => tester.getRect(
         find.descendant(of: detail, matching: find.text('Product Information')),
       );
@@ -437,8 +438,10 @@ void main() {
       // 899 pixels of available detail width: image stacks above information.
       await openDetail(tester, const Size(931, 900));
       expect(infoRect().top, greaterThanOrEqualTo(imageRect().bottom));
-      expect(find.descendant(of: detail, matching: find.byType(Card)),
-          findsWidgets);
+      expect(
+        find.descendant(of: detail, matching: find.byType(Card)),
+        findsWidgets,
+      );
       expect(tester.takeException(), isNull);
 
       // 900 pixels: image beside information.
@@ -458,7 +461,10 @@ void main() {
       expect(scaffold.backgroundColor, theme.scaffoldBackgroundColor);
 
       // Long values stay fully readable, not ellipsized.
-      final nameFinder = find.descendant(of: detail, matching: find.text(longName));
+      final nameFinder = find.descendant(
+        of: detail,
+        matching: find.text(longName),
+      );
       expect(nameFinder, findsOneWidget);
       expect(tester.widget<Text>(nameFinder).maxLines, isNull);
       final barcodeFinder = find.descendant(
@@ -490,20 +496,22 @@ void main() {
         find.descendant(of: detail, matching: find.byType(Scaffold)).first,
       );
       expect(scaffold.backgroundColor, theme.scaffoldBackgroundColor);
-      final khmerName = find.descendant(of: detail, matching: find.text(longName));
+      final khmerName = find.descendant(
+        of: detail,
+        matching: find.text(longName),
+      );
       expect(khmerName, findsOneWidget);
       expect(tester.widget<Text>(khmerName).maxLines, isNull);
     });
 
     testWidgets('detail tolerates absent optional fields', (tester) async {
-      final product =
-          productFixture(1, 'Water')
-            ..['unit'] = null
-            ..['category'] = null
-            ..['currency'] = null
-            ..['photo'] = null
-            ..['description'] = null
-            ..['created_at'] = null;
+      final product = productFixture(1, 'Water')
+        ..['unit'] = null
+        ..['category'] = null
+        ..['currency'] = null
+        ..['photo'] = null
+        ..['description'] = null
+        ..['created_at'] = null;
 
       await pumpProductScreen(
         tester,
@@ -518,8 +526,10 @@ void main() {
       final theme = Theme.of(tester.element(detail));
       expect(tester.takeException(), isNull);
       // Unit and category fall back to '-'.
-      expect(find.descendant(of: detail, matching: find.text('-')),
-          findsNWidgets(2));
+      expect(
+        find.descendant(of: detail, matching: find.text('-')),
+        findsNWidgets(2),
+      );
       expect(
         find.descendant(
           of: detail,

@@ -44,7 +44,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ? Theme.of(context).colorScheme.onSurface
                     : darkColor,
               ),
-              tooltip: 'Back'.tr,
               onPressed: onBack ?? () => Get.back(),
             )
           : null,

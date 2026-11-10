@@ -135,7 +135,8 @@ class ProductScreen extends StatelessWidget {
                   if (list.isEmpty) {
                     // Error takes precedence over any empty-result message.
                     final hasError = productCtrl.loadError.value.isNotEmpty;
-                    final isSearching = productCtrl.searchQuery.value.isNotEmpty;
+                    final isSearching =
+                        productCtrl.searchQuery.value.isNotEmpty;
                     final hasFilters = productCtrl.hasActiveFilters;
 
                     final IconData icon;
@@ -203,7 +204,8 @@ class ProductScreen extends StatelessWidget {
                                 children: [
                                   if (hasError)
                                     OutlinedButton.icon(
-                                      onPressed: () => productCtrl.getProducts(),
+                                      onPressed: () =>
+                                          productCtrl.getProducts(),
                                       icon: const Icon(Icons.refresh, size: 18),
                                       label: Text('Retry'.tr),
                                     ),
@@ -238,7 +240,9 @@ class ProductScreen extends StatelessWidget {
                               if (index == 0) {
                                 return const _ProductTableHeader();
                               }
-                              return ProductTableWidget(product: list[index - 1]);
+                              return ProductTableWidget(
+                                product: list[index - 1],
+                              );
                             }, childCount: list.length + 1),
                           );
                         }
@@ -296,59 +300,64 @@ class ProductScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Filter by ${type.capitalizeFirst}'.tr,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Filter by ${type.capitalizeFirst}'.tr,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  children: options
-                      .map(
-                        (opt) => ListTile(
-                          // Business values (category names) stay untranslated;
-                          // only the 'All' sentinel is UI copy.
-                          title: Text(
-                            opt == 'All' ? 'All'.tr : opt,
-                            style: TextStyle(color: theme.colorScheme.onSurface),
+                const SizedBox(height: 12),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: options
+                        .map(
+                          (opt) => ListTile(
+                            // Business values (category names) stay untranslated;
+                            // only the 'All' sentinel is UI copy.
+                            title: Text(
+                              opt == 'All' ? 'All'.tr : opt,
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            trailing:
+                                (type == 'category' &&
+                                        ctrl.filterCategory.value == opt) ||
+                                    (type == 'status' &&
+                                        ctrl.selectedStatus.value == opt) ||
+                                    (type == 'recency' &&
+                                        ctrl.selectedRecency.value == opt)
+                                ? Icon(
+                                    Icons.check,
+                                    color: theme.colorScheme.primary,
+                                  )
+                                : null,
+                            onTap: () {
+                              if (type == 'category') {
+                                ctrl.filterCategory.value = opt;
+                              }
+                              if (type == 'status') {
+                                ctrl.selectedStatus.value = opt;
+                              }
+                              if (type == 'recency') {
+                                ctrl.selectedRecency.value = opt;
+                              }
+                              Get.back();
+                            },
                           ),
-                          trailing:
-                              (type == 'category' &&
-                                      ctrl.filterCategory.value == opt) ||
-                                  (type == 'status' &&
-                                      ctrl.selectedStatus.value == opt) ||
-                                  (type == 'recency' &&
-                                      ctrl.selectedRecency.value == opt)
-                              ? Icon(Icons.check, color: theme.colorScheme.primary)
-                              : null,
-                          onTap: () {
-                            if (type == 'category') {
-                              ctrl.filterCategory.value = opt;
-                            }
-                            if (type == 'status') {
-                              ctrl.selectedStatus.value = opt;
-                            }
-                            if (type == 'recency') {
-                              ctrl.selectedRecency.value = opt;
-                            }
-                            Get.back();
-                          },
-                        ),
-                      )
-                      .toList(),
+                        )
+                        .toList(),
+                  ),
                 ),
-              ),
-            ],
+              ],
             ),
           ),
         ),

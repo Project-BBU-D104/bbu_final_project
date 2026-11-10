@@ -31,37 +31,37 @@
 - **Route:** `/product`
 - **Purpose:** Searches, browses and manages products.
 - **Navigation:** Manage/Home quick action; add, edit, detail actions. Next: product form/detail or scanner from forms.
-- **UI:** App bar, search, filter, table/card layout, add button.
-- **State/data:** `ProductController`, `ProductBinding`, product service/model.
-- **Custom widgets:** `screen/product/widget/product_table_widget.dart`, `product_card_widget.dart`, `filter_widget.dart`; shared search and view-toggle widgets.
-- **Current design issues:** Responsive table/card layouts; specific theme deviations unclear.
+- **UI:** Redesigned 2026-11: app bar with labeled refresh, themed search with labeled scan/clear actions, wrapping category filter, lazy card list below 760px of available width and table at/above 760px, content centered at max 1240px with 16/32px outer padding, distinct loading/empty/no-match/failure states with retry banner, labeled FAB add action. Keyboard-activatable rows.
+- **State/data:** `ProductController`, `ProductBinding`, product service/model. Search query and category filter compose in `filteredItems`.
+- **Custom widgets:** `screen/product/widget/product_table_widget.dart`, `product_card_widget.dart`, `filter_widget.dart`; shared search widget.
+- **Current design issues:** None known after the 2026-11 redesign; live-device, camera, and spoken screen-reader checks remain pending.
 
 ## Add product — `frontend/lib/screen/product/widget/add_product_widget.dart`
 - **Route:** `/add-product`
 - **Purpose:** Creates a product with identifying, price, stock and image information.
-- **Navigation:** Product list add action; barcode action pushes scanner page. Save/cancel returns to caller/list.
-- **UI:** Long form, image upload, barcode scan, save/cancel.
-- **State/data:** `ProductController`, product model/service, image upload controller/service.
-- **Custom widgets:** `frontend/lib/widget/image_upload_widget.dart`, scanner page below.
-- **Current design issues:** Long form; exact spacing/theme issues unclear.
+- **Navigation:** Product list add action; barcode action pushes scanner page. Save/Cancel returns to caller/list.
+- **UI:** Redesigned 2026-11 as a thin adapter around shared `product_form_widget.dart`: grouped HomeSectionCard sections (Product information / Pricing / Image and description), one column below 900px and two at/above capped at 1000px, visible labels with required indicators, inline validation copy, focus to first invalid field, persistent footer above the onscreen keyboard, native image upload, web shows preview plus an unavailable-upload message.
+- **State/data:** `ProductController` (`isSaving`/`formError`), product model/service, image upload controller/service. Duplicate submissions are ignored while pending; failed saves retain the draft and show a safe error.
+- **Custom widgets:** `frontend/lib/screen/product/widget/product_form_widget.dart`, `frontend/lib/widget/image_upload_widget.dart`, scanner page below.
+- **Current design issues:** Browser image upload remains unavailable (explicit follow-up).
 
 ## Edit product — `frontend/lib/screen/product/widget/edit_product_widget.dart`
 - **Route:** `/edit-product`, product ID in GetX arguments.
 - **Purpose:** Updates an existing product.
-- **Navigation:** Product list action; barcode action pushes scanner. Save/cancel returns to list/detail context.
-- **UI:** Prefilled product form, image and barcode actions.
-- **State/data:** `ProductController`, product ID/model/service.
-- **Custom widgets:** `frontend/lib/widget/image_upload_widget.dart`, scanner page.
-- **Current design issues:** Long form; exact spacing/theme issues unclear.
+- **Navigation:** Product detail/list action; barcode action pushes scanner. Update/Cancel returns to list/detail context.
+- **UI:** Redesigned 2026-11 as a thin adapter around shared `product_form_widget.dart` (same layout/validation as Add product), prefilled by the controller; existing photo preview preserved.
+- **State/data:** `ProductController`, product ID/model/service. Prices are sent as validated trimmed text (no invalid-to-zero fallback); failed fetches stay on detail with a safe toast and `isOpeningEdit` guards repeated taps.
+- **Custom widgets:** `frontend/lib/screen/product/widget/product_form_widget.dart`, `frontend/lib/widget/image_upload_widget.dart`, scanner page.
+- **Current design issues:** Browser image upload remains unavailable (explicit follow-up).
 
 ## Product detail — `frontend/lib/screen/product/widget/product_card_detail_widget.dart`
 - **Route:** `/product-card-detail`, product object argument.
 - **Purpose:** Reviews a selected product.
-- **Navigation:** Product card action; back returns to products.
-- **UI:** Scaffold with product details/card content.
-- **State/data:** Product argument/model; controller origin unclear.
-- **Custom widgets:** Product card/detail widgets in the same folder.
-- **Current design issues:** Specific issues unclear.
+- **Navigation:** Product card/row action (tap or keyboard Enter); back returns to products.
+- **UI:** Redesigned 2026-11: themed scaffold, image above information below 900px of available width and beside it at/above, wrapping information rows in HomeSectionCards (no fixed-aspect tiles), safe fallbacks for absent optional fields, SafeArea footer with wrapping Delete/Edit actions; Edit disabled while opening.
+- **State/data:** Product argument map; shared `ProductController` resolved via `Get.find` (no second controller). Confirmed deletion retained.
+- **Custom widgets:** Product card/detail widgets in the same folder; shared HomeSectionCard.
+- **Current design issues:** Detail shows its route snapshot after edit until reopened (documented `shortcut:` comment); live detail refresh is an explicit follow-up.
 
 ## Product scanner — `frontend/lib/widget/test_product_scanner_page.dart`
 - **Route:** None; `Navigator.push(MaterialPageRoute)` from add/edit product forms.

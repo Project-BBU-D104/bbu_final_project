@@ -15,6 +15,7 @@ class ProductCardDetailWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // shortcut: detail uses its route snapshot after edit; refresh it when live detail updates are required
     final product = Get.arguments as Map<String, dynamic>;
 
     final String photo = product['photo']?.toString() ?? '';
@@ -44,9 +45,18 @@ class ProductCardDetailWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _infoRow(context, Icons.inventory_2_outlined, 'Product Name',
-              _field(product['name'])),
-          _infoRow(context, Icons.qr_code, 'Barcode', _field(product['barcode'])),
+          _infoRow(
+            context,
+            Icons.inventory_2_outlined,
+            'Product Name',
+            _field(product['name']),
+          ),
+          _infoRow(
+            context,
+            Icons.qr_code,
+            'Barcode',
+            _field(product['barcode']),
+          ),
           _infoRow(
             context,
             Icons.sell,
@@ -104,16 +114,20 @@ class ProductCardDetailWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                ElevatedButton.icon(
-                  onPressed: () => ctr.onEditProduct(product['id'], context),
-                  icon: const Icon(Icons.edit_outlined),
-                  label: Text('Edit'.tr),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
-                    minimumSize: const Size(140, 52),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                Obx(
+                  () => ElevatedButton.icon(
+                    onPressed: ctr.isOpeningEdit.value
+                        ? null
+                        : () => ctr.onEditProduct(product['id'], context),
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text('Edit'.tr),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      minimumSize: const Size(140, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                 ),

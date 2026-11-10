@@ -31,8 +31,18 @@ class _FakeProductService implements ProductService {
 }
 
 List<Map<String, dynamic>> composedFixture() => <Map<String, dynamic>>[
-  {'id': 1, 'name': 'Water', 'barcode': '111', 'category': {'name': 'Drinks'}},
-  {'id': 2, 'name': 'Bread', 'barcode': '222', 'category': {'name': 'Bakery'}},
+  {
+    'id': 1,
+    'name': 'Water',
+    'barcode': '111',
+    'category': {'name': 'Drinks'},
+  },
+  {
+    'id': 2,
+    'name': 'Bread',
+    'barcode': '222',
+    'category': {'name': 'Bakery'},
+  },
   {
     'id': 3,
     'name': 'Bread roll',
@@ -43,7 +53,7 @@ List<Map<String, dynamic>> composedFixture() => <Map<String, dynamic>>[
 
 /// Loads a controller from the fake service, which also seeds the static
 /// product cache so each test is independent of prior cache contents.
-Future<ProductController> seeded(_FakeProductService service) async {
+Future<ProductController> _seeded(_FakeProductService service) async {
   final controller = ProductController(service: service);
   await controller.getProducts(showLoading: false);
   return controller;
@@ -121,7 +131,7 @@ void main() {
 
   test('query and category return their intersection', () async {
     final service = _FakeProductService(composedFixture());
-    final controller = await seeded(service);
+    final controller = await _seeded(service);
 
     // Barcode queries match through the existing BarcodeUtils behavior.
     controller.searchProduct('111');
@@ -134,7 +144,7 @@ void main() {
 
   test('clearing query keeps category', () async {
     final service = _FakeProductService(composedFixture());
-    final controller = await seeded(service);
+    final controller = await _seeded(service);
 
     controller.filterCategory.value = 'Drinks';
     controller.searchProduct('bread');
@@ -145,7 +155,7 @@ void main() {
 
   test('refresh preserves combined filtering', () async {
     final service = _FakeProductService(composedFixture());
-    final controller = await seeded(service);
+    final controller = await _seeded(service);
 
     controller.filterCategory.value = 'Drinks';
     controller.searchProduct('bread');
@@ -171,7 +181,7 @@ void main() {
 
   test('clearFilters preserves search and form selections', () async {
     final service = _FakeProductService(composedFixture());
-    final controller = await seeded(service);
+    final controller = await _seeded(service);
 
     controller.selectedCategory.value = '7';
     controller.searchProduct('bread');

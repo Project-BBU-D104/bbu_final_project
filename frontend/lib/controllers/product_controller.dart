@@ -38,6 +38,11 @@ class ProductController extends GetxController {
   var isLoading = false.obs;
   var loadError = ''.obs;
   var searchQuery = ''.obs;
+
+  /// Form submission state, separate from the list's isLoading.
+  final isSaving = false.obs;
+  final formError = ''.obs;
+  final isOpeningEdit = false.obs;
   var filterCategory = 'All'.obs;
   var selectedStatus = 'All'.obs;
   var selectedRecency = 'All'.obs;
@@ -228,7 +233,8 @@ class ProductController extends GetxController {
       if (query.isNotEmpty) {
         final name = (item['name'] ?? '').toString().toLowerCase();
         final barcode = (item['barcode'] ?? '').toString().toLowerCase();
-        queryMatch = name.contains(query) || BarcodeUtils.matches(barcode, query);
+        queryMatch =
+            name.contains(query) || BarcodeUtils.matches(barcode, query);
       }
 
       return catMatch && statusMatch && queryMatch;
@@ -241,17 +247,20 @@ class ProductController extends GetxController {
   }
 
   Future<void> onSaveProduct(BuildContext context) async {
+    if (isSaving.value) return;
+    isSaving.value = true;
+    formError.value = '';
     try {
-      isLoading.value = true;
-
       final data = {
         'name': productNameController.text,
         'category_id': selectedCategory.value,
         'unit_id': selectedUnit.value,
         'currency_id': selectedCurrency.value,
         'barcode': productBarcodeController.text,
-        'cost_price': productCostPriceController.text,
-        'sale_price': productSalePriceController.text,
+        // Trimmed text keeps the API's Decimal-compatible representation;
+        // the form validates finiteness before submission.
+        'cost_price': productCostPriceController.text.trim(),
+        'sale_price': productSalePriceController.text.trim(),
         'description': productDescriptionController.text,
         'photo': productPhotoController.text,
         'warehouse_id': selectedWarehouse.value == null
@@ -268,14 +277,14 @@ class ProductController extends GetxController {
       await getProducts();
       _refreshSaleProducts();
 
-      Navigator.pop(context);
+      if (context.mounted) Navigator.pop(context);
 
       // Clear textfields
       clearProducts();
     } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
+      formError.value = 'Could not save product. Please try again.'.tr;
     } finally {
-      isLoading.value = false;
+      isSaving.value = false;
     }
   }
 
@@ -284,6 +293,8 @@ class ProductController extends GetxController {
   }
 
   Future<void> onEditProduct(int productId, BuildContext context) async {
+    if (isOpeningEdit.value) return;
+    isOpeningEdit.value = true;
     try {
       final product = await service.getProductById(productId);
       productPhotoController.text = product["photo"] ?? "";
@@ -311,11 +322,19 @@ class ProductController extends GetxController {
 
       Get.toNamed(AppRoutes.editProduct, arguments: productId);
     } catch (e) {
-      // print(e);
+      ToastWidget.show(
+        message: 'Could not open product. Please try again.'.tr,
+        type: ToastType.error,
+      );
+    } finally {
+      isOpeningEdit.value = false;
     }
   }
 
   Future<void> onUpdateProduct(int productId, BuildContext context) async {
+    if (isSaving.value) return;
+    isSaving.value = true;
+    formError.value = '';
     try {
       final data = {
         "name": productNameController.text.trim(),
@@ -323,8 +342,10 @@ class ProductController extends GetxController {
         "currency_id": selectedCurrency.value,
         "unit_id": selectedUnit.value,
         "barcode": productBarcodeController.text.trim(),
-        "cost_price": double.tryParse(productCostPriceController.text) ?? 0,
-        "sale_price": double.tryParse(productSalePriceController.text) ?? 0,
+        // Trimmed text keeps the API's Decimal-compatible representation;
+        // the form validates finiteness before submission.
+        "cost_price": productCostPriceController.text.trim(),
+        "sale_price": productSalePriceController.text.trim(),
         "description": productDescriptionController.text.trim(),
         "photo": productPhotoController.text,
         "warehouse_id": selectedWarehouse.value == null
@@ -338,14 +359,18 @@ class ProductController extends GetxController {
       await getProducts();
       _refreshSaleProducts();
 
-      Navigator.pop(context);
+      if (context.mounted) {
+        Navigator.pop(context);
 
-      ToastWidget.show(
-        message: "Product updated successfully",
-        type: ToastType.success,
-      );
+        ToastWidget.show(
+          message: "Product updated successfully",
+          type: ToastType.success,
+        );
+      }
     } catch (e) {
-      // Do nothing
+      formError.value = 'Could not save product. Please try again.'.tr;
+    } finally {
+      isSaving.value = false;
     }
   }
 

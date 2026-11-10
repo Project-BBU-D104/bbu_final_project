@@ -80,7 +80,9 @@ void main() {
     final controller = Get.put(SearchController());
 
     await tester.pumpWidget(
-      const GetMaterialApp(home: Scaffold(body: SearchWidget(title: 'Search'))),
+      const GetMaterialApp(
+        home: Scaffold(body: SearchWidget(title: 'Search')),
+      ),
     );
 
     await tester.enterText(find.byType(TextField), 'water');

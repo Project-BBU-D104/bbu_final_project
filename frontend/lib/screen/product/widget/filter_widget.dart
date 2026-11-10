@@ -6,7 +6,13 @@ class FilterWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onPressed;
 
-  const FilterWidget({super.key, required this.icon, required this.label, required this.isSelected, required this.onPressed});
+  const FilterWidget({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
