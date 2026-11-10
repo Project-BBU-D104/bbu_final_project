@@ -4,28 +4,28 @@
 - **Route:** `/category`
 - **Purpose:** Browses and manages product categories.
 - **Navigation:** Manage feature card; add/edit forms are reached from list actions. Next: return to Manage or open another feature.
-- **UI:** App bar, search/view toggle, responsive table/cards, add action.
-- **State/data:** `CategoryController`, `CategoryBinding`, category service/model.
-- **Custom widgets:** `screen/category/widget/table_category_widget.dart`, `card_category_widget.dart`, `add_category_widget.dart`, `edit_category_widget.dart`; shared `custom_app_bar.dart`, `button_change_table_or_card_widget.dart`.
-- **Current design issues:** Responsive table/card variants; exact hardcoded values unclear.
+- **UI:** Redesigned 2026-11: app bar with labeled refresh, themed search, wrapping header actions, lazy card list below 800px of available width / table at or above, content centered at max 1240px with 16/32px outer padding, distinct loading/error/empty/no-match states with retry and add actions. Keyboard-activatable rows.
+- **State/data:** `CategoryController` (guarded `isLoading`/`isSaving`/`isOpeningEdit`, `loadError`/`formError`, 60s shared cache), `CategoryBinding`, category service. `categoryList`/`searchCategoryList` stay map-shaped for the product form and category filter.
+- **Custom widgets:** `screen/category/widget/table_category_widget.dart`, `card_category_widget.dart`, thin `add_category_widget.dart`/`edit_category_widget.dart` adapters over shared `category_form_widget.dart`; shared `custom_app_bar.dart`, `search_widget.dart`.
+- **Current design issues:** None known after the 2026-11 redesign; manual device/browser and screen-reader checks remain pending.
 
 ## Add category — `frontend/lib/screen/category/widget/add_category_widget.dart`
-- **Route:** No route; feature form widget. Host presentation unclear.
+- **Route:** No route; shown as a dialog at/above 840px, otherwise a bottom sheet.
 - **Purpose:** Enters and saves a category.
-- **Navigation:** Opened from category list action; save/cancel returns to its host.
-- **UI:** Form fields and save/cancel actions.
-- **State/data:** `CategoryController`, category create request.
-- **Custom widgets:** None established.
-- **Current design issues:** Host and styling specifics unclear.
+- **Navigation:** Opened from category list actions; save/cancel returns to its host. Dismissal is blocked while a write is pending.
+- **UI:** Thin adapter over shared `category_form_widget.dart`: icon and title header, Category details section, visible labels, required-name validation with focus to the first invalid field, inline error text, persistent Cancel/Save footer with a saving state.
+- **State/data:** `CategoryController` (`isSaving`/`formError`); sends trimmed `name` and `description`. Duplicate submissions are ignored and failed saves retain the draft.
+- **Custom widgets:** `category_form_widget.dart`.
+- **Current design issues:** None known after the 2026-11 redesign; manual checks remain pending.
 
 ## Edit category — `frontend/lib/screen/category/widget/edit_category_widget.dart`
-- **Route:** No route; feature form widget. Host presentation unclear.
+- **Route:** No route; shown as a dialog at/above 840px, otherwise a bottom sheet.
 - **Purpose:** Updates a selected category.
-- **Navigation:** Opened from category list/card action; save/cancel returns to host.
-- **UI:** Prefilled form and actions.
-- **State/data:** `CategoryController`, selected category.
-- **Custom widgets:** None established.
-- **Current design issues:** Host and styling specifics unclear.
+- **Navigation:** Opened from category list/card action; save/cancel returns to host. A late fetch never opens the form over another route.
+- **UI:** Same shared `category_form_widget.dart` as Add category, prefilled from the fetched record.
+- **State/data:** `CategoryController` (`isSaving`/`isOpeningEdit`/`formError`), selected category ID; sends trimmed `name` and `description`.
+- **Custom widgets:** `category_form_widget.dart`.
+- **Current design issues:** None known after the 2026-11 redesign; manual checks remain pending.
 
 ## Products — `frontend/lib/screen/product/product_screen.dart`
 - **Route:** `/product`
@@ -100,4 +100,18 @@
 - **Current design issues:** Host presentation unclear.
 
 ## Redesign notes
+
+**Done (2026-11): Products workflow** — 5 of 10 screens.
+- Products list: lazy themed cards below 760px of available width / table at or above, content centered at max 1240px, distinct loading/empty/no-match/failure states with retry banner, search and category filter compose.
+- Product detail: image stacked below 900px / beside at or above, wrapping HomeSectionCard rows, SafeArea footer, confirmed deletion, Edit guarded while opening.
+- Add/Edit product: one shared `product_form_widget.dart` with HomeSectionCard sections, inline validation in English and Khmer, duplicate-submission guard, draft retention on failed writes, native image upload (web shows an unavailable message).
+- Verification: 205 Flutter tests pass, targeted analysis 0 new diagnostics, `flutter build web` exits 0.
+
+**Done (2026-11): Categories workflow** — 3 of 10 screens.
+- Categories list: lazy themed cards below 800px of available width / table at or above, content centered at max 1240px, distinct loading/error/empty/no-match states with retry and add actions, keyboard-activatable rows.
+- Add/Edit category: one shared `category_form_widget.dart` (dialog at/above 840px, bottom sheet below), inline validation in English and Khmer, duplicate-submission guard, dismissal blocked while saving, draft retention on failed writes, late-fetch route guard.
+- Verification: 281 Flutter tests pass with 1 web-only test skipped; `flutter analyze` reports no diagnostics in the changed files (repository baseline: 57 existing issues elsewhere); `flutter build web` exits 0; changed Dart files are `dart format` clean (the two locale maps excluded, already unformatted at baseline).
+
+**Remaining (4 screens):** Units list/add/edit (3), product scanner (1).
+**Pending checks:** browser image upload, physical-device camera, TalkBack/VoiceOver, live-API error paths, manual device/browser category walkthrough.
 
