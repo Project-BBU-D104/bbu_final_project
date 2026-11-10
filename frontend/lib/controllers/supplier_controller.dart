@@ -128,13 +128,28 @@ class SupplierController extends GetxController {
   Future<void> _showForm(BuildContext context, Widget child) async {
     _formOpen = true;
     try {
-      await AppBottomSheets.show(
-        context,
-        child: child,
-        isDismissible: false,
-        enableDrag: false,
-        constraints: const BoxConstraints(maxWidth: 760),
-      );
+      if (MediaQuery.sizeOf(context).width >= 840) {
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => Dialog(
+            constraints: const BoxConstraints(maxWidth: 720),
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: child,
+          ),
+        );
+      } else {
+        await AppBottomSheets.show(
+          context,
+          child: child,
+          isDismissible: false,
+          enableDrag: false,
+          constraints: const BoxConstraints(maxWidth: 760),
+        );
+      }
     } finally {
       _formOpen = false;
     }
@@ -204,7 +219,7 @@ class SupplierController extends GetxController {
       _cachedAt = null;
     }
     searchSupplier(_query);
-    if (context.mounted && route is ModalBottomSheetRoute && route.isCurrent) {
+    if (context.mounted && route is PopupRoute && route.isCurrent) {
       navigator.pop();
     }
     await getSuppliers();
@@ -278,7 +293,8 @@ class SupplierController extends GetxController {
             await getSuppliers();
           } catch (_) {
             if (!isClosed) {
-              formError.value = 'Unable to delete supplier. Please try again.'.tr;
+              formError.value =
+                  'Unable to delete supplier. Please try again.'.tr;
             }
           } finally {
             if (!isClosed) isSaving.value = false;

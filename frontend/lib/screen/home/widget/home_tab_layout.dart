@@ -8,11 +8,13 @@ class HomeTabLayout extends StatelessWidget {
     required this.subtitle,
     required this.child,
     this.action,
+    this.translateTitle = true,
   });
   final String title;
   final String subtitle;
   final Widget child;
   final Widget? action;
+  final bool translateTitle;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -50,7 +52,7 @@ class HomeTabLayout extends StatelessWidget {
                                 Semantics(
                                   header: true,
                                   child: Text(
-                                    title.tr,
+                                    translateTitle ? title.tr : title,
                                     style: theme.textTheme.headlineMedium
                                         ?.copyWith(fontWeight: FontWeight.bold),
                                   ),

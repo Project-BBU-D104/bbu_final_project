@@ -275,12 +275,12 @@ void main() {
     await tester.pumpAndSettle();
     final fields = find.byType(TextFormField);
     expect(
-      tester.getTopLeft(fields.at(0)).dy,
       tester.getTopLeft(fields.at(1)).dy,
+      tester.getTopLeft(fields.at(2)).dy,
     );
     expect(
-      tester.getTopLeft(fields.at(1)).dx,
-      greaterThan(tester.getTopLeft(fields.at(0)).dx),
+      tester.getTopLeft(fields.at(2)).dx,
+      greaterThan(tester.getTopLeft(fields.at(1)).dx),
     );
   });
   testWidgets('detail remains visible behind its edit sheet', (tester) async {

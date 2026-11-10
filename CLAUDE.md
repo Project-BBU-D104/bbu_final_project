@@ -8,6 +8,8 @@ Any plan you write down must be saved in the repository root (`Final Project/`),
 
 Never Push code to Github or similar without asking the user.
 
+Never Push or commit the Plan that generate by any Agent.
+
 Never add `Co-Authored-By` trailers to commit messages. 
 
 ## Commands

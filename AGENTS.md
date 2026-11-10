@@ -6,6 +6,8 @@ Never Push code to Github or similar without asking the user.
 
 Never add Co-Authored-By trailers to commit messages.
 
+Never Push or commit the Plan that generate by any Agent.
+
 ## Project Structure & Module Organization
 
 This repository contains an inventory management system with two applications:

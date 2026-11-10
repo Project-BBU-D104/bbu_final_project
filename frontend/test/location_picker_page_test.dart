@@ -73,6 +73,22 @@ Future<LatLng?> _openPicker(
 void main() {
   setUp(setUpSupplierTests);
   tearDown(Get.reset);
+  testWidgets('desktop picker puts coordinate controls beside the map', (
+    tester,
+  ) async {
+    await pumpSupplierHost(
+      tester,
+      home: LocationPickerPage(
+        initialPosition: defaultMapLocation,
+        tileProvider: _MemoryTileProvider(),
+      ),
+      size: const Size(1440, 900),
+    );
+    final map = tester.getRect(find.byType(FlutterMap));
+    final field = tester.getRect(find.byType(TextFormField));
+    expect(field.left, greaterThanOrEqualTo(map.right));
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('picker remains operable without tiles in Khmer and large text', (
     tester,
   ) async {

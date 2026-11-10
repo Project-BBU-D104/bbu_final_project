@@ -1,4 +1,7 @@
 const Map<String, String> enUS = {
+  "Contact details": "Contact details",
+  "Location details": "Location details",
+  "Tap the map or enter coordinates.": "Tap the map or enter coordinates.",
   "Cannot open map": "Cannot open map",
   "Actions": "Actions",
   "Active": "Active",

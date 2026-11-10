@@ -75,6 +75,47 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
   @override
   Widget build(BuildContext context) {
     final c = widget.controller;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    InputDecoration decoration(
+      String label, {
+      Widget? suffix,
+      String? hint,
+    }) => InputDecoration(
+      labelText: label.tr,
+      hintText: hint?.tr,
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: Color.alphaBlend(
+        colors.onSurface.withValues(alpha: 0.025),
+        theme.cardColor,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      labelStyle: theme.textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.primary, width: 1.5),
+      ),
+    );
+    Widget heading(String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Semantics(
+        header: true,
+        child: Text(
+          text.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
     return Obx(() {
       final busy = c.isSaving.value;
       final error = c.formError.value;
@@ -92,19 +133,8 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
         enabled: !busy,
         keyboardType: type,
         textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          labelText: label.tr,
-          border: const OutlineInputBorder(),
-        ),
+        decoration: decoration(label),
         validator: (value) => (value ?? '').trim().isEmpty ? message.tr : null,
-      );
-      final name = field(
-        'Supplier Name',
-        c.supplierNameController,
-        _nameKey,
-        _nameFocus,
-        'Supplier name is required',
-        TextInputType.name,
       );
       final phone = field(
         'Phone Number',
@@ -125,15 +155,15 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
       return PopScope(
         canPop: !busy && !_picking,
         child: Material(
-          color: Theme.of(context).colorScheme.surface,
+          color: theme.cardColor,
           child: SafeArea(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 760),
+              constraints: const BoxConstraints(maxWidth: 720),
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(
-                  16,
                   24,
-                  16,
+                  24,
+                  24,
                   MediaQuery.viewInsetsOf(context).bottom + 24,
                 ),
                 child: Form(
@@ -144,10 +174,27 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                     children: [
                       Row(
                         children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: colors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.business_outlined,
+                              color: theme.brightness == Brightness.light
+                                  ? colors.primaryContainer
+                                  : colors.primary,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               widget.title.tr,
-                              style: Theme.of(context).textTheme.headlineSmall,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                           IconButton(
@@ -155,40 +202,59 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                             onPressed: busy || _picking
                                 ? null
                                 : () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.close),
+                            icon: const Icon(Icons.close, size: 20),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(
+                          height: 1,
+                          color: colors.onSurface.withValues(alpha: 0.08),
+                        ),
+                      ),
+                      heading('Contact details'),
+                      field(
+                        'Supplier Name',
+                        c.supplierNameController,
+                        _nameKey,
+                        _nameFocus,
+                        'Supplier name is required',
+                        TextInputType.name,
+                      ),
+                      const SizedBox(height: 20),
                       LayoutBuilder(
                         builder: (context, constraints) => Wrap(
                           spacing: 16,
                           runSpacing: 20,
                           children: [
-                            for (final item in [name, phone, email])
+                            for (final item in [phone, email])
                               SizedBox(
-                                width: constraints.maxWidth < 640
-                                    ? constraints.maxWidth
-                                    : (constraints.maxWidth - 16) / 2,
+                                width: constraints.maxWidth >= 560
+                                    ? (constraints.maxWidth - 16) / 2
+                                    : constraints.maxWidth,
                                 child: item,
                               ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 28),
+                      heading('Location details'),
                       TextFormField(
                         controller: c.supplierMapController,
                         readOnly: true,
                         enabled: !busy && !_picking,
                         onTap: _pick,
-                        decoration: InputDecoration(
-                          labelText: 'Map'.tr,
-                          hintText: 'Pick Location'.tr,
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
+                        decoration: decoration(
+                          'Map',
+                          hint: 'Pick Location',
+                          suffix: IconButton(
                             tooltip: 'Pick Location'.tr,
                             onPressed: busy || _picking ? null : _pick,
-                            icon: const Icon(Icons.location_on_outlined),
+                            icon: const Icon(
+                              Icons.location_on_outlined,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ),
@@ -196,36 +262,45 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                       TextFormField(
                         controller: c.supplierAddressController,
                         enabled: !busy,
-                        minLines: 3,
-                        maxLines: 6,
-                        decoration: InputDecoration(
-                          labelText: 'Address'.tr,
-                          border: const OutlineInputBorder(),
-                        ),
+                        minLines: 2,
+                        maxLines: 4,
+                        decoration: decoration('Address'),
                       ),
                       if (widget.showStatus)
-                        CheckboxListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text('Active'.tr),
-                          value: c.status.value,
-                          onChanged: busy
-                              ? null
-                              : (value) => c.status.value = value ?? false,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: SwitchListTile.adaptive(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              'Active'.tr,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                            value: c.status.value,
+                            onChanged: busy
+                                ? null
+                                : (value) => c.status.value = value,
+                          ),
                         ),
                       if (error.isNotEmpty)
                         Padding(
-                          padding: const EdgeInsets.only(top: 16),
+                          padding: const EdgeInsets.only(top: 20),
                           child: Semantics(
                             liveRegion: true,
                             child: Text(
                               error,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colors.error,
                               ),
                             ),
                           ),
                         ),
-                      const SizedBox(height: 24),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(
+                          height: 1,
+                          color: colors.onSurface.withValues(alpha: 0.08),
+                        ),
+                      ),
                       Wrap(
                         alignment: WrapAlignment.end,
                         spacing: 12,
@@ -236,24 +311,34 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                                 ? null
                                 : () => Navigator.of(context).pop(),
                             style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(96, 48),
+                              minimumSize: const Size(100, 48),
+                              side: BorderSide(
+                                color: colors.onSurface.withValues(alpha: 0.12),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: Text('Cancel'.tr),
                           ),
                           FilledButton(
                             onPressed: busy || _picking ? null : _submit,
                             style: FilledButton.styleFrom(
-                              minimumSize: const Size(96, 48),
+                              minimumSize: const Size(112, 48),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: busy
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const SizedBox(
+                                      SizedBox(
                                         width: 18,
                                         height: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
+                                          color: colors.onPrimary,
                                         ),
                                       ),
                                       const SizedBox(width: 8),

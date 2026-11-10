@@ -23,8 +23,10 @@ class SupplierCardWidget extends StatelessWidget {
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: theme.dividerColor),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -74,9 +76,7 @@ class SupplierCardWidget extends StatelessWidget {
                 children: [
                   StatusWidget(
                     text: (item.status == true ? 'Active' : 'Inactive').tr,
-                    color: item.status == true
-                        ? activeColor
-                        : inactiveColor,
+                    color: item.status == true ? activeColor : inactiveColor,
                   ),
                   Text(
                     item.createdAt == null

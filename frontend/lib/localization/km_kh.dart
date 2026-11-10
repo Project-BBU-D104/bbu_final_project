@@ -1,4 +1,7 @@
 const Map<String, String> kmKH = {
+  "Contact details": "ព័ត៌មានទំនាក់ទំនង",
+  "Location details": "ព័ត៌មានទីតាំង",
+  "Tap the map or enter coordinates.": "ចុចលើផែនទី ឬបញ្ចូលកូអរដោនេ។",
   "Cannot open map": "មិនអាចបើកផែនទីបានទេ",
   "Actions": "សកម្មភាព",
   "Active": "សកម្ម",
