@@ -3,7 +3,7 @@ import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/screen/product/widget/product_form_widget.dart';
 import 'package:get/get.dart';
 
-/// Route adapter for '/add-product'; the shared form owns the UI.
+/// Add-form adapter; the shared form owns the UI.
 class AddProductWidget extends StatelessWidget {
   AddProductWidget({super.key});
 

@@ -93,6 +93,12 @@ void main() {
     );
     expect(scaffold.appBar, isNull);
     expect(scaffold.bottomNavigationBar, isNull);
+    final back = find.byTooltip('Back');
+    expect(back, findsOneWidget);
+    expect(
+      tester.getRect(back).right,
+      lessThan(tester.getRect(find.text(c.suppliers.first.name)).left),
+    );
     expect(tester.getRect(find.text('Edit')).top, lessThan(220));
     expect(tester.getRect(find.text('Delete')).top, lessThan(220));
   });

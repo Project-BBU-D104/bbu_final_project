@@ -3,7 +3,7 @@ import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/screen/product/widget/product_form_widget.dart';
 import 'package:get/get.dart';
 
-/// Route adapter for '/edit-product'; the shared form owns the UI.
+/// Edit-form adapter; the shared form owns the UI.
 class EditProductWidget extends StatelessWidget {
   final int productId;
 

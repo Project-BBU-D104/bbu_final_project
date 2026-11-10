@@ -18,11 +18,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
   final SupplierModel? _supplier;
   final ctr = Get.find<SupplierController>();
 
-  Widget _actions(
-    BuildContext context,
-    SupplierModel supplier, {
-    required bool desktop,
-  }) => Obx(() {
+  Widget _actions(BuildContext context, SupplierModel supplier) => Obx(() {
     final busy = ctr.isSaving.value || ctr.isOpeningEdit.value;
     return Wrap(
       alignment: WrapAlignment.end,
@@ -30,12 +26,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
       runSpacing: 12,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        if (desktop)
-          IconButton.outlined(
-            tooltip: 'Back'.tr,
-            onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back, size: 20),
-          ),
         OutlinedButton.icon(
           onPressed: busy || supplier.id == null
               ? null
@@ -246,9 +236,14 @@ class SupplierDetailCardWidget extends StatelessWidget {
                   translateTitle: false,
                   title: supplier.name.isEmpty ? '-' : supplier.name,
                   subtitle: 'Supplier Detail',
-                  action: desktop
-                      ? _actions(context, supplier, desktop: true)
+                  leading: desktop
+                      ? IconButton.outlined(
+                          tooltip: 'Back'.tr,
+                          onPressed: () => Get.back(),
+                          icon: const Icon(Icons.arrow_back, size: 20),
+                        )
                       : null,
+                  action: desktop ? _actions(context, supplier) : null,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -292,7 +287,7 @@ class SupplierDetailCardWidget extends StatelessWidget {
             : SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: _actions(context, original, desktop: false),
+                  child: _actions(context, original),
                 ),
               ),
       ),

@@ -2,15 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/image_upload_controller.dart';
 import 'package:frontend/controllers/product_controller.dart';
-import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/widget/app_cached_image.dart';
-import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
 import 'package:frontend/widget/test_product_scanner_page.dart';
 import 'package:get/get.dart';
 
-/// Shared Add/Edit product form. Route adapters (AddProductWidget,
-/// EditProductWidget) supply the title, submit label, and write handler.
+/// Shared Add/Edit product form, presented by the controller in a desktop
+/// dialog or a mobile bottom sheet. Adapters supply the title, submit label,
+/// and write handler.
 class ProductFormWidget extends StatefulWidget {
   const ProductFormWidget({
     super.key,
@@ -41,11 +40,13 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
 
   ProductController get c => widget.controller;
 
+  bool get _uploading =>
+      Get.isRegistered<ImageUploadController>() &&
+      Get.find<ImageUploadController>().loading.value;
+
   @override
   void initState() {
     super.initState();
-    // A new form never shows the previous attempt's error.
-    c.formError.value = '';
     // Clear the shared upload preview once on entry, not on rebuild, so it
     // cannot display a previous product's image.
     final upload = Get.isRegistered<ImageUploadController>()
@@ -84,7 +85,7 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
       id != null && items.any((item) => item['id'].toString() == id);
 
   void _submit() {
-    if (c.isSaving.value) return;
+    if (c.isSaving.value || _uploading) return;
     c.formError.value = '';
 
     // Show inline errors, then focus the first invalid field in display
@@ -134,252 +135,412 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
     );
   }
 
+  InputDecoration _decoration(
+    BuildContext context,
+    String label, {
+    Widget? suffix,
+    String? hint,
+  }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return InputDecoration(
+      labelText: label.tr,
+      hintText: hint?.tr,
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: Color.alphaBlend(
+        colors.onSurface.withValues(alpha: 0.025),
+        theme.cardColor,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      labelStyle: theme.textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.primary, width: 1.5),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return Obx(
-      () => PopScope(
-        // Block system back while a write is pending; the app-bar back
-        // control is hidden for the same window.
-        canPop: !c.isSaving.value,
-        child: Scaffold(
-          backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: CustomAppBar(
-            title: widget.title,
-            showBack: !c.isSaving.value,
+    final colors = theme.colorScheme;
+    Widget heading(String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Semantics(
+        header: true,
+        child: Text(
+          text.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
-
-          // Persistent bottomSheet (not bottomNavigationBar) so the actions stay
-          // above an onscreen keyboard.
-          bottomSheet: SafeArea(
-            child: Material(
-              color: theme.colorScheme.surface,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+        ),
+      ),
+    );
+    return Obx(() {
+      final busy = c.isSaving.value || _uploading;
+      final error = c.formError.value;
+      final enabled = !busy;
+      return PopScope(
+        // Block system back while a write or upload is pending; the close
+        // control is disabled for the same window.
+        canPop: !busy,
+        child: Material(
+          color: theme.cardColor,
+          child: SafeArea(
+            // Lift the pinned footer above an onscreen keyboard.
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Obx(() {
-                      if (c.formError.value.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 20,
-                              color: theme.colorScheme.error,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                c.formError.value,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.error,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                    Obx(() {
-                      final uploadLoading =
-                          Get.isRegistered<ImageUploadController>() &&
-                          Get.find<ImageUploadController>().loading.value;
-                      final busy = c.isSaving.value || uploadLoading;
-                      return Row(
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      child: Row(
                         children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: busy
-                                  ? null
-                                  : () => Navigator.pop(context),
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: const Size.fromHeight(52),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: Text('Cancel'.tr),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: colors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.inventory_2_outlined,
+                              color: theme.brightness == Brightness.light
+                                  ? colors.primaryContainer
+                                  : colors.primary,
+                              size: 22,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: busy ? null : _submit,
-                              icon: c.isSaving.value
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.check),
-                              label: Text(widget.submitLabel.tr),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.primary,
-                                foregroundColor: theme.colorScheme.onPrimary,
-                                minimumSize: const Size.fromHeight(52),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
+                            child: Text(
+                              widget.title.tr,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
+                          IconButton(
+                            tooltip: 'Close'.tr,
+                            onPressed: busy
+                                ? null
+                                : () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.close, size: 20),
+                          ),
                         ],
-                      );
-                    }),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      child: Divider(
+                        height: 1,
+                        color: colors.onSurface.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              heading('Product Information'),
+                              TextFormField(
+                                controller: c.productNameController,
+                                focusNode: _nameNode,
+                                enabled: enabled,
+                                textInputAction: TextInputAction.next,
+                                decoration: _decoration(
+                                  context,
+                                  'Product Name',
+                                  hint: 'Enter Product Name',
+                                ),
+                                validator: _validateName,
+                              ),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: c.productBarcodeController,
+                                focusNode: _barcodeNode,
+                                enabled: enabled,
+                                textInputAction: TextInputAction.next,
+                                decoration: _decoration(
+                                  context,
+                                  'Barcode',
+                                  hint: 'Enter Barcode',
+                                  suffix: IconButton(
+                                    tooltip: 'Scan Barcode'.tr,
+                                    icon: const Icon(
+                                      Icons.qr_code_scanner,
+                                      size: 20,
+                                    ),
+                                    onPressed: enabled ? _scanBarcode : null,
+                                  ),
+                                ),
+                                validator: _validateBarcode,
+                              ),
+                              const SizedBox(height: 20),
+                              _lookupDropdown(
+                                hint: 'Select Category',
+                                requiredLabel: 'Category',
+                                selectedGetter: () => c.selectedCategory.value,
+                                controller: c.categoryCtr,
+                                listGetter: (ctr) => ctr.categoryList,
+                                loadingGetter: (ctr) => ctr.isLoading.value,
+                                itemLabel: (item) => item['name'].toString(),
+                                errorText: 'Select a category.',
+                                focusNode: _categoryNode,
+                                enabled: enabled,
+                                onChanged: (value) =>
+                                    c.selectedCategory.value = value,
+                              ),
+                              const SizedBox(height: 20),
+                              _lookupDropdown(
+                                hint: 'Select Unit',
+                                requiredLabel: 'Unit',
+                                selectedGetter: () => c.selectedUnit.value,
+                                controller: c.unitCtr,
+                                listGetter: (ctr) => ctr.unitList,
+                                loadingGetter: (ctr) => ctr.isLoading.value,
+                                itemLabel: (item) =>
+                                    item['short_name'].toString(),
+                                errorText: 'Select a unit.',
+                                focusNode: _unitNode,
+                                enabled: enabled,
+                                onChanged: (value) =>
+                                    c.selectedUnit.value = value,
+                              ),
+                              const SizedBox(height: 20),
+                              _lookupDropdown(
+                                hint: 'Select Warehouse',
+                                requiredLabel: 'Warehouse',
+                                selectedGetter: () => c.selectedWarehouse.value,
+                                controller: c.warehouseCtr,
+                                listGetter: (ctr) => ctr.warehouseList,
+                                loadingGetter: (ctr) => ctr.isLoading.value,
+                                itemLabel: (item) => item['name'].toString(),
+                                errorText: null,
+                                focusNode: null,
+                                enabled: enabled,
+                                onChanged: (value) =>
+                                    c.selectedWarehouse.value = value,
+                              ),
+                              const SizedBox(height: 28),
+                              heading('Pricing'),
+                              _lookupDropdown(
+                                hint: 'Select Currency',
+                                requiredLabel: 'Currency',
+                                selectedGetter: () => c.selectedCurrency.value,
+                                controller: c.currencyCtr,
+                                listGetter: (ctr) => ctr.currencyList,
+                                loadingGetter: (ctr) => ctr.isLoading.value,
+                                itemLabel: (item) => item['name'].toString(),
+                                errorText: 'Select a currency.',
+                                focusNode: _currencyNode,
+                                enabled: enabled,
+                                onChanged: (value) =>
+                                    c.selectedCurrency.value = value,
+                              ),
+                              const SizedBox(height: 20),
+                              LayoutBuilder(
+                                builder: (context, constraints) => Wrap(
+                                  spacing: 16,
+                                  runSpacing: 20,
+                                  children: [
+                                    for (final item in [
+                                      TextFormField(
+                                        controller:
+                                            c.productCostPriceController,
+                                        focusNode: _costNode,
+                                        enabled: enabled,
+                                        keyboardType:
+                                            const TextInputType.numberWithOptions(
+                                              decimal: true,
+                                            ),
+                                        textInputAction: TextInputAction.next,
+                                        decoration: _decoration(
+                                          context,
+                                          'Cost Price',
+                                          hint: 'Enter Cost Price',
+                                        ),
+                                        validator: _validatePrice,
+                                      ),
+                                      TextFormField(
+                                        controller:
+                                            c.productSalePriceController,
+                                        focusNode: _saleNode,
+                                        enabled: enabled,
+                                        keyboardType:
+                                            const TextInputType.numberWithOptions(
+                                              decimal: true,
+                                            ),
+                                        decoration: _decoration(
+                                          context,
+                                          'Sale Price',
+                                          hint: 'Enter Sale Price',
+                                        ),
+                                        validator: _validatePrice,
+                                      ),
+                                    ])
+                                      SizedBox(
+                                        width: constraints.maxWidth >= 560
+                                            ? (constraints.maxWidth - 16) / 2
+                                            : constraints.maxWidth,
+                                        child: item,
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 28),
+                              heading('Image and description'),
+                              if (kIsWeb) ...[
+                                // The shared upload plugin has no browser
+                                // support; show the existing photo without an
+                                // operative upload action.
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: AppCachedImage(
+                                    url: c.productPhotoController.text,
+                                    height: 120,
+                                    width: double.infinity,
+                                    fallbackIcon: Icons.image,
+                                    fallbackIconSize: 60,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Image upload is unavailable in the browser.'
+                                      .tr,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ] else
+                                ImageUploadWidget(
+                                  bucket: 'product',
+                                  folder: 'products',
+                                  imageUrl: c.productPhotoController.text,
+                                  onUploaded: (url) {
+                                    c.productPhotoController.text = url;
+                                  },
+                                ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: c.productDescriptionController,
+                                enabled: enabled,
+                                minLines: 3,
+                                maxLines: 8,
+                                decoration: _decoration(
+                                  context,
+                                  'Description',
+                                  hint: 'This is a sample description',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+                      child: Divider(
+                        height: 1,
+                        color: colors.onSurface.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (error.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Semantics(
+                                liveRegion: true,
+                                child: Text(
+                                  error,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colors.error,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Wrap(
+                            alignment: WrapAlignment.end,
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              OutlinedButton(
+                                onPressed: busy
+                                    ? null
+                                    : () => Navigator.of(context).pop(),
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: const Size(100, 48),
+                                  side: BorderSide(
+                                    color: colors.onSurface.withValues(
+                                      alpha: 0.12,
+                                    ),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text('Cancel'.tr),
+                              ),
+                              FilledButton(
+                                onPressed: busy ? null : _submit,
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size(112, 48),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: busy
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: colors.onPrimary,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text('Saving...'.tr),
+                                        ],
+                                      )
+                                    : Text(widget.submitLabel.tr),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-
-          body: SafeArea(
-            child: Obx(() {
-              // Rebuilding the form on saving-state changes keeps entered text:
-              // the controllers own the values.
-              final enabled = !c.isSaving.value;
-              return Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1000),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final info = _informationCard(enabled);
-                          final pricing = _pricingCard(enabled);
-                          final media = _imageDescriptionCard(enabled);
-
-                          if (constraints.maxWidth >= 900) {
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: info),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      pricing,
-                                      const SizedBox(height: 20),
-                                      media,
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-
-                          return Column(
-                            children: [
-                              info,
-                              const SizedBox(height: 20),
-                              pricing,
-                              const SizedBox(height: 20),
-                              media,
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
         ),
-      ),
-    );
-  }
-
-  Widget _informationCard(bool enabled) {
-    return HomeSectionCard(
-      title: 'Product Information',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextFormField(
-            controller: c.productNameController,
-            focusNode: _nameNode,
-            enabled: enabled,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: '${'Product Name'.tr} *',
-              hintText: 'Enter Product Name'.tr,
-              border: const OutlineInputBorder(),
-            ),
-            validator: _validateName,
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: c.productBarcodeController,
-            focusNode: _barcodeNode,
-            enabled: enabled,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: '${'Barcode'.tr} *',
-              hintText: 'Enter Barcode'.tr,
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                tooltip: 'Scan Barcode'.tr,
-                icon: const Icon(Icons.qr_code_scanner),
-                onPressed: enabled ? _scanBarcode : null,
-              ),
-            ),
-            validator: _validateBarcode,
-          ),
-          const SizedBox(height: 16),
-          _lookupDropdown(
-            hint: 'Select Category',
-            requiredLabel: 'Category'.tr,
-            selectedGetter: () => c.selectedCategory.value,
-            controller: c.categoryCtr,
-            listGetter: (ctr) => ctr.categoryList,
-            loadingGetter: (ctr) => ctr.isLoading.value,
-            itemLabel: (item) => item['name'].toString(),
-            errorText: 'Select a category.',
-            focusNode: _categoryNode,
-            enabled: enabled,
-            onChanged: (value) => c.selectedCategory.value = value,
-          ),
-          const SizedBox(height: 16),
-          _lookupDropdown(
-            hint: 'Select Unit',
-            requiredLabel: 'Unit'.tr,
-            selectedGetter: () => c.selectedUnit.value,
-            controller: c.unitCtr,
-            listGetter: (ctr) => ctr.unitList,
-            loadingGetter: (ctr) => ctr.isLoading.value,
-            itemLabel: (item) => item['short_name'].toString(),
-            errorText: 'Select a unit.',
-            focusNode: _unitNode,
-            enabled: enabled,
-            onChanged: (value) => c.selectedUnit.value = value,
-          ),
-          const SizedBox(height: 16),
-          _lookupDropdown(
-            hint: 'Select Warehouse',
-            requiredLabel: 'Warehouse'.tr,
-            selectedGetter: () => c.selectedWarehouse.value,
-            controller: c.warehouseCtr,
-            listGetter: (ctr) => ctr.warehouseList,
-            loadingGetter: (ctr) => ctr.isLoading.value,
-            itemLabel: (item) => item['name'].toString(),
-            errorText: null,
-            focusNode: null,
-            enabled: enabled,
-            onChanged: (value) => c.selectedWarehouse.value = value,
-          ),
-        ],
-      ),
-    );
+      );
+    });
   }
 
   /// Dropdown bound to a lookup controller's Rx list. The displayed value is
@@ -412,15 +573,7 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
         initialValue: available ? selected : null,
         isExpanded: true,
         focusNode: focusNode,
-        decoration: InputDecoration(
-          labelText: errorText == null ? requiredLabel : '$requiredLabel *',
-          hintText: hint.tr,
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 16,
-          ),
-        ),
+        decoration: _decoration(context, requiredLabel, hint: hint),
         items: items
             .map(
               (item) => DropdownMenuItem<String>(
@@ -435,123 +588,5 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
             : (value) => value == null ? errorText.tr : null,
       );
     });
-  }
-
-  Widget _pricingCard(bool enabled) {
-    return HomeSectionCard(
-      title: 'Pricing',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _lookupDropdown(
-            hint: 'Select Currency',
-            requiredLabel: 'Currency'.tr,
-            selectedGetter: () => c.selectedCurrency.value,
-            controller: c.currencyCtr,
-            listGetter: (ctr) => ctr.currencyList,
-            loadingGetter: (ctr) => ctr.isLoading.value,
-            itemLabel: (item) => item['name'].toString(),
-            errorText: 'Select a currency.',
-            focusNode: _currencyNode,
-            enabled: enabled,
-            onChanged: (value) => c.selectedCurrency.value = value,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: c.productCostPriceController,
-                  focusNode: _costNode,
-                  enabled: enabled,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: '${'Cost Price'.tr} *',
-                    hintText: 'Enter Cost Price'.tr,
-                    border: const OutlineInputBorder(),
-                  ),
-                  validator: _validatePrice,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: c.productSalePriceController,
-                  focusNode: _saleNode,
-                  enabled: enabled,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: '${'Sale Price'.tr} *',
-                    hintText: 'Enter Sale Price'.tr,
-                    border: const OutlineInputBorder(),
-                  ),
-                  validator: _validatePrice,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _imageDescriptionCard(bool enabled) {
-    final theme = Theme.of(context);
-    return HomeSectionCard(
-      title: 'Image and description',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (kIsWeb) ...[
-            // The shared upload plugin has no browser support; show the
-            // existing photo without an operative upload action.
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: AppCachedImage(
-                url: c.productPhotoController.text,
-                height: 120,
-                width: double.infinity,
-                fallbackIcon: Icons.image,
-                fallbackIconSize: 60,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Image upload is unavailable in the browser.'.tr,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ] else
-            ImageUploadWidget(
-              bucket: 'product',
-              folder: 'products',
-              imageUrl: c.productPhotoController.text,
-              onUploaded: (url) {
-                c.productPhotoController.text = url;
-              },
-            ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: c.productDescriptionController,
-            enabled: enabled,
-            minLines: 3,
-            maxLines: 8,
-            decoration: InputDecoration(
-              labelText: 'Description'.tr,
-              hintText: 'This is a sample description'.tr,
-              border: const OutlineInputBorder(),
-              alignLabelWithHint: true,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

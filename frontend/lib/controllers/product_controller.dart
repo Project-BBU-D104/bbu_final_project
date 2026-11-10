@@ -6,8 +6,11 @@ import 'package:frontend/controllers/unit_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/screen/product/widget/add_product_widget.dart';
+import 'package:frontend/screen/product/widget/edit_product_widget.dart';
 import 'package:frontend/services/main_service/product_service.dart';
 import 'package:frontend/utils/barcode_utils.dart';
+import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
@@ -54,6 +57,7 @@ class ProductController extends GetxController {
 
   var scannedProduct = Rxn<Map<String, dynamic>>();
   var scanResultText = ''.obs;
+  bool _formOpen = false;
 
   final productPhotoController = TextEditingController();
   final productNameController = TextEditingController();
@@ -241,9 +245,41 @@ class ProductController extends GetxController {
     }).toList();
   }
 
-  void gotoAddProduct() {
+  void addProduct(BuildContext context) {
+    if (_formOpen || isSaving.value || isOpeningEdit.value || isClosed) return;
     clearProducts();
-    Get.toNamed(AppRoutes.addProduct);
+    formError.value = '';
+    _showForm(context, AddProductWidget());
+  }
+
+  Future<void> _showForm(BuildContext context, Widget child) async {
+    _formOpen = true;
+    try {
+      if (MediaQuery.sizeOf(context).width >= 840) {
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => Dialog(
+            constraints: const BoxConstraints(maxWidth: 720),
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: child,
+          ),
+        );
+      } else {
+        await AppBottomSheets.show(
+          context,
+          child: child,
+          isDismissible: false,
+          enableDrag: false,
+          constraints: const BoxConstraints(maxWidth: 760),
+        );
+      }
+    } finally {
+      _formOpen = false;
+    }
   }
 
   Future<void> onSaveProduct(BuildContext context) async {
@@ -297,10 +333,13 @@ class ProductController extends GetxController {
   }
 
   Future<void> onEditProduct(int productId, BuildContext context) async {
-    if (isOpeningEdit.value) return;
+    if (_formOpen || isOpeningEdit.value || isSaving.value || isClosed) return;
+    final route = ModalRoute.of(context);
+    formError.value = '';
     isOpeningEdit.value = true;
     try {
       final product = await service.getProductById(productId);
+      if (isClosed || !context.mounted || route?.isCurrent != true) return;
       productPhotoController.text = product["photo"] ?? "";
       productNameController.text = product["name"] ?? "";
       productDescriptionController.text = product["description"] ?? "";
@@ -324,7 +363,7 @@ class ProductController extends GetxController {
           ? product["warehouse"]["id"].toString()
           : null;
 
-      Get.toNamed(AppRoutes.editProduct, arguments: productId);
+      _showForm(context, EditProductWidget(productId: productId));
     } catch (e) {
       ToastWidget.show(
         message: 'Could not open product. Please try again.'.tr,

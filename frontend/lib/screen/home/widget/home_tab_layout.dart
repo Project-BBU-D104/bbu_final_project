@@ -8,12 +8,14 @@ class HomeTabLayout extends StatelessWidget {
     required this.subtitle,
     required this.child,
     this.action,
+    this.leading,
     this.translateTitle = true,
   });
   final String title;
   final String subtitle;
   final Widget child;
   final Widget? action;
+  final Widget? leading;
   final bool translateTitle;
 
   @override
@@ -49,13 +51,25 @@ class HomeTabLayout extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Semantics(
-                                  header: true,
-                                  child: Text(
-                                    translateTitle ? title.tr : title,
-                                    style: theme.textTheme.headlineMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
+                                Row(
+                                  children: [
+                                    if (leading != null) ...[
+                                      leading!,
+                                      const SizedBox(width: 12),
+                                    ],
+                                    Flexible(
+                                      child: Semantics(
+                                        header: true,
+                                        child: Text(
+                                          translateTitle ? title.tr : title,
+                                          style: theme.textTheme.headlineMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 8),
                                 Text(

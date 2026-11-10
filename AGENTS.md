@@ -44,7 +44,7 @@ Set the API endpoint in `frontend/assets/.env` before running the app.
 
 Use four spaces and PEP 8-style snake_case for Python modules, functions, and variables; use PascalCase for classes and FastAPI/SQLModel types. use lower_snake_case filenames, PascalCase widgets/classes, and camelCase members. Keep feature-specific code in its corresponding route/service/controller directory. Do not edit generated platform files unless the change is platform-specific.
 
-When redesigning a screen, always use the supplier screens in `frontend/lib/screen/supplier/` as the reference for layout, styling, responsive behavior, and interactions, adapting them to the screen's needs.
+When redesigning a screen, always use all supplier screens( mian, edit, create, and detail ) in `frontend/lib/screen/supplier/` as the reference for layout, styling, responsive behavior, and interactions, adapting them to the screen's needs.
 
 ## Testing Guidelines
 

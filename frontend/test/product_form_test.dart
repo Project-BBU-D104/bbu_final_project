@@ -10,13 +10,11 @@ import 'package:frontend/controllers/image_upload_controller.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/controllers/unit_controller.dart';
-import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/localization/km_kh.dart';
 import 'package:frontend/locator.dart';
 import 'package:frontend/routes/app_routes.dart';
-import 'package:frontend/screen/product/widget/add_product_widget.dart';
-import 'package:frontend/screen/product/widget/edit_product_widget.dart';
+import 'package:frontend/screen/product/widget/product_form_widget.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/widget/app_cached_image.dart';
@@ -32,31 +30,6 @@ import 'profile_widget_test.dart' show FakeStorageService;
 class _TestStorage extends FakeStorageService {
   @override
   bool hasRole(String role) => false;
-}
-
-// Lookup controllers whose onInit does not fetch; tests seed their Rx lists.
-class _SeededCategoryController extends CategoryController {
-  @override
-  // ignore: must_call_super
-  void onInit() {}
-}
-
-class _SeededUnitController extends UnitController {
-  @override
-  // ignore: must_call_super
-  void onInit() {}
-}
-
-class _SeededCurrencyController extends CurrencyController {
-  @override
-  // ignore: must_call_super
-  void onInit() {}
-}
-
-class _SeededWarehouseController extends WarehouseController {
-  @override
-  // ignore: must_call_super
-  void onInit() {}
 }
 
 class _CountingSaleController extends SaleController {
@@ -142,45 +115,7 @@ class _FakeUploadController extends ImageUploadController {
   }
 }
 
-void seedLookups({bool empty = false}) {
-  Get.put<CategoryController>(
-    _SeededCategoryController(),
-  ).categoryList.assignAll(
-    empty
-        ? []
-        : [
-            {'id': 1, 'name': 'Drinks'},
-            {'id': 2, 'name': 'Bakery'},
-          ],
-  );
-  Get.put<UnitController>(_SeededUnitController()).unitList.assignAll(
-    empty
-        ? []
-        : [
-            {'id': 1, 'name': 'Piece', 'short_name': 'Pcs'},
-          ],
-  );
-  Get.put<CurrencyController>(
-    _SeededCurrencyController(),
-  ).currencyList.assignAll(
-    empty
-        ? []
-        : [
-            {'id': 1, 'name': 'US Dollar', 'symbol': r'$', 'code': 'USD'},
-          ],
-  );
-  Get.put<WarehouseController>(
-    _SeededWarehouseController(),
-  ).warehouseList.assignAll(
-    empty
-        ? []
-        : [
-            {'id': 1, 'name': 'Main'},
-          ],
-  );
-}
-
-/// Mounts the Add form as the initial '/add-product' route.
+/// Mounts the product list stub and opens the Add form modal.
 Future<ProductController> pumpAddForm(
   WidgetTester tester, {
   FakeProductService? service,
@@ -190,6 +125,7 @@ Future<ProductController> pumpAddForm(
   double scale = 1,
   double keyboardInset = 0,
   bool seedEmptyLookups = false,
+  bool openForm = true,
   Transition transition = Transition.noTransition,
 }) async {
   tester.view.physicalSize = size;
@@ -197,7 +133,7 @@ Future<ProductController> pumpAddForm(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
-  seedLookups(empty: seedEmptyLookups);
+  seedProductLookups(empty: seedEmptyLookups);
   final controller = ProductController(
     service: service ?? FakeProductService([]),
   );
@@ -214,13 +150,6 @@ Future<ProductController> pumpAddForm(
           ? AppTheme.dark(fontFamily: family)
           : AppTheme.light(fontFamily: family),
       defaultTransition: transition,
-      getPages: [
-        GetPage(name: AppRoutes.addProduct, page: () => AddProductWidget()),
-        GetPage(
-          name: AppRoutes.editProduct,
-          page: () => EditProductWidget(productId: Get.arguments as int),
-        ),
-      ],
       home: const Scaffold(body: Text('home-stub')),
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -233,14 +162,19 @@ Future<ProductController> pumpAddForm(
     ),
   );
   await tester.pumpAndSettle();
-  // Push the form route so a successful write pops back to a real route.
-  Get.toNamed(AppRoutes.addProduct);
-  await tester.pumpAndSettle();
+  if (openForm) {
+    controller.addProduct(tester.element(find.text('home-stub')));
+    await tester.pumpAndSettle();
+  }
   return controller;
 }
 
-Future<void> openEditForm(WidgetTester tester, int productId) async {
-  Get.toNamed(AppRoutes.editProduct, arguments: productId);
+Future<void> openEditForm(
+  WidgetTester tester,
+  ProductController c, {
+  int productId = 1,
+}) async {
+  await c.onEditProduct(productId, tester.element(find.text('home-stub')));
   await tester.pumpAndSettle();
 }
 
@@ -268,8 +202,8 @@ void prefillForEdit(
 Finder fieldOf(TextEditingController c) =>
     find.byWidgetPredicate((w) => w is TextField && w.controller == c);
 
-Finder get saveButton => find.widgetWithText(ElevatedButton, 'Save');
-Finder get updateButton => find.widgetWithText(ElevatedButton, 'Update');
+Finder get saveButton => find.widgetWithText(FilledButton, 'Save');
+Finder get updateButton => find.widgetWithText(FilledButton, 'Update');
 Finder get cancelButton => find.widgetWithText(OutlinedButton, 'Cancel');
 
 Future<void> selectDropdown(
@@ -448,6 +382,23 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Add form opens in a dialog on desktop and a sheet on mobile', (
+    tester,
+  ) async {
+    await pumpAddForm(tester, size: const Size(1440, 900));
+    expect(find.byType(Dialog), findsOneWidget);
+    expect(find.byType(ProductFormWidget), findsOneWidget);
+    expect(tester.getRect(find.byType(Dialog)).center.dx, closeTo(720, 2));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    Get.reset();
+    await pumpAddForm(tester);
+    expect(find.byType(Dialog), findsNothing);
+    expect(find.byType(ProductFormWidget), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('zero prices and sale below cost are accepted', (tester) async {
     final service = FakeProductService([]);
     final controller = await pumpAddForm(tester, service: service);
@@ -464,10 +415,15 @@ void main() {
     // Edit form: sale below cost reaches the fake unchanged.
     await tester.pumpWidget(const SizedBox.shrink());
     Get.reset();
-    seedLookups();
-    final controller2 = await pumpAddForm(tester, service: service);
+    service.items = [productFixture(1, 'Water')];
+    final controller2 = await pumpAddForm(
+      tester,
+      service: service,
+      openForm: false,
+    );
+    await openEditForm(tester, controller2);
     prefillForEdit(controller2, cost: '5.00', sale: '1.00');
-    await openEditForm(tester, 1);
+    await tester.pumpAndSettle();
 
     await tester.tap(updateButton);
     await tester.pumpAndSettle();
@@ -544,7 +500,10 @@ void main() {
     expect(service.createCalls, 1);
     expect(controller.isSaving.value, isTrue);
     // Submit, Cancel, and fields are disabled while pending.
-    expect(tester.widget<ElevatedButton>(saveButton).onPressed, isNull);
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
     expect(tester.widget<OutlinedButton>(cancelButton).onPressed, isNull);
     expect(
       tester
@@ -554,37 +513,45 @@ void main() {
     );
 
     // A second tap while pending must not create another request.
-    await tester.tap(saveButton, warnIfMissed: false);
+    await tester.tap(find.byType(FilledButton), warnIfMissed: false);
     await tester.pump();
     expect(service.createCalls, 1);
 
     service.gate!.complete({'id': 9});
     await tester.pumpAndSettle();
-    expect(Get.currentRoute, isNot(AppRoutes.addProduct));
+    expect(find.byType(ProductFormWidget), findsNothing);
     expect(controller.isSaving.value, isFalse);
     expect(tester.takeException(), isNull);
 
     // Same guarantee for the edit form's Update.
     await tester.pumpWidget(const SizedBox.shrink());
     Get.reset();
-    seedLookups();
+    service.items = [productFixture(1, 'Water')];
     service.gate = Completer<dynamic>();
-    final controller2 = await pumpAddForm(tester, service: service);
+    final controller2 = await pumpAddForm(
+      tester,
+      service: service,
+      openForm: false,
+    );
+    await openEditForm(tester, controller2);
     prefillForEdit(controller2);
-    await openEditForm(tester, 1);
+    await tester.pumpAndSettle();
 
     await tester.tap(updateButton);
     await tester.pump();
     expect(service.updateCalls, 1);
     expect(controller2.isSaving.value, isTrue);
-    expect(tester.widget<ElevatedButton>(updateButton).onPressed, isNull);
-    await tester.tap(updateButton, warnIfMissed: false);
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
+    await tester.tap(find.byType(FilledButton), warnIfMissed: false);
     await tester.pump();
     expect(service.updateCalls, 1);
 
     service.gate!.complete({'id': 1});
     await tester.pumpAndSettle();
-    expect(Get.currentRoute, isNot(AppRoutes.editProduct));
+    expect(find.byType(ProductFormWidget), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -600,19 +567,23 @@ void main() {
     await tester.pump();
     expect(service.createCalls, 1);
 
-    // The form's own back control disappears while the write is pending.
-    expect(find.byTooltip('Back'), findsNothing);
+    // The form's close control is disabled while the write is pending.
+    final close = find.ancestor(
+      of: find.byTooltip('Close'),
+      matching: find.byType(IconButton),
+    );
+    expect(tester.widget<IconButton>(close).onPressed, isNull);
 
-    // System back does not pop either.
+    // System back does not dismiss the form either.
     await tester.binding.handlePopRoute();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
-    expect(Get.currentRoute, AppRoutes.addProduct);
+    expect(find.byType(ProductFormWidget), findsOneWidget);
     expect(controller.isSaving.value, isTrue);
 
     service.gate!.complete({'id': 9});
     await tester.pumpAndSettle();
-    expect(Get.currentRoute, isNot(AppRoutes.addProduct));
+    expect(find.byType(ProductFormWidget), findsNothing);
     expect(find.text('home-stub'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -659,7 +630,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.createCalls, 1);
-    expect(Get.currentRoute, AppRoutes.addProduct);
+    expect(find.byType(ProductFormWidget), findsOneWidget);
     expect(controller.productNameController.text, 'Water');
     expect(controller.isSaving.value, isFalse);
     expect(
@@ -678,7 +649,7 @@ void main() {
     expect(controller.formError.value, '');
     service.gate!.complete({'id': 9});
     await tester.pumpAndSettle();
-    expect(Get.currentRoute, isNot(AppRoutes.addProduct));
+    expect(find.byType(ProductFormWidget), findsNothing);
     expect(
       find.text('Could not save product. Please try again.'),
       findsNothing,
@@ -690,17 +661,22 @@ void main() {
     // Same guarantee for the edit form.
     await tester.pumpWidget(const SizedBox.shrink());
     Get.reset();
-    seedLookups();
-    final failingUpdate = _GatedProductService([])..failNextUpdate = true;
-    final controller2 = await pumpAddForm(tester, service: failingUpdate);
+    final failingUpdate = _GatedProductService([productFixture(1, 'Water')])
+      ..failNextUpdate = true;
+    final controller2 = await pumpAddForm(
+      tester,
+      service: failingUpdate,
+      openForm: false,
+    );
+    await openEditForm(tester, controller2);
     prefillForEdit(controller2, name: 'Coffee');
-    await openEditForm(tester, 1);
+    await tester.pumpAndSettle();
 
     await tester.tap(updateButton);
     await tester.pumpAndSettle();
 
     expect(failingUpdate.updateCalls, 1);
-    expect(Get.currentRoute, AppRoutes.editProduct);
+    expect(find.byType(ProductFormWidget), findsOneWidget);
     expect(controller2.productNameController.text, 'Coffee');
     expect(controller2.isSaving.value, isFalse);
     expect(
@@ -757,9 +733,9 @@ void main() {
       }) async {
         await tester.pumpWidget(const SizedBox.shrink());
         Get.reset();
-        seedLookups();
         final controller = await pumpAddForm(
           tester,
+          service: FakeProductService([productFixture(1, 'Water')]),
           size: size,
           dark: dark,
           khmer: khmer,
@@ -769,7 +745,7 @@ void main() {
         prefillForEdit(controller);
 
         // Locale-aware labels: the pump sets the active translations.
-        final submit = find.widgetWithText(ElevatedButton, 'Save'.tr);
+        final submit = find.widgetWithText(FilledButton, 'Save'.tr);
         final cancel = find.widgetWithText(OutlinedButton, 'Cancel'.tr);
         expect(submit, findsOneWidget);
         expect(cancel, findsOneWidget);
@@ -779,8 +755,10 @@ void main() {
         expect(tester.getRect(cancel).bottom, lessThanOrEqualTo(visibleBottom));
         expect(tester.takeException(), isNull);
 
-        await openEditForm(tester, 1);
-        final editSubmit = find.widgetWithText(ElevatedButton, 'Update'.tr);
+        Get.back();
+        await tester.pumpAndSettle();
+        await openEditForm(tester, controller);
+        final editSubmit = find.widgetWithText(FilledButton, 'Update'.tr);
         expect(editSubmit, findsOneWidget);
         expect(cancel, findsOneWidget);
         expect(
@@ -872,10 +850,16 @@ void main() {
       // button shows a repeating progress spinner while loading.
       upload.loading.value = true;
       await tester.pump();
-      expect(tester.widget<ElevatedButton>(saveButton).onPressed, isNull);
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNull,
+      );
       upload.loading.value = false;
       await tester.pump();
-      expect(tester.widget<ElevatedButton>(saveButton).onPressed, isNotNull);
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNotNull,
+      );
       expect(tester.takeException(), isNull);
     },
   );
@@ -884,9 +868,15 @@ void main() {
     tester,
   ) async {
     Get.put<ImageUploadController>(_FakeUploadController());
-    final controller = await pumpAddForm(tester);
-    prefillForEdit(controller, photo: 'https://cdn.example/products/old.jpg');
-    Get.toNamed(AppRoutes.editProduct, arguments: 1);
+    final controller = await pumpAddForm(
+      tester,
+      service: FakeProductService([
+        productFixture(1, 'Water')
+          ..['photo'] = 'https://cdn.example/products/old.jpg',
+      ]),
+      openForm: false,
+    );
+    controller.onEditProduct(1, tester.element(find.text('home-stub')));
     // Bounded frames only: the network-image placeholder animates forever
     // under test HTTP overrides.
     await tester.pump();

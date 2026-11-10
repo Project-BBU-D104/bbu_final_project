@@ -1,4 +1,72 @@
+import 'package:frontend/controllers/category_controller.dart';
+import 'package:frontend/controllers/currency_controller.dart';
+import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/services/main_service/product_service.dart';
+import 'package:get/get.dart';
+
+// Lookup controllers whose onInit does not fetch; tests seed their Rx lists.
+class SeededCategoryController extends CategoryController {
+  @override
+  // ignore: must_call_super
+  void onInit() {}
+}
+
+class SeededUnitController extends UnitController {
+  @override
+  // ignore: must_call_super
+  void onInit() {}
+}
+
+class SeededCurrencyController extends CurrencyController {
+  @override
+  // ignore: must_call_super
+  void onInit() {}
+}
+
+class SeededWarehouseController extends WarehouseController {
+  @override
+  // ignore: must_call_super
+  void onInit() {}
+}
+
+void seedProductLookups({bool empty = false}) {
+  Get.put<CategoryController>(
+    SeededCategoryController(),
+  ).categoryList.assignAll(
+    empty
+        ? []
+        : [
+            {'id': 1, 'name': 'Drinks'},
+            {'id': 2, 'name': 'Bakery'},
+          ],
+  );
+  Get.put<UnitController>(SeededUnitController()).unitList.assignAll(
+    empty
+        ? []
+        : [
+            {'id': 1, 'name': 'Piece', 'short_name': 'Pcs'},
+          ],
+  );
+  Get.put<CurrencyController>(
+    SeededCurrencyController(),
+  ).currencyList.assignAll(
+    empty
+        ? []
+        : [
+            {'id': 1, 'name': 'US Dollar', 'symbol': r'$', 'code': 'USD'},
+          ],
+  );
+  Get.put<WarehouseController>(
+    SeededWarehouseController(),
+  ).warehouseList.assignAll(
+    empty
+        ? []
+        : [
+            {'id': 1, 'name': 'Main'},
+          ],
+  );
+}
 
 /// Shared product map used by the redesign test suites. Mutate the returned
 /// map to build scenarios (missing dates, null currency, ...).

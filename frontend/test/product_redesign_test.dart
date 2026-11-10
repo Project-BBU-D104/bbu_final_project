@@ -11,6 +11,7 @@ import 'package:frontend/screen/product/product_screen.dart';
 import 'package:frontend/screen/product/widget/filter_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_detail_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_widget.dart';
+import 'package:frontend/screen/product/widget/product_form_widget.dart';
 import 'package:frontend/screen/product/widget/product_table_widget.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/themes/app_theme.dart';
@@ -106,14 +107,6 @@ Future<ProductController> pumpProductScreen(
                 : const Scaffold(body: Text('detail-stub'));
           },
         ),
-        GetPage(
-          name: AppRoutes.addProduct,
-          page: () => const Scaffold(body: Text('add-stub')),
-        ),
-        GetPage(
-          name: AppRoutes.editProduct,
-          page: () => const Scaffold(body: Text('edit-stub')),
-        ),
       ],
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -153,11 +146,11 @@ void main() {
 
   testWidgets('product list adapts to available width', (tester) async {
     // Available content width = view width - 2 * outer padding (32 at >= 600).
-    // 823 -> 759 available: cards. 824 -> 760 available: table.
+    // 863 -> 799 available: cards. 864 -> 800 available: table.
     await pumpProductScreen(
       tester,
       service: FakeProductService(twoProducts()),
-      size: const Size(823, 844),
+      size: const Size(863, 844),
     );
     expect(find.byType(ProductCardWidget), findsWidgets);
     expect(find.byType(ProductTableWidget), findsNothing);
@@ -167,7 +160,7 @@ void main() {
     await pumpProductScreen(
       tester,
       service: FakeProductService(twoProducts()),
-      size: const Size(824, 844),
+      size: const Size(864, 844),
     );
     expect(find.byType(ProductTableWidget), findsWidgets);
     expect(find.byType(ProductCardWidget), findsNothing);
@@ -184,7 +177,7 @@ void main() {
     expect(find.byType(ProductCardWidget), findsWidgets);
     expect(find.byType(SearchWidget), findsOneWidget);
     expect(find.byType(FilterWidget), findsOneWidget);
-    expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Add Product'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     // Desktop under the shell: persistent sidebar plus table presentation.
@@ -199,7 +192,7 @@ void main() {
     expect(find.byType(ProductTableWidget), findsWidgets);
     expect(find.byType(SearchWidget), findsOneWidget);
     expect(find.byType(FilterWidget), findsOneWidget);
-    expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Add Product'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     // Narrow, Khmer, 200% text scaling: controls stay reachable, no overflow.
@@ -214,7 +207,7 @@ void main() {
     );
     expect(find.byType(SearchWidget), findsOneWidget);
     expect(find.byType(FilterWidget), findsOneWidget);
-    expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Add Product'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -341,7 +334,7 @@ void main() {
       onDetail: (arguments) => detailArgs = arguments,
     );
 
-    expect(find.byTooltip('Add Product'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Add Product'), findsOneWidget);
     expect(find.byTooltip('Scan Barcode'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'wa');
@@ -436,7 +429,7 @@ void main() {
       );
 
       // 899 pixels of available detail width: image stacks above information.
-      await openDetail(tester, const Size(931, 900));
+      await openDetail(tester, const Size(963, 900));
       expect(infoRect().top, greaterThanOrEqualTo(imageRect().bottom));
       expect(
         find.descendant(of: detail, matching: find.byType(Card)),
@@ -445,7 +438,7 @@ void main() {
       expect(tester.takeException(), isNull);
 
       // 900 pixels: image beside information.
-      await openDetail(tester, const Size(932, 900));
+      await openDetail(tester, const Size(964, 900));
       expect(infoRect().left, greaterThanOrEqualTo(imageRect().right));
       expect(tester.takeException(), isNull);
 
@@ -485,7 +478,7 @@ void main() {
       );
       expect(tester.takeException(), isNull);
       expect(
-        find.descendant(of: detail, matching: find.byType(ElevatedButton)),
+        find.descendant(of: detail, matching: find.byType(FilledButton)),
         findsOneWidget,
       );
       expect(
@@ -594,15 +587,59 @@ void main() {
       expect(service.deleteCalls, 0);
       expect(Get.currentRoute, AppRoutes.productCardDetail);
 
-      // Edit fetches the same id and passes an int to /edit-product.
+      // Edit fetches the same id and opens the shared form as a modal.
+      seedProductLookups();
       await tester.tap(
         find.descendant(of: detail, matching: find.text('Edit')),
       );
       await tester.pumpAndSettle();
       expect(service.lastFetchedId, product['id']);
-      expect(Get.currentRoute, '/edit-product');
-      expect(Get.arguments, product['id']);
-      expect(Get.arguments, isA<int>());
+      expect(find.byType(ProductFormWidget), findsOneWidget);
+      expect(find.byType(Dialog), findsNothing);
+      expect(Get.currentRoute, AppRoutes.productCardDetail);
+    });
+
+    testWidgets('detail moves actions into the page header on desktop', (
+      tester,
+    ) async {
+      final detail = find.byType(ProductCardDetailWidget);
+
+      await pumpProductScreen(
+        tester,
+        service: FakeProductService(twoProducts()),
+        size: const Size(390, 844),
+        realDetail: true,
+      );
+      await tester.tap(find.text('Water'));
+      await tester.pumpAndSettle();
+      var scaffold = tester.widget<Scaffold>(
+        find.descendant(of: detail, matching: find.byType(Scaffold)).first,
+      );
+      expect(scaffold.appBar, isNotNull);
+      expect(scaffold.bottomNavigationBar, isNotNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      Get.reset();
+      await pumpProductScreen(
+        tester,
+        service: FakeProductService(twoProducts()),
+        size: const Size(1440, 900),
+        shell: true,
+        realDetail: true,
+      );
+      await tester.tap(find.text('Water'));
+      await tester.pumpAndSettle();
+      scaffold = tester.widget<Scaffold>(
+        find.descendant(of: detail, matching: find.byType(Scaffold)).first,
+      );
+      expect(scaffold.appBar, isNull);
+      expect(scaffold.bottomNavigationBar, isNull);
+      expect(find.byTooltip('Back'), findsOneWidget);
+      expect(
+        find.descendant(of: detail, matching: find.byType(FilledButton)),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
     });
   });
 }

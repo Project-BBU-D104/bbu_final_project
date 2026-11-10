@@ -29,15 +29,17 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: ProductTableWidget(
-            product: {
-              'id': 1,
-              'name': 'Coffee',
-              'barcode': '123',
-              'sale_price': 2.5,
-              'currency': {'symbol': r'$', 'code': 'USD'},
-              'created_at': '2025-01-01T00:00:00',
-              'photo': 'https://example.com/coffee.jpg',
-            },
+            items: [
+              {
+                'id': 1,
+                'name': 'Coffee',
+                'barcode': '123',
+                'sale_price': 2.5,
+                'currency': {'symbol': r'$', 'code': 'USD'},
+                'created_at': '2025-01-01T00:00:00',
+                'photo': 'https://example.com/coffee.jpg',
+              },
+            ],
           ),
         ),
       ),

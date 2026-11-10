@@ -24,8 +24,17 @@ class ProductCardWidget extends StatelessWidget {
       product['currency'] as Map<String, dynamic>?,
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+    return Card(
+      color: theme.cardColor,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: Semantics(
         button: true,
         label: name,
@@ -39,110 +48,100 @@ class ProductCardWidget extends StatelessWidget {
             }
             return KeyEventResult.ignored;
           },
-          child: Material(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(16),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: _open,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: theme.dividerColor),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: AppCachedImage(
-                          url: product['photo']?.toString(),
-                          width: 80,
-                          height: 80,
-                          fallbackIcon: Icons.fastfood,
-                          fallbackIconSize: 32,
-                        ),
+          child: InkWell(
+            onTap: _open,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: AppCachedImage(
+                        url: product['photo']?.toString(),
+                        width: 80,
+                        height: 80,
+                        fallbackIcon: Icons.fastfood,
+                        fallbackIconSize: 32,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                  ),
+                  const SizedBox(width: 16),
 
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Tooltip(
-                                  message: name,
-                                  child: Text(
-                                    name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(
-                                          color: theme.colorScheme.onSurface,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Tooltip(
+                                message: name,
+                                child: Text(
+                                  name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: theme.colorScheme.onSurface,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
+                            ),
 
-                              const SizedBox(width: 8),
+                            const SizedBox(width: 8),
 
-                              Text(
-                                price,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              price,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Tooltip(
+                          message: barcode.isEmpty ? '-' : barcode,
+                          child: Text(
+                            '${'Barcode'.tr}: ${barcode.isEmpty ? '-' : barcode}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Tooltip(
-                            message: barcode.isEmpty ? '-' : barcode,
-                            child: Text(
-                              '${'Barcode'.tr}: ${barcode.isEmpty ? '-' : barcode}',
+                        ),
+
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              size: 14,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              created == null
+                                  ? '-'
+                                  : DateFormatter.formatDate(created),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                          ),
-
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_time,
-                                size: 14,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                created == null
-                                    ? '-'
-                                    : DateFormatter.formatDate(created),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

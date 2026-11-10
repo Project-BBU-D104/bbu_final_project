@@ -23,8 +23,6 @@ import 'package:frontend/screen/customer/customer_screen.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
 import 'package:frontend/screen/payment_type/payment_type_screen.dart';
 import 'package:frontend/screen/product/product_screen.dart';
-import 'package:frontend/screen/product/widget/add_product_widget.dart';
-import 'package:frontend/screen/product/widget/edit_product_widget.dart';
 import 'package:frontend/screen/product/widget/product_card_detail_widget.dart';
 import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
 import 'package:frontend/screen/purchase_request/purchase_request_screen.dart';
@@ -155,11 +153,6 @@ class AppPages {
       name: AppRoutes.auditLogs,
       page: () => AuditLogsScreen(),
       binding: AuditLogsBinding(),
-    ),
-    GetPage(name: AppRoutes.addProduct, page: () => AddProductWidget()),
-    GetPage(
-      name: AppRoutes.editProduct,
-      page: () => EditProductWidget(productId: Get.arguments as int),
     ),
     GetPage(name: AppRoutes.currentSale, page: () => CurrentSaleWidget()),
     GetPage(name: AppRoutes.paymentSuccess, page: () => PaymentSuccessWidget()),
