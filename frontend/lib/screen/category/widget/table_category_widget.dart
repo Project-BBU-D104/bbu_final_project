@@ -1,153 +1,252 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
-class TableCategoryWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> categories;
-
-  const TableCategoryWidget({super.key, required this.categories});
+class CategoryTableWidget extends StatelessWidget {
+  const CategoryTableWidget({super.key, required this.items});
+  final List<Map<String, dynamic>> items;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final line = colors.onSurface.withValues(alpha: 0.08);
     final controller = Get.find<CategoryController>();
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: titleColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade300),
+    Widget heading(String label) => Text(
+      label.tr,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+    Widget value(String text) => Tooltip(
+      message: text,
+      child: Text(
+        text,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: colors.onSurfaceVariant,
+        ),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
-            child: DataTable(
-              headingRowColor: WidgetStatePropertyAll(Colors.grey.shade100),
-              headingTextStyle: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-              dataRowMinHeight: 64,
-              dataRowMaxHeight: 76,
-              horizontalMargin: 16,
-              columnSpacing: 24,
-              columns: const [
-                DataColumn(label: Text('CATEGORY')),
-                DataColumn(label: Text('DESCRIPTION')),
-                DataColumn(label: Text('CREATED')),
-                DataColumn(label: Text('ACTIONS')),
-              ],
-              rows: categories.map((category) {
-                final createdAt = DateTime.tryParse(
-                  category['created_at']?.toString() ?? '',
-                );
-
-                return DataRow(
-                  cells: [
-                    DataCell(
-                      SizedBox(
-                        width: 180,
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 34,
-                              height: 34,
-                              decoration: BoxDecoration(
-                                color: primaryColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.category_outlined,
-                                color: primaryColor,
-                                size: 19,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                category['name']?.toString() ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      SizedBox(
-                        width: 280,
-                        child: Text(
-                          category['description']?.toString() ?? '',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.grey.shade700),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      Text(
-                        DateFormatter.formatDate(createdAt),
-                        style: TextStyle(color: Colors.grey.shade700),
-                      ),
-                    ),
-                    DataCell(
-                      PopupMenuButton<String>(
-                        tooltip: 'Category actions',
-                        icon: const Icon(Icons.more_horiz),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            controller.onEditCategory(category['id'], context);
-                          } else if (value == 'delete') {
-                            controller.onDeleteCategory(
-                              category['id'],
-                              context,
-                            );
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) => Theme(
+        data: theme.copyWith(
+          dividerColor: line,
+          dividerTheme: DividerThemeData(color: line, thickness: 1),
+        ),
+        child: Card(
+          elevation: 0,
+          color: theme.cardColor,
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: line),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: math.max(960, constraints.maxWidth),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 48,
+                dataRowMinHeight: 72,
+                dataRowMaxHeight: 76,
+                columnSpacing: 20,
+                horizontalMargin: 24,
+                headingRowColor: WidgetStatePropertyAll(
+                  Color.alphaBlend(
+                    colors.onSurface.withValues(alpha: 0.025),
+                    theme.cardColor,
+                  ),
+                ),
+                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+                dataRowColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.hovered)
+                      ? colors.primary.withValues(alpha: 0.035)
+                      : null,
+                ),
+                columns: [
+                  DataColumn(
+                    label: heading('Category'),
+                    columnWidth: const FlexColumnWidth(),
+                  ),
+                  DataColumn(
+                    label: heading('Description'),
+                    columnWidth: const FlexColumnWidth(),
+                  ),
+                  DataColumn(
+                    label: heading('Created At'),
+                    columnWidth: const FixedColumnWidth(160),
+                  ),
+                  DataColumn(
+                    label: heading('Actions'),
+                    columnWidth: const FixedColumnWidth(144),
+                  ),
+                ],
+                rows: [
+                  for (final item in items)
+                    if (item['id'] is int)
+                      DataRow(
+                        onSelectChanged: (_) =>
+                            controller.onEditCategory(item['id'], context),
+                        cells: [
+                          DataCell(
+                            Row(
                               children: [
-                                const Icon(Icons.edit_outlined, size: 20),
-                                const SizedBox(width: 10),
-                                Text('Edit'.tr),
+                                ExcludeSemantics(
+                                  child: CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: colors.primary.withValues(
+                                      alpha: 0.08,
+                                    ),
+                                    foregroundColor: colors.primary,
+                                    child: const Icon(
+                                      Icons.category_outlined,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Tooltip(
+                                    message:
+                                        (item['name'] ?? '').toString().trim(),
+                                    child: Text(
+                                      (item['name'] ?? '')
+                                              .toString()
+                                              .trim()
+                                              .isEmpty
+                                          ? '-'
+                                          : item['name'].toString().trim(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
+                          DataCell(
+                            value(
+                              (item['description'] ?? '')
+                                      .toString()
+                                      .trim()
+                                      .isEmpty
+                                  ? '-'
+                                  : item['description'].toString().trim(),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              DateTime.tryParse(
+                                        (item['created_at'] ?? '')
+                                            .toString(),
+                                      ) ==
+                                      null
+                                  ? '-'
+                                  : DateFormatter.formatDate(
+                                      DateTime.tryParse(
+                                        item['created_at'].toString(),
+                                      ),
+                                    ),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.delete_outline,
-                                  color: Colors.red,
-                                  size: 20,
+                                IconButton(
+                                  tooltip: 'Edit'.tr,
+                                  onPressed: () => controller.onEditCategory(
+                                    item['id'],
+                                    context,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    size: 20,
+                                  ),
                                 ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Delete'.tr,
-                                  style: const TextStyle(color: Colors.red),
+                                IconButton(
+                                  tooltip: 'Delete'.tr,
+                                  color: colors.error,
+                                  onPressed: () => controller.onDeleteCategory(
+                                    item['id'],
+                                    context,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    size: 20,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ],
+                      )
+                    else
+                      DataRow(
+                        cells: [
+                          DataCell(
+                            Row(
+                              children: [
+                                ExcludeSemantics(
+                                  child: CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: colors.primary.withValues(
+                                      alpha: 0.08,
+                                    ),
+                                    foregroundColor: colors.primary,
+                                    child: const Icon(
+                                      Icons.category_outlined,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    (item['name'] ?? '').toString().trim().isEmpty
+                                        ? '-'
+                                        : item['name'].toString().trim(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          DataCell(
+                            value(
+                              (item['description'] ?? '')
+                                      .toString()
+                                      .trim()
+                                      .isEmpty
+                                  ? '-'
+                                  : item['description'].toString().trim(),
+                            ),
+                          ),
+                          DataCell(Text('-')),
+                          const DataCell(SizedBox.shrink()),
+                        ],
                       ),
-                    ),
-                  ],
-                );
-              }).toList(),
+                ],
+              ),
             ),
           ),
         ),

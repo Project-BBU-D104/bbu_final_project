@@ -1,151 +1,129 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/category_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
-class CardCategoryWidget extends StatelessWidget {
-  final Map<String, dynamic> category;
+class CategoryCardWidget extends StatelessWidget {
+  const CategoryCardWidget({super.key, required this.item});
+  final Map<String, dynamic> item;
 
-  CardCategoryWidget({
-    super.key,
-    required this.category,
-  });
-
-  final ctr = Get.find<CategoryController>();
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 5),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: titleColor,
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final controller = Get.find<CategoryController>();
+    final categoryId = item['id'] is int ? item['id'] as int : null;
+    final name = (item['name'] ?? '').toString().trim();
+    final description = (item['description'] ?? '').toString().trim();
+    final createdAt = DateTime.tryParse(
+      (item['created_at'] ?? '').toString(),
+    );
+    return Card(
+      color: theme.cardColor,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        side: BorderSide(color: colors.onSurface.withValues(alpha: 0.08)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Category Icon
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: .12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              Icons.category_rounded,
-              color: primaryColor,
-              size: 30,
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          /// Category Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  category["name"]?.toString() ?? "",
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                Text(
-                  category["description"]?.toString() ?? "",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                    height: 1.4,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_rounded,
-                      size: 15,
-                      color: Colors.grey.shade500,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Created: ${DateFormatter.formatDate(
-                        DateTime.parse(category["created_at"]),
-                      )}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: categoryId == null
+            ? null
+            : () => controller.onEditCategory(categoryId, context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.category_outlined, color: colors.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Tooltip(
+                      message: name,
+                      child: Text(
+                        name.isEmpty ? '-' : name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleLarge,
                       ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          /// Popup Menu
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              switch (value) {
-                case "edit":
-                  ctr.onEditCategory(category["id"], context);
-                  break;
-
-                case "delete":
-                  ctr.onDeleteCategory(category["id"], context);
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: "edit",
-                child: Row(
-                  children: [
-                    Icon(Icons.edit_outlined, size: 20),
-                    SizedBox(width: 10),
-                    Text("Edit".tr),
-                  ],
-                ),
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    tooltip: 'Actions'.tr,
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (categoryId == null) return;
+                      if (value == 'edit') {
+                        controller.onEditCategory(categoryId, context);
+                      } else if (value == 'delete') {
+                        controller.onDeleteCategory(categoryId, context);
+                      }
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.edit_outlined, size: 20),
+                            const SizedBox(width: 10),
+                            Text('Edit'.tr),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete_outline,
+                              size: 20,
+                              color: colors.error,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Delete'.tr,
+                              style: TextStyle(color: colors.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              PopupMenuItem(
-                value: "delete",
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: 20,
+              const SizedBox(height: 12),
+              Text(
+                description.isEmpty ? '-' : description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Icon(
+                    Icons.access_time_rounded,
+                    size: 16,
+                    color: colors.onSurfaceVariant,
+                  ),
+                  Text(
+                    createdAt == null
+                        ? '-'
+                        : DateFormatter.formatDate(createdAt),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
                     ),
-                    SizedBox(width: 10),
-                    Text(
-                      "Delete".tr,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
