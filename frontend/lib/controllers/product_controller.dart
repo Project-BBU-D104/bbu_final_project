@@ -277,7 +277,11 @@ class ProductController extends GetxController {
       await getProducts();
       _refreshSaleProducts();
 
-      if (context.mounted) Navigator.pop(context);
+      // Never pop a second route if the user already left this form while
+      // the write was in flight.
+      if (context.mounted && ModalRoute.of(context)?.isCurrent == true) {
+        Navigator.pop(context);
+      }
 
       // Clear textfields
       clearProducts();
@@ -359,14 +363,16 @@ class ProductController extends GetxController {
       await getProducts();
       _refreshSaleProducts();
 
-      if (context.mounted) {
+      // Never pop a second route if the user already left this form while
+      // the write was in flight.
+      if (context.mounted && ModalRoute.of(context)?.isCurrent == true) {
         Navigator.pop(context);
-
-        ToastWidget.show(
-          message: "Product updated successfully",
-          type: ToastType.success,
-        );
       }
+
+      ToastWidget.show(
+        message: "Product updated successfully",
+        type: ToastType.success,
+      );
     } catch (e) {
       formError.value = 'Could not save product. Please try again.'.tr;
     } finally {

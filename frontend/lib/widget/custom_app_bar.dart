@@ -35,6 +35,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
 
+      // showBack fully controls the back button; without this the AppBar
+      // would imply its own BackButton whenever the route can pop.
+      automaticallyImplyLeading: false,
       leading: showBack
           ? IconButton(
               tooltip: 'Back'.tr,

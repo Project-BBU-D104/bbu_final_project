@@ -138,149 +138,163 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: CustomAppBar(title: widget.title),
+    return Obx(
+      () => PopScope(
+        // Block system back while a write is pending; the app-bar back
+        // control is hidden for the same window.
+        canPop: !c.isSaving.value,
+        child: Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          appBar: CustomAppBar(
+            title: widget.title,
+            showBack: !c.isSaving.value,
+          ),
 
-      // Persistent bottomSheet (not bottomNavigationBar) so the actions stay
-      // above an onscreen keyboard.
-      bottomSheet: SafeArea(
-        child: Material(
-          color: theme.colorScheme.surface,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Obx(() {
-                  if (c.formError.value.isEmpty) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 20,
-                          color: theme.colorScheme.error,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            c.formError.value,
-                            style: theme.textTheme.bodyMedium?.copyWith(
+          // Persistent bottomSheet (not bottomNavigationBar) so the actions stay
+          // above an onscreen keyboard.
+          bottomSheet: SafeArea(
+            child: Material(
+              color: theme.colorScheme.surface,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Obx(() {
+                      if (c.formError.value.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 20,
                               color: theme.colorScheme.error,
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                Obx(() {
-                  final uploadLoading =
-                      Get.isRegistered<ImageUploadController>() &&
-                      Get.find<ImageUploadController>().loading.value;
-                  final busy = c.isSaving.value || uploadLoading;
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: busy ? null : () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(52),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text('Cancel'.tr),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: busy ? null : _submit,
-                          icon: c.isSaving.value
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.check),
-                          label: Text(widget.submitLabel.tr),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            minimumSize: const Size.fromHeight(52),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ],
-            ),
-          ),
-        ),
-      ),
-
-      body: SafeArea(
-        child: Obx(() {
-          // Rebuilding the form on saving-state changes keeps entered text:
-          // the controllers own the values.
-          final enabled = !c.isSaving.value;
-          return Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1000),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final info = _informationCard(enabled);
-                      final pricing = _pricingCard(enabled);
-                      final media = _imageDescriptionCard(enabled);
-
-                      if (constraints.maxWidth >= 900) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: info),
-                            const SizedBox(width: 20),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: Column(
-                                children: [
-                                  pricing,
-                                  const SizedBox(height: 20),
-                                  media,
-                                ],
+                              child: Text(
+                                c.formError.value,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
                               ),
                             ),
                           ],
-                        );
-                      }
-
-                      return Column(
+                        ),
+                      );
+                    }),
+                    Obx(() {
+                      final uploadLoading =
+                          Get.isRegistered<ImageUploadController>() &&
+                          Get.find<ImageUploadController>().loading.value;
+                      final busy = c.isSaving.value || uploadLoading;
+                      return Row(
                         children: [
-                          info,
-                          const SizedBox(height: 20),
-                          pricing,
-                          const SizedBox(height: 20),
-                          media,
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: busy
+                                  ? null
+                                  : () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(52),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: Text('Cancel'.tr),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: busy ? null : _submit,
+                              icon: c.isSaving.value
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.check),
+                              label: Text(widget.submitLabel.tr),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                                minimumSize: const Size.fromHeight(52),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       );
-                    },
-                  ),
+                    }),
+                  ],
                 ),
               ),
             ),
-          );
-        }),
+          ),
+
+          body: SafeArea(
+            child: Obx(() {
+              // Rebuilding the form on saving-state changes keeps entered text:
+              // the controllers own the values.
+              final enabled = !c.isSaving.value;
+              return Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1000),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final info = _informationCard(enabled);
+                          final pricing = _pricingCard(enabled);
+                          final media = _imageDescriptionCard(enabled);
+
+                          if (constraints.maxWidth >= 900) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: info),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      pricing,
+                                      const SizedBox(height: 20),
+                                      media,
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          return Column(
+                            children: [
+                              info,
+                              const SizedBox(height: 20),
+                              pricing,
+                              const SizedBox(height: 20),
+                              media,
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }

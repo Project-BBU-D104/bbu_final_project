@@ -190,6 +190,7 @@ Future<ProductController> pumpAddForm(
   double scale = 1,
   double keyboardInset = 0,
   bool seedEmptyLookups = false,
+  Transition transition = Transition.noTransition,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -212,7 +213,7 @@ Future<ProductController> pumpAddForm(
       theme: dark
           ? AppTheme.dark(fontFamily: family)
           : AppTheme.light(fontFamily: family),
-      defaultTransition: Transition.noTransition,
+      defaultTransition: transition,
       getPages: [
         GetPage(name: AppRoutes.addProduct, page: () => AddProductWidget()),
         GetPage(
@@ -584,6 +585,65 @@ void main() {
     service.gate!.complete({'id': 1});
     await tester.pumpAndSettle();
     expect(Get.currentRoute, isNot(AppRoutes.editProduct));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('navigation controls are blocked while a save is pending', (
+    tester,
+  ) async {
+    final service = _GatedProductService([]);
+    service.gate = Completer<dynamic>();
+    final controller = await pumpAddForm(tester, service: service);
+    await fillValidForm(tester, controller);
+
+    await tester.tap(saveButton);
+    await tester.pump();
+    expect(service.createCalls, 1);
+
+    // The form's own back control disappears while the write is pending.
+    expect(find.byTooltip('Back'), findsNothing);
+
+    // System back does not pop either.
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(Get.currentRoute, AppRoutes.addProduct);
+    expect(controller.isSaving.value, isTrue);
+
+    service.gate!.complete({'id': 9});
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, isNot(AppRoutes.addProduct));
+    expect(find.text('home-stub'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a pop racing a pending save cannot pop a second route', (
+    tester,
+  ) async {
+    final service = _GatedProductService([]);
+    service.gate = Completer<dynamic>();
+    final controller = await pumpAddForm(
+      tester,
+      service: service,
+      // Widen the pop window the route-currency guard protects; production
+      // uses noTransition, where the same race fits inside a single frame.
+      transition: Transition.fadeIn,
+    );
+    await fillValidForm(tester, controller);
+    await tester.tap(saveButton);
+    await tester.pump();
+    expect(service.createCalls, 1);
+
+    // A programmatic pop starts while the write is still pending.
+    Get.back();
+    await tester.pump();
+
+    service.gate!.complete({'id': 9});
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('home-stub'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.text('home-stub'), findsOneWidget);
+    expect(Get.currentRoute, '/');
     expect(tester.takeException(), isNull);
   });
 
