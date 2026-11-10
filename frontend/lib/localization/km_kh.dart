@@ -325,7 +325,6 @@ const Map<String, String> kmKH = {
   'Product Information': 'ព័ត៌មានផលិតផល',
   'No description available.': 'គ្មានការពិពណ៌នាទេ។',
   'Update': 'ធ្វើបច្ចុប្បន្នភាព',
-  'Cancel': 'បោះបង់',
   'Select Currency': 'ជ្រើសរើសរូបិយប័ណ្ណ',
   'This is a sample description': 'នេះជាគំរូនៃការពិពណ៌នា',
   'Upload Image': 'បញ្ចូលរូបភាព',

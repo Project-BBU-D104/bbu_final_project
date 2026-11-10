@@ -90,7 +90,6 @@ class _SearchWidgetState extends State<SearchWidget> {
                         onPressed: _clear,
                         tooltip: 'Clear search'.tr,
                         icon: const Icon(Icons.close),
-                        tooltip: 'Clear search'.tr,
                       );
               }),
             ],

@@ -52,18 +52,34 @@ class SupplierScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       if (desktop) ...[
-                                        Semantics(
-                                          header: true,
-                                          child: Text(
-                                            'Suppliers'.tr,
-                                            style: theme
-                                                .textTheme
-                                                .headlineMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                  letterSpacing: -0.5,
+                                        Row(
+                                          children: [
+                                            IconButton.outlined(
+                                              tooltip: 'Back'.tr,
+                                              onPressed: () => Get.back(),
+                                              icon: const Icon(
+                                                Icons.arrow_back,
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Flexible(
+                                              child: Semantics(
+                                                header: true,
+                                                child: Text(
+                                                  'Suppliers'.tr,
+                                                  style: theme
+                                                      .textTheme
+                                                      .headlineMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        letterSpacing: -0.5,
+                                                      ),
                                                 ),
-                                          ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 8),
                                       ],

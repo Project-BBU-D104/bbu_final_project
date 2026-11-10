@@ -324,7 +324,6 @@ const Map<String, String> enUS = {
   'Product Information':'Product Information',
   'No description available.':'No description available.',
   'Update':'Update',
-  'Cancel':'Cancel',
   'Select Currency':'Select Currency',
   'This is a sample description':'This is a sample description',
   'Upload Image':'Upload Image',

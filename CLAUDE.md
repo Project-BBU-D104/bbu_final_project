@@ -47,6 +47,7 @@ flutter analyze
 
 ## Frontend architecture
 
+- When redesigning a screen, always use the supplier screens in `frontend/lib/screen/supplier/` as the reference for layout, styling, responsive behavior, and interactions, adapting them to the screen's needs.
 - GetX for state and navigation: controllers in `lib/controllers/`, screens in `lib/screen/`, routes/bindings in `lib/routes/` and `lib/binding/`.
 - API access goes through `lib/services/` (e.g. `api_service.dart`); `API_URL` and Telegram keys load from `assets/.env` via flutter_dotenv.
 - `lib/locator.dart` wires get_it singletons (storage, Telegram) at startup.
