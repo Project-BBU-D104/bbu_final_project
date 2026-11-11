@@ -1,138 +1,330 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/unit/widget/unit_card_widget.dart';
 import 'package:frontend/screen/unit/widget/unit_table_widget.dart';
-import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class UnitScreen extends StatelessWidget {
   UnitScreen({super.key});
-
-  final ctr = Get.put(UnitController());
+  final controller = Get.find<UnitController>();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final desktop = DesktopAppShell.isVisible(context);
     return Scaffold(
-      appBar: CustomAppBar(title: "Unit"),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: [
-              SizedBox(height: 4),
-              SearchWidget(title: "Search Unit"),
-
-              SizedBox(height: 16),
-
-              Obx(() {
-                if (ctr.isLoading.value) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (ctr.unitList.isEmpty) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AppCachedImage(
-                            assetPath: 'assets/images/empty.png',
-                            width: 120,
-                            fit: BoxFit.contain,
-                          ),
-                          Text("No Unit Found".tr),
-                        ],
+      appBar: desktop
+          ? null
+          : const CustomAppBar(title: 'Units', useTheme: true),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final gutter = constraints.maxWidth < 600 ? 16.0 : 32.0;
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1240),
+                child: Padding(
+                  padding: EdgeInsets.all(gutter),
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 24,
+                              runSpacing: 16,
+                              children: [
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: constraints.maxWidth < 600
+                                        ? constraints.maxWidth - gutter * 2
+                                        : 580,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (desktop) ...[
+                                        Row(
+                                          children: [
+                                            IconButton.outlined(
+                                              tooltip: 'Back'.tr,
+                                              onPressed: () => Get.back(),
+                                              icon: const Icon(
+                                                Icons.arrow_back,
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Flexible(
+                                              child: Semantics(
+                                                header: true,
+                                                child: Text(
+                                                  'Units'.tr,
+                                                  style: theme
+                                                      .textTheme
+                                                      .headlineMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        letterSpacing: -0.5,
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                      ],
+                                      Text(
+                                        'Manage product units.'.tr,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    IconButton.outlined(
+                                      tooltip: 'Refresh'.tr,
+                                      onPressed: controller.onRefresh,
+                                      style: IconButton.styleFrom(
+                                        minimumSize: const Size(48, 48),
+                                        side: BorderSide(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.12),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.refresh, size: 20),
+                                    ),
+                                    FilledButton.icon(
+                                      onPressed: () =>
+                                          controller.addUnit(context),
+                                      style: FilledButton.styleFrom(
+                                        minimumSize: const Size(0, 48),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.add, size: 20),
+                                      label: Text('Add Unit'.tr),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 28),
+                            LayoutBuilder(
+                              builder: (context, content) => Wrap(
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 20,
+                                runSpacing: 12,
+                                children: [
+                                  SizedBox(
+                                    width: content.maxWidth < 420
+                                        ? content.maxWidth
+                                        : 420,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.08),
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const SearchWidget(
+                                        title: 'Search Units',
+                                      ),
+                                    ),
+                                  ),
+                                  Obx(
+                                    () => Text(
+                                      '${controller.searchUnitList.length} ${'Units'.tr}',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }
-
-                if (ctr.searchUnitList.isEmpty) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(child: Text("Search Not Found".tr)),
-                  );
-                }
-
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth < 700) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: ctr.searchUnitList.length,
-                        padding: const EdgeInsets.only(bottom: 50),
-                        itemBuilder: (context, index) {
-                          return UnitCardWidget(
-                            units: ctr.searchUnitList[index],
+                      SliverFillRemaining(
+                        child: Obx(() {
+                          final loading = controller.isLoading.value;
+                          final error = controller.loadError.value;
+                          final items = controller.searchUnitList.toList();
+                          if (loading && controller.unitList.isEmpty) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (loading)
+                                const LinearProgressIndicator(minHeight: 2),
+                              if (error.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: Wrap(
+                                    spacing: 12,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      Text(error),
+                                      TextButton(
+                                        onPressed: loading
+                                            ? null
+                                            : controller.onRefresh,
+                                        child: Text('Retry'.tr),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              Expanded(
+                                child: items.isEmpty
+                                    ? SingleChildScrollView(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                            vertical: 56,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: theme.cardColor,
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            border: Border.all(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.08),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Icon(
+                                                Icons.straighten,
+                                                size: 40,
+                                                color: theme
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Text(
+                                                (controller.unitList.isEmpty
+                                                        ? 'No units yet'
+                                                        : 'No matching units')
+                                                    .tr,
+                                                textAlign: TextAlign.center,
+                                                style:
+                                                    theme.textTheme.titleMedium,
+                                              ),
+                                              const SizedBox(height: 16),
+                                              if (controller.unitList.isEmpty)
+                                                FilledButton.icon(
+                                                  key: const Key(
+                                                    'empty-add-unit',
+                                                  ),
+                                                  onPressed: () => controller
+                                                      .addUnit(context),
+                                                  icon: const Icon(
+                                                    Icons.add,
+                                                    size: 20,
+                                                  ),
+                                                  label: Text('Add Unit'.tr),
+                                                )
+                                              else
+                                                Text(
+                                                  'Try a different search or clear the filter.'
+                                                      .tr,
+                                                  textAlign: TextAlign.center,
+                                                  style: theme
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        color: theme
+                                                            .colorScheme
+                                                            .onSurfaceVariant,
+                                                      ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    : LayoutBuilder(
+                                        builder: (context, content) {
+                                          final table =
+                                              content.maxWidth >= 800 &&
+                                              MediaQuery.textScalerOf(
+                                                    context,
+                                                  ).scale(16) <=
+                                                  20.8;
+                                          return RefreshIndicator(
+                                            onRefresh: controller.onRefresh,
+                                            child: table
+                                                ? SingleChildScrollView(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    child: UnitTableWidget(
+                                                      items: items,
+                                                    ),
+                                                  )
+                                                : ListView.builder(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    itemCount: items.length,
+                                                    itemBuilder: (_, i) =>
+                                                        UnitCardWidget(
+                                                          item: items[i],
+                                                        ),
+                                                  ),
+                                          );
+                                        },
+                                      ),
+                              ),
+                            ],
                           );
-                        },
-                      );
-                    }
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 50),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(10),
+                        }),
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        children: [
-                          const _UnitTableHeader(),
-                          ...ctr.searchUnitList.map(
-                            (unit) => UnitTableWidget(units: unit),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }),
-            ],
-          ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ctr.addUnit(context);
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class _UnitTableHeader extends StatelessWidget {
-  const _UnitTableHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final headerStyle = TextStyle(
-      color: Colors.grey.shade700,
-      fontSize: 12,
-      fontWeight: FontWeight.w600,
-    );
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      color: Colors.grey.shade100,
-      child: Row(
-        children: [
-          Expanded(flex: 4, child: Text('UNIT', style: headerStyle)),
-          Expanded(flex: 2, child: Text('STATUS', style: headerStyle)),
-          Expanded(flex: 2, child: Text('CREATED', style: headerStyle)),
-          Expanded(flex: 2, child: Text('UPDATED', style: headerStyle)),
-          const SizedBox(width: 48),
-        ],
       ),
     );
   }

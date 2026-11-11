@@ -1,158 +1,255 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/unit_controller.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class UnitTableWidget extends StatelessWidget {
-  final Map<String, dynamic> units;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-
-  UnitTableWidget({super.key, required this.units, this.onEdit, this.onDelete});
-
-  final ctr = Get.put(UnitController());
-
-  String formatDate(dynamic date) {
-    if (date == null) return "-";
-    try {
-      return DateFormat(
-        "dd MMM yyyy, hh:mm a",
-      ).format(DateTime.parse(date.toString()));
-    } catch (e) {
-      return "-";
-    }
-  }
+  const UnitTableWidget({super.key, required this.items});
+  final List<Map<String, dynamic>> items;
 
   @override
   Widget build(BuildContext context) {
-    final bool isActive = units['status'] ?? false;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final line = colors.onSurface.withValues(alpha: 0.08);
+    final controller = Get.find<UnitController>();
+    Widget heading(String label) => Flexible(
+      child: Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    Widget value(String text) => Tooltip(
+      message: text,
+      child: Text(
+        text,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: colors.onSurfaceVariant,
+        ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 4,
-            child: Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.inventory_2_outlined,
-                    color: Colors.orange.shade700,
-                    size: 21,
+    );
+    Widget dateCell(DateTime? date) => Text(
+      date == null ? '-' : DateFormatter.formatDate(date),
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+    );
+    Widget statusChip(bool active) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: active
+            ? colors.primary.withValues(alpha: 0.08)
+            : colors.onSurface.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        active ? 'Active'.tr : 'Inactive'.tr,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: active ? colors.primary : colors.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) => Theme(
+        data: theme.copyWith(
+          dividerColor: line,
+          dividerTheme: DividerThemeData(color: line, thickness: 1),
+        ),
+        child: Card(
+          elevation: 0,
+          color: theme.cardColor,
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: line),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: math.max(960, constraints.maxWidth),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 48,
+                dataRowMinHeight: 72,
+                dataRowMaxHeight: 76,
+                columnSpacing: 20,
+                horizontalMargin: 24,
+                headingRowColor: WidgetStatePropertyAll(
+                  Color.alphaBlend(
+                    colors.onSurface.withValues(alpha: 0.025),
+                    theme.cardColor,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        units['name']?.toString() ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+                dataRowColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.hovered)
+                      ? colors.primary.withValues(alpha: 0.035)
+                      : null,
+                ),
+                columns: [
+                  DataColumn(
+                    label: heading('Unit'),
+                    columnWidth: const FlexColumnWidth(),
+                  ),
+                  DataColumn(
+                    label: heading('Short Name'),
+                    columnWidth: const FixedColumnWidth(120),
+                  ),
+                  DataColumn(
+                    label: heading('Status'),
+                    columnWidth: const FixedColumnWidth(120),
+                  ),
+                  DataColumn(
+                    label: heading('Created At'),
+                    columnWidth: const FixedColumnWidth(160),
+                  ),
+                  DataColumn(
+                    label: heading('Updated At'),
+                    columnWidth: const FixedColumnWidth(160),
+                  ),
+                  DataColumn(
+                    label: heading('Actions'),
+                    columnWidth: const FixedColumnWidth(144),
+                  ),
+                ],
+                rows: [
+                  for (final item in items)
+                    if (item['id'] is int)
+                      DataRow(
+                        onSelectChanged: (_) =>
+                            controller.onEditUnit(item['id'], context),
+                        cells: [
+                          DataCell(
+                            Row(
+                              children: [
+                                ExcludeSemantics(
+                                  child: CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: colors.primary.withValues(
+                                      alpha: 0.08,
+                                    ),
+                                    foregroundColor: colors.primary,
+                                    child: const Icon(
+                                      Icons.straighten,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Tooltip(
+                                        message: (item['name'] ?? '')
+                                            .toString()
+                                            .trim(),
+                                        child: Text(
+                                          (item['name'] ?? '')
+                                                  .toString()
+                                                  .trim()
+                                                  .isEmpty
+                                              ? '-'
+                                              : item['name'].toString().trim(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ),
+                                      Text(
+                                        (item['description'] ?? '')
+                                                .toString()
+                                                .trim()
+                                                .isEmpty
+                                            ? '-'
+                                            : item['description']
+                                                  .toString()
+                                                  .trim(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: colors.onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          DataCell(
+                            value(
+                              (item['short_name'] ?? '')
+                                      .toString()
+                                      .trim()
+                                      .isEmpty
+                                  ? '-'
+                                  : item['short_name'].toString().trim(),
+                            ),
+                          ),
+                          DataCell(statusChip(item['status'] == true)),
+                          DataCell(
+                            dateCell(
+                              DateTime.tryParse(
+                                (item['created_at'] ?? '').toString(),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            dateCell(
+                              DateTime.tryParse(
+                                (item['updated_at'] ?? '').toString(),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  tooltip: 'Edit'.tr,
+                                  onPressed: () => controller.onEditUnit(
+                                    item['id'],
+                                    context,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    size: 20,
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Delete'.tr,
+                                  color: colors.error,
+                                  onPressed: () => controller.onDeleteUnit(
+                                    item['id'],
+                                    context,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        units['description']?.toString() ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: isActive ? Colors.green.shade50 : Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  isActive ? 'Active' : 'Inactive',
-                  style: TextStyle(
-                    color: isActive
-                        ? Colors.green.shade700
-                        : Colors.red.shade700,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                ],
               ),
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              formatDate(units['created_at']),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              formatDate(units['updated_at']),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13),
-            ),
-          ),
-          PopupMenuButton<String>(
-            tooltip: 'Unit actions',
-            icon: const Icon(Icons.more_horiz),
-            onSelected: (value) {
-              if (value == 'edit') {
-                onEdit?.call();
-                if (onEdit == null) ctr.onEditUnit(units['id'], context);
-              } else if (value == 'delete') {
-                onDelete?.call();
-                if (onDelete == null) ctr.onDeleteUnit(units['id'], context);
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: 'edit',
-                child: ListTile(
-                  leading: Icon(Icons.edit_outlined),
-                  title: Text('Edit'),
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  leading: Icon(Icons.delete_outline, color: Colors.red),
-                  title: Text('Delete'),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

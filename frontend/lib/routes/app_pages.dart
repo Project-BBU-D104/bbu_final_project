@@ -12,6 +12,7 @@ import 'package:frontend/binding/sale_binding.dart';
 import 'package:frontend/binding/stock_adjustment_binding.dart';
 import 'package:frontend/binding/stock_transfer_binding.dart';
 import 'package:frontend/binding/supplier_binding.dart';
+import 'package:frontend/binding/unit_binding.dart';
 import 'package:frontend/binding/user_binding.dart';
 import 'package:frontend/binding/warehouse_binding.dart';
 import 'package:frontend/binding/warehouse_stock_binding.dart';
@@ -200,7 +201,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.unit,
       page: () => UnitScreen(),
-      // binding: PurchasePaymentBinding(),
+      binding: UnitBinding(),
     ),
     GetPage(
       name: AppRoutes.systemConfiguration,
