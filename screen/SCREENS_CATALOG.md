@@ -75,29 +75,29 @@
 ## Units — `frontend/lib/screen/unit/unit_screen.dart`
 - **Route:** `/unit`
 - **Purpose:** Manages product units.
-- **Navigation:** Manage → Unit; add/edit through list controls.
-- **UI:** Search/view toggle, table/card list, form actions.
-- **State/data:** `UnitController`, unit service/model.
-- **Custom widgets:** `screen/unit/widget/unit_table_widget.dart`, `unit_card_widget.dart`, `add_unit_widget.dart`, `edit_unit_widget.dart`.
-- **Current design issues:** Responsive variants and literal sizing; specifics unclear.
+- **Navigation:** Manage → Unit; add/edit through list controls. Next: return to Manage or open another feature.
+- **UI:** Redesigned 2026-11: app bar with labeled refresh, themed search, wrapping header actions, lazy card list below 800px of available width / table at or above, content centered at max 1240px with 16/32px outer padding, distinct loading/error/empty/no-match states with retry and add actions. Keyboard-activatable rows.
+- **State/data:** `UnitController` (guarded `isLoading`/`isSaving`/`isOpeningEdit`, `loadError`/`formError`, 60s shared cache), `UnitBinding`, unit service. `unitList`/`searchUnitList` stay map-shaped for the product form's unit dropdown.
+- **Custom widgets:** `screen/unit/widget/unit_table_widget.dart`, `unit_card_widget.dart`, thin `add_unit_widget.dart`/`edit_unit_widget.dart` adapters over shared `unit_form_widget.dart`; shared `custom_app_bar.dart`, `search_widget.dart`.
+- **Current design issues:** None known after the 2026-11 redesign; manual device/browser and screen-reader checks remain pending.
 
 ## Add unit — `frontend/lib/screen/unit/widget/add_unit_widget.dart`
-- **Route:** None; presentation unclear.
+- **Route:** No route; shown as a dialog at/above 840px, otherwise a bottom sheet.
 - **Purpose:** Creates a unit.
-- **Navigation:** Unit list add action; returns to host after save/cancel.
-- **UI:** Short form and actions.
-- **State/data:** `UnitController`, unit create request.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+- **Navigation:** Opened from unit list actions; save/cancel returns to its host. Dismissal is blocked while a write is pending.
+- **UI:** Thin adapter over shared `unit_form_widget.dart`: icon and title header, Unit details section, visible labels, required name and short-name validation with focus to the first invalid field, inline error text, Active checkbox, persistent Cancel/Save footer with a saving state.
+- **State/data:** `UnitController` (`isSaving`/`formError`); sends trimmed `name`, `short_name`, `description` and a bool `status`. Duplicate submissions are ignored and failed saves retain the draft.
+- **Custom widgets:** `unit_form_widget.dart`.
+- **Current design issues:** None known after the 2026-11 redesign; manual checks remain pending.
 
 ## Edit unit — `frontend/lib/screen/unit/widget/edit_unit_widget.dart`
-- **Route:** None; presentation unclear.
-- **Purpose:** Updates a unit.
-- **Navigation:** Unit list edit action; returns to host after save/cancel.
-- **UI:** Prefilled form and actions.
-- **State/data:** `UnitController`, selected unit.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+- **Route:** No route; shown as a dialog at/above 840px, otherwise a bottom sheet.
+- **Purpose:** Updates a selected unit.
+- **Navigation:** Opened from unit list/card action; save/cancel returns to host. A late fetch never opens the form over another route.
+- **UI:** Same shared `unit_form_widget.dart` as Add unit, prefilled from the fetched record including the Active checkbox.
+- **State/data:** `UnitController` (`isSaving`/`isOpeningEdit`/`formError`), selected unit ID; sends trimmed `name`, `short_name`, `description` and a bool `status`.
+- **Custom widgets:** `unit_form_widget.dart`.
+- **Current design issues:** None known after the 2026-11 redesign; manual checks remain pending.
 
 ## Redesign notes
 
@@ -112,6 +112,11 @@
 - Add/Edit category: one shared `category_form_widget.dart` (dialog at/above 840px, bottom sheet below), inline validation in English and Khmer, duplicate-submission guard, dismissal blocked while saving, draft retention on failed writes, late-fetch route guard.
 - Verification: 281 Flutter tests pass with 1 web-only test skipped; `flutter analyze` reports no diagnostics in the changed files (repository baseline: 57 existing issues elsewhere); `flutter build web` exits 0; changed Dart files are `dart format` clean (the two locale maps excluded, already unformatted at baseline).
 
-**Remaining (4 screens):** Units list/add/edit (3), product scanner (1).
-**Pending checks:** browser image upload, physical-device camera, TalkBack/VoiceOver, live-API error paths, manual device/browser category walkthrough.
+**Done (2026-11): Units workflow** — 3 of 10 screens.
+- Units list: lazy themed cards below 800px of available width / table at or above (short-name and status chips, created/updated dates), content centered at max 1240px, distinct loading/error/empty/no-match states with retry and add actions, keyboard-activatable rows.
+- Add/Edit unit: one shared `unit_form_widget.dart` (dialog at/above 840px, bottom sheet below), required name and short-name validation in English and Khmer, Active checkbox, duplicate-submission guard, dismissal blocked while saving, draft retention on failed writes, late-fetch route guard; deleting stays on the list.
+- Verification: 308 Flutter tests pass with 1 web-only test skipped; `flutter analyze` reports no diagnostics in the changed files (56 existing issues elsewhere, one fewer than baseline — the rewrite removed a legacy `use_build_context_synchronously` info); `flutter build web` exits 0; changed Dart files are `dart format` clean (the two locale maps excluded, already unformatted at baseline).
+
+**Remaining (1 screen):** product scanner.
+**Pending checks:** browser image upload, physical-device camera, TalkBack/VoiceOver, live-API error paths, manual device/browser category walkthrough, manual device/browser unit walkthrough.
 
