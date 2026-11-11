@@ -8,26 +8,17 @@ class UnitCardWidget extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
-  UnitCardWidget({
-    super.key,
-    required this.units,
-    this.onEdit,
-    this.onDelete,
-  });
+  UnitCardWidget({super.key, required this.units, this.onEdit, this.onDelete});
 
   final ctr = Get.put(UnitController());
- 
+
   @override
   Widget build(BuildContext context) {
     final bool isActive = units['status'] ?? false;
     return Card(
       elevation: 3,
-      margin: const EdgeInsets.only(
-        bottom: 16,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -51,6 +42,7 @@ class UnitCardWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
+
                 /// Name
                 Expanded(
                   child: Column(
@@ -58,11 +50,13 @@ class UnitCardWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            units['name'] ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          Flexible(
+                            child: Text(
+                              units['name'] ?? "",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -83,6 +77,7 @@ class UnitCardWidget extends StatelessWidget {
                     ],
                   ),
                 ),
+
                 /// Status
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -90,46 +85,34 @@ class UnitCardWidget extends StatelessWidget {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? Colors.green.shade50
-                        : Colors.red.shade50,
+                    color: isActive ? Colors.green.shade50 : Colors.red.shade50,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    isActive
-                        ? "Active"
-                        : "Inactive",
+                    isActive ? "Active" : "Inactive",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isActive
-                          ? Colors.green
-                          : Colors.red,
+                      color: isActive ? Colors.green : Colors.red,
                     ),
                   ),
                 ),
                 PopupMenuButton<String>(
-                  icon: const Icon(
-                    Icons.more_vert,
-                  ),
-                  onSelected: (value){
-                    if(value == "edit"){
-                      ctr.editUnit(context, units['id']);
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) {
+                    if (value == "edit") {
+                      ctr.onEditUnit(units['id'], context);
                     }
-                    if(value == "delete"){
-                      ctr.onDeleteUnit(context, units['id']);
+                    if (value == "delete") {
+                      ctr.onDeleteUnit(units['id'], context);
                     }
                   },
-                  itemBuilder: (context)=>[
+                  itemBuilder: (context) => [
                     const PopupMenuItem(
                       value: "edit",
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.edit,
-                            color: Colors.blue,
-                            size: 20,
-                          ),
+                          Icon(Icons.edit, color: Colors.blue, size: 20),
                           SizedBox(width: 10),
                           Text("Edit"),
                         ],
@@ -139,22 +122,19 @@ class UnitCardWidget extends StatelessWidget {
                       value: "delete",
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                            size: 20,
-                          ),
+                          Icon(Icons.delete, color: Colors.red, size: 20),
                           SizedBox(width: 10),
                           Text("Delete"),
                         ],
                       ),
                     ),
                   ],
-                )
-              ]
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             const Divider(),
+
             /// Date Info
             Row(
               children: [
@@ -163,7 +143,7 @@ class UnitCardWidget extends StatelessWidget {
                     icon: Icons.calendar_today,
                     title: "Created",
                     value: DateFormatter.formatDate(
-                      DateTime.tryParse(units['created_at']),
+                      DateTime.tryParse((units['created_at'] ?? '').toString()),
                     ),
                   ),
                 ),
@@ -172,7 +152,7 @@ class UnitCardWidget extends StatelessWidget {
                     icon: Icons.update,
                     title: "Updated",
                     value: DateFormatter.formatDate(
-                      DateTime.tryParse(units['updated_at']),
+                      DateTime.tryParse((units['updated_at'] ?? '').toString()),
                     ),
                   ),
                 ),
@@ -184,6 +164,7 @@ class UnitCardWidget extends StatelessWidget {
     );
   }
 }
+
 class _InfoItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -197,11 +178,7 @@ class _InfoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: Colors.grey.shade600,
-        ),
+        Icon(icon, size: 18, color: Colors.grey.shade600),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -209,10 +186,7 @@ class _InfoItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
               ),
               Text(
                 value,
@@ -222,7 +196,7 @@ class _InfoItem extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
-              )
+              ),
             ],
           ),
         ),

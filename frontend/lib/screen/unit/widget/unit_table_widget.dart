@@ -129,10 +129,10 @@ class UnitTableWidget extends StatelessWidget {
             onSelected: (value) {
               if (value == 'edit') {
                 onEdit?.call();
-                if (onEdit == null) ctr.editUnit(context, units['id']);
+                if (onEdit == null) ctr.onEditUnit(units['id'], context);
               } else if (value == 'delete') {
                 onDelete?.call();
-                if (onDelete == null) ctr.onDeleteUnit(context, units['id']);
+                if (onDelete == null) ctr.onDeleteUnit(units['id'], context);
               }
             },
             itemBuilder: (context) => const [
