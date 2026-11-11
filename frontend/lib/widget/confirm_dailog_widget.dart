@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 
 class ConfirmDialogWidget extends StatelessWidget {
   final String title;
@@ -21,82 +20,99 @@ class ConfirmDialogWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Message
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Buttons
-            Row(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      backgroundColor: theme.cardColor,
+      surfaceTintColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: SizedBox(
+          key: const Key('confirm-dialog-surface'),
+          width: double.maxFinite,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: dangerColor.shade500,
-                      foregroundColor: titleColor,
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colors.error.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.delete_outline,
+                        color: colors.error,
+                        size: 20,
+                      ),
                     ),
-                    onPressed: onCancel,
-                    child: Text(cancelText),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Semantics(
+                        header: true,
+                        child: Text(
+                          title,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  message,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: titleColor,
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    OutlinedButton(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(100, 48),
+                        side: BorderSide(
+                          color: colors.onSurface.withValues(alpha: 0.12),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(cancelText),
                     ),
-                    onPressed: onConfirm,
-                    child: Text(confirmText),
-                  ),
+                    FilledButton(
+                      onPressed: onConfirm,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(112, 48),
+                        backgroundColor: colors.error,
+                        foregroundColor: colors.onError,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(confirmText),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
-
-
-// how to use it
-// ElevatedButton(
-//   onPressed: () {
-//     showConfirmDialog(
-//       context: context,
-//       message: "Do you want to save this data?",
-//       onConfirm: () {
-//         print("Saved!");
-//       },
-//       onCancel: () {
-//         print("Cancelled!");
-//       },
-//     );
-//   },
-//   child: const Text("Show Dialog"),
-// ),
