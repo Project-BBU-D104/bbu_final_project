@@ -42,6 +42,7 @@ class PurchasePaymentTableWidget extends StatelessWidget {
               width: math.max(980, constraints.maxWidth),
               child: DataTable(
                 showCheckboxColumn: false,
+                dividerThickness: 0,
                 headingRowHeight: 48,
                 dataRowMinHeight: 56,
                 dataRowMaxHeight: 72,
