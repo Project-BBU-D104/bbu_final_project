@@ -1,16 +1,283 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/purchase/purchase_payment_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/screen/purchase_payment/payment_format.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
+import 'package:get/get.dart';
 
 class PurchasePaymentDetailWidget extends StatelessWidget {
   const PurchasePaymentDetailWidget({super.key, required this.payment});
 
   final Map<String, dynamic> payment;
 
+  String _value(dynamic map, String key) {
+    if (map is! Map) return '-';
+    final text = (map[key] ?? '').toString().trim();
+    return text.isEmpty ? '-' : text;
+  }
+
+  Widget _statusChip(BuildContext context, String? raw) {
+    final color = paymentStatusColor(context, raw);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        paymentStatusLabel(raw),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, dynamic> _current(PurchasePaymentController ctr) {
+    return ctr.purchasePaymentList.firstWhere(
+      (record) => record['id'] == payment['id'],
+      orElse: () => payment,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final desktop = DesktopAppShell.isVisible(context);
+    final ctr = Get.isRegistered<PurchasePaymentController>()
+        ? Get.find<PurchasePaymentController>()
+        : Get.put(PurchasePaymentController());
+
     return Scaffold(
-      appBar: CustomAppBar(title: "Purchase Payment"),
-      body: Text("Purchase Payment Card Widget"),
+      appBar: desktop
+          ? null
+          : const CustomAppBar(
+              title: 'Purchase Payment Detail',
+              useTheme: true,
+            ),
+      body: HomeTabLayout(
+        title: payment['payment_no']?.toString() ?? '-',
+        translateTitle: false,
+        subtitle: 'Purchase Payment Detail',
+        leading: desktop
+            ? IconButton.outlined(
+                tooltip: 'Back'.tr,
+                onPressed: () => Get.back(),
+                icon: const Icon(Icons.arrow_back),
+              )
+            : null,
+        child: Obx(() {
+          final current = _current(ctr);
+          final purchase = current['purchase'];
+          final supplier = current['supplier'];
+          final paymentType = current['payment_type'];
+          final currency = current['currency'];
+          final error = ctr.formError.value;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (error.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.errorContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    error,
+                    style: TextStyle(color: theme.colorScheme.onErrorContainer),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              HomeSectionCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          current['payment_no']?.toString() ?? '-',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        _statusChip(context, current['status']?.toString()),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      paymentAmountText(current),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 14,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          paymentDateText(current['payment_date']),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              HomeSectionCard(
+                title: 'Payment details',
+                child: Column(
+                  children: [
+                    _infoRow(
+                      context,
+                      Icons.receipt_long_outlined,
+                      'Invoice'.tr,
+                      _value(purchase, 'invoice_no'),
+                    ),
+                    _infoRow(
+                      context,
+                      Icons.local_shipping_outlined,
+                      'Supplier'.tr,
+                      _value(supplier, 'name'),
+                    ),
+                    _infoRow(
+                      context,
+                      Icons.account_balance_wallet_outlined,
+                      'Payment Type'.tr,
+                      _value(paymentType, 'name'),
+                    ),
+                    _infoRow(
+                      context,
+                      Icons.currency_exchange,
+                      'Currency'.tr,
+                      _value(currency, 'name'),
+                    ),
+                    _infoRow(
+                      context,
+                      Icons.numbers,
+                      'Payment No'.tr,
+                      current['payment_no']?.toString() ?? '-',
+                    ),
+                    _infoRow(
+                      context,
+                      Icons.notes,
+                      'Note'.tr,
+                      current['note']?.toString() ?? '-',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          color: theme.cardColor,
+          child: Obx(() {
+            final current = _current(ctr);
+            final id = int.tryParse(current['id']?.toString() ?? '');
+            final busy = ctr.isSaving.value || ctr.isOpeningEdit.value;
+            return Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: busy || id == null
+                        ? null
+                        : () => ctr.onDeletePurchasePayment(
+                            context,
+                            id,
+                            onDeleted: () => Get.back(),
+                          ),
+                    icon: const Icon(Icons.delete_outline),
+                    label: Text('Delete'.tr),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
+                      side: BorderSide(color: theme.colorScheme.error),
+                      minimumSize: const Size.fromHeight(50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: busy
+                        ? null
+                        : () => ctr.editPurchasePayment(context, current),
+                    icon: const Icon(Icons.edit),
+                    label: Text('Edit'.tr),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+      ),
     );
   }
 }

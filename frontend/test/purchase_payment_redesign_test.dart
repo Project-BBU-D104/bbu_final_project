@@ -4,6 +4,7 @@ import 'package:frontend/controllers/purchase/purchase_payment_controller.dart';
 import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
 import 'package:frontend/screen/purchase_payment/widget/purchase_payment_card_widget.dart';
+import 'package:frontend/screen/purchase_payment/widget/purchase_payment_detail_widget.dart';
 import 'package:frontend/screen/purchase_payment/widget/purchase_payment_table_widget.dart';
 import 'package:get/get.dart';
 import 'purchase_payment_test_support.dart';
@@ -153,5 +154,89 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     }
+  });
+
+  testWidgets('detail renders placeholders for missing fields', (tester) async {
+    await seedPurchasePaymentController();
+    await pumpPurchasePaymentHost(
+      tester,
+      home: const PurchasePaymentDetailWidget(
+        payment: {'id': 999, 'payment_no': 'PP-X'},
+      ),
+    );
+    expect(find.text('PP-X'), findsWidgets);
+    expect(find.text('-'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('detail shows real values', (tester) async {
+    final c = await seedPurchasePaymentController();
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    await tester.tap(find.byType(PurchasePaymentCardWidget).first);
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchasePaymentDetailWidget), findsOneWidget);
+    expect(find.text('PP-1'), findsWidgets);
+    expect(find.text('Supplier A'), findsOneWidget);
+    expect(find.text('Cash'), findsOneWidget);
+    expect(find.text('\$40.00'), findsWidgets);
+    expect(c.purchasePaymentList, hasLength(2));
+  });
+
+  testWidgets('delete from detail closes it and refreshes the list', (
+    tester,
+  ) async {
+    final s = FakePurchasePaymentService();
+    final c = await seedPurchasePaymentController(service: s);
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    await tester.tap(find.byType(PurchasePaymentCardWidget).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Delete'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Do you want to delete this purchase payment?'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Ok'));
+    await tester.pumpAndSettle();
+    expect(s.deleteCalls, 1);
+    expect(find.byType(PurchasePaymentDetailWidget), findsNothing);
+    expect(find.byType(PurchasePaymentScreen), findsOneWidget);
+    expect(c.purchasePaymentList, hasLength(1));
+  });
+
+  testWidgets('failed delete keeps the detail open', (tester) async {
+    final s = FakePurchasePaymentService()..failWrite = true;
+    final c = await seedPurchasePaymentController(service: s);
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    await tester.tap(find.byType(PurchasePaymentCardWidget).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ok'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchasePaymentDetailWidget), findsOneWidget);
+    expect(c.purchasePaymentList, hasLength(2));
+    expect(
+      find.text('Unable to delete purchase payment. Please try again.'),
+      findsWidgets,
+    );
+  });
+
+  testWidgets('edit from detail refreshes the displayed amount', (
+    tester,
+  ) async {
+    final s = FakePurchasePaymentService();
+    await seedPurchasePaymentController(service: s);
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    await tester.tap(find.byType(PurchasePaymentCardWidget).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Edit'));
+    await tester.pumpAndSettle();
+    Get.find<PurchasePaymentController>().amountCtrl.text = '45';
+    await tester.ensureVisible(find.text('Update'));
+    await tester.tap(find.text('Update'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchasePaymentDetailWidget), findsOneWidget);
+    expect(find.text('\$45.00'), findsWidgets);
   });
 }
