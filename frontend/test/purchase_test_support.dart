@@ -171,8 +171,28 @@ class FakeWarehouseController extends WarehouseController {
 class FakePurchaseSupplierService extends SupplierService {
   @override
   Future<dynamic> getSuppliers() async => [
-    {'id': 1, 'name': 'Alpha', 'status': true},
-    {'id': 2, 'name': 'Beta', 'status': true},
+    {
+      'id': 1,
+      'name': 'Alpha',
+      'phone': '012345678',
+      'email': 'alpha@example.com',
+      'map': null,
+      'address': null,
+      'status': true,
+      'created_at': null,
+      'updated_at': null,
+    },
+    {
+      'id': 2,
+      'name': 'Beta',
+      'phone': '098765432',
+      'email': 'beta@example.com',
+      'map': null,
+      'address': null,
+      'status': true,
+      'created_at': null,
+      'updated_at': null,
+    },
   ];
 }
 

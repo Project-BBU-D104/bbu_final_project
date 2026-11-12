@@ -3,6 +3,8 @@ import 'package:frontend/controllers/purchase/purchase_controller.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/screen/purchases/widget/purchase_item_row_widget.dart';
+import 'package:frontend/screen/purchases/widget/summary_row_widget.dart';
+import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 
 class PurchaseFormWidget extends StatelessWidget {
@@ -49,6 +51,7 @@ class PurchaseFormWidget extends StatelessWidget {
         );
     return Obx(() {
       final busy = ctr.isSaving.value;
+      final error = ctr.formError.value;
       return PopScope(
         canPop: !busy,
         child: Material(
@@ -100,6 +103,18 @@ class PurchaseFormWidget extends StatelessWidget {
                           ),
                         ],
                       ),
+                      if (error.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              error,
+                              key: const Key('purchase-form-error'),
+                              style: TextStyle(color: colors.error),
+                            ),
+                          ),
+                        ),
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Divider(height: 1),
@@ -108,64 +123,75 @@ class PurchaseFormWidget extends StatelessWidget {
                       if (warehouses.isLoading.value)
                         const LinearProgressIndicator()
                       else
-                        DropdownButtonFormField<int>(
-                          value:
-                              warehouses.warehouseList.any(
-                                (w) => w['id'] == ctr.selectedWarehouse.value,
-                              )
-                              ? ctr.selectedWarehouse.value
-                              : null,
-                          isExpanded: true,
-                          decoration: decoration('Warehouse'),
-                          items: warehouses.warehouseList
-                              .map(
-                                (w) => DropdownMenuItem<int>(
-                                  value: w['id'] as int,
-                                  child: Text(w['name'] ?? ''),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: busy
-                              ? null
-                              : (v) => ctr.selectedWarehouse.value = v,
-                          validator: (v) =>
-                              v == null ? 'Please select a warehouse'.tr : null,
+                        Obx(
+                          () => DropdownButtonFormField<int>(
+                            key: ValueKey(ctr.selectedWarehouse.value),
+                            value:
+                                warehouses.warehouseList.any(
+                                  (w) => w['id'] == ctr.selectedWarehouse.value,
+                                )
+                                ? ctr.selectedWarehouse.value
+                                : null,
+                            isExpanded: true,
+                            decoration: decoration('Warehouse'),
+                            items: warehouses.warehouseList
+                                .map(
+                                  (w) => DropdownMenuItem<int>(
+                                    value: w['id'] as int,
+                                    child: Text(w['name'] ?? ''),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: busy
+                                ? null
+                                : (v) => ctr.selectedWarehouse.value = v,
+                            validator: (v) => v == null
+                                ? 'Please select a warehouse'.tr
+                                : null,
+                          ),
                         ),
                       const SizedBox(height: 20),
                       if (suppliers.isLoading.value)
                         const LinearProgressIndicator()
                       else
-                        DropdownButtonFormField<int>(
-                          value:
-                              suppliers.suppliers.any(
-                                (s) =>
-                                    s.id == ctr.selectedSupplier.value &&
-                                    (editing || s.status == true),
-                              )
-                              ? ctr.selectedSupplier.value
-                              : null,
-                          isExpanded: true,
-                          decoration: decoration('Supplier'),
-                          items: suppliers.suppliers
-                              .where((s) => editing || s.status == true)
-                              .map(
-                                (s) => DropdownMenuItem<int>(
-                                  value: s.id,
-                                  child: Text(s.name),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: busy
-                              ? null
-                              : (v) => ctr.selectedSupplier.value = v,
-                          validator: (v) =>
-                              v == null ? 'Please select a supplier'.tr : null,
+                        Obx(
+                          () => DropdownButtonFormField<int>(
+                            key: ValueKey(ctr.selectedSupplier.value),
+                            value:
+                                suppliers.suppliers.any(
+                                  (s) =>
+                                      s.id == ctr.selectedSupplier.value &&
+                                      (editing || s.status == true),
+                                )
+                                ? ctr.selectedSupplier.value
+                                : null,
+                            isExpanded: true,
+                            decoration: decoration('Supplier'),
+                            items: suppliers.suppliers
+                                .where((s) => editing || s.status == true)
+                                .map(
+                                  (s) => DropdownMenuItem<int>(
+                                    value: s.id,
+                                    child: Text(s.name),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: busy
+                                ? null
+                                : (v) => ctr.selectedSupplier.value = v,
+                            validator: (v) => v == null
+                                ? 'Please select a supplier'.tr
+                                : null,
+                          ),
                         ),
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: ctr.invoiceCtrl,
                         enabled: !busy,
                         decoration: decoration('Invoice Number'),
+                        validator: (value) => (value ?? '').trim().isEmpty
+                            ? 'Invoice number is required'.tr
+                            : null,
                       ),
                       const SizedBox(height: 20),
                       OutlinedButton.icon(
@@ -182,7 +208,7 @@ class PurchaseFormWidget extends StatelessWidget {
                               },
                         icon: const Icon(Icons.calendar_today_outlined),
                         label: Text(
-                          '${'Purchase Date'.tr}: ${ctr.purchaseDate.value.toIso8601String().split('T').first}',
+                          '${'Purchase Date'.tr}: ${DateFormat('yyyy-MM-dd').format(ctr.purchaseDate.value)}',
                         ),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(0, 48),
@@ -206,6 +232,7 @@ class PurchaseFormWidget extends StatelessWidget {
                           key: item.id,
                           item: item,
                           canRemove: !busy && ctr.items.length > 1,
+                          enabled: !busy,
                           onRemove: () => ctr.removeItemRow(item),
                         ),
                       ),
@@ -229,6 +256,28 @@ class PurchaseFormWidget extends StatelessWidget {
                               ),
                           ],
                         ),
+                      ),
+                      const SizedBox(height: 20),
+                      SummaryRowWidget(
+                        label: 'Subtotal'.tr,
+                        value: ctr.itemsSubtotal,
+                      ),
+                      SummaryRowWidget(label: 'Tax'.tr, value: ctr.tax.value),
+                      SummaryRowWidget(
+                        label: 'Discount'.tr,
+                        value: ctr.discount.value,
+                      ),
+                      const Divider(height: 20),
+                      SummaryRowWidget(
+                        label: 'Total'.tr,
+                        value: ctr.total,
+                        bold: true,
+                      ),
+                      SummaryRowWidget(label: 'Paid'.tr, value: ctr.paid.value),
+                      SummaryRowWidget(
+                        label: 'Due'.tr,
+                        value: ctr.due,
+                        color: ctr.due > 0 ? colors.error : null,
                       ),
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
