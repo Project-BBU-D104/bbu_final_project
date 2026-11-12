@@ -55,6 +55,7 @@ class PurchasePaymentController extends GetxController {
   String _query = '';
   Worker? _searchWorker;
   bool _formOpen = false;
+  bool _openingForm = false;
 
   bool get isEditing => editingPaymentId.value != null;
 
@@ -122,7 +123,15 @@ class PurchasePaymentController extends GetxController {
   }
 
   Future<void> addPurchasePayment(BuildContext context) async {
-    if (_formOpen || isSaving.value || isOpeningEdit.value || isClosed) return;
+    if (_formOpen ||
+        _openingForm ||
+        isSaving.value ||
+        isOpeningEdit.value ||
+        isClosed) {
+      return;
+    }
+    final route = ModalRoute.of(context);
+    _openingForm = true;
     formError.value = '';
     editingPaymentId.value = null;
     _originalPayment = null;
@@ -135,9 +144,18 @@ class PurchasePaymentController extends GetxController {
     paymentStatus.value = "completed";
     purchaseDate.value = DateTime.now();
 
-    await purchaseCtr.onGetPurchaseList();
-    if (!context.mounted || isClosed) return;
-    _showForm(context, AddPurchasePaymentWidget());
+    try {
+      await purchaseCtr.onGetPurchaseList();
+      if (isClosed ||
+          !context.mounted ||
+          route?.isCurrent != true ||
+          _formOpen) {
+        return;
+      }
+      _showForm(context, AddPurchasePaymentWidget());
+    } finally {
+      _openingForm = false;
+    }
   }
 
   Map<String, dynamic>? get selectedPurchase {

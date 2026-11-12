@@ -154,6 +154,38 @@ void main() {
     expect(s.lastUpdatedData?['payment_no'], 'PP-11');
   });
 
+  testWidgets('a second add tap during the purchase load opens one form', (
+    tester,
+  ) async {
+    final gate = Completer<void>();
+    final c = PurchasePaymentController(
+      service: FakePurchasePaymentService(),
+      purchaseCtr: DelayedPurchaseController(gate: gate),
+      paymentTypeCtr: FakePaymentTypeController(
+        types: [
+          {'id': 2, 'name': 'Cash'},
+        ],
+      ),
+      currencyCtr: FakeCurrencyController(
+        currencies: [
+          {'id': 1, 'name': 'USD', 'symbol': '\$'},
+        ],
+      ),
+    );
+    await c.onGetPaymentList();
+    Get.put<PurchasePaymentController>(c);
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+
+    final context = tester.element(find.byType(PurchasePaymentScreen));
+    c.addPurchasePayment(context);
+    c.addPurchasePayment(context);
+    await tester.pump();
+    gate.complete();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AddPurchasePaymentWidget), findsOneWidget);
+  });
+
   testWidgets('wide screens host the form in a dialog', (tester) async {
     final c = await seed(tester, FakePurchasePaymentService());
     await pumpPurchasePaymentHost(

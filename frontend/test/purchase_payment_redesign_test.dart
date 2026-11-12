@@ -124,6 +124,17 @@ void main() {
     expect(find.byKey(const Key('empty-add-purchase-payment')), findsOneWidget);
   });
 
+  testWidgets('refresh failure keeps rows visible with a retry banner', (
+    tester,
+  ) async {
+    final c = await seedPurchasePaymentController();
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    c.loadError.value = 'Unable to load purchase payments. Please try again.';
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchasePaymentCardWidget), findsNWidgets(2));
+    expect(find.text('Retry'), findsOneWidget);
+  });
+
   testWidgets('retry keeps the active search query', (tester) async {
     final c = await seedPurchasePaymentController();
     await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());

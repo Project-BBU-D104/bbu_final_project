@@ -132,6 +132,18 @@ class FakePurchaseController extends PurchaseController {
   }
 }
 
+class DelayedPurchaseController extends FakePurchaseController {
+  DelayedPurchaseController({super.purchases, required this.gate});
+
+  final Completer<void> gate;
+
+  @override
+  Future<void> onGetPurchaseList() async {
+    await gate.future;
+    await super.onGetPurchaseList();
+  }
+}
+
 class FakePaymentTypeController extends PaymentTypeController {
   FakePaymentTypeController({required List<Map<String, dynamic>> types}) {
     paymentTypeList.value = types;

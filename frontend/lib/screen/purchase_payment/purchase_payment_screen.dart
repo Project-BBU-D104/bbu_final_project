@@ -131,26 +131,25 @@ class PurchasePaymentScreen extends StatelessWidget {
                           }
 
                           final error = ctr.loadError.value;
-                          if (error.isNotEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(error, textAlign: TextAlign.center),
-                                  const SizedBox(height: 12),
-                                  TextButton(
-                                    onPressed: ctr.isLoading.value
-                                        ? null
-                                        : ctr.onRefresh,
-                                    child: Text('Retry'.tr),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-
                           final payments = ctr.searchPaymentList.toList();
                           if (payments.isEmpty) {
+                            if (error.isNotEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(error, textAlign: TextAlign.center),
+                                    const SizedBox(height: 12),
+                                    TextButton(
+                                      onPressed: ctr.isLoading.value
+                                          ? null
+                                          : ctr.onRefresh,
+                                      child: Text('Retry'.tr),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
                             return Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -188,6 +187,38 @@ class PurchasePaymentScreen extends StatelessWidget {
                             children: [
                               if (ctr.isLoading.value)
                                 const LinearProgressIndicator(minHeight: 2),
+                              if (error.isNotEmpty)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.errorContainer,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          error,
+                                          style: TextStyle(
+                                            color: theme
+                                                .colorScheme
+                                                .onErrorContainer,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: ctr.isLoading.value
+                                            ? null
+                                            : ctr.onRefresh,
+                                        child: Text('Retry'.tr),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               const SizedBox(height: 8),
                               Expanded(
                                 child: LayoutBuilder(
