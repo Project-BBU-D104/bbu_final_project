@@ -33,10 +33,7 @@ class PurchasePaymentTableWidget extends StatelessWidget {
       color: theme.cardColor,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.dividerColor),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
