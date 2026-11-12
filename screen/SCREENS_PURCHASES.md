@@ -38,3 +38,6 @@
 
 ## Redesign notes
 
+Done: the purchase list, add form, edit form, and detail screen have been redesigned. The list adapts between cards and a table, and the forms share a supplier-style layout. Existing purchase controller behavior and validation are unchanged.
+
+Validation: the existing Flutter suite passed (340 tests, one skipped), as did the focused purchase-card test. Focused analysis reported four informational lints. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.

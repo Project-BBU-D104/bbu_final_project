@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 
 class PurchaseDetailWidget extends StatelessWidget {
   PurchaseDetailWidget({super.key});
@@ -50,178 +52,224 @@ class PurchaseDetailWidget extends StatelessWidget {
     final paymentStatus = (purchase['payment_status'] ?? '').toString();
     final status = (purchase['status'] ?? '').toString();
 
+    final theme = Theme.of(context);
+    final desktop = DesktopAppShell.isVisible(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      appBar: CustomAppBar(
-        title: "Purchase Detail",
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Invoice header card
-          _buildCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      purchase['invoice_no']?.toString() ?? '-',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+      appBar: desktop
+          ? null
+          : const CustomAppBar(title: 'Purchase Detail', useTheme: true),
+      body: HomeTabLayout(
+        title: purchase['invoice_no']?.toString() ?? '-',
+        translateTitle: false,
+        subtitle: 'Purchase Detail',
+        leading: desktop
+            ? IconButton.outlined(
+                tooltip: 'Back'.tr,
+                onPressed: () => Get.back(),
+                icon: const Icon(Icons.arrow_back),
+              )
+            : null,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Invoice header card
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      Text(
+                        purchase['invoice_no']?.toString() ?? '-',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        _buildStatusChip(paymentStatus),
-                        const SizedBox(width: 6),
-                        _buildStatusChip(status),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                    const SizedBox(width: 6),
-                    Text(
-                      _formatDate(purchase['purchase_date']),
-                      style: const TextStyle(color: Colors.grey, fontSize: 13),
-                    ),
-                  ],
-                ),
-                if (purchase['description'] != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    purchase['description'].toString(),
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Supplier & created by
-          _buildCard(
-            child: Column(
-              children: [
-                _buildInfoRow(
-                  icon: Icons.local_shipping_outlined,
-                  label: "Supplier",
-                  value: supplier?['name']?.toString() ?? '-',
-                ),
-                const Divider(height: 20),
-                _buildInfoRow(
-                  icon: Icons.person_outline,
-                  label: "Created By",
-                  value: user?['name']?.toString() ?? '-',
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Items
-          Text(
-            "Items (${items.length})",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          const SizedBox(height: 8),
-          _buildCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: List.generate(items.length, (index) {
-                final item = items[index] as Map<String, dynamic>;
-                final product = item['product'] as Map<String, dynamic>?;
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      child: Row(
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: successColor.withValues(alpha:0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.inventory_2_outlined,
-                                color: successColor, size: 20),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product?['name']?.toString() ?? '-',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "${item['qty']} x ${_formatCurrency(item['cost_price'])}",
-                                  style: const TextStyle(
-                                      color: Colors.grey, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            _formatCurrency(item['subtotal']),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
+                          _buildStatusChip(paymentStatus),
+                          const SizedBox(width: 6),
+                          _buildStatusChip(status),
                         ],
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatDate(purchase['purchase_date']),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (purchase['description'] != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      purchase['description'].toString(),
+                      style: const TextStyle(fontSize: 13),
                     ),
-                    if (index != items.length - 1)
-                      const Divider(height: 1, indent: 16, endIndent: 16),
                   ],
-                );
-              }),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Summary
-          _buildCard(
-            child: Column(
-              children: [
-                _buildSummaryRow("Subtotal", purchase['subtotal']),
-                _buildSummaryRow("Tax", purchase['tax_amount']),
-                _buildSummaryRow("Discount", purchase['discount_amount']),
-                const Divider(height: 20),
-                _buildSummaryRow("Total", purchase['total_amount'],
-                    bold: true),
-                _buildSummaryRow("Paid", purchase['paid_amount'],
-                    valueColor: successColor),
-                _buildSummaryRow("Due", purchase['due_amount'],
+            // Supplier & created by
+            _buildCard(
+              child: Column(
+                children: [
+                  _buildInfoRow(
+                    icon: Icons.local_shipping_outlined,
+                    label: "Supplier",
+                    value: supplier?['name']?.toString() ?? '-',
+                  ),
+                  const Divider(height: 20),
+                  _buildInfoRow(
+                    icon: Icons.person_outline,
+                    label: "Created By",
+                    value: user?['name']?.toString() ?? '-',
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Items
+            Text(
+              "Items (${items.length})",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            const SizedBox(height: 8),
+            _buildCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: List.generate(items.length, (index) {
+                  final item = items[index] as Map<String, dynamic>;
+                  final product = item['product'] as Map<String, dynamic>?;
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: successColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.inventory_2_outlined,
+                                color: successColor,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product?['name']?.toString() ?? '-',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "${item['qty']} x ${_formatCurrency(item['cost_price'])}",
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              _formatCurrency(item['subtotal']),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (index != items.length - 1)
+                        const Divider(height: 1, indent: 16, endIndent: 16),
+                    ],
+                  );
+                }),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Summary
+            _buildCard(
+              child: Column(
+                children: [
+                  _buildSummaryRow("Subtotal", purchase['subtotal']),
+                  _buildSummaryRow("Tax", purchase['tax_amount']),
+                  _buildSummaryRow("Discount", purchase['discount_amount']),
+                  const Divider(height: 20),
+                  _buildSummaryRow(
+                    "Total",
+                    purchase['total_amount'],
+                    bold: true,
+                  ),
+                  _buildSummaryRow(
+                    "Paid",
+                    purchase['paid_amount'],
+                    valueColor: successColor,
+                  ),
+                  _buildSummaryRow(
+                    "Due",
+                    purchase['due_amount'],
                     valueColor:
-                        (double.tryParse(purchase['due_amount']?.toString() ?? '0') ?? 0) > 0
-                            ? Colors.red
-                            : null),
-              ],
+                        (double.tryParse(
+                                  purchase['due_amount']?.toString() ?? '0',
+                                ) ??
+                                0) >
+                            0
+                        ? Colors.red
+                        : null,
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 24),
-        ],
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16),
-          color: Colors.white,
+          color: theme.cardColor,
           child: Row(
             children: [
               Expanded(
@@ -267,22 +315,7 @@ class PurchaseDetailWidget extends StatelessWidget {
   }
 
   Widget _buildCard({required Widget child, EdgeInsets? padding}) {
-    return Container(
-      width: double.infinity,
-      padding: padding ?? const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: child,
-    );
+    return HomeSectionCard(child: child);
   }
 
   Widget _buildStatusChip(String status) {
@@ -324,8 +357,12 @@ class PurchaseDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, dynamic value,
-      {bool bold = false, Color? valueColor}) {
+  Widget _buildSummaryRow(
+    String label,
+    dynamic value, {
+    bool bold = false,
+    Color? valueColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -336,7 +373,7 @@ class PurchaseDetailWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: bold ? 15 : 13,
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-              color: bold ? Colors.black : Colors.grey[700],
+              color: null,
             ),
           ),
           Text(
@@ -344,7 +381,7 @@ class PurchaseDetailWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: bold ? 15 : 13,
               fontWeight: bold ? FontWeight.bold : FontWeight.w500,
-              color: valueColor ?? (bold ? Colors.black : Colors.black87),
+              color: valueColor,
             ),
           ),
         ],

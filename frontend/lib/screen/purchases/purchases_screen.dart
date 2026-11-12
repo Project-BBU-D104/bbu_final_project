@@ -1,126 +1,167 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase/purchase_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/purchases/widget/purchase_card_widget.dart';
-import 'package:frontend/screen/purchases/widget/purchase_kpi_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_table_widget.dart';
-import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class PurchasesScreen extends StatelessWidget {
   PurchasesScreen({super.key});
-
   final ctr = Get.find<PurchaseController>();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final desktop = DesktopAppShell.isVisible(context);
     return Scaffold(
-      appBar: CustomAppBar(title: "Purchases"),
-
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            SizedBox(height: 4),
-
-            // KPI ROW
-            // if(ctr.purchaseList.isNotEmpty)
-            Row(
-              children: [
-                Obx(
-                  () => Expanded(
-                    child: PurchaseKpiWidget(
-                      title: "Total Purchases".tr,
-                      value: ctr.purchaseList.length,
-                    ),
+      appBar: desktop
+          ? null
+          : const CustomAppBar(title: 'Purchases', useTheme: true),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final gutter = constraints.maxWidth < 600 ? 16.0 : 32.0;
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1240),
+                child: Padding(
+                  padding: EdgeInsets.all(gutter),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 20,
+                        runSpacing: 16,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (desktop)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton.outlined(
+                                      tooltip: 'Back'.tr,
+                                      onPressed: () => Get.back(),
+                                      icon: const Icon(Icons.arrow_back),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Semantics(
+                                      header: true,
+                                      child: Text(
+                                        'Purchases'.tr,
+                                        style: theme.textTheme.headlineMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              const SizedBox(height: 8),
+                              Obx(
+                                () => Text(
+                                  '${'Total Purchases'.tr}: ${ctr.purchaseList.length}',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Wrap(
+                            spacing: 12,
+                            children: [
+                              IconButton.outlined(
+                                tooltip: 'Refresh'.tr,
+                                onPressed: ctr.onGetPurchaseList,
+                                icon: const Icon(Icons.refresh),
+                              ),
+                              FilledButton.icon(
+                                onPressed: () => ctr.addPurchase(context),
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size(0, 48),
+                                ),
+                                icon: const Icon(Icons.add),
+                                label: Text('Add Purchase'.tr),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 420),
+                          child: SearchWidget(title: 'Search Purchases...'),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: Obx(() {
+                          if (ctr.isLoading.value && ctr.purchaseList.isEmpty) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final purchases = ctr.searchPurchaseList.toList();
+                          if (purchases.isEmpty) {
+                            return Center(
+                              child: Text(
+                                (ctr.purchaseList.isEmpty
+                                        ? 'No purchase found'
+                                        : 'Search results not found')
+                                    .tr,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                            );
+                          }
+                          return LayoutBuilder(
+                            builder: (context, content) {
+                              final table =
+                                  content.maxWidth >= 800 &&
+                                  MediaQuery.textScalerOf(context).scale(16) <=
+                                      20.8;
+                              return RefreshIndicator(
+                                onRefresh: ctr.onGetPurchaseList,
+                                child: table
+                                    ? SingleChildScrollView(
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        child: PurchaseTableWidget(
+                                          purchases: purchases,
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        itemCount: purchases.length,
+                                        itemBuilder: (_, i) => Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                          ),
+                                          child: PurchaseCardWidget(
+                                            purchase: purchases[i],
+                                          ),
+                                        ),
+                                      ),
+                              );
+                            },
+                          );
+                        }),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // SEARCH
-            SearchWidget(title: "Search Purchases..."),
-
-            const SizedBox(height: 15),
-
-            // LIST (ONLY SCROLL AREA)
-            Obx(() {
-              if (ctr.isLoading.value) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              if (ctr.purchaseList.isEmpty) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AppCachedImage(
-                          assetPath: 'assets/images/empty.png',
-                          width: 120,
-                          fit: BoxFit.contain,
-                        ),
-                        Text(
-                          "No purchase found",
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-              if (ctr.searchPurchaseList.isEmpty) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: Center(
-                    child: Text(
-                      "Search results not found",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ),
-                );
-              }
-              return Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final purchases = ctr.searchPurchaseList.toList();
-                    final isMobile = constraints.maxWidth < 600;
-
-                    if (isMobile) {
-                      return ListView.builder(
-                        itemCount: purchases.length,
-                        padding: const EdgeInsets.only(bottom: 70),
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: PurchaseCardWidget(purchase: purchases[index]),
-                        ),
-                      );
-                    }
-
-                    return SingleChildScrollView(
-                      padding: const EdgeInsets.only(bottom: 70),
-                      child: PurchaseTableWidget(purchases: purchases),
-                    );
-                  },
-                ),
-              );
-            }),
-          ],
+              ),
+            );
+          },
         ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ctr.addPurchase(context);
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }
