@@ -51,7 +51,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: CustomerTableWidget(customers: [customer])),
+        home: Scaffold(body: CustomerTableWidget(items: [customer])),
       ),
     );
 
@@ -64,7 +64,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: CustomerCardWidget(customer: customer)),
+        home: Scaffold(body: CustomerCardWidget(item: customer)),
       ),
     );
 

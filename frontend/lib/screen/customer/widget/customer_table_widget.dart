@@ -1,161 +1,241 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/widget/app_cached_image.dart';
-import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class CustomerTableWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> customers;
-
-  CustomerTableWidget({super.key, required this.customers});
-
-  final ctr = Get.find<CustomerController>();
+  const CustomerTableWidget({super.key, required this.items});
+  final List<Map<String, dynamic>> items;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: titleColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final line = colors.onSurface.withValues(alpha: 0.08);
+    final controller = Get.find<CustomerController>();
+    Widget heading(String label) => Flexible(
+      child: Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    Widget value(String text) => Tooltip(
+      message: text,
+      child: Text(
+        text,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: colors.onSurfaceVariant,
+        ),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: constraints.maxWidth,
-            child: DataTable(
-              dataRowMinHeight: 65,
-              dataRowMaxHeight: 90,
-              horizontalMargin: 16,
-              columnSpacing: 24,
-              columns: const [
-                DataColumn(label: Text('Photo')),
-                DataColumn(label: Text('Name')),
-                DataColumn(label: Text('Phone')),
-                DataColumn(label: Text('Address')),
-                DataColumn(label: Text('Status')),
-                DataColumn(label: Text('Created Date')),
-                DataColumn(label: Text('Actions')),
-              ],
-              rows: customers.map((customer) {
-                return DataRow(
-                  cells: [
-                    // Photo
-                    DataCell(
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: AppCachedImage(
-                          url: customer['photo'] != null &&
-                                  customer['photo'].toString().isNotEmpty
-                              ? customer['photo'].toString()
-                              : 'https://i.pravatar.cc/150?img=12',
-                          width: 45,
-                          height: 45,
-                          fallbackIcon: Icons.person,
-                          fallbackIconSize: 45,
-                        ),
-                      ),
-                    ),
-
-                    // Name
-                    DataCell(
-                      SizedBox(
-                        width: 140,
-                        child: Text(
-                          customer['name']?.toString() ?? 'Unknown Customer',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-
-                    // Phone
-                    DataCell(
-                      Text(customer['phone']?.toString() ?? 'Unknown Phone'),
-                    ),
-
-                    // Address
-                    DataCell(
-                      SizedBox(
-                        width: 180,
-                        child: Text(
-                          customer['address']?.toString() ?? 'Unknown Address',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-
-                    // Status
-                    DataCell(
-                      StatusWidget(
-                        text: customer['is_active'] == true
-                            ? 'Active'
-                            : 'Inactive',
-                      ),
-                    ),
-
-                    // Created date
-                    DataCell(
-                      Text(
-                        DateFormatter.formatDate(
-                          DateTime.tryParse(
-                            customer['created_at']?.toString() ?? '',
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Actions
-                    DataCell(
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            ctr.editCustomer(context, customer['id']);
-                          } else if (value == 'delete') {
-                            ctr.onDeleteCustomer(customer['id'], context);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
+    );
+    Widget dateCell(DateTime? date) => Text(
+      date == null ? '-' : DateFormatter.formatDate(date),
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+    );
+    Widget statusChip(bool active) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: active
+            ? colors.primary.withValues(alpha: 0.08)
+            : colors.onSurface.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        active ? 'Active'.tr : 'Inactive'.tr,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: active ? colors.primary : colors.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) => Theme(
+        data: theme.copyWith(
+          dividerColor: line,
+          dividerTheme: DividerThemeData(color: line, thickness: 1),
+        ),
+        child: Card(
+          elevation: 0,
+          color: theme.cardColor,
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: line),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: math.max(960, constraints.maxWidth),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 48,
+                dataRowMinHeight: 72,
+                dataRowMaxHeight: 76,
+                columnSpacing: 20,
+                horizontalMargin: 24,
+                headingRowColor: WidgetStatePropertyAll(
+                  Color.alphaBlend(
+                    colors.onSurface.withValues(alpha: 0.025),
+                    theme.cardColor,
+                  ),
+                ),
+                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+                dataRowColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.hovered)
+                      ? colors.primary.withValues(alpha: 0.035)
+                      : null,
+                ),
+                columns: [
+                  DataColumn(
+                    label: heading('Customer'),
+                    columnWidth: const FlexColumnWidth(),
+                  ),
+                  DataColumn(
+                    label: heading('Address'),
+                    columnWidth: const FixedColumnWidth(200),
+                  ),
+                  DataColumn(
+                    label: heading('Status'),
+                    columnWidth: const FixedColumnWidth(120),
+                  ),
+                  DataColumn(
+                    label: heading('Created At'),
+                    columnWidth: const FixedColumnWidth(160),
+                  ),
+                  DataColumn(
+                    label: heading('Actions'),
+                    columnWidth: const FixedColumnWidth(144),
+                  ),
+                ],
+                rows: [
+                  for (final item in items)
+                    if (item['id'] is int)
+                      DataRow(
+                        onSelectChanged: (_) =>
+                            controller.editCustomer(context, item['id']),
+                        cells: [
+                          DataCell(
+                            Row(
                               children: [
-                                const Icon(Icons.edit_outlined, size: 20),
-                                const SizedBox(width: 10),
-                                Text('Edit'.tr),
+                                ExcludeSemantics(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: AppCachedImage(
+                                      url:
+                                          (item['photo'] ?? '')
+                                              .toString()
+                                              .trim()
+                                              .isEmpty
+                                          ? null
+                                          : item['photo'].toString().trim(),
+                                      width: 36,
+                                      height: 36,
+                                      fallbackIcon: Icons.person_outline,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Tooltip(
+                                        message: (item['name'] ?? '')
+                                            .toString()
+                                            .trim(),
+                                        child: Text(
+                                          (item['name'] ?? '')
+                                                  .toString()
+                                                  .trim()
+                                                  .isEmpty
+                                              ? '-'
+                                              : item['name'].toString().trim(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ),
+                                      Text(
+                                        (item['phone'] ?? '')
+                                                .toString()
+                                                .trim()
+                                                .isEmpty
+                                            ? '-'
+                                            : item['phone'].toString().trim(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: colors.onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
+                          DataCell(
+                            value(
+                              (item['address'] ?? '').toString().trim().isEmpty
+                                  ? '-'
+                                  : item['address'].toString().trim(),
+                            ),
+                          ),
+                          DataCell(statusChip(item['is_active'] == true)),
+                          DataCell(
+                            dateCell(
+                              DateTime.tryParse(
+                                (item['created_at'] ?? '').toString(),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.delete_outline,
-                                  color: Colors.red,
-                                  size: 20,
+                                IconButton(
+                                  tooltip: 'Edit'.tr,
+                                  onPressed: () => controller.editCustomer(
+                                    context,
+                                    item['id'],
+                                  ),
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    size: 20,
+                                  ),
                                 ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Delete'.tr,
-                                  style: const TextStyle(color: Colors.red),
+                                IconButton(
+                                  tooltip: 'Delete'.tr,
+                                  color: colors.error,
+                                  onPressed: () => controller.onDeleteCustomer(
+                                    item['id'],
+                                    context,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    size: 20,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                );
-              }).toList(),
+                ],
+              ),
             ),
           ),
         ),
