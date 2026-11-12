@@ -45,7 +45,6 @@ class CardPurchaseRequestWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Text(
@@ -57,6 +56,15 @@ class CardPurchaseRequestWidget extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
                   _StatusChip(status: status),
                   IconButton(
                     visualDensity: VisualDensity.compact,
@@ -81,7 +89,6 @@ class CardPurchaseRequestWidget extends StatelessWidget {
                     color: colors.error,
                     icon: const Icon(Icons.delete_outline, size: 19),
                   ),
-                  const Icon(Icons.chevron_right),
                 ],
               ),
               const SizedBox(height: 6),
