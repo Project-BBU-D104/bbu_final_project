@@ -21,11 +21,19 @@ void main() {
 
   testWidgets('customer list adapts to usable width', (tester) async {
     await seed();
-    await pumpCustomerHost(tester, home: CustomerScreen(), size: const Size(900, 900));
+    await pumpCustomerHost(
+      tester,
+      home: CustomerScreen(),
+      size: const Size(900, 900),
+    );
     expect(find.byType(CustomerCardWidget), findsNWidgets(2));
     expect(find.byType(CustomerTableWidget), findsNothing);
     expect(find.widgetWithText(FilledButton, 'Add Customer'), findsOneWidget);
-    await pumpCustomerHost(tester, home: CustomerScreen(), size: const Size(1440, 900));
+    await pumpCustomerHost(
+      tester,
+      home: CustomerScreen(),
+      size: const Size(1440, 900),
+    );
     expect(find.byType(CustomerTableWidget), findsOneWidget);
   });
 

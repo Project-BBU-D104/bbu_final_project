@@ -186,7 +186,9 @@ class _CustomerPickerState extends State<_CustomerPicker> {
                           ),
                         ),
                       ),
-                      title: Text(customer['name']?.toString() ?? 'Customer'.tr),
+                      title: Text(
+                        customer['name']?.toString() ?? 'Customer'.tr,
+                      ),
                       subtitle: Text(customer['phone']?.toString() ?? ''),
                       trailing: isSelected
                           ? Icon(Icons.check, color: theme.colorScheme.primary)

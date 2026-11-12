@@ -49,7 +49,10 @@ void main() {
     final c = Get.put<SaleController>(TestSaleController());
     await pumpSelector(tester);
     expect(find.text('Select Customer'), findsOneWidget);
-    expect(find.text('Please select a customer for this sale.'), findsOneWidget);
+    expect(
+      find.text('Please select a customer for this sale.'),
+      findsOneWidget,
+    );
     c.selectedCustomer.value = customerJson(1, 'Dara');
     await tester.pumpAndSettle();
     expect(find.text('Dara'), findsOneWidget);
@@ -122,7 +125,9 @@ void main() {
     c.customers.assignAll([customerJson(1, 'Alpha')]);
     await pumpSelector(tester, dark: true);
     final card = tester.widget<Card>(find.byType(Card).first);
-    final theme = Theme.of(tester.element(find.byType(SelectCustomerCardWidget)));
+    final theme = Theme.of(
+      tester.element(find.byType(SelectCustomerCardWidget)),
+    );
     expect(card.color, theme.cardColor);
     await tester.tap(find.byType(InkWell).first);
     await tester.pumpAndSettle();

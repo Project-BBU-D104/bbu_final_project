@@ -238,7 +238,10 @@ void main() {
     expect(c.customerNameController.text, 'Changed');
     expect(find.byType(EditCustomerWidget), findsOneWidget);
     c.customerNameController.text = ' ';
-    await c.onUpdateCustomer(1, tester.element(find.byType(EditCustomerWidget)));
+    await c.onUpdateCustomer(
+      1,
+      tester.element(find.byType(EditCustomerWidget)),
+    );
     expect(s.updateCalls, 1);
   });
 

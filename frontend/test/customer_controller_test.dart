@@ -51,7 +51,9 @@ void main() {
   });
 
   test('load failure exposes a retryable error', () async {
-    final c = CustomerController(service: FakeCustomerService()..failGet = true);
+    final c = CustomerController(
+      service: FakeCustomerService()..failGet = true,
+    );
     await c.getCustomers();
     expect(c.isLoading.value, isFalse);
     expect(c.loadError.value, 'Unable to load customers. Please try again.');
