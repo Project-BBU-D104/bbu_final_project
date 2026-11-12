@@ -140,9 +140,12 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                                 tooltip: 'Actions'.tr,
                                 icon: const Icon(Icons.more_horiz, size: 20),
                                 onSelected: (value) {
-                                  if (value == 'edit') onEdit?.call(payment);
-                                  if (value == 'delete')
+                                  if (value == 'edit') {
+                                    onEdit?.call(payment);
+                                  }
+                                  if (value == 'delete') {
                                     onDelete?.call(payment);
+                                  }
                                 },
                                 itemBuilder: (_) => [
                                   PopupMenuItem(
