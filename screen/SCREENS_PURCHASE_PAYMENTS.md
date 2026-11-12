@@ -40,5 +40,5 @@
 
 Done: the purchase payment list, add form, edit form, and detail are redesigned. The list has distinct loading, error/retry, empty, and no-match states, keeps search across refresh, and adapts between cards and a table. Add and Edit share one supplier-style form with inline validation, a duplicate-submission guard, blocked dismissal while saving, and draft retention on failed writes. The detail screen uses the same themed surfaces and closes after a successful delete. The `/purchase-payment` route, service methods, and payment payload keys are unchanged.
 
-Validation: the Flutter suite passed (407 passed, 1 web-only test skipped), targeted analysis reported no issues in the changed paths, and `flutter build web` exited 0. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.
+Validation: the Flutter suite passed (416 passed, 1 web-only test skipped at final verification), targeted analysis reported no issues in the changed paths, and `flutter build web` exited 0. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.
 
