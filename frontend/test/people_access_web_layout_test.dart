@@ -5,6 +5,8 @@ import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/role/widget/role_card_widget.dart';
+import 'package:frontend/screen/role/widget/role_form_widget.dart';
+import 'package:frontend/screen/user/widget/user_form_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
@@ -65,6 +67,36 @@ void main() {
     );
     controller.roleList.assignAll(service.items);
     controller.searchRole('');
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpUserForm(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    Get.put(
+      UserController(
+        service: FakeWebUserService(),
+        systemConfigurationCtr: NoopSystemConfigurationController(),
+      ),
+    );
+    Get.put(RoleController(service: FakeWebRoleService()));
+    await tester.pumpWidget(
+      GetMaterialApp(home: Scaffold(body: UserFormWidget())),
+    );
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpRoleForm(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    Get.put(RoleController(service: FakeWebRoleService()));
+    await tester.pumpWidget(
+      GetMaterialApp(home: Scaffold(body: RoleFormWidget())),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -259,5 +291,36 @@ void main() {
     );
     expect(scaffold.bottomNavigationBar, isNotNull);
     expect(find.text('Edit'), findsOneWidget);
+  });
+
+  testWidgets('user form pairs email and phone on wide content', (
+    tester,
+  ) async {
+    await pumpUserForm(tester, const Size(1400, 900));
+    final email = tester.getRect(find.text('Email'));
+    final phone = tester.getRect(find.text('Phone Number'));
+    expect(email.top, closeTo(phone.top, 1));
+    expect(email.right, lessThan(phone.left));
+    final role = tester.getRect(find.text('Role'));
+    final config = tester.getRect(find.text('System Configuration'));
+    expect(role.top, closeTo(config.top, 1));
+  });
+
+  testWidgets('user form stacks fields on narrow content', (tester) async {
+    await pumpUserForm(tester, const Size(390, 844));
+    expect(
+      tester.getRect(find.text('Phone Number')).top,
+      greaterThan(tester.getRect(find.text('Email')).bottom),
+    );
+  });
+
+  testWidgets('role form pairs name and description on wide content', (
+    tester,
+  ) async {
+    await pumpRoleForm(tester, const Size(1400, 900));
+    final name = tester.getRect(find.text('Role Name'));
+    final desc = tester.getRect(find.text('Description'));
+    expect(name.top, closeTo(desc.top, 1));
+    expect(name.right, lessThan(desc.left));
   });
 }

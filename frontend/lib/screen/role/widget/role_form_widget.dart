@@ -54,28 +54,43 @@ class RoleFormWidget extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: ctr.roleNameController,
-                          decoration: _decoration(
-                            context,
-                            'Role Name'.tr,
-                            'Enter Role Name'.tr,
+                        LayoutBuilder(
+                          builder: (context, constraints) => Wrap(
+                            spacing: 16,
+                            runSpacing: 20,
+                            children: [
+                              for (final field in [
+                                TextFormField(
+                                  controller: ctr.roleNameController,
+                                  decoration: _decoration(
+                                    context,
+                                    'Role Name'.tr,
+                                    'Enter Role Name'.tr,
+                                  ),
+                                  validator: (value) =>
+                                      value == null || value.trim().isEmpty
+                                      ? 'Please enter role name'.tr
+                                      : null,
+                                ),
+                                TextFormField(
+                                  controller: ctr.roleDescriptionController,
+                                  minLines: 3,
+                                  maxLines: 6,
+                                  decoration: _decoration(
+                                    context,
+                                    'Description'.tr,
+                                    'Enter Description'.tr,
+                                  ).copyWith(alignLabelWithHint: true),
+                                ),
+                              ])
+                                SizedBox(
+                                  width: constraints.maxWidth >= 560
+                                      ? (constraints.maxWidth - 16) / 2
+                                      : constraints.maxWidth,
+                                  child: field,
+                                ),
+                            ],
                           ),
-                          validator: (value) =>
-                              value == null || value.trim().isEmpty
-                              ? 'Please enter role name'.tr
-                              : null,
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: ctr.roleDescriptionController,
-                          minLines: 3,
-                          maxLines: 6,
-                          decoration: _decoration(
-                            context,
-                            'Description'.tr,
-                            'Enter Description'.tr,
-                          ).copyWith(alignLabelWithHint: true),
                         ),
                         const SizedBox(height: 8),
                         CheckboxListTile(

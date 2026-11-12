@@ -57,19 +57,37 @@ class UserFormWidget extends StatelessWidget {
                               hint: 'Enter Username'.tr,
                               required: true,
                             ),
-                            _field(
-                              context: context,
-                              label: 'Email'.tr,
-                              controller: ctr.userEmailController,
-                              hint: 'Enter Email'.tr,
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            _field(
-                              context: context,
-                              label: 'Phone Number'.tr,
-                              controller: ctr.userPhoneController,
-                              hint: 'Enter Phone Number'.tr,
-                              keyboardType: TextInputType.phone,
+                            LayoutBuilder(
+                              builder: (context, constraints) => Wrap(
+                                spacing: 16,
+                                runSpacing: 20,
+                                children: [
+                                  for (final field in [
+                                    _field(
+                                      context: context,
+                                      label: 'Email'.tr,
+                                      controller: ctr.userEmailController,
+                                      hint: 'Enter Email'.tr,
+                                      keyboardType: TextInputType.emailAddress,
+                                      bottomPadding: false,
+                                    ),
+                                    _field(
+                                      context: context,
+                                      label: 'Phone Number'.tr,
+                                      controller: ctr.userPhoneController,
+                                      hint: 'Enter Phone Number'.tr,
+                                      keyboardType: TextInputType.phone,
+                                      bottomPadding: false,
+                                    ),
+                                  ])
+                                    SizedBox(
+                                      width: constraints.maxWidth >= 560
+                                          ? (constraints.maxWidth - 16) / 2
+                                          : constraints.maxWidth,
+                                      child: field,
+                                    ),
+                                ],
+                              ),
                             ),
                             _field(
                               context: context,
@@ -83,9 +101,24 @@ class UserFormWidget extends StatelessWidget {
                         _section(
                           title: 'Access'.tr,
                           children: [
-                            _roleField(context),
-                            const SizedBox(height: 12),
-                            _configurationField(context),
+                            LayoutBuilder(
+                              builder: (context, constraints) => Wrap(
+                                spacing: 16,
+                                runSpacing: 20,
+                                children: [
+                                  for (final field in [
+                                    _roleField(context),
+                                    _configurationField(context),
+                                  ])
+                                    SizedBox(
+                                      width: constraints.maxWidth >= 560
+                                          ? (constraints.maxWidth - 16) / 2
+                                          : constraints.maxWidth,
+                                      child: field,
+                                    ),
+                                ],
+                              ),
+                            ),
                             Obx(
                               () => CheckboxListTile(
                                 contentPadding: EdgeInsets.zero,
@@ -200,26 +233,28 @@ class UserFormWidget extends StatelessWidget {
     bool required = false,
     bool obscureText = false,
     TextInputType? keyboardType,
+    bool bottomPadding = true,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: _decoration(context, label, hint),
-        validator: required
-            ? (value) => value == null || value.trim().isEmpty
-                  ? 'Please enter username'.tr
-                  : null
-            : null,
-      ),
+    final field = TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      decoration: _decoration(context, label, hint),
+      validator: required
+          ? (value) => value == null || value.trim().isEmpty
+                ? 'Please enter username'.tr
+                : null
+          : null,
     );
+    return bottomPadding
+        ? Padding(padding: const EdgeInsets.only(bottom: 12), child: field)
+        : field;
   }
 
   Widget _roleField(BuildContext context) {
     return Obx(
       () => DropdownButtonFormField<String>(
+        isExpanded: true,
         initialValue:
             roleCtr.roleList.any(
               (role) => role['id'].toString() == ctr.selectedRole.value,
@@ -247,6 +282,7 @@ class UserFormWidget extends StatelessWidget {
   Widget _configurationField(BuildContext context) {
     return Obx(
       () => DropdownButtonFormField<String>(
+        isExpanded: true,
         initialValue:
             ctr.systemConfigurationCtr.systemConfigurationList.any(
               (configuration) =>
