@@ -4,6 +4,7 @@ import 'package:frontend/controllers/purchase/purchase_controller.dart';
 import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_card_widget.dart';
+import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_table_widget.dart';
 import 'package:get/get.dart';
 import 'purchase_test_support.dart';
@@ -165,5 +166,88 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     }
+  });
+
+  testWidgets('detail renders no-data state without arguments', (tester) async {
+    await seedPurchase();
+    await pumpPurchaseHost(tester, home: PurchaseDetailWidget());
+    expect(find.text('No purchase data found'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('detail shows items, totals, and real values', (tester) async {
+    final c = await seedPurchase();
+    await pumpPurchaseHost(tester, home: PurchasesScreen());
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchaseDetailWidget), findsOneWidget);
+    expect(find.text('INV-1'), findsWidgets);
+    expect(find.text('Widget'), findsOneWidget);
+    expect(find.text('\$10.00'), findsWidgets);
+    expect(find.text('No items in this purchase'), findsNothing);
+  });
+
+  testWidgets('delete from detail closes it and refreshes the list', (
+    tester,
+  ) async {
+    final s = FakePurchaseService();
+    final c = await seedPurchase(s);
+    await pumpPurchaseHost(tester, home: PurchasesScreen());
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Do you want to delete this purchase?'), findsOneWidget);
+    await tester.tap(find.text('Ok'));
+    await tester.pumpAndSettle();
+    expect(s.deleteCalls, 1);
+    expect(find.byType(PurchaseDetailWidget), findsNothing);
+    expect(find.byType(PurchasesScreen), findsOneWidget);
+    expect(c.purchaseList.length, 1);
+  });
+
+  testWidgets('failed delete keeps the detail open', (tester) async {
+    final s = FakePurchaseService()..failWrite = true;
+    final c = await seedPurchase(s);
+    await pumpPurchaseHost(tester, home: PurchasesScreen());
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ok'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchaseDetailWidget), findsOneWidget);
+    expect(c.purchaseList.length, 2);
+    expect(
+      find.text('Unable to delete purchase. Please try again.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('edit from detail refreshes the displayed values', (
+    tester,
+  ) async {
+    final s = FakePurchaseService();
+    final c = await seedPurchase(s);
+    await pumpPurchaseHost(tester, home: PurchasesScreen());
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Edit'));
+    await tester.pumpAndSettle();
+    c.invoiceCtrl.text = 'INV-EDITED';
+    await tester.ensureVisible(find.text('Update'));
+    await tester.tap(find.text('Update'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PurchaseDetailWidget), findsOneWidget);
+    expect(find.text('INV-EDITED'), findsWidgets);
+  });
+
+  testWidgets('detail has an empty-items state', (tester) async {
+    final c = await seedPurchase();
+    await pumpPurchaseHost(tester, home: PurchasesScreen());
+    c.purchaseList[0] = {...c.purchaseList.first, 'purchase_items': []};
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    expect(find.text('No items in this purchase'), findsOneWidget);
   });
 }
