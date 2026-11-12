@@ -45,6 +45,9 @@ const purchaseRequestKeys = [
   'Request Details',
   'Create Request',
   'Save Changes',
+  'Item',
+  'Remove item',
+  'Request No',
 ];
 
 void main() {

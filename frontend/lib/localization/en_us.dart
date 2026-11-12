@@ -506,4 +506,7 @@ const Map<String, String> enUS = {
   "Purchase payment updated successfully": "Purchase payment updated successfully",
   "Purchase payment deleted successfully": "Purchase payment deleted successfully",
   "Do you want to delete this purchase payment?": "Do you want to delete this purchase payment?",
+  "Item": "Item",
+  "Remove item": "Remove item",
+  "Request No": "Request No",
 };

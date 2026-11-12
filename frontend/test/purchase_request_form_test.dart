@@ -151,4 +151,27 @@ void main() {
     expect(c.itemLines, hasLength(1));
     expect(find.text('Save Changes'), findsOneWidget);
   });
+
+  testWidgets('form localizes item labels and remove tooltip in Khmer', (
+    tester,
+  ) async {
+    final c = PurchaseRequestController(
+      service: FakePurchaseRequestService(),
+      warehouses: FakeWarehouseController(),
+      products: FakeProductController(),
+    );
+    await c.onGetPurchaseRequests();
+    Get.put<PurchaseRequestController>(c);
+    await pumpPurchaseRequestHost(
+      tester,
+      home: PurchaseRequestScreen(),
+      locale: const Locale('km', 'KH'),
+    );
+    unawaited(
+      c.addPurchaseRequest(tester.element(find.byType(PurchaseRequestScreen))),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('ធាតុ 1'), findsOneWidget);
+    expect(find.byTooltip('យកធាតុចេញ'), findsOneWidget);
+  });
 }

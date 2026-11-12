@@ -95,7 +95,7 @@ class PurchaseRequestFormWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  "Item ${index + 1}".tr,
+                  "${'Item'.tr} ${index + 1}",
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),

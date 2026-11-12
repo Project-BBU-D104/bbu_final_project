@@ -219,4 +219,48 @@ void main() {
     expect(deleted, isTrue);
     expect(c.requestList, isEmpty);
   });
+
+  testWidgets('detail localizes the items heading in Khmer', (tester) async {
+    Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    await pumpPurchaseRequestHost(
+      tester,
+      home: const CardPurchaseRequestDetailWidget(
+        purchaseRequest: {
+          'id': 1,
+          'request_no': 'REQ-1',
+          'items': [
+            {'product_id': 1, 'qty': 2, 'unit': 'pcs'},
+          ],
+        },
+      ),
+      locale: const Locale('km', 'KH'),
+    );
+    expect(find.textContaining('ទំនិញដែលបានស្នើ'), findsOneWidget);
+    expect(find.textContaining('Requested Items'), findsNothing);
+  });
+
+  testWidgets('table localizes its headers in Khmer', (tester) async {
+    Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    await pumpPurchaseRequestHost(
+      tester,
+      home: Scaffold(
+        body: PurchaseRequestTableWidget(requests: [purchaseRequestJson(1)]),
+      ),
+      locale: const Locale('km', 'KH'),
+    );
+    expect(find.text('លេខសំណើ'), findsOneWidget);
+    expect(find.text('Request No'), findsNothing);
+  });
 }

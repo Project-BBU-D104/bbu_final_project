@@ -130,7 +130,7 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              "Requested Items (${items.length})".tr,
+              "${'Requested Items'.tr} (${items.length})",
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),

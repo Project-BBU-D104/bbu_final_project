@@ -507,4 +507,7 @@ const Map<String, String> kmKH = {
   "Purchase payment updated successfully": "បានធ្វើបច្ចុប្បន្នភាពការទូទាត់ការបញ្ជាទិញដោយជោគជ័យ",
   "Purchase payment deleted successfully": "បានលុបការទូទាត់ការបញ្ជាទិញដោយជោគជ័យ",
   "Do you want to delete this purchase payment?": "តើអ្នកចង់លុបការទូទាត់ការបញ្ជាទិញនេះទេ?",
+  "Item": "ធាតុ",
+  "Remove item": "យកធាតុចេញ",
+  "Request No": "លេខសំណើ",
 };
