@@ -40,5 +40,5 @@
 
 Done: the purchase request list, add/edit form, and detail screen have been redesigned. The list adapts between cards and a table, has distinct loading/error/empty/no-match states with retry, and keeps the active search across refresh. Add and Edit share one guarded form with inline validation, a duplicate-submission guard, blocked dismissal while saving, and draft retention on failed writes. Detail uses the same themed surfaces and closes after a successful delete. The `/purchase-request` route, controller service methods, and request/item payload keys are unchanged.
 
-Validation: the four purchase request test files pass (18 tests); the full Flutter suite ran 407 passed with 1 web-only test skipped. Targeted analysis reported no issues in the changed paths, and `flutter build web` exited 0. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.
+Validation: the four purchase request test files pass (21 tests); the full Flutter suite ran 416 passed with 1 web-only test skipped. Targeted analysis reported no issues in the changed paths, and `flutter build web` exited 0. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.
 
