@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/controllers/system_configuration_controller.dart';
 import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/screen/role/role_screen.dart';
@@ -10,7 +9,6 @@ import 'package:frontend/screen/user/widget/user_form_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
-import 'package:frontend/screen/user/widget/user_table_list_widget.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/widget/status_widget.dart';
