@@ -4,10 +4,10 @@
 - **Route:** `/purchase`
 - **Purpose:** Browses and manages purchase records.
 - **Navigation:** Manage or Home recent-purchase action; rows open detail; add/edit actions open forms.
-- **UI:** KPI summary, search, responsive table/cards and add action.
+- **UI:** Search, responsive table/cards and add action.
 - **State/data:** `PurchaseController`, `PurchaseBinding`, purchase service/models.
 - **Custom widgets:** `screen/purchases/widget/purchase_kpi_widget.dart`, `purchase_table_widget.dart`, `purchase_card_widget.dart`, add/edit forms.
-- **Current design issues:** Multiple responsive/list representations; exact theme deviations unclear.
+- **Current design issues:** None known from the redesign; manual device, browser, and screen-reader checks pending.
 
 ## Add purchase — `frontend/lib/screen/purchases/widget/add_purchase_widget.dart`
 - **Route:** No route; form widget, host presentation unclear.
@@ -38,6 +38,6 @@
 
 ## Redesign notes
 
-Done: the purchase list, add form, edit form, and detail screen have been redesigned. The list adapts between cards and a table, and the forms share a supplier-style layout. Existing purchase controller behavior and validation are unchanged.
+Done: the purchase list, add form, edit form, and detail screen are complete. The list has distinct loading, error/retry, empty, and no-match states, keeps search across refresh, and adapts between cards and a table. The add/edit form is one shared supplier-style form with inline validation, a totals summary, a duplicate-submission guard, blocked dismissal while saving, and draft retention on failed writes. The detail screen uses the supplier-style themed layout and closes after a successful delete. The `/purchase` and `/purchase-detail` routes, service methods, and purchase payload keys are unchanged.
 
-Validation: the existing Flutter suite passed (340 tests, one skipped), as did the focused purchase-card test. Focused analysis reported four informational lints. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.
+Validation: all 25 Purchases tests pass (localization 1, controller 4, card/list/detail 14, form 6). Targeted analysis reports no errors or warnings in the changed paths; three informational `value` deprecation lints remain in the form dropdowns. `flutter build web` exited 0. The full suite ran 392 passed, 1 skipped, and 2 failed; both failures are in the concurrent Purchase Requests/Payments work-in-progress, outside this group. Live API, complete browser workflow, physical-device, and screen-reader checks remain pending.
