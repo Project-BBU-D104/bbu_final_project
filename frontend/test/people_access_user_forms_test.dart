@@ -92,4 +92,29 @@ void main() {
 
     expect(find.byType(Dialog), findsOneWidget);
   });
+
+  testWidgets('user form uses supplier rounded filled fields', (tester) async {
+    Get.reset();
+    Get.testMode = true;
+    Get.put(
+      UserController(
+        service: _SlowUsers(),
+        systemConfigurationCtr: _NoopSystemConfigurationController(),
+      ),
+    );
+    await tester.pumpWidget(
+      GetMaterialApp(home: Scaffold(body: UserFormWidget())),
+    );
+    await tester.pump();
+
+    final field = tester.widget<InputDecorator>(
+      find.byType(InputDecorator).first,
+    );
+    expect(field.decoration.filled, isTrue);
+    expect(field.decoration.border, isA<OutlineInputBorder>());
+    expect(
+      (field.decoration.border! as OutlineInputBorder).borderRadius,
+      BorderRadius.circular(12),
+    );
+  });
 }

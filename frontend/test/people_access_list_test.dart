@@ -1,11 +1,13 @@
 // ignore_for_file: must_call_super
 
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/controllers/system_configuration_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/screen/role/role_screen.dart';
+import 'package:frontend/screen/role/widget/role_card_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/services/main_service/role_service.dart';
 import 'package:frontend/services/main_service/user_service.dart';
@@ -59,6 +61,7 @@ void main() {
 
     expect(controller.loadError.value, isNotNull);
     expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('Unable to load roles'), findsOneWidget);
   });
 
   testWidgets('user list exposes a retry action after load failure', (
@@ -76,5 +79,39 @@ void main() {
     await tester.pump();
 
     expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('Unable to load users'), findsOneWidget);
+  });
+
+  testWidgets('people access lists use the supplier responsive scroll shell', (
+    tester,
+  ) async {
+    Get.reset();
+    Get.testMode = true;
+    Get.put(
+      UserController(
+        service: _FailingUserService(),
+        systemConfigurationCtr: _NoopSystemConfigurationController(),
+      ),
+    );
+    await tester.pumpWidget(GetMaterialApp(home: UserScreen()));
+    await tester.pump();
+
+    expect(find.byType(CustomScrollView), findsOneWidget);
+    expect(find.byType(ConstrainedBox), findsWidgets);
+  });
+
+  testWidgets('role cards inherit the active theme surface', (tester) async {
+    Get.reset();
+    Get.testMode = true;
+    Get.put(RoleController(service: _FailingRoleService()));
+    await tester.pumpWidget(
+      GetMaterialApp(
+        theme: ThemeData.dark(),
+        home: RoleCardWidget(role: {'name': 'Admin', 'is_active': true}),
+      ),
+    );
+
+    final card = tester.widget<Card>(find.byType(Card));
+    expect(card.color, isNull);
   });
 }

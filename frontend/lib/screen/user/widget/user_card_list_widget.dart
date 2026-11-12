@@ -11,13 +11,20 @@ class UserCardListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final createdAt = DateTime.tryParse(user["created_at"]?.toString() ?? "");
     return GestureDetector(
       onTap: () {
         Get.find<UserController>().gotoUserDetail(user);
       },
       child: Card(
+        elevation: 0,
         margin: const EdgeInsets.only(bottom: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: colors.onSurface.withValues(alpha: 0.08)),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -38,8 +45,7 @@ class UserCardListWidget extends StatelessWidget {
                   children: [
                     Text(
                       user["name"]?.toString() ?? "-",
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -60,7 +66,7 @@ class UserCardListWidget extends StatelessWidget {
               ),
 
               StatusWidget(
-                text: user["is_active"] == true ? "Active" : "Inactive",
+                text: (user["is_active"] == true ? "Active" : "Inactive").tr,
                 color: user["is_active"] == true ? Colors.green : Colors.red,
               ),
             ],

@@ -12,15 +12,16 @@ class RoleCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final roleId = int.tryParse(role["id"]?.toString() ?? "");
     final createdAt = DateTime.tryParse(role["created_at"]?.toString() ?? "");
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
-      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+        side: BorderSide(color: colors.onSurface.withValues(alpha: 0.08)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -33,15 +34,13 @@ class RoleCardWidget extends StatelessWidget {
               children: [
                 Text(
                   role["name"]?.toString() ?? "-",
-                  style: TextStyle(
-                    fontSize: 18,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
                   ),
                 ),
 
                 StatusWidget(
-                  text: role["is_active"] == true ? "Active" : "Inactive",
+                  text: (role["is_active"] == true ? "Active" : "Inactive").tr,
                 ),
               ],
             ),
@@ -51,10 +50,9 @@ class RoleCardWidget extends StatelessWidget {
             /// Description
             Text(
               role["description"]?.toString() ?? "-",
-              style: TextStyle(
-                fontSize: 13,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 height: 1.5,
-                color: Colors.black54,
+                color: colors.onSurfaceVariant,
               ),
             ),
 
@@ -65,9 +63,9 @@ class RoleCardWidget extends StatelessWidget {
                 Icon(
                   Icons.calendar_month_outlined,
                   size: 15,
-                  color: Colors.black54,
+                  color: colors.onSurfaceVariant,
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Text(
                   createdAt == null ? "-" : DateFormatter.formatDate(createdAt),
                 ),

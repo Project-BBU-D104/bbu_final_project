@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/user_controller.dart';
-import 'package:frontend/screen/user/widget/kpi_user_widget.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
 import 'package:frontend/screen/user/widget/user_table_list_widget.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
@@ -10,170 +10,273 @@ import 'package:get/get.dart';
 class UserScreen extends StatelessWidget {
   UserScreen({super.key});
 
-  final ctr = Get.find<UserController>();
+  final controller = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final desktop = DesktopAppShell.isVisible(context);
     return Scaffold(
-      appBar: CustomAppBar(title: "User"),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Users'.tr,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: ctr.getUserList,
-                    icon: const Icon(Icons.refresh),
-                    label: Text('Refresh'.tr),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton.icon(
-                    onPressed: () => ctr.addUser(context),
-                    icon: const Icon(Icons.add),
-                    label: Text('Add User'.tr),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: SearchWidget(title: "Search User...".tr),
-              ),
-              SizedBox(height: 12),
-              Obx(() {
-                final activeUsers = ctr.userList
-                    .where((user) => user["is_active"] == true)
-                    .length;
-                final inactiveUsers = ctr.userList.length - activeUsers;
-
-                return SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: KpiUserWidget(
-                          title: "Active Users",
-                          value: activeUsers,
+      appBar: desktop
+          ? null
+          : const CustomAppBar(title: 'Users', useTheme: true),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final gutter = constraints.maxWidth < 600 ? 16.0 : 32.0;
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1240),
+                child: Padding(
+                  padding: EdgeInsets.all(gutter),
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 24,
+                              runSpacing: 16,
+                              children: [
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: constraints.maxWidth < 600
+                                        ? constraints.maxWidth - gutter * 2
+                                        : 580,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (desktop) ...[
+                                        Row(
+                                          children: [
+                                            IconButton.outlined(
+                                              tooltip: 'Back'.tr,
+                                              onPressed: Get.back,
+                                              icon: const Icon(
+                                                Icons.arrow_back,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Flexible(
+                                              child: Semantics(
+                                                header: true,
+                                                child: Text(
+                                                  'Users'.tr,
+                                                  style: theme
+                                                      .textTheme
+                                                      .headlineMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                      ],
+                                      Text(
+                                        'Manage users and access permissions.'
+                                            .tr,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  children: [
+                                    IconButton.outlined(
+                                      tooltip: 'Refresh'.tr,
+                                      onPressed: controller.getUserList,
+                                      icon: const Icon(Icons.refresh),
+                                    ),
+                                    FilledButton.icon(
+                                      onPressed: () =>
+                                          controller.addUser(context),
+                                      icon: const Icon(Icons.add),
+                                      label: Text('Add User'.tr),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 28),
+                            LayoutBuilder(
+                              builder: (context, content) => Wrap(
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 20,
+                                runSpacing: 12,
+                                children: [
+                                  SizedBox(
+                                    width: content.maxWidth < 440
+                                        ? content.maxWidth
+                                        : 420,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.08),
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: SearchWidget(
+                                        title: 'Search Users'.tr,
+                                      ),
+                                    ),
+                                  ),
+                                  Obx(
+                                    () => Text(
+                                      '${controller.searchUserList.length} ${'Users'.tr}',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: KpiUserWidget(
-                          value: inactiveUsers,
-                          title: "Inactive Users",
-                        ),
+                      SliverFillRemaining(
+                        child: Obx(() {
+                          final loading = controller.isListLoading.value;
+                          final error = controller.loadError.value;
+                          final items = controller.searchUserList.toList();
+                          if (loading && controller.userList.isEmpty) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (loading)
+                                const LinearProgressIndicator(minHeight: 2),
+                              if (error != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: Wrap(
+                                    spacing: 12,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Unable to refresh users'.tr,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.error,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: loading
+                                            ? null
+                                            : controller.getUserList,
+                                        child: Text('Retry'.tr),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              Expanded(
+                                child: items.isEmpty
+                                    ? _emptyState(context, error != null)
+                                    : LayoutBuilder(
+                                        builder: (context, content) {
+                                          final table =
+                                              content.maxWidth >= 800 &&
+                                              MediaQuery.textScalerOf(
+                                                    context,
+                                                  ).scale(16) <=
+                                                  20.8;
+                                          return RefreshIndicator(
+                                            onRefresh: controller.getUserList,
+                                            child: table
+                                                ? SingleChildScrollView(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    child: UserTableListWidget(
+                                                      users: items,
+                                                    ),
+                                                  )
+                                                : ListView.builder(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    itemCount: items.length,
+                                                    itemBuilder: (_, index) =>
+                                                        UserCardListWidget(
+                                                          user: items[index],
+                                                        ),
+                                                  ),
+                                          );
+                                        },
+                                      ),
+                              ),
+                            ],
+                          );
+                        }),
                       ),
                     ],
                   ),
-                );
-              }),
-
-              SizedBox(height: 15),
-              SizedBox(height: 15),
-
-              Obx(
-                () => ctr.isListLoading.value
-                    ? SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: const Center(child: CircularProgressIndicator()),
-                      )
-                    : ctr.loadError.value != null && ctr.userList.isEmpty
-                    ? _errorState(context)
-                    : ctr.loadError.value != null
-                    ? Column(
-                        children: [
-                          Text(
-                            'Unable to refresh users'.tr,
-                            style: TextStyle(color: theme.colorScheme.error),
-                          ),
-                          TextButton.icon(
-                            onPressed: ctr.getUserList,
-                            icon: const Icon(Icons.refresh),
-                            label: Text('Retry'.tr),
-                          ),
-                          _userResults(context),
-                        ],
-                      )
-                    : ctr.userList.isEmpty
-                    ? Center(child: Text("No User Found".tr))
-                    : ctr.searchUserList.isEmpty
-                    ? Center(child: Text("No User Found for search".tr))
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          final users = ctr.searchUserList.toList();
-                          final isMobile =
-                              constraints.maxWidth < 800 ||
-                              MediaQuery.textScalerOf(context).scale(1) > 1.3;
-
-                          if (isMobile) {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: users.length,
-                              itemBuilder: (context, index) =>
-                                  UserCardListWidget(user: users[index]),
-                            );
-                          }
-
-                          return UserTableListWidget(users: users);
-                        },
-                      ),
+                ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _errorState(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * .55,
-      child: Center(
+  Widget _emptyState(BuildContext context, bool error) {
+    final theme = Theme.of(context);
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 56),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+          ),
+        ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Unable to load users'.tr),
-            const SizedBox(height: 8),
-            FilledButton.icon(
-              onPressed: ctr.getUserList,
-              icon: const Icon(Icons.refresh),
-              label: Text('Retry'.tr),
+            Icon(
+              Icons.people_outline,
+              size: 40,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              error
+                  ? 'Unable to load users'.tr
+                  : (controller.userList.isEmpty
+                            ? 'No users yet'
+                            : 'No matching users')
+                        .tr,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium,
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _userResults(BuildContext context) {
-    final users = ctr.searchUserList.toList();
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 800 ||
-            MediaQuery.textScalerOf(context).scale(1) > 1.3) {
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: users.length,
-            itemBuilder: (context, index) =>
-                UserCardListWidget(user: users[index]),
-          );
-        }
-        return UserTableListWidget(users: users);
-      },
     );
   }
 }

@@ -16,101 +16,141 @@ class UserFormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Obx(
       () => PopScope(
         canPop: !ctr.isLoading.value,
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.viewInsetsOf(context).bottom + 28,
-          ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: ctr.key,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _header(context),
-                  _section(
-                    title: 'Account details'.tr,
-                    children: [
-                      ImageUploadWidget(
-                        bucket: 'user',
-                        folder: 'users',
-                        imageUrl: ctr.userPhotoController.text,
-                        onUploaded: (url) => ctr.userPhotoController.text = url,
-                      ),
-                      _field(
-                        label: 'Username'.tr,
-                        controller: ctr.userNameController,
-                        hint: 'Enter Username'.tr,
-                        required: true,
-                      ),
-                      _field(
-                        label: 'Email'.tr,
-                        controller: ctr.userEmailController,
-                        hint: 'Enter Email'.tr,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      _field(
-                        label: 'Phone Number'.tr,
-                        controller: ctr.userPhoneController,
-                        hint: 'Enter Phone Number'.tr,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      _field(
-                        label: 'Password'.tr,
-                        controller: ctr.userPasswordController,
-                        hint: 'Enter Password'.tr,
-                        obscureText: true,
-                      ),
-                    ],
+        child: Material(
+          color: theme.cardColor,
+          child: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    24,
+                    24,
+                    24,
+                    MediaQuery.viewInsetsOf(context).bottom + 24,
                   ),
-                  _section(
-                    title: 'Access'.tr,
-                    children: [
-                      _roleField(),
-                      const SizedBox(height: 12),
-                      _configurationField(),
-                      Obx(
-                        () => CheckboxListTile(
-                          contentPadding: EdgeInsets.zero,
-                          value: ctr.isChecked.value,
-                          onChanged: ctr.isLoading.value
-                              ? null
-                              : (value) => ctr.isChecked.value = value ?? false,
-                          title: Text('Disable User'.tr),
-                          controlAffinity: ListTileControlAffinity.leading,
+                  child: Form(
+                    key: ctr.key,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _header(context),
+                        _section(
+                          title: 'Account details'.tr,
+                          children: [
+                            ImageUploadWidget(
+                              bucket: 'user',
+                              folder: 'users',
+                              imageUrl: ctr.userPhotoController.text,
+                              onUploaded: (url) =>
+                                  ctr.userPhotoController.text = url,
+                            ),
+                            _field(
+                              context: context,
+                              label: 'Username'.tr,
+                              controller: ctr.userNameController,
+                              hint: 'Enter Username'.tr,
+                              required: true,
+                            ),
+                            _field(
+                              context: context,
+                              label: 'Email'.tr,
+                              controller: ctr.userEmailController,
+                              hint: 'Enter Email'.tr,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            _field(
+                              context: context,
+                              label: 'Phone Number'.tr,
+                              controller: ctr.userPhoneController,
+                              hint: 'Enter Phone Number'.tr,
+                              keyboardType: TextInputType.phone,
+                            ),
+                            _field(
+                              context: context,
+                              label: 'Password'.tr,
+                              controller: ctr.userPasswordController,
+                              hint: 'Enter Password'.tr,
+                              obscureText: true,
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: FilledButton(
-                      onPressed: ctr.isLoading.value
-                          ? null
-                          : () => _submit(context),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: successColor,
-                        foregroundColor: titleColor,
-                      ),
-                      child: Text(
-                        isEdit ? 'Update'.tr : 'Save'.tr,
-                        style: const TextStyle(fontSize: 17),
-                      ),
+                        _section(
+                          title: 'Access'.tr,
+                          children: [
+                            _roleField(context),
+                            const SizedBox(height: 12),
+                            _configurationField(context),
+                            Obx(
+                              () => CheckboxListTile(
+                                contentPadding: EdgeInsets.zero,
+                                value: ctr.isChecked.value,
+                                onChanged: ctr.isLoading.value
+                                    ? null
+                                    : (value) =>
+                                          ctr.isChecked.value = value ?? false,
+                                title: Text('Disable User'.tr),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: FilledButton(
+                            onPressed: ctr.isLoading.value
+                                ? null
+                                : () => _submit(context),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: successColor,
+                              foregroundColor: titleColor,
+                            ),
+                            child: Text(
+                              isEdit ? 'Update'.tr : 'Save'.tr,
+                              style: const TextStyle(fontSize: 17),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _decoration(BuildContext context, String label, String hint) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      filled: true,
+      fillColor: Color.alphaBlend(
+        colors.onSurface.withValues(alpha: 0.025),
+        theme.cardColor,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.primary, width: 1.5),
       ),
     );
   }
@@ -153,6 +193,7 @@ class UserFormWidget extends StatelessWidget {
   }
 
   Widget _field({
+    required BuildContext context,
     required String label,
     required TextEditingController controller,
     required String hint,
@@ -166,11 +207,7 @@ class UserFormWidget extends StatelessWidget {
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          border: const OutlineInputBorder(),
-        ),
+        decoration: _decoration(context, label, hint),
         validator: required
             ? (value) => value == null || value.trim().isEmpty
                   ? 'Please enter username'.tr
@@ -180,7 +217,7 @@ class UserFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _roleField() {
+  Widget _roleField(BuildContext context) {
     return Obx(
       () => DropdownButtonFormField<String>(
         initialValue:
@@ -189,11 +226,7 @@ class UserFormWidget extends StatelessWidget {
             )
             ? ctr.selectedRole.value
             : null,
-        decoration: InputDecoration(
-          labelText: 'Role'.tr,
-          hintText: 'Select Role'.tr,
-          border: const OutlineInputBorder(),
-        ),
+        decoration: _decoration(context, 'Role'.tr, 'Select Role'.tr),
         items: roleCtr.roleList
             .map(
               (role) => DropdownMenuItem<String>(
@@ -211,7 +244,7 @@ class UserFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _configurationField() {
+  Widget _configurationField(BuildContext context) {
     return Obx(
       () => DropdownButtonFormField<String>(
         initialValue:
@@ -222,10 +255,10 @@ class UserFormWidget extends StatelessWidget {
             )
             ? ctr.selectedSystemConfiguration.value
             : null,
-        decoration: InputDecoration(
-          labelText: 'System Configuration'.tr,
-          hintText: 'Select System Configuration'.tr,
-          border: const OutlineInputBorder(),
+        decoration: _decoration(
+          context,
+          'System Configuration'.tr,
+          'Select System Configuration'.tr,
         ),
         items: ctr.systemConfigurationCtr.systemConfigurationList
             .map(
