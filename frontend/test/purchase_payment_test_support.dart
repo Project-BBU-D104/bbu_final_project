@@ -35,6 +35,7 @@ Map<String, dynamic> purchasePaymentJson(
   String? paymentDate = '2026-11-01T00:00:00Z',
   String? status = 'completed',
   String? note = 'Existing',
+  double purchaseDue = 60.0,
 }) => {
   'id': id,
   'payment_no': paymentNo,
@@ -42,7 +43,7 @@ Map<String, dynamic> purchasePaymentJson(
   'payment_date': paymentDate,
   'status': status,
   'note': note,
-  'purchase': purchaseFixture(),
+  'purchase': purchaseFixture(due: purchaseDue),
   'supplier': {'id': 9, 'name': 'Supplier A'},
   'payment_type': {'id': 2, 'name': 'Cash'},
   'currency': {'id': 1, 'name': 'USD', 'symbol': '\$'},
@@ -94,9 +95,9 @@ class FakePurchasePaymentService implements PurchasePaymentService {
     Map<String, dynamic> data,
   ) async {
     if (updateGate != null) await updateGate!.future;
+    if (failWrite) throw Exception('failed');
     updateCalls++;
     lastUpdatedData = data;
-    if (failWrite) throw Exception('failed');
     final updated = {
       ...payments.firstWhere((p) => p['id'] == id),
       ...data,
