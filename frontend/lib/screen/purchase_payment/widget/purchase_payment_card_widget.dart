@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/purchase_payment/payment_format.dart';
 import 'package:frontend/screen/purchase_payment/widget/purchase_payment_detail_widget.dart';
-import 'package:frontend/widget/record_actions_menu.dart';
 import 'package:get/get.dart';
 
 class PurchasePaymentCardWidget extends StatelessWidget {
@@ -48,38 +47,32 @@ class PurchasePaymentCardWidget extends StatelessWidget {
         onTap: () =>
             Get.to(() => PurchasePaymentDetailWidget(payment: payment)),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.payments_outlined,
-                      color: theme.colorScheme.primary,
-                    ),
+                  Icon(
+                    Icons.payments_outlined,
+                    color: theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          payment['payment_no']?.toString() ?? '-',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        Tooltip(
+                          message: payment['payment_no']?.toString() ?? '-',
+                          child: Text(
+                            payment['payment_no']?.toString() ?? '-',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleLarge,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 4),
                         Text(
                           supplierName,
                           maxLines: 1,
@@ -114,7 +107,43 @@ class PurchasePaymentCardWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  RecordActionsMenu(onEdit: onEdit, onDelete: onDelete),
+                  PopupMenuButton<String>(
+                    tooltip: 'Actions'.tr,
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (value == 'edit') onEdit?.call();
+                      if (value == 'delete') onDelete?.call();
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.edit_outlined, size: 20),
+                            const SizedBox(width: 10),
+                            Text('Edit'.tr),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete_outline,
+                              size: 20,
+                              color: theme.colorScheme.error,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Delete'.tr,
+                              style: TextStyle(color: theme.colorScheme.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 12),

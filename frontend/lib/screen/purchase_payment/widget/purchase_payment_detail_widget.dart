@@ -104,9 +104,10 @@ class PurchasePaymentDetailWidget extends StatelessWidget {
             ? IconButton.outlined(
                 tooltip: 'Back'.tr,
                 onPressed: () => Get.back(),
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back, size: 20),
               )
             : null,
+        action: desktop ? _actions(context, ctr) : null,
         child: Obx(() {
           final current = _current(ctr);
           final purchase = current['purchase'];
@@ -226,58 +227,65 @@ class PurchasePaymentDetailWidget extends StatelessWidget {
           );
         }),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          color: theme.cardColor,
-          child: Obx(() {
-            final current = _current(ctr);
-            final id = int.tryParse(current['id']?.toString() ?? '');
-            final busy = ctr.isSaving.value || ctr.isOpeningEdit.value;
-            return Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: busy || id == null
-                        ? null
-                        : () => ctr.onDeletePurchasePayment(
-                            context,
-                            id,
-                            onDeleted: () => Get.back(),
-                          ),
-                    icon: const Icon(Icons.delete_outline),
-                    label: Text('Delete'.tr),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: theme.colorScheme.error,
-                      side: BorderSide(color: theme.colorScheme.error),
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: busy
-                        ? null
-                        : () => ctr.editPurchasePayment(context, current),
-                    icon: const Icon(Icons.edit),
-                    label: Text('Edit'.tr),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }),
-        ),
-      ),
+      bottomNavigationBar: desktop
+          ? null
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: _actions(context, ctr),
+              ),
+            ),
     );
+  }
+
+  Widget _actions(BuildContext context, PurchasePaymentController ctr) {
+    final theme = Theme.of(context);
+    return Obx(() {
+      final current = _current(ctr);
+      final id = int.tryParse(current['id']?.toString() ?? '');
+      final busy = ctr.isSaving.value || ctr.isOpeningEdit.value;
+      return Wrap(
+        alignment: WrapAlignment.end,
+        spacing: 12,
+        runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          OutlinedButton.icon(
+            onPressed: busy || id == null
+                ? null
+                : () => ctr.onDeletePurchasePayment(
+                    context,
+                    id,
+                    onDeleted: () => Get.back(),
+                  ),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(100, 48),
+              foregroundColor: theme.colorScheme.error,
+              side: BorderSide(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(Icons.delete_outline, size: 18),
+            label: Text('Delete'.tr),
+          ),
+          FilledButton.icon(
+            onPressed: busy
+                ? null
+                : () => ctr.editPurchasePayment(context, current),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(100, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(Icons.edit_outlined, size: 18),
+            label: Text('Edit'.tr),
+          ),
+        ],
+      );
+    });
   }
 }

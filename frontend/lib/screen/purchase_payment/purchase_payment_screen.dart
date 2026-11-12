@@ -35,36 +35,49 @@ class PurchasePaymentScreen extends StatelessWidget {
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
                         crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 20,
+                        spacing: 24,
                         runSpacing: 16,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (desktop)
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton.outlined(
-                                      tooltip: 'Back'.tr,
-                                      onPressed: () => Get.back(),
-                                      icon: const Icon(Icons.arrow_back),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Semantics(
-                                      header: true,
-                                      child: Text(
-                                        'Purchase Payments'.tr,
-                                        style: theme.textTheme.headlineMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth < 600
+                                  ? constraints.maxWidth - gutter * 2
+                                  : 580,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (desktop) ...[
+                                  Row(
+                                    children: [
+                                      IconButton.outlined(
+                                        tooltip: 'Back'.tr,
+                                        onPressed: () => Get.back(),
+                                        icon: const Icon(
+                                          Icons.arrow_back,
+                                          size: 20,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              if (desktop) ...[
-                                const SizedBox(height: 8),
+                                      const SizedBox(width: 12),
+                                      Flexible(
+                                        child: Semantics(
+                                          header: true,
+                                          child: Text(
+                                            'Purchase Payments'.tr,
+                                            style: theme
+                                                .textTheme
+                                                .headlineMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: -0.5,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
                                 Text(
                                   'Manage purchase payments.'.tr,
                                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -72,38 +85,41 @@ class PurchasePaymentScreen extends StatelessWidget {
                                   ),
                                 ),
                               ],
-                              const SizedBox(height: 8),
-                              Obx(
-                                () => Text(
-                                  '${ctr.searchPaymentList.length} '
-                                  '${'Purchase Payments'.tr}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                           Wrap(
                             spacing: 12,
                             runSpacing: 12,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               IconButton.outlined(
                                 tooltip: 'Refresh'.tr,
                                 onPressed: ctr.onRefresh,
-                                icon: const Icon(Icons.refresh),
-                                constraints: const BoxConstraints(
-                                  minWidth: 48,
-                                  minHeight: 48,
+                                style: IconButton.styleFrom(
+                                  minimumSize: const Size(48, 48),
+                                  side: BorderSide(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.12),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
+                                icon: const Icon(Icons.refresh, size: 20),
                               ),
                               FilledButton.icon(
                                 onPressed: () =>
                                     ctr.addPurchasePayment(context),
                                 style: FilledButton.styleFrom(
                                   minimumSize: const Size(0, 48),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                icon: const Icon(Icons.add),
+                                icon: const Icon(Icons.add, size: 20),
                                 label: Text('Add Purchase Payment'.tr),
                               ),
                             ],
@@ -111,13 +127,40 @@ class PurchasePaymentScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 28),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 420),
-                          child: SearchWidget(
-                            title: 'Search Purchase Payments',
-                          ),
+                      LayoutBuilder(
+                        builder: (context, content) => Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 20,
+                          runSpacing: 12,
+                          children: [
+                            SizedBox(
+                              width: content.maxWidth < 440
+                                  ? content.maxWidth
+                                  : 420,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.08),
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const SearchWidget(
+                                  title: 'Search Purchase Payments',
+                                ),
+                              ),
+                            ),
+                            Obx(
+                              () => Text(
+                                '${ctr.searchPaymentList.length} '
+                                '${'Purchase Payments'.tr}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -151,34 +194,59 @@ class PurchasePaymentScreen extends StatelessWidget {
                               );
                             }
                             return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.payments_outlined,
-                                    size: 56,
-                                    color: theme.colorScheme.onSurfaceVariant,
+                              child: SingleChildScrollView(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 56,
                                   ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    (ctr.purchasePaymentList.isEmpty
-                                            ? 'No purchase payments yet'
-                                            : 'No matching purchase payments')
-                                        .tr,
-                                    textAlign: TextAlign.center,
-                                    style: theme.textTheme.titleMedium,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  FilledButton.icon(
-                                    key: const Key(
-                                      'empty-add-purchase-payment',
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.08),
                                     ),
-                                    onPressed: () =>
-                                        ctr.addPurchasePayment(context),
-                                    icon: const Icon(Icons.add),
-                                    label: Text('Add Purchase Payment'.tr),
                                   ),
-                                ],
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.payments_outlined,
+                                        size: 40,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        (ctr.purchasePaymentList.isEmpty
+                                                ? 'No purchase payments yet'
+                                                : 'No matching purchase payments')
+                                            .tr,
+                                        textAlign: TextAlign.center,
+                                        style: theme.textTheme.titleMedium,
+                                      ),
+                                      const SizedBox(height: 20),
+                                      FilledButton.icon(
+                                        key: const Key(
+                                          'empty-add-purchase-payment',
+                                        ),
+                                        onPressed: () =>
+                                            ctr.addPurchasePayment(context),
+                                        style: FilledButton.styleFrom(
+                                          minimumSize: const Size(0, 48),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                        ),
+                                        icon: const Icon(Icons.add, size: 20),
+                                        label: Text('Add Purchase Payment'.tr),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             );
                           }

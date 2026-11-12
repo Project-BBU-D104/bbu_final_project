@@ -19,12 +19,61 @@ class PurchasePaymentFormWidget extends StatelessWidget {
     if (picked != null) ctr.pickPurchaseDate(picked);
   }
 
-  InputDecoration _decoration(String label) =>
-      InputDecoration(labelText: label.tr, border: const OutlineInputBorder());
+  InputDecoration _decoration(
+    BuildContext context,
+    String label, {
+    String? hint,
+    Widget? suffix,
+    bool alignLabel = false,
+  }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return InputDecoration(
+      labelText: label.tr,
+      hintText: hint?.tr,
+      suffixIcon: suffix,
+      alignLabelWithHint: alignLabel,
+      filled: true,
+      fillColor: Color.alphaBlend(
+        colors.onSurface.withValues(alpha: 0.025),
+        theme.cardColor,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      labelStyle: theme.textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colors.primary, width: 1.5),
+      ),
+    );
+  }
+
+  Widget _heading(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Semantics(
+        header: true,
+        child: Text(
+          text.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Obx(() {
       final busy = ctr.isSaving.value;
       final error = ctr.formError.value;
@@ -53,17 +102,17 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                       Row(
                         children: [
                           Container(
-                            width: 44,
-                            height: 44,
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(
-                                alpha: 0.1,
-                              ),
+                              color: colors.primary.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
                               Icons.payments_outlined,
-                              color: theme.colorScheme.primary,
+                              color: theme.brightness == Brightness.light
+                                  ? colors.primaryContainer
+                                  : colors.primary,
+                              size: 22,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -79,59 +128,58 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Cancel'.tr,
+                            tooltip: 'Close'.tr,
                             onPressed: busy
                                 ? null
-                                : () => Navigator.pop(context),
-                            icon: const Icon(Icons.close),
+                                : () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.close, size: 20),
                           ),
                         ],
                       ),
-                      if (error.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          key: const Key('purchase-payment-form-error'),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.errorContainer,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            error,
-                            style: TextStyle(
-                              color: theme.colorScheme.onErrorContainer,
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      Text(
-                        'Payment details'.tr,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(
+                          height: 1,
+                          color: colors.onSurface.withValues(alpha: 0.08),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      if (editing)
-                        ..._readOnlyIdentity(busy)
-                      else ...[
-                        _purchaseDropdown(busy),
-                        const SizedBox(height: 12),
+                      _heading(context, 'Payment details'),
+                      if (editing) ...[
+                        ..._readOnlyIdentity(context),
+                        const SizedBox(height: 20),
+                      ] else ...[
+                        _purchaseDropdown(context, busy),
+                        const SizedBox(height: 20),
                       ],
-                      _paymentTypeDropdown(busy),
-                      const SizedBox(height: 12),
-                      _currencyDropdown(busy),
-                      const SizedBox(height: 12),
+                      LayoutBuilder(
+                        builder: (context, constraints) => Wrap(
+                          spacing: 16,
+                          runSpacing: 20,
+                          children: [
+                            for (final field in [
+                              _paymentTypeDropdown(context, busy),
+                              _currencyDropdown(context, busy),
+                            ])
+                              SizedBox(
+                                width: constraints.maxWidth >= 560
+                                    ? (constraints.maxWidth - 16) / 2
+                                    : constraints.maxWidth,
+                                child: field,
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       TextFormField(
                         controller: ctr.amountCtrl,
                         enabled: !busy,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: InputDecoration(
-                          labelText: 'Amount'.tr,
-                          hintText: 'Enter Amount'.tr,
-                          border: const OutlineInputBorder(),
+                        decoration: _decoration(
+                          context,
+                          'Amount',
+                          hint: 'Enter Amount',
                         ),
                         validator: (value) {
                           final amount = double.tryParse(value?.trim() ?? '');
@@ -144,32 +192,61 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        onPressed: busy ? null : () => _pickDate(context),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(0, 48),
-                          alignment: Alignment.centerLeft,
-                        ),
-                        icon: const Icon(Icons.calendar_today_outlined),
-                        label: Text(
-                          '${'Payment Date'.tr}: '
-                          '${DateFormat('yyyy-MM-dd').format(ctr.purchaseDate.value)}',
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: busy ? null : () => _pickDate(context),
+                        borderRadius: BorderRadius.circular(12),
+                        child: InputDecorator(
+                          decoration: _decoration(
+                            context,
+                            'Payment Date',
+                            suffix: Icon(
+                              Icons.calendar_today_outlined,
+                              size: 20,
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                          child: Text(
+                            DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(ctr.purchaseDate.value),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 20),
                       TextFormField(
                         controller: ctr.noteCtrl,
                         enabled: !busy,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          labelText: 'Note'.tr,
-                          hintText: 'Enter Note'.tr,
-                          border: const OutlineInputBorder(),
-                          alignLabelWithHint: true,
+                        minLines: 2,
+                        maxLines: 4,
+                        decoration: _decoration(
+                          context,
+                          'Note',
+                          hint: 'Enter Note',
+                          alignLabel: true,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      if (error.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              error,
+                              key: const Key('purchase-payment-form-error'),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colors.error,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(
+                          height: 1,
+                          color: colors.onSurface.withValues(alpha: 0.08),
+                        ),
+                      ),
                       Wrap(
                         alignment: WrapAlignment.end,
                         spacing: 12,
@@ -178,9 +255,15 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                           OutlinedButton(
                             onPressed: busy
                                 ? null
-                                : () => Navigator.pop(context),
+                                : () => Navigator.of(context).pop(),
                             style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(0, 48),
+                              minimumSize: const Size(100, 48),
+                              side: BorderSide(
+                                color: colors.onSurface.withValues(alpha: 0.12),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: Text('Cancel'.tr),
                           ),
@@ -191,16 +274,28 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                                       ? ctr.onUpdatePurchasePayment(context)
                                       : ctr.onSavePurchasePayment(context),
                             style: FilledButton.styleFrom(
-                              minimumSize: const Size(0, 48),
+                              minimumSize: const Size(112, 48),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                            child: Text(
-                              (busy
-                                      ? 'Saving...'
-                                      : editing
-                                      ? 'Update'
-                                      : 'Save')
-                                  .tr,
-                            ),
+                            child: busy
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: colors.onPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text('Saving...'.tr),
+                                    ],
+                                  )
+                                : Text((editing ? 'Update' : 'Save').tr),
                           ),
                         ],
                       ),
@@ -215,25 +310,25 @@ class PurchasePaymentFormWidget extends StatelessWidget {
     });
   }
 
-  List<Widget> _readOnlyIdentity(bool busy) {
+  List<Widget> _readOnlyIdentity(BuildContext context) {
     final purchase = ctr.originalPayment?['purchase'];
 
     return [
       InputDecorator(
-        decoration: _decoration('Purchase'),
+        decoration: _decoration(context, 'Purchase'),
         child: Text(
           "${purchase?['invoice_no'] ?? ''} - Due: ${purchase?['due_amount'] ?? ''}",
         ),
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: 20),
       InputDecorator(
-        decoration: _decoration('Payment No'),
+        decoration: _decoration(context, 'Payment No'),
         child: Text(ctr.paymentNoCtrl.text),
       ),
     ];
   }
 
-  Widget _purchaseDropdown(bool busy) {
+  Widget _purchaseDropdown(BuildContext context, bool busy) {
     return Obx(() {
       if (ctr.purchaseCtr.isLoading.value) {
         return const Center(
@@ -255,7 +350,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
       return DropdownButtonFormField<int>(
         key: ValueKey('purchase-${ctr.selectedPurchaseId.value}'),
         initialValue: ctr.selectedPurchaseId.value,
-        decoration: _decoration('Select Purchase'),
+        decoration: _decoration(context, 'Select Purchase'),
         items: purchases.map((purchase) {
           return DropdownMenuItem<int>(
             value: int.tryParse(purchase['id'].toString()),
@@ -274,7 +369,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
     });
   }
 
-  Widget _paymentTypeDropdown(bool busy) {
+  Widget _paymentTypeDropdown(BuildContext context, bool busy) {
     return Obx(() {
       if (ctr.paymentTypeCtr.isLoading.value) {
         return const Center(
@@ -288,7 +383,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
       return DropdownButtonFormField<int>(
         key: ValueKey('payment-type-${ctr.selectedPaymentTypeId.value}'),
         initialValue: ctr.selectedPaymentTypeId.value,
-        decoration: _decoration('Select Payment Type'),
+        decoration: _decoration(context, 'Select Payment Type'),
         items: ctr.paymentTypeCtr.paymentTypeList.map((paymentType) {
           return DropdownMenuItem<int>(
             value: int.tryParse(paymentType["id"].toString()),
@@ -305,7 +400,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
     });
   }
 
-  Widget _currencyDropdown(bool busy) {
+  Widget _currencyDropdown(BuildContext context, bool busy) {
     return Obx(() {
       if (ctr.currencyCtr.isLoading.value) {
         return const Center(
@@ -319,7 +414,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
       return DropdownButtonFormField<int>(
         key: ValueKey('currency-${ctr.selectedCurrencyId.value}'),
         initialValue: ctr.selectedCurrencyId.value,
-        decoration: _decoration('Select Currency'),
+        decoration: _decoration(context, 'Select Currency'),
         items: ctr.currencyCtr.currencyList.map((currency) {
           return DropdownMenuItem<int>(
             value: int.tryParse(currency["id"].toString()),

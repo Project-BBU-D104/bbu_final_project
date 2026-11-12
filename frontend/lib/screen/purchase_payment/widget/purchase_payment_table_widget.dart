@@ -109,19 +109,41 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                           ),
                           DataCell(
                             PopupMenuButton<String>(
-                              icon: const Icon(Icons.more_vert),
+                              tooltip: 'Actions'.tr,
+                              icon: const Icon(Icons.more_horiz, size: 20),
                               onSelected: (value) {
                                 if (value == 'edit') onEdit?.call(payment);
                                 if (value == 'delete') onDelete?.call(payment);
                               },
-                              itemBuilder: (_) => const [
+                              itemBuilder: (_) => [
                                 PopupMenuItem(
                                   value: 'edit',
-                                  child: Text('Edit'),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.edit_outlined, size: 18),
+                                      const SizedBox(width: 12),
+                                      Text('Edit'.tr),
+                                    ],
+                                  ),
                                 ),
                                 PopupMenuItem(
                                   value: 'delete',
-                                  child: Text('Delete'),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.delete_outline,
+                                        size: 18,
+                                        color: theme.colorScheme.error,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'Delete'.tr,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.error,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
