@@ -34,59 +34,90 @@ class PurchasesScreen extends StatelessWidget {
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
                         crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 20,
+                        spacing: 24,
                         runSpacing: 16,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (desktop)
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton.outlined(
-                                      tooltip: 'Back'.tr,
-                                      onPressed: () => Get.back(),
-                                      icon: const Icon(Icons.arrow_back),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Semantics(
-                                      header: true,
-                                      child: Text(
-                                        'Purchases'.tr,
-                                        style: theme.textTheme.headlineMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth < 600
+                                  ? constraints.maxWidth - gutter * 2
+                                  : 580,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (desktop) ...[
+                                  Row(
+                                    children: [
+                                      IconButton.outlined(
+                                        tooltip: 'Back'.tr,
+                                        onPressed: () => Get.back(),
+                                        icon: const Icon(
+                                          Icons.arrow_back,
+                                          size: 20,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              const SizedBox(height: 8),
-                              Obx(
-                                () => Text(
-                                  '${'Total Purchases'.tr}: ${ctr.purchaseList.length}',
+                                      const SizedBox(width: 12),
+                                      Flexible(
+                                        child: Semantics(
+                                          header: true,
+                                          child: Text(
+                                            'Purchases'.tr,
+                                            style: theme
+                                                .textTheme
+                                                .headlineMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: -0.5,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                                Text(
+                                  'Manage purchases.'.tr,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           Wrap(
                             spacing: 12,
+                            runSpacing: 12,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               IconButton.outlined(
                                 tooltip: 'Refresh'.tr,
-                                onPressed: ctr.onGetPurchaseList,
-                                icon: const Icon(Icons.refresh),
+                                onPressed: ctr.onRefresh,
+                                style: IconButton.styleFrom(
+                                  minimumSize: const Size(48, 48),
+                                  side: BorderSide(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.12),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.refresh, size: 20),
                               ),
                               FilledButton.icon(
                                 onPressed: () => ctr.addPurchase(context),
                                 style: FilledButton.styleFrom(
                                   minimumSize: const Size(0, 48),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                icon: const Icon(Icons.add),
+                                icon: const Icon(Icons.add, size: 20),
                                 label: Text('Add Purchase'.tr),
                               ),
                             ],
@@ -94,64 +125,172 @@ class PurchasesScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 28),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 420),
-                          child: SearchWidget(title: 'Search Purchases...'),
+                      LayoutBuilder(
+                        builder: (context, content) => Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 20,
+                          runSpacing: 12,
+                          children: [
+                            SizedBox(
+                              width: content.maxWidth < 440
+                                  ? content.maxWidth
+                                  : 420,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.08),
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const SearchWidget(
+                                  title: 'Search Purchases...',
+                                ),
+                              ),
+                            ),
+                            Obx(
+                              () => Text(
+                                '${ctr.searchPurchaseList.length} ${'Purchases'.tr}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),
                       Expanded(
                         child: Obx(() {
-                          if (ctr.isLoading.value && ctr.purchaseList.isEmpty) {
+                          final loading = ctr.isLoading.value;
+                          final error = ctr.loadError.value;
+                          final purchases = ctr.searchPurchaseList.toList();
+                          if (loading && ctr.purchaseList.isEmpty) {
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
                           }
-                          final purchases = ctr.searchPurchaseList.toList();
-                          if (purchases.isEmpty) {
-                            return Center(
-                              child: Text(
-                                (ctr.purchaseList.isEmpty
-                                        ? 'No purchase found'
-                                        : 'Search results not found')
-                                    .tr,
-                                style: theme.textTheme.titleMedium,
-                              ),
-                            );
-                          }
-                          return LayoutBuilder(
-                            builder: (context, content) {
-                              final table =
-                                  content.maxWidth >= 800 &&
-                                  MediaQuery.textScalerOf(context).scale(16) <=
-                                      20.8;
-                              return RefreshIndicator(
-                                onRefresh: ctr.onGetPurchaseList,
-                                child: table
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (loading)
+                                const LinearProgressIndicator(minHeight: 2),
+                              if (error.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: Wrap(
+                                    spacing: 12,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      Text(error),
+                                      TextButton(
+                                        onPressed: loading
+                                            ? null
+                                            : ctr.onRefresh,
+                                        child: Text('Retry'.tr),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              Expanded(
+                                child: purchases.isEmpty
                                     ? SingleChildScrollView(
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
-                                        child: PurchaseTableWidget(
-                                          purchases: purchases,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                            vertical: 56,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: theme.cardColor,
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            border: Border.all(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.08),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Icon(
+                                                Icons.shopping_bag_outlined,
+                                                size: 40,
+                                                color: theme
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Text(
+                                                error.isNotEmpty
+                                                    ? ''
+                                                    : (ctr.purchaseList.isEmpty
+                                                              ? 'No purchases yet'
+                                                              : 'No matching purchases')
+                                                          .tr,
+                                                textAlign: TextAlign.center,
+                                                style:
+                                                    theme.textTheme.titleMedium,
+                                              ),
+                                              if (error.isEmpty) ...[
+                                                const SizedBox(height: 20),
+                                                FilledButton.icon(
+                                                  key: const Key(
+                                                    'empty-add-purchase',
+                                                  ),
+                                                  onPressed: () =>
+                                                      ctr.addPurchase(context),
+                                                  icon: const Icon(
+                                                    Icons.add,
+                                                    size: 20,
+                                                  ),
+                                                  label: Text(
+                                                    'Add Purchase'.tr,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
                                         ),
                                       )
-                                    : ListView.builder(
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
-                                        itemCount: purchases.length,
-                                        itemBuilder: (_, i) => Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 12,
-                                          ),
-                                          child: PurchaseCardWidget(
-                                            purchase: purchases[i],
-                                          ),
-                                        ),
+                                    : LayoutBuilder(
+                                        builder: (context, content) {
+                                          final table =
+                                              content.maxWidth >= 800 &&
+                                              MediaQuery.textScalerOf(
+                                                    context,
+                                                  ).scale(16) <=
+                                                  20.8;
+                                          return RefreshIndicator(
+                                            onRefresh: ctr.onRefresh,
+                                            child: table
+                                                ? SingleChildScrollView(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    child: PurchaseTableWidget(
+                                                      purchases: purchases,
+                                                    ),
+                                                  )
+                                                : ListView.builder(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    itemCount: purchases.length,
+                                                    itemBuilder: (_, i) => Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            bottom: 12,
+                                                          ),
+                                                      child: PurchaseCardWidget(
+                                                        purchase: purchases[i],
+                                                      ),
+                                                    ),
+                                                  ),
+                                          );
+                                        },
                                       ),
-                              );
-                            },
+                              ),
+                            ],
                           );
                         }),
                       ),
