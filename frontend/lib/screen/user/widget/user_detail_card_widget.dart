@@ -113,60 +113,58 @@ class UserDetailCardWidget extends StatelessWidget {
           : const CustomAppBar(title: 'User Detail', useTheme: true),
       body: user.isEmpty
           ? Center(child: Text('No user data found'.tr))
-          : SafeArea(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1240),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+          : HomeTabLayout(
+              translateTitle: false,
+              title: user['name']?.toString().trim().isNotEmpty == true
+                  ? user['name'].toString()
+                  : '-',
+              subtitle: 'User Detail',
+              leading: desktop
+                  ? IconButton.outlined(
+                      tooltip: 'Back'.tr,
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.arrow_back, size: 20),
+                    )
+                  : null,
+              action: desktop
+                  ? Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
                       children: [
-                        if (desktop)
-                          Row(
-                            children: [
-                              IconButton.outlined(
-                                tooltip: 'Back'.tr,
-                                onPressed: Get.back,
-                                icon: const Icon(Icons.arrow_back),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'User Detail'.tr,
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        if (desktop) const SizedBox(height: 24),
-                        LayoutBuilder(
-                          builder: (context, constraints) =>
-                              constraints.maxWidth < 800
-                              ? Column(
-                                  children: [
-                                    account,
-                                    const SizedBox(height: 16),
-                                    system,
-                                  ],
-                                )
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(child: account),
-                                    const SizedBox(width: 16),
-                                    Expanded(child: system),
-                                  ],
-                                ),
+                        OutlinedButton.icon(
+                          onPressed: id == null
+                              ? null
+                              : () => ctr.deleteUser(id, context),
+                          icon: const Icon(Icons.delete_outline),
+                          label: Text('Delete'.tr),
+                        ),
+                        FilledButton.icon(
+                          onPressed: id == null
+                              ? null
+                              : () => ctr.editUser(context, id),
+                          icon: const Icon(Icons.edit_outlined),
+                          label: Text('Edit'.tr),
                         ),
                       ],
-                    ),
-                  ),
-                ),
+                    )
+                  : null,
+              child: LayoutBuilder(
+                builder: (context, constraints) => constraints.maxWidth >= 900
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: account),
+                          const SizedBox(width: 24),
+                          Expanded(child: system),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [account, const SizedBox(height: 24), system],
+                      ),
               ),
             ),
-      bottomNavigationBar: user.isEmpty
+      bottomNavigationBar: user.isEmpty || desktop
           ? null
           : SafeArea(
               child: Padding(

@@ -9,6 +9,7 @@ import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
 import 'package:frontend/screen/user/widget/user_table_list_widget.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
@@ -211,5 +212,52 @@ void main() {
     await openRoles(tester, dark: true);
     final status = tester.widget<StatusWidget>(find.byType(StatusWidget).first);
     expect(status.color, AppTheme.dark().colorScheme.primary);
+  });
+
+  testWidgets('desktop user detail keeps edit and delete in its page header', (
+    tester,
+  ) async {
+    await openUsers(tester);
+    Get.find<UserController>().gotoUserDetail(userJson(1, 'Alice'));
+    await tester.pumpAndSettle();
+    final scaffold = tester.widget<Scaffold>(
+      find.descendant(
+        of: find.byType(UserDetailCardWidget),
+        matching: find.byType(Scaffold),
+      ),
+    );
+    expect(scaffold.appBar, isNull);
+    expect(scaffold.bottomNavigationBar, isNull);
+    expect(find.byType(HomeTabLayout), findsOneWidget);
+    expect(find.byTooltip('Back'), findsOneWidget);
+    expect(tester.getRect(find.text('Edit')).top, lessThan(220));
+    expect(tester.getRect(find.text('Delete')).top, lessThan(220));
+  });
+
+  testWidgets('desktop user detail shows sections side by side at 900+', (
+    tester,
+  ) async {
+    await openUsers(tester);
+    Get.find<UserController>().gotoUserDetail(userJson(1, 'Alice'));
+    await tester.pumpAndSettle();
+    final cards = find.byType(HomeSectionCard);
+    expect(
+      tester.getRect(cards.first).right,
+      lessThan(tester.getRect(cards.last).left),
+    );
+  });
+
+  testWidgets('mobile user detail keeps the bottom action bar', (tester) async {
+    await openUsers(tester, size: const Size(390, 844));
+    Get.find<UserController>().gotoUserDetail(userJson(1, 'Alice'));
+    await tester.pumpAndSettle();
+    final scaffold = tester.widget<Scaffold>(
+      find.descendant(
+        of: find.byType(UserDetailCardWidget),
+        matching: find.byType(Scaffold),
+      ),
+    );
+    expect(scaffold.bottomNavigationBar, isNotNull);
+    expect(find.text('Edit'), findsOneWidget);
   });
 }
