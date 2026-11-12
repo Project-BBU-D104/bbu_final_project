@@ -152,6 +152,27 @@ void main() {
     expect(find.text('Save Changes'), findsOneWidget);
   });
 
+  testWidgets('save button shows progress while saving', (tester) async {
+    final s = FakePurchaseRequestService()..createGate = Completer();
+    final c = await seed(tester, s);
+    c.addPurchaseRequest(tester.element(find.byType(PurchaseRequestScreen)));
+    await tester.pumpAndSettle();
+    fill(c);
+    await tester.pump();
+    await tester.ensureVisible(find.text('Create Request'));
+    await tester.tap(find.text('Create Request'));
+    await tester.pump();
+    expect(
+      find.descendant(
+        of: find.byType(FilledButton),
+        matching: find.byType(CircularProgressIndicator),
+      ),
+      findsOneWidget,
+    );
+    s.createGate!.complete({'id': 3});
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('form localizes item labels and remove tooltip in Khmer', (
     tester,
   ) async {

@@ -13,9 +13,56 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
 
   final Map<String, dynamic> purchaseRequest;
 
+  Widget _actions(
+    BuildContext context,
+    PurchaseRequestController controller,
+    int? requestId,
+  ) => Obx(() {
+    final busy = controller.isSaving.value || controller.isOpeningEdit.value;
+    final colors = Theme.of(context).colorScheme;
+    return Wrap(
+      alignment: WrapAlignment.end,
+      spacing: 12,
+      runSpacing: 12,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        OutlinedButton.icon(
+          onPressed: busy || requestId == null
+              ? null
+              : () => controller.deletePurchaseRequest(
+                  context,
+                  requestId,
+                  onDeleted: () => Get.back(),
+                ),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(100, 48),
+            foregroundColor: colors.error,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: const Icon(Icons.delete_outline, size: 18),
+          label: Text('Delete'.tr),
+        ),
+        FilledButton.icon(
+          onPressed: busy || requestId == null
+              ? null
+              : () => controller.editPurchaseRequest(context, requestId),
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(100, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: const Icon(Icons.edit_outlined, size: 18),
+          label: Text('Edit'.tr),
+        ),
+      ],
+    );
+  });
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final controller = Get.find<PurchaseRequestController>();
     final requestId = int.tryParse(purchaseRequest["id"].toString());
     final status = purchaseRequest["status"]?.toString() ?? "pending";
@@ -24,217 +71,180 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
         : <Map<String, dynamic>>[];
     final reason = (purchaseRequest["reason"]?.toString() ?? "").trim();
     final desktop = DesktopAppShell.isVisible(context);
-
-    return Scaffold(
-      appBar: desktop
-          ? null
-          : const CustomAppBar(
-              title: 'Purchase Request Detail',
-              useTheme: true,
-            ),
-      body: HomeTabLayout(
-        title: _value(purchaseRequest["request_no"]),
-        translateTitle: false,
-        subtitle: 'Purchase Request Detail',
-        leading: desktop
-            ? IconButton.outlined(
-                tooltip: 'Back'.tr,
-                onPressed: () => Get.back(),
-                icon: const Icon(Icons.arrow_back),
-              )
-            : null,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            HomeSectionCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        _value(purchaseRequest["request_no"]),
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      _StatusChip(status: status),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _value(purchaseRequest["request_type"]),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (reason.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(reason, style: theme.textTheme.bodyMedium),
-                  ],
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_date(purchaseRequest["request_date"])}  ·  ${_date(purchaseRequest["approved_date"])}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            HomeSectionCard(
-              child: Column(
-                children: [
-                  Obx(
-                    () => _infoRow(
-                      context,
-                      "Warehouse",
-                      _warehouseName(
-                        controller,
-                        purchaseRequest["warehouse_id"],
-                      ),
-                    ),
-                  ),
-                  const Divider(height: 20),
-                  _infoRow(
-                    context,
-                    "Requested By",
-                    _value(purchaseRequest["requested_by"]),
-                  ),
-                  const Divider(height: 20),
-                  _infoRow(
-                    context,
-                    "Approved By",
-                    _value(purchaseRequest["approved_by"]),
-                  ),
-                  const Divider(height: 20),
-                  _infoRow(
-                    context,
-                    "Request Date",
-                    _date(purchaseRequest["request_date"]),
-                  ),
-                  const Divider(height: 20),
-                  _infoRow(
-                    context,
-                    "Approved Date",
-                    _date(purchaseRequest["approved_date"]),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "${'Requested Items'.tr} (${items.length})",
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            HomeSectionCard(
-              child: items.isEmpty
-                  ? Text(
-                      "No items in this request".tr,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    )
-                  : Column(
-                      children: List.generate(items.length, (index) {
-                        final item = items[index];
-                        return Column(
-                          children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const Icon(Icons.inventory_2_outlined),
-                              title: Text(_productName(controller, item)),
-                              subtitle: Text(
-                                "${_value(item["qty"])} ${_value(item["unit"])}",
-                              ),
-                            ),
-                            if (index != items.length - 1)
-                              const Divider(height: 1),
-                          ],
-                        );
-                      }),
-                    ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          color: theme.cardColor,
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: requestId == null
-                      ? null
-                      : () => controller.deletePurchaseRequest(
-                          context,
-                          requestId,
-                          onDeleted: () => Get.back(),
-                        ),
-                  icon: const Icon(Icons.delete_outline),
-                  label: Text("Delete".tr),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.colorScheme.error,
-                    side: BorderSide(color: theme.colorScheme.error),
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: requestId == null
-                      ? null
-                      : () =>
-                            controller.editPurchaseRequest(context, requestId),
-                  icon: const Icon(Icons.edit),
-                  label: Text("Edit".tr),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _infoRow(BuildContext context, String label, String value) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
+    final colors = theme.colorScheme;
+    final active = theme.brightness == Brightness.light
+        ? colors.primaryContainer
+        : colors.primary;
+
+    Widget info(String label, String value) => Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label.tr,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+          Text(
+            label.tr,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
             ),
           ),
-          Expanded(child: Text(value)),
+          const SizedBox(height: 6),
+          SelectableText(
+            value,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
+      ),
+    );
+
+    return Theme(
+      data: theme.copyWith(
+        dividerColor: colors.onSurface.withValues(alpha: 0.08),
+        dividerTheme: DividerThemeData(
+          color: colors.onSurface.withValues(alpha: 0.08),
+          thickness: 1,
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(0, 48),
+            side: BorderSide(color: colors.onSurface.withValues(alpha: 0.12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+      child: Scaffold(
+        appBar: desktop
+            ? null
+            : const CustomAppBar(
+                title: 'Purchase Request Detail',
+                useTheme: true,
+              ),
+        body: Obx(() {
+          final error = controller.formError.value;
+          final summary = HomeSectionCard(
+            title: 'Request details',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: colors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.assignment_outlined,
+                        size: 24,
+                        color: active,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    _StatusChip(status: status),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                info('Request Type', _value(purchaseRequest["request_type"])),
+                info(
+                  'Warehouse',
+                  _warehouseName(controller, purchaseRequest["warehouse_id"]),
+                ),
+                info('Requested By', _value(purchaseRequest["requested_by"])),
+                info('Approved By', _value(purchaseRequest["approved_by"])),
+                info('Request Date', _date(purchaseRequest["request_date"])),
+                info('Approved Date', _date(purchaseRequest["approved_date"])),
+                if (reason.isNotEmpty) info('Reason', reason),
+              ],
+            ),
+          );
+          final itemsCard = HomeSectionCard(
+            title: 'Requested Items',
+            child: items.isEmpty
+                ? Text(
+                    "No items in this request".tr,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  )
+                : Column(
+                    children: List.generate(items.length, (index) {
+                      final item = items[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.inventory_2_outlined),
+                            title: Text(_productName(controller, item)),
+                            subtitle: Text(
+                              "${_value(item["qty"])} ${_value(item["unit"])}",
+                            ),
+                          ),
+                          if (index != items.length - 1)
+                            const Divider(height: 1),
+                        ],
+                      );
+                    }),
+                  ),
+          );
+          return HomeTabLayout(
+            translateTitle: false,
+            title: _value(purchaseRequest["request_no"]),
+            subtitle: 'Purchase Request Detail',
+            leading: desktop
+                ? IconButton.outlined(
+                    tooltip: 'Back'.tr,
+                    onPressed: () => Get.back(),
+                    icon: const Icon(Icons.arrow_back, size: 20),
+                  )
+                : null,
+            action: desktop ? _actions(context, controller, requestId) : null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (error.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(error, style: TextStyle(color: colors.error)),
+                    ),
+                  ),
+                LayoutBuilder(
+                  builder: (context, constraints) => constraints.maxWidth >= 900
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: summary),
+                            const SizedBox(width: 24),
+                            Expanded(child: itemsCard),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            summary,
+                            const SizedBox(height: 24),
+                            itemsCard,
+                          ],
+                        ),
+                ),
+              ],
+            ),
+          );
+        }),
+        bottomNavigationBar: desktop
+            ? null
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: _actions(context, controller, requestId),
+                ),
+              ),
       ),
     );
   }

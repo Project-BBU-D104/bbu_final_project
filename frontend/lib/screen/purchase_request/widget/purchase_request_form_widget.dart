@@ -38,7 +38,7 @@ class PurchaseRequestFormWidget extends StatelessWidget {
         header: true,
         child: Text(
           title.tr,
-          style: theme.textTheme.titleMedium?.copyWith(
+          style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -245,25 +245,6 @@ class PurchaseRequestFormWidget extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Divider(height: 1),
                       ),
-                      if (error.isNotEmpty)
-                        Container(
-                          key: const Key('purchase-request-form-error'),
-                          margin: const EdgeInsets.only(bottom: 20),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: colors.error.withValues(alpha: .08),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colors.error.withValues(alpha: .3),
-                            ),
-                          ),
-                          child: Text(
-                            error,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colors.error,
-                            ),
-                          ),
-                        ),
                       heading('Request details'),
                       TextFormField(
                         controller: ctr.requestTypeController,
@@ -317,24 +298,39 @@ class PurchaseRequestFormWidget extends StatelessWidget {
                         );
                       }),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        controller: ctr.requestedByController,
-                        enabled: !busy,
-                        decoration: decoration("Requested By"),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? "Requester is required".tr
-                            : null,
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: ctr.approvedByController,
-                        enabled: !busy,
-                        decoration: decoration("Approved By"),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? "Approver is required".tr
-                            : null,
+                      LayoutBuilder(
+                        builder: (context, constraints) => Wrap(
+                          spacing: 16,
+                          runSpacing: 20,
+                          children: [
+                            for (final field in [
+                              TextFormField(
+                                controller: ctr.requestedByController,
+                                enabled: !busy,
+                                decoration: decoration("Requested By"),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty
+                                    ? "Requester is required".tr
+                                    : null,
+                              ),
+                              TextFormField(
+                                controller: ctr.approvedByController,
+                                enabled: !busy,
+                                decoration: decoration("Approved By"),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty
+                                    ? "Approver is required".tr
+                                    : null,
+                              ),
+                            ])
+                              SizedBox(
+                                width: constraints.maxWidth >= 560
+                                    ? (constraints.maxWidth - 16) / 2
+                                    : constraints.maxWidth,
+                                child: field,
+                              ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Obx(
@@ -364,9 +360,24 @@ class PurchaseRequestFormWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      dateField("Request Date", false, busy),
-                      const SizedBox(height: 20),
-                      dateField("Approved Date", true, busy),
+                      LayoutBuilder(
+                        builder: (context, constraints) => Wrap(
+                          spacing: 16,
+                          runSpacing: 20,
+                          children: [
+                            for (final field in [
+                              dateField("Request Date", false, busy),
+                              dateField("Approved Date", true, busy),
+                            ])
+                              SizedBox(
+                                width: constraints.maxWidth >= 560
+                                    ? (constraints.maxWidth - 16) / 2
+                                    : constraints.maxWidth,
+                                child: field,
+                              ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: ctr.reasonController,
@@ -406,6 +417,19 @@ class PurchaseRequestFormWidget extends StatelessWidget {
                               .toList(),
                         ),
                       ),
+                      if (error.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              error,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colors.error,
+                              ),
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 28),
                       Wrap(
                         alignment: WrapAlignment.end,
@@ -433,14 +457,28 @@ class PurchaseRequestFormWidget extends StatelessWidget {
                             style: FilledButton.styleFrom(
                               minimumSize: const Size(112, 48),
                             ),
-                            child: Text(
-                              (busy
-                                      ? 'Saving...'
-                                      : requestId == null
-                                      ? 'Create Request'
-                                      : 'Save Changes')
-                                  .tr,
-                            ),
+                            child: busy
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: colors.onPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text('Saving...'.tr),
+                                    ],
+                                  )
+                                : Text(
+                                    (requestId == null
+                                            ? 'Create Request'
+                                            : 'Save Changes')
+                                        .tr,
+                                  ),
                           ),
                         ],
                       ),

@@ -329,6 +329,86 @@ void main() {
     expect(find.text('Main'), findsOneWidget);
   });
 
+  testWidgets('detail keeps actions in the header on desktop only', (
+    tester,
+  ) async {
+    Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    await pumpPurchaseRequestHost(
+      tester,
+      home: const CardPurchaseRequestDetailWidget(
+        purchaseRequest: {'id': 1, 'request_no': 'REQ-1', 'items': []},
+      ),
+      size: const Size(1440, 900),
+    );
+    final desktopScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(desktopScaffold.bottomNavigationBar, isNull);
+    expect(find.widgetWithText(FilledButton, 'Edit'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Delete'), findsOneWidget);
+
+    await pumpPurchaseRequestHost(
+      tester,
+      home: const CardPurchaseRequestDetailWidget(
+        purchaseRequest: {'id': 1, 'request_no': 'REQ-1', 'items': []},
+      ),
+    );
+    final mobileScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(mobileScaffold.bottomNavigationBar, isNotNull);
+  });
+
+  testWidgets('detail uses supplier section titles and selectable values', (
+    tester,
+  ) async {
+    Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    await pumpPurchaseRequestHost(
+      tester,
+      home: const CardPurchaseRequestDetailWidget(
+        purchaseRequest: {'id': 1, 'request_no': 'REQ-1', 'items': []},
+      ),
+    );
+    expect(find.text('Request details'), findsOneWidget);
+    expect(find.text('Requested Items'), findsOneWidget);
+    expect(find.byType(SelectableText), findsWidgets);
+  });
+
+  testWidgets('detail surfaces a failed edit error as a live region', (
+    tester,
+  ) async {
+    final c = Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    c.formError.value = 'Unable to save purchase request. Please try again.';
+    await pumpPurchaseRequestHost(
+      tester,
+      home: const CardPurchaseRequestDetailWidget(
+        purchaseRequest: {'id': 1, 'request_no': 'REQ-1', 'items': []},
+      ),
+    );
+    expect(
+      find.text('Unable to save purchase request. Please try again.'),
+      findsOneWidget,
+    );
+    final semantics = tester.getSemantics(
+      find.text('Unable to save purchase request. Please try again.'),
+    );
+    expect(semantics.flagsCollection.isLiveRegion, isTrue);
+  });
+
   testWidgets('card exposes edit and delete in the actions menu', (
     tester,
   ) async {
