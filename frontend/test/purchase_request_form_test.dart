@@ -152,6 +152,27 @@ void main() {
     expect(find.text('Save Changes'), findsOneWidget);
   });
 
+  testWidgets('edit normalizes status values for the status dropdown', (
+    tester,
+  ) async {
+    final s = FakePurchaseRequestService()
+      ..requests = [
+        purchaseRequestJson(1, requestNo: 'REQ-1', status: 'Approved'),
+      ];
+    final c = await seed(tester, s);
+    unawaited(
+      c.editPurchaseRequest(
+        tester.element(find.byType(PurchaseRequestScreen)),
+        1,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(c.requestStatus.value, 'approved');
+    expect(find.text('Approved'), findsNWidgets(2));
+  });
+
   testWidgets('save button shows progress while saving', (tester) async {
     final s = FakePurchaseRequestService()..createGate = Completer();
     final c = await seed(tester, s);

@@ -281,7 +281,12 @@ class PurchaseRequestController extends GetxController {
       selectedWarehouseId.value = int.tryParse(
         request["warehouse_id"].toString(),
       );
-      requestStatus.value = request["status"]?.toString() ?? "pending";
+      final status = request["status"]?.toString().trim().toLowerCase();
+      requestStatus.value = const ["pending", "approved", "rejected"].contains(
+        status,
+      )
+          ? status!
+          : "pending";
       requestDate.value =
           DateTime.tryParse(request["request_date"].toString()) ??
           DateTime.now();
