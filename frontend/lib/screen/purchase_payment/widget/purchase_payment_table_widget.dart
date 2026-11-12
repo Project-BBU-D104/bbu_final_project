@@ -44,131 +44,146 @@ class PurchasePaymentTableWidget extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: SizedBox(
               width: math.max(960, constraints.maxWidth),
-              child: DataTable(
-                showCheckboxColumn: false,
-                dividerThickness: 0,
-                headingRowColor: WidgetStatePropertyAll(
-                  Color.alphaBlend(
-                    colors.onSurface.withValues(alpha: 0.025),
-                    theme.cardColor,
+              child: Theme(
+                data: theme.copyWith(
+                  dividerColor: Colors.transparent,
+                  dividerTheme: const DividerThemeData(
+                    color: Colors.transparent,
+                    thickness: 0,
                   ),
                 ),
-                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-                headingRowHeight: 48,
-                dataRowMinHeight: 56,
-                dataRowMaxHeight: 72,
-                columnSpacing: 20,
-                horizontalMargin: 24,
-                columns: [
-                  for (final label in const [
-                    'Payment No',
-                    'Supplier',
-                    'Invoice',
-                    'Payment Type',
-                    'Date',
-                    'Amount',
-                    'Status',
-                    'Actions',
-                  ])
-                    DataColumn(
-                      label: heading(label),
-                      numeric: label == 'Amount',
+                child: DataTable(
+                  showCheckboxColumn: false,
+                  dividerThickness: 0,
+                  headingRowColor: WidgetStatePropertyAll(
+                    Color.alphaBlend(
+                      colors.onSurface.withValues(alpha: 0.025),
+                      theme.cardColor,
                     ),
-                ],
-                rows: [
-                  for (final payment in payments)
-                    if (payment['id'] is int)
-                      DataRow(
-                        onSelectChanged: (_) => Get.to(
-                          () => PurchasePaymentDetailWidget(payment: payment),
-                        ),
-                        cells: [
-                          DataCell(
-                            cell(
-                              payment['payment_no']?.toString() ?? '-',
-                              bold: true,
+                  ),
+                  headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  headingRowHeight: 48,
+                  dataRowMinHeight: 56,
+                  dataRowMaxHeight: 72,
+                  columnSpacing: 20,
+                  horizontalMargin: 24,
+                  columns: [
+                    for (final label in const [
+                      'Payment No',
+                      'Supplier',
+                      'Invoice',
+                      'Payment Type',
+                      'Date',
+                      'Amount',
+                      'Status',
+                      'Actions',
+                    ])
+                      DataColumn(
+                        label: heading(label),
+                        numeric: label == 'Amount',
+                      ),
+                  ],
+                  rows: [
+                    for (final payment in payments)
+                      if (payment['id'] is int)
+                        DataRow(
+                          onSelectChanged: (_) => Get.to(
+                            () => PurchasePaymentDetailWidget(payment: payment),
+                          ),
+                          cells: [
+                            DataCell(
+                              cell(
+                                payment['payment_no']?.toString() ?? '-',
+                                bold: true,
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            cell(
-                              payment['supplier'] is Map
-                                  ? (payment['supplier']['name'] ?? '-')
-                                        .toString()
-                                  : '-',
+                            DataCell(
+                              cell(
+                                payment['supplier'] is Map
+                                    ? (payment['supplier']['name'] ?? '-')
+                                          .toString()
+                                    : '-',
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            cell(
-                              payment['purchase'] is Map
-                                  ? (payment['purchase']['invoice_no'] ?? '-')
-                                        .toString()
-                                  : '-',
+                            DataCell(
+                              cell(
+                                payment['purchase'] is Map
+                                    ? (payment['purchase']['invoice_no'] ?? '-')
+                                          .toString()
+                                    : '-',
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            cell(
-                              payment['payment_type'] is Map
-                                  ? (payment['payment_type']['name'] ?? '-')
-                                        .toString()
-                                  : '-',
+                            DataCell(
+                              cell(
+                                payment['payment_type'] is Map
+                                    ? (payment['payment_type']['name'] ?? '-')
+                                          .toString()
+                                    : '-',
+                              ),
                             ),
-                          ),
-                          DataCell(
-                            cell(paymentDateText(payment['payment_date'])),
-                          ),
-                          DataCell(cell(paymentAmountText(payment))),
-                          DataCell(
-                            cell(
-                              paymentStatusLabel(payment['status']?.toString()),
+                            DataCell(
+                              cell(paymentDateText(payment['payment_date'])),
                             ),
-                          ),
-                          DataCell(
-                            PopupMenuButton<String>(
-                              tooltip: 'Actions'.tr,
-                              icon: const Icon(Icons.more_horiz, size: 20),
-                              onSelected: (value) {
-                                if (value == 'edit') onEdit?.call(payment);
-                                if (value == 'delete') onDelete?.call(payment);
-                              },
-                              itemBuilder: (_) => [
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.edit_outlined, size: 18),
-                                      const SizedBox(width: 12),
-                                      Text('Edit'.tr),
-                                    ],
-                                  ),
+                            DataCell(cell(paymentAmountText(payment))),
+                            DataCell(
+                              cell(
+                                paymentStatusLabel(
+                                  payment['status']?.toString(),
                                 ),
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.delete_outline,
-                                        size: 18,
-                                        color: theme.colorScheme.error,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        'Delete'.tr,
-                                        style: TextStyle(
+                              ),
+                            ),
+                            DataCell(
+                              PopupMenuButton<String>(
+                                tooltip: 'Actions'.tr,
+                                icon: const Icon(Icons.more_horiz, size: 20),
+                                onSelected: (value) {
+                                  if (value == 'edit') onEdit?.call(payment);
+                                  if (value == 'delete')
+                                    onDelete?.call(payment);
+                                },
+                                itemBuilder: (_) => [
+                                  PopupMenuItem(
+                                    value: 'edit',
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.edit_outlined,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text('Edit'.tr),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'delete',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete_outline,
+                                          size: 18,
                                           color: theme.colorScheme.error,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Delete'.tr,
+                                          style: TextStyle(
+                                            color: theme.colorScheme.error,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                ],
+                          ],
+                        ),
+                  ],
+                ),
               ),
             ),
           );
