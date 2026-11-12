@@ -151,6 +151,7 @@ Future<void> pumpPeopleHost(
   Locale locale = const Locale('en', 'US'),
   double textScale = 1,
 }) async {
+  final fontFamily = locale.languageCode == 'km' ? 'NotoSansKhmer' : null;
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -159,7 +160,9 @@ Future<void> pumpPeopleHost(
     GetMaterialApp(
       translations: AppTranslation(),
       locale: locale,
-      theme: dark ? AppTheme.dark() : AppTheme.light(),
+      theme: dark
+          ? AppTheme.dark(fontFamily: fontFamily)
+          : AppTheme.light(fontFamily: fontFamily),
       defaultTransition: Transition.noTransition,
       getPages: [
         GetPage(name: AppRoutes.userDetail, page: () => UserDetailCardWidget()),

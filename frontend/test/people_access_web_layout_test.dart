@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
+import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/screen/role/role_screen.dart';
 import 'package:frontend/screen/role/widget/role_card_widget.dart';
 import 'package:frontend/screen/role/widget/role_form_widget.dart';
@@ -16,6 +19,29 @@ import 'package:get/get.dart';
 
 import 'people_access_web_test_support.dart';
 
+class _PendingWebUserService extends FakeWebUserService {
+  final writes = <Completer<dynamic>>[];
+
+  @override
+  Future<dynamic> createUser(Map<String, dynamic> data) {
+    createCalls++;
+    final write = Completer<dynamic>();
+    writes.add(write);
+    return write.future;
+  }
+}
+
+class _PendingWebRoleService extends FakeWebRoleService {
+  final writes = <Completer<dynamic>>[];
+
+  @override
+  Future<dynamic> createRole(Map<String, dynamic> data) {
+    final write = Completer<dynamic>();
+    writes.add(write);
+    return write.future;
+  }
+}
+
 void main() {
   setUp(setUpPeopleWebTests);
   tearDown(Get.reset);
@@ -25,9 +51,12 @@ void main() {
     Size size = const Size(1440, 900),
     double textScale = 1,
     bool dark = false,
+    Locale locale = const Locale('en', 'US'),
     List<Map<String, dynamic>> extra = const [],
+    FakeWebUserService? serviceOverride,
   }) async {
-    final service = FakeWebUserService()..items.addAll(extra);
+    final service = serviceOverride ?? FakeWebUserService();
+    service.items.addAll(extra);
     final controller = Get.put(
       UserController(
         service: service,
@@ -40,6 +69,7 @@ void main() {
       size: size,
       textScale: textScale,
       dark: dark,
+      locale: locale,
     );
     controller.userList.assignAll(service.items);
     controller.searchUser('');
@@ -51,9 +81,12 @@ void main() {
     Size size = const Size(1440, 900),
     double textScale = 1,
     bool dark = false,
+    Locale locale = const Locale('en', 'US'),
     List<Map<String, dynamic>> extra = const [],
+    FakeWebRoleService? serviceOverride,
   }) async {
-    final service = FakeWebRoleService()..items.addAll(extra);
+    final service = serviceOverride ?? FakeWebRoleService();
+    service.items.addAll(extra);
     final controller = Get.put(RoleController(service: service));
     await pumpPeopleHost(
       tester,
@@ -62,20 +95,25 @@ void main() {
       size: size,
       textScale: textScale,
       dark: dark,
+      locale: locale,
     );
     controller.roleList.assignAll(service.items);
     controller.searchRole('');
     await tester.pumpAndSettle();
   }
 
-  Future<void> pumpUserForm(WidgetTester tester, Size size) async {
+  Future<void> pumpUserForm(
+    WidgetTester tester,
+    Size size, {
+    FakeWebUserService? service,
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     Get.put(
       UserController(
-        service: FakeWebUserService(),
+        service: service ?? FakeWebUserService(),
         systemConfigurationCtr: NoopSystemConfigurationController(),
       ),
     );
@@ -86,15 +124,57 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> pumpRoleForm(WidgetTester tester, Size size) async {
+  Future<void> pumpRoleForm(
+    WidgetTester tester,
+    Size size, {
+    FakeWebRoleService? service,
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    Get.put(RoleController(service: FakeWebRoleService()));
+    Get.put(RoleController(service: service ?? FakeWebRoleService()));
     await tester.pumpWidget(
       GetMaterialApp(home: Scaffold(body: RoleFormWidget())),
     );
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpUserFormRoute(
+    WidgetTester tester,
+    FakeWebUserService service,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    Get.put(
+      UserController(
+        service: service,
+        systemConfigurationCtr: NoopSystemConfigurationController(),
+      ),
+    );
+    Get.put(RoleController(service: FakeWebRoleService()));
+    await tester.pumpWidget(
+      const GetMaterialApp(home: Scaffold(body: Text('parent'))),
+    );
+    Get.to(() => Scaffold(body: UserFormWidget()));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpRoleFormRoute(
+    WidgetTester tester,
+    FakeWebRoleService service,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    Get.put(RoleController(service: service));
+    await tester.pumpWidget(
+      const GetMaterialApp(home: Scaffold(body: Text('parent'))),
+    );
+    Get.to(() => Scaffold(body: RoleFormWidget()));
     await tester.pumpAndSettle();
   }
 
@@ -320,5 +400,140 @@ void main() {
     final desc = tester.getRect(find.text('Description'));
     expect(name.top, closeTo(desc.top, 1));
     expect(name.right, lessThan(desc.left));
+  });
+
+  testWidgets('user table keeps Khmer headings at normal text scale', (
+    tester,
+  ) async {
+    await openUsers(tester, locale: const Locale('km', 'KH'));
+    expect(
+      Theme.of(
+        tester.element(find.byType(DataTable)),
+      ).textTheme.bodyMedium?.fontFamily,
+      'NotoSansKhmer',
+    );
+    expect(find.byType(DataTable), findsOneWidget);
+    expect(
+      find.text(AppTranslation().keys['km_KH']!['Contact details']!),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('user table keeps Khmer headings at 130 percent scale', (
+    tester,
+  ) async {
+    await openUsers(tester, locale: const Locale('km', 'KH'), textScale: 1.3);
+    expect(find.byType(DataTable), findsOneWidget);
+    expect(
+      find.text(AppTranslation().keys['km_KH']!['Contact details']!),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('user list uses cards above 130 percent Khmer text scale', (
+    tester,
+  ) async {
+    await openUsers(tester, locale: const Locale('km', 'KH'), textScale: 1.4);
+    expect(find.byType(DataTable), findsNothing);
+    expect(find.byType(UserCardListWidget), findsWidgets);
+  });
+
+  testWidgets('role table keeps Khmer headings at normal text scale', (
+    tester,
+  ) async {
+    await openRoles(tester, locale: const Locale('km', 'KH'));
+    expect(find.byType(DataTable), findsOneWidget);
+    expect(
+      find.text(AppTranslation().keys['km_KH']!['Description']!),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('role table keeps Khmer headings at 130 percent scale', (
+    tester,
+  ) async {
+    await openRoles(tester, locale: const Locale('km', 'KH'), textScale: 1.3);
+    expect(find.byType(DataTable), findsOneWidget);
+    expect(
+      find.text(AppTranslation().keys['km_KH']!['Description']!),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('role list uses cards above 130 percent Khmer text scale', (
+    tester,
+  ) async {
+    await openRoles(tester, locale: const Locale('km', 'KH'), textScale: 1.4);
+    expect(find.byType(DataTable), findsNothing);
+    expect(find.byType(RoleCardWidget), findsWidgets);
+  });
+
+  testWidgets('user form blocks duplicate save and back while writing', (
+    tester,
+  ) async {
+    final service = _PendingWebUserService();
+    await pumpUserFormRoute(tester, service);
+    final controller = Get.find<UserController>();
+    final context = tester.element(find.byType(UserFormWidget));
+    final save = controller.onSaveUser(context);
+    await tester.pump();
+    await controller.onSaveUser(context);
+    expect(service.createCalls, 1);
+    expect(controller.isLoading.value, isTrue);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pump();
+    expect(find.byType(UserFormWidget), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    expect(find.byType(UserFormWidget), findsOneWidget);
+
+    service.writes.single.completeError(Exception('offline'));
+    await save;
+    await tester.pumpAndSettle();
+    expect(controller.isLoading.value, isFalse);
+
+    final retry = controller.onSaveUser(context);
+    await tester.pump();
+    expect(service.createCalls, 2);
+    service.writes.last.completeError(Exception('offline'));
+    await retry;
+    await tester.pumpAndSettle();
+    expect(controller.isLoading.value, isFalse);
+  });
+
+  testWidgets('role form blocks duplicate save and back while writing', (
+    tester,
+  ) async {
+    final service = _PendingWebRoleService();
+    await pumpRoleFormRoute(tester, service);
+    final controller = Get.find<RoleController>();
+    final save = controller.onSaveRole();
+    await tester.pump();
+    await controller.onSaveRole();
+    expect(service.writes, hasLength(1));
+    expect(controller.isLoading.value, isTrue);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pump();
+    expect(find.byType(RoleFormWidget), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    expect(find.byType(RoleFormWidget), findsOneWidget);
+
+    service.writes.single.completeError(Exception('offline'));
+    await save;
+    await tester.pumpAndSettle();
+    expect(controller.isLoading.value, isFalse);
+
+    final retry = controller.onSaveRole();
+    await tester.pump();
+    expect(service.writes, hasLength(2));
+    service.writes.last.completeError(Exception('offline'));
+    await retry;
+    await tester.pumpAndSettle();
+    expect(controller.isLoading.value, isFalse);
   });
 }

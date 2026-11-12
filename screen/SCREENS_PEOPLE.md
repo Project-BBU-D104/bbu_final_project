@@ -103,10 +103,10 @@ through list → add → edit → detail/delete in both themes.
 ### Web alignment — 2026-11-12
 
 The user and role tables now follow the supplier web table styling, with themed
-status and hover colors, tooltips, formatted created dates, and 48px desktop
-list actions. User detail edit/delete actions are in the desktop page header;
+status and heading colors, tooltips, formatted created dates, user-row hover
+styling, and 48px desktop list actions. User detail edit/delete actions are in the desktop page header;
 user and role forms pair fields when content is at least 560px wide. Verification
-passed: 460 Flutter tests with 1 known web-only skip, a successful web build,
+passed: 468 Flutter tests with 1 known web-only skip, a successful web build,
 and a clean format gate. `flutter analyze` reported no diagnostics in changed
 screen/test-support paths; 37 existing project diagnostics remain. Manual
 checks still needed: live browser walk at desktop width, dark theme, Khmer locale,
