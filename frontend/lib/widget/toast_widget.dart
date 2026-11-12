@@ -8,6 +8,7 @@ class ToastWidget {
     String title = "",
     Duration duration = const Duration(seconds: 3),
   }) {
+    if (Get.context == null) return;
     Get.snackbar(
       title.isEmpty ? _title(type) : title,
       message,
@@ -17,10 +18,7 @@ class ToastWidget {
       borderRadius: 14,
       backgroundColor: _color(type),
       colorText: Colors.white,
-      icon: Icon(
-        _icon(type),
-        color: Colors.white,
-      ),
+      icon: Icon(_icon(type), color: Colors.white),
       snackStyle: SnackStyle.FLOATING,
       animationDuration: const Duration(milliseconds: 300),
       isDismissible: true,
@@ -68,10 +66,4 @@ class ToastWidget {
   }
 }
 
-
-enum ToastType {
-  success,
-  error,
-  warning,
-  info,
-}
+enum ToastType { success, error, warning, info }

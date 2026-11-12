@@ -14,16 +14,44 @@ class RoleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: CustomAppBar(title: "Role"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             children: [
-              SizedBox(height: 4),
-              SearchWidget(title: "Search Role"),
+              LayoutBuilder(
+                builder: (context, constraints) => Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Roles'.tr,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: ctr.getRoles,
+                      icon: const Icon(Icons.refresh),
+                      label: Text('Refresh'.tr),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: () => ctr.addRole(context),
+                      icon: const Icon(Icons.add),
+                      label: Text('Add Role'.tr),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(height: 16),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: SearchWidget(title: "Search Role"),
+              ),
 
               Obx(() {
                 if (ctr.isLoading.value) {
@@ -31,6 +59,27 @@ class RoleScreen extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.6,
                     child: const Center(child: CircularProgressIndicator()),
                   );
+                }
+
+                if (ctr.loadError.value != null && ctr.roleList.isNotEmpty) {
+                  return Column(
+                    children: [
+                      Text(
+                        'Unable to refresh roles'.tr,
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                      TextButton.icon(
+                        onPressed: ctr.getRoles,
+                        icon: const Icon(Icons.refresh),
+                        label: Text('Retry'.tr),
+                      ),
+                      _roleResults(context),
+                    ],
+                  );
+                }
+
+                if (ctr.loadError.value != null) {
+                  return _errorState(context);
                 }
 
                 if (ctr.roleList.isEmpty) {
@@ -84,17 +133,49 @@ class RoleScreen extends StatelessWidget {
                   },
                 );
               }),
-              SizedBox(height: 80),
+              const SizedBox(height: 40),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ctr.addRole(context);
-        },
-        child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _errorState(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * .55,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Unable to load roles'.tr),
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: ctr.getRoles,
+              icon: const Icon(Icons.refresh),
+              label: Text('Retry'.tr),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _roleResults(BuildContext context) {
+    final roles = ctr.searchRoleList.toList();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.3) {
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: roles.length,
+            itemBuilder: (context, index) => RoleCardWidget(role: roles[index]),
+          );
+        }
+        return RoleTableWidget(roles: roles);
+      },
     );
   }
 }

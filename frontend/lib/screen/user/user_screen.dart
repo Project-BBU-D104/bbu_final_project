@@ -14,14 +14,42 @@ class UserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: CustomAppBar(title: "User"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             children: [
-              SearchWidget(title: "Search User...".tr),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Users'.tr,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: ctr.getUserList,
+                    icon: const Icon(Icons.refresh),
+                    label: Text('Refresh'.tr),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    onPressed: () => ctr.addUser(context),
+                    icon: const Icon(Icons.add),
+                    label: Text('Add User'.tr),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: SearchWidget(title: "Search User...".tr),
+              ),
               SizedBox(height: 12),
               Obx(() {
                 final activeUsers = ctr.userList
@@ -53,20 +81,6 @@ class UserScreen extends StatelessWidget {
               }),
 
               SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Obx(() => Text("${ctr.userList.length} Users")),
-
-                  ElevatedButton(
-                    onPressed: () {
-                      ctr.addUser(context);
-                    },
-                    child: Text("New User".tr),
-                  ),
-                ],
-              ),
-
               SizedBox(height: 15),
 
               Obx(
@@ -75,6 +89,23 @@ class UserScreen extends StatelessWidget {
                         height: MediaQuery.of(context).size.height * 0.6,
                         child: const Center(child: CircularProgressIndicator()),
                       )
+                    : ctr.loadError.value != null && ctr.userList.isEmpty
+                    ? _errorState(context)
+                    : ctr.loadError.value != null
+                    ? Column(
+                        children: [
+                          Text(
+                            'Unable to refresh users'.tr,
+                            style: TextStyle(color: theme.colorScheme.error),
+                          ),
+                          TextButton.icon(
+                            onPressed: ctr.getUserList,
+                            icon: const Icon(Icons.refresh),
+                            label: Text('Retry'.tr),
+                          ),
+                          _userResults(context),
+                        ],
+                      )
                     : ctr.userList.isEmpty
                     ? Center(child: Text("No User Found".tr))
                     : ctr.searchUserList.isEmpty
@@ -82,7 +113,9 @@ class UserScreen extends StatelessWidget {
                     : LayoutBuilder(
                         builder: (context, constraints) {
                           final users = ctr.searchUserList.toList();
-                          final isMobile = constraints.maxWidth < 600;
+                          final isMobile =
+                              constraints.maxWidth < 800 ||
+                              MediaQuery.textScalerOf(context).scale(1) > 1.3;
 
                           if (isMobile) {
                             return ListView.builder(
@@ -102,6 +135,45 @@ class UserScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _errorState(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * .55,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Unable to load users'.tr),
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: ctr.getUserList,
+              icon: const Icon(Icons.refresh),
+              label: Text('Retry'.tr),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _userResults(BuildContext context) {
+    final users = ctr.searchUserList.toList();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.3) {
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: users.length,
+            itemBuilder: (context, index) =>
+                UserCardListWidget(user: users[index]),
+          );
+        }
+        return UserTableListWidget(users: users);
+      },
     );
   }
 }
