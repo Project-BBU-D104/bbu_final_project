@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/system_configuration_controller.dart';
+import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
+import 'package:frontend/screen/role/role_screen.dart';
+import 'package:frontend/screen/role/widget/role_card_widget.dart';
 import 'package:frontend/screen/user/user_screen.dart';
 import 'package:frontend/screen/user/widget/user_card_list_widget.dart';
 import 'package:frontend/screen/user/widget/user_detail_card_widget.dart';
@@ -39,6 +42,28 @@ void main() {
     );
     controller.userList.assignAll(service.items);
     controller.searchUser('');
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> openRoles(
+    WidgetTester tester, {
+    Size size = const Size(1440, 900),
+    double textScale = 1,
+    bool dark = false,
+    List<Map<String, dynamic>> extra = const [],
+  }) async {
+    final service = FakeWebRoleService()..items.addAll(extra);
+    final controller = Get.put(RoleController(service: service));
+    await pumpPeopleHost(
+      tester,
+      home: RoleScreen(),
+      route: '/role',
+      size: size,
+      textScale: textScale,
+      dark: dark,
+    );
+    controller.roleList.assignAll(service.items);
+    controller.searchRole('');
     await tester.pumpAndSettle();
   }
 
@@ -120,6 +145,70 @@ void main() {
 
   testWidgets('user table status is themed in dark mode', (tester) async {
     await openUsers(tester, dark: true);
+    final status = tester.widget<StatusWidget>(find.byType(StatusWidget).first);
+    expect(status.color, AppTheme.dark().colorScheme.primary);
+  });
+
+  testWidgets('role table matches the supplier web table', (tester) async {
+    await openRoles(tester);
+    final table = tester.widget<DataTable>(find.byType(DataTable));
+    expect(table.showCheckboxColumn, isFalse);
+    expect(table.dataRowColor!.resolve({WidgetState.hovered}), isNotNull);
+    expect(
+      tester.getSize(find.byType(DataTable)).width,
+      greaterThanOrEqualTo(960),
+    );
+    final status = tester.widget<StatusWidget>(find.byType(StatusWidget).first);
+    expect(status.color, AppTheme.light().colorScheme.primaryContainer);
+  });
+
+  testWidgets('role table formats created dates', (tester) async {
+    await openRoles(tester);
+    expect(find.text('02-01-2026'), findsNWidgets(2));
+    expect(find.text('2026-01-02T00:00:00'), findsNothing);
+  });
+
+  testWidgets('role actions ignore non-numeric ids', (tester) async {
+    await openRoles(
+      tester,
+      extra: [
+        {'id': 'abc', 'name': 'Bad'},
+      ],
+    );
+    await tester.tap(find.byType(PopupMenuButton<String>).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete').last);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('role list falls back to cards at large text scale', (
+    tester,
+  ) async {
+    await openRoles(tester, textScale: 1.4);
+    expect(find.byType(DataTable), findsNothing);
+    expect(find.byType(RoleCardWidget), findsWidgets);
+  });
+
+  testWidgets('role table renders malformed records safely', (tester) async {
+    await openRoles(
+      tester,
+      extra: [
+        {
+          'id': 3,
+          'name': null,
+          'description': null,
+          'is_active': null,
+          'created_at': 'garbage',
+        },
+      ],
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.text('-'), findsWidgets);
+  });
+
+  testWidgets('role table status is themed in dark mode', (tester) async {
+    await openRoles(tester, dark: true);
     final status = tester.widget<StatusWidget>(find.byType(StatusWidget).first);
     expect(status.color, AppTheme.dark().colorScheme.primary);
   });

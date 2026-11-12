@@ -60,6 +60,7 @@ class RoleScreen extends StatelessWidget {
                                               onPressed: Get.back,
                                               icon: const Icon(
                                                 Icons.arrow_back,
+                                                size: 20,
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -74,6 +75,7 @@ class RoleScreen extends StatelessWidget {
                                                       ?.copyWith(
                                                         fontWeight:
                                                             FontWeight.w700,
+                                                        letterSpacing: -0.5,
                                                       ),
                                                 ),
                                               ),
@@ -102,12 +104,40 @@ class RoleScreen extends StatelessWidget {
                                     IconButton.outlined(
                                       tooltip: 'Refresh'.tr,
                                       onPressed: controller.getRoles,
-                                      icon: const Icon(Icons.refresh),
+                                      style: desktop
+                                          ? IconButton.styleFrom(
+                                              minimumSize: const Size(48, 48),
+                                              side: BorderSide(
+                                                color: theme
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.12),
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            )
+                                          : null,
+                                      icon: const Icon(Icons.refresh, size: 20),
                                     ),
                                     FilledButton.icon(
                                       onPressed: () =>
                                           controller.addRole(context),
-                                      icon: const Icon(Icons.add),
+                                      style: desktop
+                                          ? FilledButton.styleFrom(
+                                              minimumSize: const Size(0, 48),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 20,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            )
+                                          : null,
+                                      icon: const Icon(Icons.add, size: 20),
                                       label: Text('Add Role'.tr),
                                     ),
                                   ],
