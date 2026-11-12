@@ -38,6 +38,7 @@ class PurchaseRequestTableWidget extends StatelessWidget {
               dataRowMaxHeight: 72,
               columnSpacing: 20,
               horizontalMargin: 24,
+              dividerThickness: 0,
               headingRowColor: WidgetStatePropertyAll(
                 Color.alphaBlend(
                   colors.onSurface.withValues(alpha: 0.025),
