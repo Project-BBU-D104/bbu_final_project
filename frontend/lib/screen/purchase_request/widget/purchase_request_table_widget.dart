@@ -15,7 +15,6 @@ class PurchaseRequestTableWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final controller = Get.find<PurchaseRequestController>();
-    final line = colors.onSurface.withValues(alpha: 0.08);
 
     Widget heading(String label) => Flexible(
       child: Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -27,10 +26,7 @@ class PurchaseRequestTableWidget extends StatelessWidget {
         color: theme.cardColor,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: line),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SizedBox(
