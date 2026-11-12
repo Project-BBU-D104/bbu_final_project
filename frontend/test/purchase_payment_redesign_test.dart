@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:frontend/controllers/purchase/purchase_payment_controller.dart';
+import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/screen/purchase_payment/purchase_payment_screen.dart';
 import 'package:frontend/screen/purchase_payment/widget/purchase_payment_card_widget.dart';
 import 'package:frontend/screen/purchase_payment/widget/purchase_payment_table_widget.dart';
 import 'package:get/get.dart';
@@ -82,5 +85,73 @@ void main() {
     expect(find.text('PP-1'), findsOneWidget);
     expect(find.text('PP-2'), findsOneWidget);
     expect(find.text('\$40.00'), findsNWidgets(2));
+  });
+
+  testWidgets('list adapts cards and table to usable width', (tester) async {
+    await seedPurchasePaymentController();
+    await pumpPurchasePaymentHost(
+      tester,
+      home: PurchasePaymentScreen(),
+      size: const Size(900, 900),
+    );
+    expect(find.byType(PurchasePaymentCardWidget), findsNWidgets(2));
+    expect(find.byType(PurchasePaymentTableWidget), findsNothing);
+    await pumpPurchasePaymentHost(
+      tester,
+      home: PurchasePaymentScreen(),
+      size: const Size(1440, 900),
+    );
+    expect(find.byType(PurchasePaymentTableWidget), findsOneWidget);
+  });
+
+  testWidgets('loading, error, empty and no-match states are distinct', (
+    tester,
+  ) async {
+    final c = await seedPurchasePaymentController();
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    c.loadError.value = 'Unable to load purchase payments. Please try again.';
+    await tester.pumpAndSettle();
+    expect(find.text('Retry'), findsOneWidget);
+    c.loadError.value = '';
+    c.searchPayments('missing');
+    await tester.pumpAndSettle();
+    expect(find.text('No matching purchase payments'), findsOneWidget);
+    c.purchasePaymentList.clear();
+    c.searchPayments('');
+    await tester.pumpAndSettle();
+    expect(find.text('No purchase payments yet'), findsOneWidget);
+    expect(find.byKey(const Key('empty-add-purchase-payment')), findsOneWidget);
+  });
+
+  testWidgets('retry keeps the active search query', (tester) async {
+    final c = await seedPurchasePaymentController();
+    await pumpPurchasePaymentHost(tester, home: PurchasePaymentScreen());
+    final search = Get.find<SearchController>();
+    search.keyword.value = 'pp-2';
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(c.searchPaymentList, hasLength(1));
+    await c.onRefresh();
+    await tester.pumpAndSettle();
+    expect(c.searchPaymentList, hasLength(1));
+  });
+
+  testWidgets('long Khmer content reflows in both themes', (tester) async {
+    final c = await seedPurchasePaymentController();
+    c.purchasePaymentList[0] = {
+      ...c.purchasePaymentList.first,
+      'payment_no': 'ទូទាត់ ' * 12,
+    };
+    c.searchPayments('');
+    for (final dark in [false, true]) {
+      await pumpPurchasePaymentHost(
+        tester,
+        home: PurchasePaymentScreen(),
+        size: const Size(360, 720),
+        dark: dark,
+        locale: const Locale('km', 'KH'),
+        textScale: 1.3,
+      );
+      expect(tester.takeException(), isNull);
+    }
   });
 }

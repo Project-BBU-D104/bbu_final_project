@@ -20,6 +20,15 @@ class PurchasePaymentTableWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    Widget heading(String label) => Flexible(
+      child: Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    Widget cell(String text) => Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.bodyMedium,
+    );
     return Card(
       color: theme.cardColor,
       elevation: 0,
@@ -35,7 +44,12 @@ class PurchasePaymentTableWidget extends StatelessWidget {
             child: SizedBox(
               width: math.max(980, constraints.maxWidth),
               child: DataTable(
-                columnSpacing: 24,
+                showCheckboxColumn: false,
+                headingRowHeight: 48,
+                dataRowMinHeight: 56,
+                dataRowMaxHeight: 72,
+                columnSpacing: 20,
+                horizontalMargin: 24,
                 columns: [
                   for (final label in const [
                     'Payment No',
@@ -47,7 +61,7 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                     'Status',
                     'Actions',
                   ])
-                    DataColumn(label: Text(label.tr)),
+                    DataColumn(label: heading(label)),
                 ],
                 rows: [
                   for (final payment in payments)
@@ -58,10 +72,10 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                         ),
                         cells: [
                           DataCell(
-                            Text(payment['payment_no']?.toString() ?? '-'),
+                            cell(payment['payment_no']?.toString() ?? '-'),
                           ),
                           DataCell(
-                            Text(
+                            cell(
                               payment['supplier'] is Map
                                   ? (payment['supplier']['name'] ?? '-')
                                         .toString()
@@ -69,7 +83,7 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                             ),
                           ),
                           DataCell(
-                            Text(
+                            cell(
                               payment['purchase'] is Map
                                   ? (payment['purchase']['invoice_no'] ?? '-')
                                         .toString()
@@ -77,7 +91,7 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                             ),
                           ),
                           DataCell(
-                            Text(
+                            cell(
                               payment['payment_type'] is Map
                                   ? (payment['payment_type']['name'] ?? '-')
                                         .toString()
@@ -85,35 +99,12 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                             ),
                           ),
                           DataCell(
-                            Text(paymentDateText(payment['payment_date'])),
+                            cell(paymentDateText(payment['payment_date'])),
                           ),
-                          DataCell(Text(paymentAmountText(payment))),
+                          DataCell(cell(paymentAmountText(payment))),
                           DataCell(
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: paymentStatusColor(
-                                  context,
-                                  payment['status']?.toString(),
-                                ).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                paymentStatusLabel(
-                                  payment['status']?.toString(),
-                                ),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: paymentStatusColor(
-                                    context,
-                                    payment['status']?.toString(),
-                                  ),
-                                ),
-                              ),
+                            cell(
+                              paymentStatusLabel(payment['status']?.toString()),
                             ),
                           ),
                           DataCell(
