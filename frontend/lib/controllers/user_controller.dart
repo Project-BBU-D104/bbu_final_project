@@ -121,7 +121,30 @@ class UserController extends GetxController {
 
   void addUser(BuildContext context) {
     clearUser();
-    AppBottomSheets.show(context, child: AddUserWidget());
+    _showUserForm(context, const AddUserWidget());
+  }
+
+  Future<void> _showUserForm(BuildContext context, Widget child) {
+    if (MediaQuery.sizeOf(context).width >= 840) {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Dialog(
+          insetPadding: const EdgeInsets.all(32),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760, maxHeight: 760),
+            child: child,
+          ),
+        ),
+      );
+    }
+
+    return AppBottomSheets.show<void>(
+      context,
+      child: child,
+      isDismissible: false,
+      enableDrag: false,
+    );
   }
 
   Future<void> onSaveUser(BuildContext context) async {
@@ -159,7 +182,9 @@ class UserController extends GetxController {
       Get.find<ImageUploadController>().clearImage();
 
       // Close BottomSheet
-      Navigator.pop(context);
+      if (context.mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {
@@ -188,10 +213,8 @@ class UserController extends GetxController {
       selectedSystemConfiguration.value = user["system_configuration_id"]
           ?.toString();
       isChecked.value = user["is_active"] != true;
-      await AppBottomSheets.show(
-        context,
-        child: EditUserWidget(userId: userId),
-      );
+      if (!context.mounted) return;
+      await _showUserForm(context, EditUserWidget(userId: userId));
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {
@@ -224,7 +247,9 @@ class UserController extends GetxController {
         type: ToastType.success,
       );
 
-      Navigator.pop(context);
+      if (context.mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
       await getUserList();
 
       clearUser();

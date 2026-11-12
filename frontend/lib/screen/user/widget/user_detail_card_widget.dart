@@ -8,14 +8,20 @@ import 'package:intl/intl.dart';
 class UserDetailCardWidget extends StatelessWidget {
   UserDetailCardWidget({super.key});
 
-  final Map<String, dynamic> user =
-      Get.arguments as Map<String, dynamic>;
+  final Map<String, dynamic> user = Get.arguments is Map
+      ? Map<String, dynamic>.from(Get.arguments as Map)
+      : <String, dynamic>{};
 
   final ctr = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
-    final active = !(user["disable"] ?? false);
+    final active = user["is_active"] == true;
+    final role = user["role"] is Map
+        ? Map<String, dynamic>.from(user["role"] as Map)
+        : <String, dynamic>{};
+    final createdAt = DateTime.tryParse(user["created_at"]?.toString() ?? '');
+    final userId = int.tryParse(user["id"]?.toString() ?? '');
 
     return Scaffold(
       backgroundColor: const Color(0xffF4F6FB),
@@ -25,16 +31,10 @@ class UserDetailCardWidget extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(
-                top: 25,
-                bottom: 30,
-              ),
+              padding: const EdgeInsets.only(top: 25, bottom: 30),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF1E3C72),
-                    Color(0xFF2A5298),
-                  ],
+                  colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
                 ),
               ),
               child: Column(
@@ -48,19 +48,22 @@ class UserDetailCardWidget extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 45,
                       backgroundColor: Colors.white,
-                      backgroundImage: user["photo"] != null &&
-                        user["photo"].toString().isNotEmpty
-                    ? NetworkImage(user["photo"])
-                    : const AssetImage(
-                        "assets/images/default_avatar.png",
-                      ),
+                      backgroundImage:
+                          user["photo"] != null &&
+                              user["photo"].toString().isNotEmpty
+                          ? NetworkImage(user["photo"])
+                          : const AssetImage(
+                              "assets/images/default_avatar.png",
+                            ),
                     ),
                   ),
 
                   const SizedBox(height: 12),
 
                   Text(
-                    user["name"] ?? "",
+                    user["name"]?.toString().isNotEmpty == true
+                        ? user["name"].toString()
+                        : "-",
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -72,9 +75,7 @@ class UserDetailCardWidget extends StatelessWidget {
 
                   Text(
                     user["email"] ?? "-",
-                    style: const TextStyle(
-                      color: Colors.white70,
-                    ),
+                    style: const TextStyle(color: Colors.white70),
                   ),
 
                   const SizedBox(height: 10),
@@ -115,10 +116,10 @@ class UserDetailCardWidget extends StatelessWidget {
                   _card(
                     title: "Account Info",
                     children: [
-                      _row("ID", "${user["id"] ?? ""}"),
-                      _row("Username", user["name"] ?? ""),
-                      _row("Email", user["email"] ?? "-"),
-                      _row("Role", user["role"]["name"]),
+                      _row("ID", user["id"]?.toString() ?? "-"),
+                      _row("Username", user["name"]?.toString() ?? "-"),
+                      _row("Email", user["email"]?.toString() ?? "-"),
+                      _row("Role", role["name"]?.toString() ?? "-"),
                     ],
                   ),
 
@@ -129,13 +130,10 @@ class UserDetailCardWidget extends StatelessWidget {
                     children: [
                       _row(
                         "Created",
-                        user["created_at"] == null
+                        createdAt == null
                             ? "-"
-                            : DateFormat("dd MMM yyyy").format(
-                                DateTime.parse(user["created_at"]),
-                              ),
+                            : DateFormat("dd MMM yyyy").format(createdAt),
                       ),
-                      
                     ],
                   ),
                 ],
@@ -155,9 +153,9 @@ class UserDetailCardWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ctr.deleteUser(user["id"], context);
-                  },
+                  onPressed: userId == null
+                      ? null
+                      : () => ctr.deleteUser(userId, context),
                   icon: const Icon(Icons.delete_outline),
                   label: Text("Delete".tr),
                   style: OutlinedButton.styleFrom(
@@ -175,9 +173,9 @@ class UserDetailCardWidget extends StatelessWidget {
 
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    ctr.editUser(context, user["id"]);
-                  },
+                  onPressed: userId == null
+                      ? null
+                      : () => ctr.editUser(context, userId),
                   icon: const Icon(Icons.edit),
                   label: Text("Edit".tr),
                   style: ElevatedButton.styleFrom(
@@ -197,10 +195,7 @@ class UserDetailCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _card({
-    required String title,
-    required List<Widget> children,
-  }) {
+  Widget _card({required String title, required List<Widget> children}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -242,20 +237,14 @@ class UserDetailCardWidget extends StatelessWidget {
             flex: 3,
             child: Text(
               label.tr,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 13,
-              ),
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
             ),
           ),
           Expanded(
             flex: 5,
             child: Text(
               value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
           ),
         ],
