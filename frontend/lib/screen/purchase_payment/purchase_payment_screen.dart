@@ -151,17 +151,8 @@ class PurchasePaymentScreen extends StatelessWidget {
                                     width: content.maxWidth < 440
                                         ? content.maxWidth
                                         : 420,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.08),
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: const SearchWidget(
-                                        title: 'Search Purchase Payments',
-                                      ),
+                                    child: const SearchWidget(
+                                      title: 'Search Purchase Payments',
                                     ),
                                   ),
                                   Obx(

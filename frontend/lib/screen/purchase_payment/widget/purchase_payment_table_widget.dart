@@ -23,13 +23,17 @@ class PurchasePaymentTableWidget extends StatelessWidget {
     Widget heading(String label) => Flexible(
       child: Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
     );
-    Widget cell(String text) => Text(
+    Widget cell(String text, {bool bold = false}) => Text(
       text,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: theme.textTheme.bodyMedium,
+      style: theme.textTheme.bodyMedium?.copyWith(
+        fontWeight: bold ? FontWeight.w600 : null,
+      ),
     );
+    final colors = theme.colorScheme;
     return Card(
+      margin: EdgeInsets.zero,
       color: theme.cardColor,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
@@ -39,10 +43,20 @@ class PurchasePaymentTableWidget extends StatelessWidget {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: math.max(980, constraints.maxWidth),
+              width: math.max(960, constraints.maxWidth),
               child: DataTable(
                 showCheckboxColumn: false,
                 dividerThickness: 0,
+                headingRowColor: WidgetStatePropertyAll(
+                  Color.alphaBlend(
+                    colors.onSurface.withValues(alpha: 0.025),
+                    theme.cardColor,
+                  ),
+                ),
+                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
                 headingRowHeight: 48,
                 dataRowMinHeight: 56,
                 dataRowMaxHeight: 72,
@@ -59,7 +73,10 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                     'Status',
                     'Actions',
                   ])
-                    DataColumn(label: heading(label)),
+                    DataColumn(
+                      label: heading(label),
+                      numeric: label == 'Amount',
+                    ),
                 ],
                 rows: [
                   for (final payment in payments)
@@ -70,7 +87,10 @@ class PurchasePaymentTableWidget extends StatelessWidget {
                         ),
                         cells: [
                           DataCell(
-                            cell(payment['payment_no']?.toString() ?? '-'),
+                            cell(
+                              payment['payment_no']?.toString() ?? '-',
+                              bold: true,
+                            ),
                           ),
                           DataCell(
                             cell(
