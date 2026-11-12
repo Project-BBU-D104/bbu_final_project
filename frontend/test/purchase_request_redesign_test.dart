@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/purchase/purchase_request_controller.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/screen/purchase_request/purchase_request_screen.dart';
+import 'package:frontend/screen/purchase_request/widget/card_purchase_request_detail_widget.dart';
 import 'package:frontend/screen/purchase_request/widget/card_purchase_request_widget.dart';
 import 'package:frontend/screen/purchase_request/widget/purchase_request_table_widget.dart';
 import 'package:get/get.dart';
@@ -161,5 +163,60 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     }
+  });
+
+  testWidgets('detail renders placeholders for missing fields', (tester) async {
+    Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    await pumpPurchaseRequestHost(
+      tester,
+      home: const CardPurchaseRequestDetailWidget(
+        purchaseRequest: {'id': 1, 'request_no': 'REQ-1', 'items': []},
+      ),
+    );
+    expect(find.text('REQ-1'), findsWidgets);
+    expect(find.text('-'), findsWidgets);
+    expect(find.text('No items in this request'), findsOneWidget);
+    expect(find.byType(HomeTabLayout), findsOneWidget);
+    expect(find.byType(HomeSectionCard), findsWidgets);
+    expect(find.widgetWithText(FilledButton, 'Edit'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Delete'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('delete from detail refreshes the list and invokes the close '
+      'callback', (tester) async {
+    final s = FakePurchaseRequestService()
+      ..requests = [purchaseRequestJson(1)]
+      ..items = [];
+    final c = PurchaseRequestController(
+      service: s,
+      warehouses: FakeWarehouseController(),
+      products: FakeProductController(),
+    );
+    await c.onGetPurchaseRequests();
+    Get.put(c);
+    await pumpPurchaseRequestHost(tester, home: PurchaseRequestScreen());
+    var deleted = false;
+    c.deletePurchaseRequest(
+      tester.element(find.byType(PurchaseRequestScreen)),
+      1,
+      onDeleted: () => deleted = true,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Do you want to delete this purchase request?'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Ok'));
+    await tester.pumpAndSettle();
+    expect(s.deleteCalls, 1);
+    expect(deleted, isTrue);
+    expect(c.requestList, isEmpty);
   });
 }

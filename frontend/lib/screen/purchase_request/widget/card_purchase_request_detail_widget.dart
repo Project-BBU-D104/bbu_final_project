@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase/purchase_request_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class CardPurchaseRequestDetailWidget extends StatelessWidget {
@@ -12,175 +15,296 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final controller = Get.find<PurchaseRequestController>();
     final requestId = int.tryParse(purchaseRequest["id"].toString());
     final status = purchaseRequest["status"]?.toString() ?? "pending";
-    final statusColor = switch (status.toLowerCase()) {
-      "approved" => Colors.green,
-      "rejected" => Colors.red,
-      _ => Colors.orange,
-    };
     final warehouseId = int.tryParse(
       purchaseRequest["warehouse_id"].toString(),
     );
     final warehouse = controller.warehouseController.warehouseList
         .where((item) => int.tryParse(item["id"].toString()) == warehouseId)
         .firstOrNull;
+    final warehouseName = warehouse?["name"]?.toString().trim() ?? "";
     final items = purchaseRequest["items"] is List
         ? List<Map<String, dynamic>>.from(purchaseRequest["items"])
         : <Map<String, dynamic>>[];
+    final reason = (purchaseRequest["reason"]?.toString() ?? "").trim();
+    final desktop = DesktopAppShell.isVisible(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(purchaseRequest["request_no"]?.toString() ?? "Request"),
-        actions: [
-          IconButton(
-            tooltip: "Edit request".tr,
-            onPressed: requestId == null
-                ? null
-                : () => controller.editPurchaseRequest(context, requestId),
-            icon: const Icon(Icons.edit_outlined),
-          ),
-        ],
+      appBar: desktop
+          ? null
+          : const CustomAppBar(
+              title: 'Purchase Request Detail',
+              useTheme: true,
+            ),
+      body: HomeTabLayout(
+        title: _value(purchaseRequest["request_no"]),
+        translateTitle: false,
+        subtitle: 'Purchase Request Detail',
+        leading: desktop
+            ? IconButton.outlined(
+                tooltip: 'Back'.tr,
+                onPressed: () => Get.back(),
+                icon: const Icon(Icons.arrow_back),
+              )
+            : null,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            HomeSectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        _value(purchaseRequest["request_no"]),
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      _StatusChip(status: status),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _value(purchaseRequest["request_type"]),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (reason.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(reason, style: theme.textTheme.bodyMedium),
+                  ],
+                  const SizedBox(height: 8),
+                  Text(
+                    '${_date(purchaseRequest["request_date"])}  ·  ${_date(purchaseRequest["approved_date"])}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            HomeSectionCard(
+              child: Column(
+                children: [
+                  _infoRow(
+                    context,
+                    "Warehouse",
+                    warehouseName.isEmpty ? '-' : warehouseName,
+                  ),
+                  const Divider(height: 20),
+                  _infoRow(
+                    context,
+                    "Requested By",
+                    _value(purchaseRequest["requested_by"]),
+                  ),
+                  const Divider(height: 20),
+                  _infoRow(
+                    context,
+                    "Approved By",
+                    _value(purchaseRequest["approved_by"]),
+                  ),
+                  const Divider(height: 20),
+                  _infoRow(
+                    context,
+                    "Request Date",
+                    _date(purchaseRequest["request_date"]),
+                  ),
+                  const Divider(height: 20),
+                  _infoRow(
+                    context,
+                    "Approved Date",
+                    _date(purchaseRequest["approved_date"]),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "Requested Items (${items.length})".tr,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            HomeSectionCard(
+              child: items.isEmpty
+                  ? Text(
+                      "No items in this request".tr,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    )
+                  : Column(
+                      children: List.generate(items.length, (index) {
+                        final item = items[index];
+                        final productId = int.tryParse(
+                          item["product_id"].toString(),
+                        );
+                        final product = controller.productController.products
+                            .where(
+                              (product) =>
+                                  int.tryParse(product["id"].toString()) ==
+                                  productId,
+                            )
+                            .firstOrNull;
+                        final productName =
+                            product?["name"]?.toString().trim() ?? "";
+                        final name = productName.isEmpty
+                            ? (productId == null ? '-' : 'Product $productId')
+                            : productName;
+                        return Column(
+                          children: [
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.inventory_2_outlined),
+                              title: Text(name),
+                              subtitle: Text(
+                                "${_value(item["qty"])} ${_value(item["unit"])}",
+                              ),
+                            ),
+                            if (index != items.length - 1)
+                              const Divider(height: 1),
+                          ],
+                        );
+                      }),
+                    ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Row(
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          color: theme.cardColor,
+          child: Row(
             children: [
               Expanded(
-                child: Text(
-                  purchaseRequest["request_type"]?.toString() ?? "",
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                child: OutlinedButton.icon(
+                  onPressed: requestId == null
+                      ? null
+                      : () => controller.deletePurchaseRequest(
+                          context,
+                          requestId,
+                          onDeleted: () => Get.back(),
+                        ),
+                  icon: const Icon(Icons.delete_outline),
+                  label: Text("Delete".tr),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.colorScheme.error,
+                    side: BorderSide(color: theme.colorScheme.error),
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  status.tr,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.w600,
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: requestId == null
+                      ? null
+                      : () =>
+                            controller.editPurchaseRequest(context, requestId),
+                  icon: const Icon(Icons.edit),
+                  label: Text("Edit".tr),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          if ((purchaseRequest["reason"]?.toString() ?? "").isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(purchaseRequest["reason"].toString()),
-          ],
-          const SizedBox(height: 20),
-          Text(
-            "Request Details".tr,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          _infoRow(
-            context,
-            "Warehouse".tr,
-            warehouse?["name"]?.toString() ?? "Warehouse $warehouseId",
-          ),
-          _infoRow(
-            context,
-            "Requested By".tr,
-            purchaseRequest["requested_by"]?.toString() ?? "-",
-          ),
-          _infoRow(
-            context,
-            "Approved By".tr,
-            purchaseRequest["approved_by"]?.toString() ?? "-",
-          ),
-          _infoRow(
-            context,
-            "Request Date".tr,
-            _formatDate(purchaseRequest["request_date"]),
-          ),
-          _infoRow(
-            context,
-            "Approved Date".tr,
-            _formatDate(purchaseRequest["approved_date"]),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Requested Items (${items.length})".tr,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          if (items.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text("No items in this request".tr),
-            )
-          else
-            ...items.map((item) {
-              final productId = int.tryParse(item["product_id"].toString());
-              final product = controller.productController.products
-                  .where(
-                    (product) =>
-                        int.tryParse(product["id"].toString()) == productId,
-                  )
-                  .firstOrNull;
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.inventory_2_outlined),
-                title: Text(
-                  product?["name"]?.toString() ?? "Product $productId",
-                ),
-                subtitle: Text("${item["qty"]} ${item["unit"]}"),
-              );
-            }),
-        ],
+        ),
       ),
-      bottomNavigationBar: requestId == null
-          ? null
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: FilledButton.icon(
-                  onPressed: () =>
-                      controller.editPurchaseRequest(context, requestId),
-                  icon: const Icon(Icons.edit_outlined),
-                  label: Text("Edit Request".tr),
-                ),
-              ),
-            ),
     );
   }
 
-  Widget _infoRow(BuildContext context, String label, String value) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: TextStyle(color: Theme.of(context).colorScheme.outline),
+  Widget _infoRow(BuildContext context, String label, String value) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label.tr,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
-        ),
-        Expanded(child: Text(value)),
-      ],
-    ),
-  );
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
 
-  String _formatDate(dynamic value) {
+  String _value(dynamic value) {
+    final text = value?.toString().trim() ?? "";
+    return text.isEmpty ? '-' : text;
+  }
+
+  String _date(dynamic value) {
     final date = DateTime.tryParse(value?.toString() ?? "");
     if (date == null) return "-";
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final normalized = status.toLowerCase();
+    final color = switch (normalized) {
+      "approved" => colors.primary,
+      "rejected" => colors.error,
+      _ => colors.onSurfaceVariant,
+    };
+    final background = switch (normalized) {
+      "approved" => colors.primary.withValues(alpha: .1),
+      "rejected" => colors.error.withValues(alpha: .1),
+      _ => colors.onSurface.withValues(alpha: .06),
+    };
+    final label = status.isEmpty
+        ? '-'
+        : (status[0].toUpperCase() + status.substring(1).toLowerCase()).tr;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 }
