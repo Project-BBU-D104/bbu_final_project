@@ -36,37 +36,24 @@ class PurchasePaymentDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value,
-  ) {
+  Widget _info(BuildContext context, String label, String value) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          const SizedBox(height: 6),
+          SelectableText(
+            value.trim().isEmpty ? '-' : value,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -184,42 +171,24 @@ class PurchasePaymentDetailWidget extends StatelessWidget {
                 title: 'Payment details',
                 child: Column(
                   children: [
-                    _infoRow(
+                    _info(
                       context,
-                      Icons.receipt_long_outlined,
                       'Invoice'.tr,
                       _value(purchase, 'invoice_no'),
                     ),
-                    _infoRow(
+                    _info(context, 'Supplier'.tr, _value(supplier, 'name')),
+                    _info(
                       context,
-                      Icons.local_shipping_outlined,
-                      'Supplier'.tr,
-                      _value(supplier, 'name'),
-                    ),
-                    _infoRow(
-                      context,
-                      Icons.account_balance_wallet_outlined,
                       'Payment Type'.tr,
                       _value(paymentType, 'name'),
                     ),
-                    _infoRow(
+                    _info(context, 'Currency'.tr, _value(currency, 'name')),
+                    _info(
                       context,
-                      Icons.currency_exchange,
-                      'Currency'.tr,
-                      _value(currency, 'name'),
-                    ),
-                    _infoRow(
-                      context,
-                      Icons.numbers,
                       'Payment No'.tr,
                       current['payment_no']?.toString() ?? '-',
                     ),
-                    _infoRow(
-                      context,
-                      Icons.notes,
-                      'Note'.tr,
-                      current['note']?.toString() ?? '-',
-                    ),
+                    _info(context, 'Note'.tr, _value(current, 'note')),
                   ],
                 ),
               ),
