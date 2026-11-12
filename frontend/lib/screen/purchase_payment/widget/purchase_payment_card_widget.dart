@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/purchase_payment/payment_format.dart';
+import 'package:frontend/screen/purchase_payment/widget/purchase_payment_detail_widget.dart';
 import 'package:frontend/widget/record_actions_menu.dart';
-import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 class PurchasePaymentCardWidget extends StatelessWidget {
   final Map<String, dynamic> payment;
@@ -14,251 +16,204 @@ class PurchasePaymentCardWidget extends StatelessWidget {
     this.onDelete,
   });
 
-  String formatDate(String? date) {
-    if (date == null) return '-';
-
-    try {
-      return DateFormat(
-        'dd MMM yyyy',
-      ).format(DateTime.parse(date));
-    } catch (_) {
-      return '-';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final purchase = payment['purchase'] ?? {};
-    final supplier = payment['supplier'] ?? {};
-    final paymentType = payment['payment_type'] ?? {};
-    final currency = payment['currency'] ?? {};
+    final theme = Theme.of(context);
+    final purchase = payment['purchase'];
+    final supplier = payment['supplier'];
+    final paymentType = payment['payment_type'];
+    final status = payment['status']?.toString();
+    final statusColor = paymentStatusColor(context, status);
 
-    final status = payment['status'] ?? 'Unknown';
-    final isPaid = status.toString().toLowerCase() == 'paid';
+    final supplierName = supplier is Map
+        ? (supplier['name'] ?? '-').toString()
+        : '-';
+    final invoiceNo = purchase is Map
+        ? (purchase['invoice_no'] ?? '-').toString()
+        : '-';
+    final paymentTypeName = paymentType is Map
+        ? (paymentType['name'] ?? '-').toString()
+        : '-';
 
     return Card(
-      margin: const EdgeInsets.only(
-        bottom: 12,
-      ),
-      elevation: 1,
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      color: theme.cardColor,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.dividerColor),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          children: [
-
-            // ==========================
-            // TOP
-            // ==========================
-            Row(
-              children: [
-
-                // Payment Icon
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: () =>
+            Get.to(() => PurchasePaymentDetailWidget(payment: payment)),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.payments_outlined,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.payments_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                // Payment No + Supplier
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        payment['payment_no'] ?? '-',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          payment['payment_no']?.toString() ?? '-',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
+                        const SizedBox(height: 3),
+                        Text(
+                          supplierName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 5,
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        supplier['name'] ?? '-',
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        paymentStatusLabel(status),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: statusColor,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-
-                // Status
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isPaid
-                        ? Colors.green.withValues(alpha: 0.1)
-                        : Colors.orange.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    status,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isPaid
-                          ? Colors.green
-                          : Colors.orange,
                     ),
                   ),
-                ),
-
-                RecordActionsMenu(
-                  onEdit: onEdit,
-                  onDelete: onDelete,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            const Divider(height: 1),
-
-            const SizedBox(height: 12),
-
-            // ==========================
-            // PAYMENT INFO
-            // ==========================
-            Row(
-              children: [
-
-                // Invoice
-                Expanded(
-                  child: _Info(
-                    icon: Icons.receipt_long_outlined,
-                    label: 'Invoice',
-                    value: purchase['invoice_no'] ?? '-',
-                  ),
-                ),
-
-                // Payment Type
-                Expanded(
-                  child: _Info(
-                    icon: Icons.account_balance_wallet_outlined,
-                    label: 'Payment',
-                    value: paymentType['name'] ?? '-',
-                  ),
-                ),
-
-                // Date
-                Expanded(
-                  child: _Info(
-                    icon: Icons.calendar_today_outlined,
-                    label: 'Date',
-                    value: formatDate(
-                      payment['payment_date'],
+                  RecordActionsMenu(onEdit: onEdit, onDelete: onDelete),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                children: [
+                  SizedBox(
+                    width: 160,
+                    child: _Info(
+                      icon: Icons.receipt_long_outlined,
+                      label: 'Invoice'.tr,
+                      value: invoiceNo,
                     ),
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 14),
-
-            // ==========================
-            // BOTTOM AMOUNT
-            // ==========================
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
-              children: [
-
-                Text(
-                  'Amount',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
+                  SizedBox(
+                    width: 160,
+                    child: _Info(
+                      icon: Icons.account_balance_wallet_outlined,
+                      label: 'Payment Type'.tr,
+                      value: paymentTypeName,
+                    ),
                   ),
-                ),
-
-                Text(
-                  '${payment['amount'] ?? 0} ${currency['symbol'] ?? ''}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary,
+                  SizedBox(
+                    width: 160,
+                    child: _Info(
+                      icon: Icons.calendar_today_outlined,
+                      label: 'Date'.tr,
+                      value: paymentDateText(payment['payment_date']),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Amount'.tr,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      paymentAmountText(payment),
+                      textAlign: TextAlign.end,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-
-// ========================================
-// INFO WIDGET
-// ========================================
-
 class _Info extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
 
-  const _Info({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _Info({required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 17,
-          color: Colors.grey.shade500,
-        ),
-
+        Icon(icon, size: 17, color: theme.colorScheme.onSurfaceVariant),
         const SizedBox(width: 7),
-
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey.shade500,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-
               const SizedBox(height: 2),
-
               Text(
                 value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
+                style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
