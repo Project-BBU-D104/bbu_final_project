@@ -275,7 +275,10 @@ class PurchaseDetailWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ctr.deletePurchase(purchase['id'], context);
+                    ctr.deletePurchase(
+                      context: context,
+                      purchaseId: purchase['id'] as int,
+                    );
                   },
                   icon: const Icon(Icons.delete_outline),
                   label: Text("Delete".tr),

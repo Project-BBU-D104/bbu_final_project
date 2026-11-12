@@ -14,8 +14,10 @@ import 'package:frontend/controllers/search_controller.dart';
 import 'package:get/get.dart';
 
 class PurchaseController extends GetxController {
+  PurchaseController({PurchaseService? service})
+    : service = service ?? PurchaseService();
 
-  final PurchaseService service = PurchaseService();
+  final PurchaseService service;
 
   var isLoading = false.obs;
   final purchaseList = <Map<String, dynamic>>[].obs;
@@ -38,28 +40,40 @@ class PurchaseController extends GetxController {
   final RxDouble paid = 0.0.obs;
 
   var isSaving = false.obs;
+  final loadError = ''.obs;
+  final formError = ''.obs;
+  final isOpeningEdit = false.obs;
 
-  double get itemsSubtotal => items.fold(0.0, (sum, item) => sum + item.subtotal);
-  double get total => (itemsSubtotal + tax.value - discount.value).clamp(0, double.infinity);
+  bool _formOpen = false;
+  bool _confirmingDelete = false;
+  int _dataRevision = 0;
+  String _query = '';
+  Worker? _searchWorker;
+
+  double get itemsSubtotal =>
+      items.fold(0.0, (sum, item) => sum + item.subtotal);
+  double get total =>
+      (itemsSubtotal + tax.value - discount.value).clamp(0, double.infinity);
   double get due => (total - paid.value).clamp(0, double.infinity);
-
-  PurchaseController() {
-    taxCtrl.addListener(() => tax.value = double.tryParse(taxCtrl.text) ?? 0);
-    discountCtrl.addListener(
-        () => discount.value = double.tryParse(discountCtrl.text) ?? 0);
-    paidCtrl.addListener(() => paid.value = double.tryParse(paidCtrl.text) ?? 0);
-  }
 
   static final List<Map<String, dynamic>> _cache = [];
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(seconds: 60);
 
   static bool get _hasFreshCache =>
-      _cachedAt != null &&
-      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+      _cachedAt != null && DateTime.now().difference(_cachedAt!) < _cacheTtl;
+
+  void _listeners() {
+    taxCtrl.addListener(() => tax.value = double.tryParse(taxCtrl.text) ?? 0);
+    discountCtrl.addListener(
+      () => discount.value = double.tryParse(discountCtrl.text) ?? 0,
+    );
+    paidCtrl.addListener(
+      () => paid.value = double.tryParse(paidCtrl.text) ?? 0,
+    );
+  }
 
   void resetForm() {
-
     invoiceCtrl.clear();
     taxCtrl.text = '0';
     discountCtrl.text = '0';
@@ -97,73 +111,111 @@ class PurchaseController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _listeners();
+
+    final products = Get.isRegistered<ProductController>()
+        ? Get.find<ProductController>()
+        : Get.put(ProductController());
+    products.getProducts();
+    final warehouses = Get.isRegistered<WarehouseController>()
+        ? Get.find<WarehouseController>()
+        : Get.put(WarehouseController());
+    warehouses.getWarehouses();
+    final search = Get.isRegistered<SearchController>()
+        ? Get.find<SearchController>()
+        : Get.put(SearchController());
+    _query = search.keyword.value.trim().toLowerCase();
+    _searchWorker = ever(search.keyword, searchPurchase);
 
     if (_hasFreshCache) {
-      purchaseList.value = List<Map<String, dynamic>>.from(_cache);
-      searchPurchaseList.value = purchaseList;
-    }else{
+      purchaseList.assignAll(_cache);
+      searchPurchase(_query);
+    } else {
       onGetPurchaseList();
     }
-
-    Get.put(ProductController()).getProducts();
-    Get.put(WarehouseController()).getWarehouses();
-
-    final search = Get.put(SearchController());
-
-    ever(
-      search.keyword,
-      (search){
-        searchPurchase(search);
-      }
-    );
   }
 
+  Future<void> onRefresh() => onGetPurchaseList();
+
   Future<void> onGetPurchaseList() async {
+    if (isLoading.value || isClosed) return;
+    isLoading.value = true;
+    loadError.value = '';
+    final revision = _dataRevision;
     try {
-      isLoading.value = true;
       final resp = await service.getPurchases();
-      if (resp is List) {
-
-        purchaseList.value = List<Map<String, dynamic>>.from(resp);
-        searchPurchaseList.value = purchaseList;
-
-        _cache
-          ..clear()
-          ..addAll(purchaseList);
-        _cachedAt = DateTime.now();
-
+      if (isClosed || revision != _dataRevision) return;
+      if (resp is! List) throw const FormatException('Expected purchase list');
+      purchaseList.assignAll(List<Map<String, dynamic>>.from(resp));
+      searchPurchase(_query);
+      _cache
+        ..clear()
+        ..addAll(purchaseList);
+      _cachedAt = DateTime.now();
+    } catch (_) {
+      if (!isClosed) {
+        loadError.value = 'Unable to load purchases. Please try again.'.tr;
       }
-    } catch (e) {
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isLoading.value = false;
     }
   }
 
   void searchPurchase(String keyword) {
-    final search = keyword.trim().toLowerCase();
-
-    if (search.isEmpty) {
-      searchPurchaseList.value = purchaseList;
+    _query = keyword.trim().toLowerCase();
+    if (_query.isEmpty) {
+      searchPurchaseList.assignAll(purchaseList);
       return;
     }
-
-    searchPurchaseList.value = purchaseList.where((purchase) {
-      final invoiceNo = (purchase["invoice_no"] ?? "").toString().toLowerCase();
-      final supplierName = (purchase["supplier"]?["name"] ?? "").toString().toLowerCase();
-      return invoiceNo.contains(search) || supplierName.contains(search);
-    }).toList();
+    searchPurchaseList.assignAll(
+      purchaseList.where((purchase) {
+        final invoiceNo = (purchase['invoice_no'] ?? '')
+            .toString()
+            .toLowerCase();
+        final supplier = purchase['supplier'];
+        final supplierName = supplier is Map
+            ? (supplier['name'] ?? '').toString().toLowerCase()
+            : '';
+        return invoiceNo.contains(_query) || supplierName.contains(_query);
+      }),
+    );
   }
 
   void addPurchase(BuildContext context) {
+    if (_formOpen || isSaving.value || isOpeningEdit.value || isClosed) return;
     resetForm();
-    AppBottomSheets.show(
-      context,
-      child: AddPurchaseWidget(),
-    );
+    formError.value = '';
+    _showForm(context, AddPurchaseWidget());
+  }
+
+  Future<void> _showForm(BuildContext context, Widget child) async {
+    _formOpen = true;
+    try {
+      if (MediaQuery.sizeOf(context).width >= 840) {
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => Dialog(
+            constraints: const BoxConstraints(maxWidth: 720),
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: child,
+          ),
+        );
+      } else {
+        await AppBottomSheets.show(
+          context,
+          child: child,
+          isDismissible: false,
+          enableDrag: false,
+          constraints: const BoxConstraints(maxWidth: 760),
+        );
+      }
+    } finally {
+      _formOpen = false;
+    }
   }
 
   void gotoPurchaseDetail(Map<String, dynamic> purchase) {
@@ -171,273 +223,236 @@ class PurchaseController extends GetxController {
   }
 
   Future<void> editPurchase(BuildContext context, int purchaseId) async {
-  try {
-    isLoading.value = true;
-    final purchase = await service.getPurchaseById(purchaseId);
-    if (purchase == null) {
-      ToastWidget.show(
-        message: "Purchase not found",
-        type: ToastType.error,
-      );
+    if (_formOpen || isOpeningEdit.value || isSaving.value || isClosed) return;
+    final route = ModalRoute.of(context);
+    isOpeningEdit.value = true;
+    formError.value = '';
+    try {
+      final response = await service.getPurchaseById(purchaseId);
+      if (isClosed || !context.mounted || route?.isCurrent != true) return;
+      if (response is! Map) throw const FormatException('Expected purchase');
+      final purchase = Map<String, dynamic>.from(response);
+
+      editingPurchaseId.value = purchaseId;
+      editingPurchase.value = purchase;
+      invoiceCtrl.text = purchase['invoice_no'] ?? '';
+      taxCtrl.text = (purchase['tax_amount'] ?? 0).toString();
+      discountCtrl.text = (purchase['discount_amount'] ?? 0).toString();
+      paidCtrl.text = (purchase['paid_amount'] ?? 0).toString();
+      final supplier = purchase['supplier'];
+      selectedSupplier.value = supplier is Map ? supplier['id'] : null;
+      final warehouse = purchase['warehouse'];
+      selectedWarehouse.value = warehouse is Map ? warehouse['id'] : null;
+      if (purchase['purchase_date'] != null) {
+        purchaseDate.value =
+            DateTime.tryParse(purchase['purchase_date'].toString()) ??
+            DateTime.now();
+      }
+
+      for (final item in items) {
+        item.dispose();
+      }
+      items.clear();
+
+      final purchaseItems = purchase['purchase_items'];
+      for (final data in purchaseItems is List ? purchaseItems : const []) {
+        if (data is! Map) continue;
+        final record = Map<String, dynamic>.from(data);
+        final row = PurchaseItemForm();
+        final product = record['product'];
+        final productId = product is Map ? product['id'] : null;
+        row.product.value = Get.find<ProductController>().products.firstWhere(
+          (p) => p['id'] == productId,
+          orElse: () =>
+              product is Map<String, dynamic> ? product : <String, dynamic>{},
+        );
+        final qty = double.tryParse(record['qty'].toString()) ?? 0;
+        row.qty.value = qty;
+        row.qtyCtrl.text = qty.toString();
+        final cost = double.tryParse(record['cost_price'].toString()) ?? 0;
+        row.cost.value = cost;
+        row.costCtrl.text = cost.toString();
+        items.add(row);
+      }
+      if (items.isEmpty) items.add(PurchaseItemForm());
+
+      _showForm(context, EditPurchaseWidget());
+    } catch (_) {
+      if (!isClosed) {
+        ToastWidget.show(
+          message: 'Unable to open purchase. Please try again.'.tr,
+          type: ToastType.error,
+        );
+      }
+    } finally {
+      if (!isClosed) isOpeningEdit.value = false;
+    }
+  }
+
+  Future<void> createPurchase(BuildContext context) => _save(context);
+
+  Future<void> onUpdatePurchase(BuildContext context) =>
+      _save(context, purchaseId: editingPurchaseId.value);
+
+  Future<void> _save(BuildContext context, {int? purchaseId}) async {
+    if (isSaving.value || isClosed) return;
+    formError.value = '';
+    if (!formKey.currentState!.validate()) return;
+    if (purchaseId != null && purchaseId == 0) {
+      formError.value = 'Unable to save purchase. Please try again.'.tr;
       return;
     }
-    editingPurchaseId.value = purchaseId;
-    editingPurchase.value = purchase;
-
-    invoiceCtrl.text = purchase["invoice_no"] ?? "";
-    taxCtrl.text = (purchase["tax_amount"] ?? 0).toString();
-    discountCtrl.text = (purchase["discount_amount"] ?? 0).toString();
-    paidCtrl.text = (purchase["paid_amount"] ?? 0).toString();
-    selectedSupplier.value = purchase["supplier"]?["id"];
-    selectedWarehouse.value = purchase["warehouse"]?["id"];
-
-    if (purchase["purchase_date"] != null) {
-      purchaseDate.value =
-        DateTime.parse(
-          purchase["purchase_date"].toString(),
-        );
+    if (selectedWarehouse.value == null) {
+      formError.value = 'Please select a warehouse'.tr;
+      return;
+    }
+    if (selectedSupplier.value == null) {
+      formError.value = 'Please select a supplier'.tr;
+      return;
+    }
+    final invalidRow = items.any(
+      (i) => i.product.value == null || i.qty.value <= 0 || i.cost.value <= 0,
+    );
+    if (invalidRow) {
+      formError.value = 'Choose a product, quantity and cost for each item'.tr;
+      return;
     }
 
-    for (final item in items) {
-      item.dispose();
-    }
-    items.clear();
-  
-    final purchaseItems = purchase["purchase_items"] ?? [];
-    for (final data in purchaseItems) {
+    final payload = <String, dynamic>{
+      'supplier_id': selectedSupplier.value,
+      'warehouse_id': selectedWarehouse.value,
+      'invoice_no': invoiceCtrl.text.trim(),
+      if (purchaseId == null)
+        'user_id': storage.lastUserLoginRead['user']['id'],
+      'purchase_date': purchaseDate.value.toIso8601String(),
+      'subtotal': itemsSubtotal,
+      'tax_amount': tax.value,
+      'discount_amount': discount.value,
+      'total_amount': total,
+      'paid_amount': paid.value,
+      'due_amount': due,
+      'payment_status': due <= 0
+          ? 'paid'
+          : (paid.value > 0 ? 'partial' : 'unpaid'),
+      'items': items
+          .map(
+            (i) => {
+              'product_id': i.product.value!['id'],
+              'qty': i.qty.value,
+              'cost_price': i.cost.value,
+              'subtotal': i.subtotal,
+            },
+          )
+          .toList(),
+    };
 
-      final row = PurchaseItemForm();
-      final productId = data["product"]?["id"];
-      final product = Get.find<ProductController>()
-              .products
-              .firstWhere(
-                (p) =>
-                    p["id"] == productId,
-                orElse: () => {},
-              );
-      row.product.value = product;
-      final qty =
-          double.tryParse(
-            data["qty"].toString(),
-          ) ??
-          0;
-      row.qty.value = qty;
-      row.qtyCtrl.text = qty.toString();
-
-      final cost =
-          double.tryParse(
-            data["cost_price"].toString(),
-          ) ??
-          0;
-      row.cost.value = cost;
-      row.costCtrl.text =
-          cost.toString();
-      items.add(row);
-    }
-
-    if (items.isEmpty) {
-
-      items.add(
-        PurchaseItemForm(),
-      );
-    }
-   
-    AppBottomSheets.show(
-      context,
-      child: EditPurchaseWidget(),
-    );
-  } catch (e) {
-    ToastWidget.show(
-      message: e.toString(),
-      type: ToastType.error,
-    );
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-Future<void> onUpdatePurchase(BuildContext context) async {
-
-  if (!formKey.currentState!.validate()) return;
-  if(editingPurchaseId.value == 0){
-    ToastWidget.show(
-      message: "Invalid purchase",
-      type: ToastType.error,
-    );
-    return;
-  }
-  final invalidRow = items.any(
-    (i) =>
-      i.product.value == null ||
-      i.qty.value <= 0 ||
-      i.cost.value <= 0
-  );
-
-  if(invalidRow){
-    ToastWidget.show(
-      message: "Fill product, qty and cost",
-      type: ToastType.error,
-    );
-    return;
-  }
-  final payload = {
-    "supplier_id": selectedSupplier.value,
-    "warehouse_id": selectedWarehouse.value,
-    "invoice_no": invoiceCtrl.text.trim(),
-    "purchase_date": purchaseDate.value.toIso8601String(),
-    "subtotal": itemsSubtotal,
-    "tax_amount": tax.value,
-    "discount_amount": discount.value,
-    "total_amount": total,
-    "paid_amount": paid.value,
-    "due_amount": due,
-    "payment_status":
-      due <= 0
-      ? "paid"
-      : paid.value > 0
-          ? "partial"
-          : "unpaid",
-    "items":
-      items.map((i){
-        return {
-          "product_id":
-            i.product.value!["id"],
-          "qty":
-            i.qty.value,
-          "cost_price":
-            i.cost.value,
-          "subtotal":
-            i.subtotal,
-        };
-      }).toList(),
-  };
-  try {
+    final route = ModalRoute.of(context);
+    final navigator = Navigator.of(context);
     isSaving.value = true;
-    await service.updatePurchase(
-      editingPurchaseId.value,
-      payload,
-    );
+    dynamic response;
+    try {
+      response = purchaseId == null
+          ? await service.createPurchase(payload)
+          : await service.updatePurchase(purchaseId, payload);
+    } catch (_) {
+      if (!isClosed) {
+        formError.value = 'Unable to save purchase. Please try again.'.tr;
+      }
+      return;
+    } finally {
+      if (!isClosed) isSaving.value = false;
+    }
+    if (isClosed) return;
 
-    await onGetPurchaseList();
-
+    _dataRevision++;
+    if (response is Map) {
+      final record = Map<String, dynamic>.from(response);
+      final index = purchaseList.indexWhere((p) => p['id'] == record['id']);
+      if (index < 0) {
+        purchaseList.add(record);
+      } else {
+        purchaseList[index] = record;
+      }
+      _cache
+        ..clear()
+        ..addAll(purchaseList);
+      _cachedAt = DateTime.now();
+    }
+    searchPurchase(_query);
+    if (context.mounted && route is PopupRoute && route.isCurrent) {
+      navigator.pop();
+    }
     ToastWidget.show(
-      message: "Purchase updated successfully",
+      message:
+          (purchaseId == null
+                  ? 'Purchase created successfully'
+                  : 'Purchase updated successfully')
+              .tr,
       type: ToastType.success,
     );
-    Navigator.pop(context);
-  }catch(e){
-    ToastWidget.show(
-      message:e.toString(),
-      type:ToastType.error,
-    );
-  }finally{
-    isSaving.value=false;
+    await onGetPurchaseList();
   }
-}
 
-  void deletePurchase(int purchaseId, BuildContext context) {
-    showConfirmDialog(
-      context: context,
-      message: "Do you want to delete this purchase?".tr,
-      onConfirm: () async {
-        try{
-          await service.deletePurchase(purchaseId);
-
-          await onGetPurchaseList();
-
+  Future<void> deletePurchase({
+    required BuildContext context,
+    required int purchaseId,
+    VoidCallback? onDeleted,
+  }) async {
+    if (isClosed ||
+        isSaving.value ||
+        _confirmingDelete ||
+        _formOpen ||
+        isOpeningEdit.value) {
+      return;
+    }
+    _confirmingDelete = true;
+    formError.value = '';
+    try {
+      await showConfirmDialog(
+        context: context,
+        title: 'Confirm'.tr,
+        cancelText: 'Cancel'.tr,
+        confirmText: 'Ok'.tr,
+        message: 'Do you want to delete this purchase?'.tr,
+        onConfirm: () async {
+          if (isClosed || !context.mounted) return;
+          isSaving.value = true;
+          try {
+            await service.deletePurchase(purchaseId);
+          } catch (_) {
+            if (!isClosed) {
+              formError.value =
+                  'Unable to delete purchase. Please try again.'.tr;
+            }
+            return;
+          } finally {
+            if (!isClosed) isSaving.value = false;
+          }
+          if (isClosed) return;
+          _dataRevision++;
+          purchaseList.removeWhere((p) => p['id'] == purchaseId);
+          searchPurchase(_query);
+          _cache
+            ..clear()
+            ..addAll(purchaseList);
+          _cachedAt = DateTime.now();
+          onDeleted?.call();
           ToastWidget.show(
-            message: "Purchase deleted successfully".tr,
+            message: 'Purchase deleted successfully'.tr,
             type: ToastType.success,
           );
-
-        }catch(e){
-          ToastWidget.show(
-            message: e.toString(),
-            type: ToastType.error,
-          );
-        }
-      },
-      onCancel: () {
-        // Do nothing
-      },
-    );
-  }
-  
-  Future<void> createPurchase(BuildContext context) async {
-  if (!formKey.currentState!.validate()) return;
-
-  if (selectedSupplier.value == null) {
-    ToastWidget.show(
-      message: "Please select a supplier",
-      type: ToastType.error,
-    );
-    return;
-  }
-
-  final invalidRow = items.any(
-    (i) => i.product.value == null || i.qty.value <= 0 || i.cost.value <= 0,
-  );
-
-  if (invalidRow) {
-    ToastWidget.show(
-      message: "Fill in product, qty and cost for every item",
-      type: ToastType.error,
-    );
-    return;
-  }
-
-  final payload = {
-    "supplier_id": selectedSupplier.value,
-    "warehouse_id": selectedWarehouse.value,
-    "invoice_no": invoiceCtrl.text.trim(),
-    "user_id": storage.lastUserLoginRead["user"]["id"],
-    "purchase_date": purchaseDate.value.toIso8601String(),
-    "subtotal": itemsSubtotal,
-    "tax_amount": tax.value,
-    "discount_amount": discount.value,
-    "total_amount": total,
-    "paid_amount": paid.value,
-    "due_amount": due,
-    "payment_status":
-        due <= 0 ? "paid" : (paid.value > 0 ? "partial" : "unpaid"),
-    "items": items
-      .map(
-        (i) => {
-          "product_id": i.product.value!["id"],
-          "qty": i.qty.value,
-          "cost_price": i.cost.value,
-          "subtotal": i.subtotal,
+          await onGetPurchaseList();
         },
-      )
-      .toList(),
-  };
-
-  try {
-    isSaving.value = true;
-
-    await service.createPurchase(payload);
-
-    await onGetPurchaseList();
-
-    ToastWidget.show(
-      message: "Purchase added successfully",
-      type: ToastType.success,
-    );
-
-    Navigator.pop(context);
-
-  } catch (e) {
-    ToastWidget.show(
-      message: e.toString(),
-      type: ToastType.error,
-    );
-  } finally {
-    isSaving.value = false;
+        onCancel: () {},
+      );
+    } finally {
+      _confirmingDelete = false;
+    }
   }
-}
 
   @override
   void onClose() {
+    _searchWorker?.dispose();
     invoiceCtrl.dispose();
     taxCtrl.dispose();
     discountCtrl.dispose();
