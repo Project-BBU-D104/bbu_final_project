@@ -14,10 +14,20 @@ class PurchaseRequestTableWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final line = colors.onSurface.withValues(alpha: 0.08);
     final controller = Get.find<PurchaseRequestController>();
 
     Widget heading(String label) => Flexible(
       child: Text(label.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    Widget cell(String text) => Tooltip(
+      message: text,
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.bodyMedium,
+      ),
     );
 
     return LayoutBuilder(
@@ -26,151 +36,151 @@ class PurchaseRequestTableWidget extends StatelessWidget {
         color: theme.cardColor,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: line),
+        ),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SizedBox(
             width: math.max(960, constraints.maxWidth),
-            child: DataTable(
-              showCheckboxColumn: false,
-              headingRowHeight: 48,
-              dataRowMinHeight: 64,
-              dataRowMaxHeight: 72,
-              columnSpacing: 20,
-              horizontalMargin: 24,
-              dividerThickness: 0,
-              headingRowColor: WidgetStatePropertyAll(
-                Color.alphaBlend(
-                  colors.onSurface.withValues(alpha: 0.025),
-                  theme.cardColor,
-                ),
+            child: Theme(
+              data: theme.copyWith(
+                dividerColor: line,
+                dividerTheme: DividerThemeData(color: line, thickness: 1),
               ),
-              headingTextStyle: theme.textTheme.labelMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-              dataRowColor: WidgetStateProperty.resolveWith(
-                (states) => states.contains(WidgetState.hovered)
-                    ? colors.primary.withValues(alpha: 0.035)
-                    : null,
-              ),
-              columns: [
-                DataColumn(
-                  label: heading('Request No'),
-                  columnWidth: const FlexColumnWidth(),
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowHeight: 48,
+                dataRowMinHeight: 56,
+                dataRowMaxHeight: 72,
+                columnSpacing: 20,
+                horizontalMargin: 24,
+                headingRowColor: WidgetStatePropertyAll(
+                  Color.alphaBlend(
+                    colors.onSurface.withValues(alpha: 0.025),
+                    theme.cardColor,
+                  ),
                 ),
-                DataColumn(
-                  label: heading('Request Type'),
-                  columnWidth: const FixedColumnWidth(140),
+                headingTextStyle: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
                 ),
-                DataColumn(
-                  label: heading('Warehouse'),
-                  columnWidth: const FixedColumnWidth(160),
-                ),
-                DataColumn(
-                  label: heading('Requested By'),
-                  columnWidth: const FixedColumnWidth(160),
-                ),
-                DataColumn(
-                  label: heading('Status'),
-                  columnWidth: const FixedColumnWidth(120),
-                ),
-                DataColumn(
-                  label: heading('Date'),
-                  columnWidth: const FixedColumnWidth(130),
-                ),
-                DataColumn(
-                  label: heading('Actions'),
-                  columnWidth: const FixedColumnWidth(80),
-                ),
-              ],
-              rows: [
-                for (final request in requests)
-                  if (request['id'] is int)
-                    DataRow(
-                      onSelectChanged: (_) => Get.to(
-                        () => CardPurchaseRequestDetailWidget(
-                          purchaseRequest: request,
-                        ),
-                      ),
-                      cells: [
-                        DataCell(
-                          Text(
-                            _value(request['request_no']),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                columns: [
+                  DataColumn(
+                    label: heading('Request No'),
+                    columnWidth: const FlexColumnWidth(),
+                  ),
+                  DataColumn(
+                    label: heading('Request Type'),
+                    columnWidth: const FixedColumnWidth(140),
+                  ),
+                  DataColumn(
+                    label: heading('Warehouse'),
+                    columnWidth: const FixedColumnWidth(160),
+                  ),
+                  DataColumn(
+                    label: heading('Requested By'),
+                    columnWidth: const FixedColumnWidth(160),
+                  ),
+                  DataColumn(
+                    label: heading('Status'),
+                    columnWidth: const FixedColumnWidth(120),
+                  ),
+                  DataColumn(
+                    label: heading('Date'),
+                    columnWidth: const FixedColumnWidth(130),
+                  ),
+                  DataColumn(
+                    label: heading('Actions'),
+                    columnWidth: const FixedColumnWidth(80),
+                  ),
+                ],
+                rows: [
+                  for (final request in requests)
+                    if (request['id'] is int)
+                      DataRow(
+                        onSelectChanged: (_) => Get.to(
+                          () => CardPurchaseRequestDetailWidget(
+                            purchaseRequest: request,
                           ),
                         ),
-                        DataCell(
-                          Text(
-                            _value(request['request_type']),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        DataCell(
-                          Obx(
-                            () => Text(
-                              _warehouseName(
-                                controller,
-                                request['warehouse_id'],
-                              ),
+                        cells: [
+                          DataCell(
+                            Text(
+                              _value(request['request_no']),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                        DataCell(
-                          Text(
-                            _value(request['requested_by']),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        DataCell(
-                          _StatusChip(
-                            status: request['status']?.toString() ?? 'pending',
-                          ),
-                        ),
-                        DataCell(Text(_date(request['request_date']))),
-                        DataCell(
-                          PopupMenuButton<String>(
-                            tooltip: 'Actions'.tr,
-                            icon: const Icon(Icons.more_vert),
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                controller.editPurchaseRequest(
-                                  context,
-                                  request['id'] as int,
-                                );
-                              }
-                              if (value == 'delete') {
-                                controller.deletePurchaseRequest(
-                                  context,
-                                  request['id'] as int,
-                                );
-                              }
-                            },
-                            itemBuilder: (_) => [
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Edit'.tr),
+                          DataCell(cell(_value(request['request_type']))),
+                          DataCell(
+                            Obx(
+                              () => cell(
+                                _warehouseName(
+                                  controller,
+                                  request['warehouse_id'],
+                                ),
                               ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Delete'.tr),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-              ],
+                          DataCell(cell(_value(request['requested_by']))),
+                          DataCell(
+                            cell(
+                              _statusLabel(
+                                request['status']?.toString() ?? 'pending',
+                              ),
+                            ),
+                          ),
+                          DataCell(cell(_date(request['request_date']))),
+                          DataCell(
+                            PopupMenuButton<String>(
+                              tooltip: 'Actions'.tr,
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  controller.editPurchaseRequest(
+                                    context,
+                                    request['id'] as int,
+                                  );
+                                }
+                                if (value == 'delete') {
+                                  controller.deletePurchaseRequest(
+                                    context,
+                                    request['id'] as int,
+                                  );
+                                }
+                              },
+                              itemBuilder: (_) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Edit'.tr),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Delete'.tr),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  String _statusLabel(String status) {
+    final text = status.trim();
+    if (text.isEmpty) return '-';
+    return (text[0].toUpperCase() + text.substring(1).toLowerCase()).tr;
   }
 
   String _value(dynamic value) {
@@ -193,46 +203,5 @@ class PurchaseRequestTableWidget extends StatelessWidget {
     final date = DateTime.tryParse(value?.toString() ?? "");
     if (date == null) return "-";
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.status});
-
-  final String status;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final normalized = status.toLowerCase();
-    final color = switch (normalized) {
-      "approved" => colors.primary,
-      "rejected" => colors.error,
-      _ => colors.onSurfaceVariant,
-    };
-    final background = switch (normalized) {
-      "approved" => colors.primary.withValues(alpha: .1),
-      "rejected" => colors.error.withValues(alpha: .1),
-      _ => colors.onSurface.withValues(alpha: .06),
-    };
-    final label = status.isEmpty
-        ? '-'
-        : (status[0].toUpperCase() + status.substring(1).toLowerCase()).tr;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
   }
 }
