@@ -65,3 +65,27 @@
 
 ## Redesign notes
 
+Implemented 2026-11-12 across all seven People & Access screens. User and role
+lists now use centered max-1240 content, responsive cards below 800 usable
+pixels (and above 130% text scale) or tables at larger widths, bounded search,
+Refresh/Add actions, retryable load failures, and theme-aware surfaces.
+
+Add/Edit user and role forms share guarded form widgets. They open as centered
+dialogs at 840 or more content pixels and non-dismissible bottom sheets below
+that width. Required fields validate inline, duplicate submissions are blocked,
+failed drafts remain visible, and the existing user and role payload keys,
+routes, bindings, and service endpoints are unchanged. User upload behavior
+continues to use the `user` bucket and `users` folder.
+
+User detail now safely handles missing IDs, nested roles, photos, and malformed
+dates, uses wrapped information cards and SafeArea actions, and disables edit
+or delete when no valid ID is available. Controllers retain 60-second caches,
+preserve search filtering through refreshes and writes, expose retryable load
+state, and guard overlapping list/form operations.
+
+Focused verification: People & Access controller/list/form/detail/integration
+tests pass, existing rapid-edit/update regression tests pass, and changed
+controller/screen files have no analyzer diagnostics. Remaining manual QA:
+physical-device keyboard/back behavior, screen-reader focus and translated
+errors, live image upload, live API CRUD/error paths, and an in-app walk
+through list → add → edit → detail/delete in both themes.

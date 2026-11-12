@@ -1,10 +1,11 @@
+// ignore_for_file: must_call_super
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/system_configuration_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/services/main_service/user_service.dart';
-import 'package:frontend/screen/user/widget/add_user_widget.dart';
 import 'package:frontend/screen/user/widget/user_form_widget.dart';
 import 'package:get/get.dart';
 
