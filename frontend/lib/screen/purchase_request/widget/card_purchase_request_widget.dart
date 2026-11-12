@@ -10,74 +10,57 @@ class CardPurchaseRequestWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final controller = Get.find<PurchaseRequestController>();
     final requestId = int.tryParse(purchaseRequest["id"].toString());
     final status = purchaseRequest["status"]?.toString() ?? "pending";
-    final statusColor = switch (status.toLowerCase()) {
-      "approved" => Colors.green,
-      "rejected" => Colors.red,
-      _ => Colors.orange,
-    };
     final warehouseId = int.tryParse(
       purchaseRequest["warehouse_id"].toString(),
     );
     final warehouse = controller.warehouseController.warehouseList
         .where((item) => int.tryParse(item["id"].toString()) == warehouseId)
         .firstOrNull;
-    
+    final warehouseName = warehouse?["name"]?.toString().trim() ?? "";
+    final reason = (purchaseRequest["reason"]?.toString() ?? "").trim();
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      color: Theme.of(context).colorScheme.surface,
+      margin: const EdgeInsets.only(bottom: 16),
+      color: theme.cardColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.dividerColor),
       ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         onTap: () => Get.to(
           () =>
               CardPurchaseRequestDetailWidget(purchaseRequest: purchaseRequest),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Text(
-                      purchaseRequest["request_no"]?.toString() ?? "Request",
+                      _value(purchaseRequest["request_no"]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      status.tr,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
+                  _StatusChip(status: status),
                   IconButton(
                     visualDensity: VisualDensity.compact,
-                    tooltip: "Edit request".tr,
+                    tooltip: 'Edit Request'.tr,
                     onPressed: requestId == null
                         ? null
                         : () => controller.editPurchaseRequest(
@@ -88,41 +71,52 @@ class CardPurchaseRequestWidget extends StatelessWidget {
                   ),
                   IconButton(
                     visualDensity: VisualDensity.compact,
-                    tooltip: "Delete request".tr,
+                    tooltip: 'Delete request'.tr,
                     onPressed: requestId == null
                         ? null
                         : () => controller.deletePurchaseRequest(
                             context,
                             requestId,
                           ),
-                    color: Colors.red,
+                    color: colors.error,
                     icon: const Icon(Icons.delete_outline, size: 19),
                   ),
+                  const Icon(Icons.chevron_right),
                 ],
               ),
+              const SizedBox(height: 6),
               Text(
-                "${purchaseRequest["request_type"] ?? ""}  ·  ${warehouse?["name"]?.toString() ?? "Warehouse $warehouseId"}",
+                _value(purchaseRequest["request_type"]),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(height: 8),
+              Text(
+                warehouseName.isEmpty ? '-' : warehouseName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 10),
               _detail(
                 context,
                 Icons.person_outline,
-                "${purchaseRequest["requested_by"] ?? ""}  ·  ${purchaseRequest["approved_by"] ?? ""}",
+                "${_value(purchaseRequest["requested_by"])}  ·  ${_value(purchaseRequest["approved_by"])}",
               ),
-              if ((purchaseRequest["reason"]?.toString() ?? "").isNotEmpty)
+              if (reason.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: Text(
-                    purchaseRequest["reason"].toString(),
+                    reason,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: theme.textTheme.bodyMedium,
                   ),
                 ),
-
               const SizedBox(height: 8),
               _detail(
                 context,
@@ -149,9 +143,55 @@ class CardPurchaseRequestWidget extends StatelessWidget {
     ),
   );
 
+  String _value(dynamic value) {
+    final text = value?.toString().trim() ?? "";
+    return text.isEmpty ? '-' : text;
+  }
+
   String _date(dynamic value) {
     final date = DateTime.tryParse(value?.toString() ?? "");
     if (date == null) return "-";
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final normalized = status.toLowerCase();
+    final color = switch (normalized) {
+      "approved" => colors.primary,
+      "rejected" => colors.error,
+      _ => colors.onSurfaceVariant,
+    };
+    final background = switch (normalized) {
+      "approved" => colors.primary.withValues(alpha: .1),
+      "rejected" => colors.error.withValues(alpha: .1),
+      _ => colors.onSurface.withValues(alpha: .06),
+    };
+    final label = status.isEmpty
+        ? '-'
+        : (status[0].toUpperCase() + status.substring(1).toLowerCase()).tr;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 }
