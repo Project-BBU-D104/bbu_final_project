@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/product_controller.dart';
+import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/controllers/warehouse_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
@@ -25,16 +26,30 @@ class PurchaseRequestLine {
 }
 
 class PurchaseRequestController extends GetxController {
-  final PurchaseRequestService service = PurchaseRequestService();
-  final WarehouseController warehouseController = Get.put(
-    WarehouseController(),
-  );
-  final ProductController productController = Get.put(ProductController());
+  PurchaseRequestController({
+    PurchaseRequestService? service,
+    WarehouseController? warehouses,
+    ProductController? products,
+  }) : service = service ?? PurchaseRequestService(),
+       _warehouses = warehouses,
+       _products = products;
+
+  final PurchaseRequestService service;
+  final WarehouseController? _warehouses;
+  final ProductController? _products;
+
+  late final WarehouseController warehouseController =
+      _warehouses ?? Get.put(WarehouseController());
+  late final ProductController productController =
+      _products ?? Get.put(ProductController());
 
   final isLoading = false.obs;
   final isSaving = false.obs;
+  final isOpeningEdit = false.obs;
+  final loadError = ''.obs;
+  final formError = ''.obs;
   final requestList = <Map<String, dynamic>>[].obs;
-  final searchQuery = "".obs;
+  final searchRequestList = <Map<String, dynamic>>[].obs;
   final selectedWarehouseId = RxnInt();
   final requestStatus = "pending".obs;
   final requestDate = DateTime.now().obs;
@@ -49,32 +64,16 @@ class PurchaseRequestController extends GetxController {
   final approvedByController = TextEditingController(text: "Pending");
   final reasonController = TextEditingController();
 
-  List<Map<String, dynamic>> get filteredRequests {
-    final query = searchQuery.value.trim().toLowerCase();
-    if (query.isEmpty) return requestList;
-
-    return requestList.where((request) {
-      final fields = [
-        request["request_no"],
-        request["request_type"],
-        request["requested_by"],
-        request["approved_by"],
-        request["status"],
-        request["reason"],
-      ];
-      return fields.any(
-        (field) => field.toString().toLowerCase().contains(query),
-      );
-    }).toList();
-  }
+  bool _formOpen = false;
+  Worker? _searchWorker;
+  String _query = '';
 
   static final List<Map<String, dynamic>> _cache = [];
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(seconds: 60);
 
   static bool get _hasFreshCache =>
-      _cachedAt != null &&
-      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+      _cachedAt != null && DateTime.now().difference(_cachedAt!) < _cacheTtl;
 
   @override
   void onInit() {
@@ -84,57 +83,98 @@ class PurchaseRequestController extends GetxController {
       requestedByController.text = loggedInUser["name"]?.toString() ?? "";
     }
     itemLines.add(PurchaseRequestLine());
+
+    final search = Get.isRegistered<SearchController>()
+        ? Get.find<SearchController>()
+        : Get.put(SearchController());
+    _query = search.keyword.value.trim().toLowerCase();
+    _searchWorker = ever(search.keyword, searchRequests);
+
     warehouseController.getWarehouses();
     productController.getProducts();
 
-    if(_hasFreshCache){
+    if (_hasFreshCache) {
       requestList.assignAll(_cache);
-    }else{
+      searchRequests(_query);
+    } else {
       onGetPurchaseRequests();
     }
   }
 
   Future<void> onGetPurchaseRequests() async {
+    if (isLoading.value || isClosed) return;
+    isLoading.value = true;
+    loadError.value = '';
     try {
-      isLoading.value = true;
       final responses = await Future.wait([
         service.getPurchaseRequests(),
         service.getPurchaseRequestItems(),
       ]);
       final requests = responses[0];
       final items = responses[1];
-
-      if (requests is List) {
-        final itemRows = items is List
-            ? List<Map<String, dynamic>>.from(items)
-            : <Map<String, dynamic>>[];
-        requestList.assignAll(
-          List<Map<String, dynamic>>.from(requests).map((request) {
-            final requestId = int.tryParse(request["id"].toString());
-            return {
-              ...request,
-              "items": itemRows
-                  .where(
-                    (item) =>
-                        int.tryParse(item["stock_request_id"].toString()) ==
-                        requestId,
-                  )
-                  .toList(),
-            };
-          }),
-        );
-
-        _cache.assignAll(requestList);
-        _cachedAt = DateTime.now();
+      if (requests is! List) {
+        throw const FormatException('Expected purchase request list');
       }
-    } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+
+      final itemRows = items is List
+          ? List<Map<String, dynamic>>.from(items)
+          : <Map<String, dynamic>>[];
+      requestList.assignAll(
+        List<Map<String, dynamic>>.from(requests).map((request) {
+          final requestId = int.tryParse(request["id"].toString());
+          return {
+            ...request,
+            "items": itemRows
+                .where(
+                  (item) =>
+                      int.tryParse(item["stock_request_id"].toString()) ==
+                      requestId,
+                )
+                .toList(),
+          };
+        }),
+      );
+      searchRequests(_query);
+
+      _cache
+        ..clear()
+        ..addAll(requestList);
+      _cachedAt = DateTime.now();
+    } catch (_) {
+      if (!isClosed) {
+        loadError.value =
+            'Unable to load purchase requests. Please try again.'.tr;
+      }
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isLoading.value = false;
     }
   }
 
-  void setSearchQuery(String value) => searchQuery.value = value;
+  Future<void> onRefresh() => onGetPurchaseRequests();
+
+  void searchRequests(String keyword) {
+    _query = keyword.trim().toLowerCase();
+    if (_query.isEmpty) {
+      searchRequestList.assignAll(requestList);
+      return;
+    }
+
+    searchRequestList.assignAll(
+      requestList.where((request) {
+        final fields = [
+          request["request_no"],
+          request["request_type"],
+          request["requested_by"],
+          request["approved_by"],
+          request["status"],
+          request["reason"],
+        ];
+        return fields.any(
+          (field) => field.toString().toLowerCase().contains(_query),
+        );
+      }),
+    );
+  }
 
   void addItemLine() => itemLines.add(PurchaseRequestLine());
 
@@ -174,16 +214,50 @@ class PurchaseRequestController extends GetxController {
     ]);
   }
 
+  Future<void> _showForm(BuildContext context, Widget child) async {
+    _formOpen = true;
+    try {
+      if (MediaQuery.sizeOf(context).width >= 840) {
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => Dialog(
+            constraints: const BoxConstraints(maxWidth: 720),
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: child,
+          ),
+        );
+      } else {
+        await AppBottomSheets.show(
+          context,
+          child: child,
+          isDismissible: false,
+          enableDrag: false,
+          constraints: const BoxConstraints(maxWidth: 760),
+        );
+      }
+    } finally {
+      _formOpen = false;
+    }
+  }
+
   Future<void> addPurchaseRequest(BuildContext context) async {
+    if (_formOpen || isSaving.value || isOpeningEdit.value || isClosed) return;
     _clearForm();
+    formError.value = '';
     await _loadLookups();
-    if (!context.mounted) return;
-    AppBottomSheets.show(context, child: const AddPurchaseRequestWidget());
+    if (!context.mounted || isClosed) return;
+    await _showForm(context, const AddPurchaseRequestWidget());
   }
 
   Future<void> editPurchaseRequest(BuildContext context, int requestId) async {
+    if (_formOpen || isSaving.value || isOpeningEdit.value || isClosed) return;
+    isOpeningEdit.value = true;
+    formError.value = '';
     try {
-      isLoading.value = true;
       await _loadLookups();
       final responses = await Future.wait([
         service.getPurchaseRequestById(requestId),
@@ -235,15 +309,17 @@ class PurchaseRequestController extends GetxController {
       }
       if (itemLines.isEmpty) itemLines.add(PurchaseRequestLine());
 
-      if (!context.mounted) return;
-      AppBottomSheets.show(
-        context,
-        child: EditPurchaseRequestWidget(requestId: requestId),
-      );
-    } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      if (!context.mounted || isClosed) return;
+      await _showForm(context, EditPurchaseRequestWidget(requestId: requestId));
+    } catch (_) {
+      if (!isClosed) {
+        ToastWidget.show(
+          message: 'Unable to open purchase request. Please try again.'.tr,
+          type: ToastType.error,
+        );
+      }
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isOpeningEdit.value = false;
     }
   }
 
@@ -267,16 +343,17 @@ class PurchaseRequestController extends GetxController {
       };
 
   bool _validateLines() {
-    if (itemLines.isEmpty) return false;
+    if (itemLines.isEmpty) {
+      formError.value =
+          'Choose a product and enter a unit and quantity for each item'.tr;
+      return false;
+    }
     for (final line in itemLines) {
       if (line.selectedProduct.value == null ||
           line.unitController.text.trim().isEmpty ||
           (int.tryParse(line.quantityController.text.trim()) ?? 0) <= 0) {
-        ToastWidget.show(
-          message:
-              "Choose a product and enter a unit and quantity for each item".tr,
-          type: ToastType.error,
-        );
+        formError.value =
+            'Choose a product and enter a unit and quantity for each item'.tr;
         return false;
       }
     }
@@ -284,14 +361,16 @@ class PurchaseRequestController extends GetxController {
   }
 
   Future<void> savePurchaseRequest(BuildContext context) async {
+    if (isSaving.value || isClosed) return;
+    formError.value = '';
     if (!(formKey.currentState?.validate() ?? false) || !_validateLines()) {
       return;
     }
     final warehouseId = selectedWarehouseId.value;
     if (warehouseId == null) return;
 
+    isSaving.value = true;
     try {
-      isSaving.value = true;
       final response = await service.createPurchaseRequest(_requestPayload());
       final requestId = int.tryParse(response["id"].toString());
       if (requestId == null) {
@@ -317,10 +396,13 @@ class PurchaseRequestController extends GetxController {
         message: "Purchase request created successfully".tr,
         type: ToastType.success,
       );
-    } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+    } catch (_) {
+      if (!isClosed) {
+        formError.value =
+            'Unable to save purchase request. Please try again.'.tr;
+      }
     } finally {
-      isSaving.value = false;
+      if (!isClosed) isSaving.value = false;
     }
   }
 
@@ -328,14 +410,16 @@ class PurchaseRequestController extends GetxController {
     BuildContext context,
     int requestId,
   ) async {
+    if (isSaving.value || isClosed) return;
+    formError.value = '';
     if (!(formKey.currentState?.validate() ?? false) || !_validateLines()) {
       return;
     }
     final warehouseId = selectedWarehouseId.value;
     if (warehouseId == null) return;
 
+    isSaving.value = true;
     try {
-      isSaving.value = true;
       await service.updatePurchaseRequest(requestId, _requestPayload());
       for (final itemId in removedItemIds) {
         await service.deletePurchaseRequestItem(itemId);
@@ -358,30 +442,47 @@ class PurchaseRequestController extends GetxController {
         message: "Purchase request updated successfully".tr,
         type: ToastType.success,
       );
-    } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+    } catch (_) {
+      if (!isClosed) {
+        formError.value =
+            'Unable to save purchase request. Please try again.'.tr;
+      }
     } finally {
-      isSaving.value = false;
+      if (!isClosed) isSaving.value = false;
     }
   }
 
   Future<void> deletePurchaseRequest(
     BuildContext context,
-    int requestId,
-  ) async {
+    int requestId, {
+    VoidCallback? onDeleted,
+  }) async {
+    if (isSaving.value || isClosed) return;
     showConfirmDialog(
       context: context,
-      message: "Delete this purchase request?".tr,
+      message: "Do you want to delete this purchase request?".tr,
       onConfirm: () async {
+        if (isSaving.value || isClosed) return;
+        isSaving.value = true;
+        formError.value = '';
         try {
           await service.deletePurchaseRequest(requestId);
           await onGetPurchaseRequests();
+          onDeleted?.call();
           ToastWidget.show(
             message: "Purchase request deleted successfully".tr,
             type: ToastType.success,
           );
-        } catch (error) {
-          ToastWidget.show(message: error.toString(), type: ToastType.error);
+        } catch (_) {
+          if (!isClosed) {
+            ToastWidget.show(
+              message:
+                  'Unable to delete purchase request. Please try again.'.tr,
+              type: ToastType.error,
+            );
+          }
+        } finally {
+          if (!isClosed) isSaving.value = false;
         }
       },
       onCancel: () {},
@@ -390,6 +491,7 @@ class PurchaseRequestController extends GetxController {
 
   @override
   void onClose() {
+    _searchWorker?.dispose();
     requestTypeController.dispose();
     requestedByController.dispose();
     approvedByController.dispose();
