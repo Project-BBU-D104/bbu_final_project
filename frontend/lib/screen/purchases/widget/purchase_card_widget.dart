@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase/purchase_controller.dart';
+import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 
 class PurchaseCardWidget extends StatelessWidget {
   const PurchaseCardWidget({super.key, required this.purchase});
   final Map<String, dynamic> purchase;
+
+  String _amount(dynamic value) => NumberFormat.currency(
+    symbol: '\$',
+    decimalDigits: 2,
+  ).format(double.tryParse(value?.toString() ?? '0') ?? 0);
+
+  String _statusLabel(dynamic raw) {
+    final status = (raw ?? '').toString().trim();
+    if (status.isEmpty) return '-';
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return 'Paid'.tr;
+      case 'partial':
+        return 'Partial'.tr;
+      case 'unpaid':
+        return 'Unpaid'.tr;
+      default:
+        return status[0].toUpperCase() + status.substring(1);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -52,6 +74,8 @@ class PurchaseCardWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       purchase['invoice_no']?.toString() ?? '-',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -75,10 +99,15 @@ class PurchaseCardWidget extends StatelessWidget {
                     purchase['purchase_date']?.toString().split('T').first ??
                         '-',
                   ),
-                  info('Status', purchase['status']?.toString() ?? '-'),
-                  info('Total', '\$${purchase['total_amount'] ?? '0'}'),
-                  info('Paid', '\$${purchase['paid_amount'] ?? '0'}'),
-                  info('Due', '\$${purchase['due_amount'] ?? '0'}'),
+                  info(
+                    'Status',
+                    _statusLabel(
+                      purchase['payment_status'] ?? purchase['status'],
+                    ),
+                  ),
+                  info('Total', _amount(purchase['total_amount'])),
+                  info('Paid', _amount(purchase['paid_amount'])),
+                  info('Due', _amount(purchase['due_amount'])),
                 ],
               ),
             ],
