@@ -97,7 +97,30 @@ class RoleController extends GetxController {
 
   void addRole(BuildContext context) {
     clearRole();
-    AppBottomSheets.show(context, child: AddRoleWidget());
+    _showRoleForm(context, const AddRoleWidget());
+  }
+
+  Future<void> _showRoleForm(BuildContext context, Widget child) {
+    if (MediaQuery.sizeOf(context).width >= 840) {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Dialog(
+          insetPadding: const EdgeInsets.all(32),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 680, maxHeight: 680),
+            child: child,
+          ),
+        ),
+      );
+    }
+
+    return AppBottomSheets.show<void>(
+      context,
+      child: child,
+      isDismissible: false,
+      enableDrag: false,
+    );
   }
 
   Future<void> onSaveRole() async {
@@ -126,7 +149,9 @@ class RoleController extends GetxController {
       clearRole();
 
       // Close BottomSheet
-      Navigator.pop(Get.context!);
+      if (Get.context != null && Navigator.canPop(Get.context!)) {
+        Navigator.pop(Get.context!);
+      }
     } catch (e) {
       loadError.value = e.toString();
       ToastWidget.show(message: e.toString(), type: ToastType.error);
@@ -143,10 +168,11 @@ class RoleController extends GetxController {
     roleDescriptionController.text = role["description"] ?? "";
     isActive.value = role["is_active"] ?? false;
 
-    AppBottomSheets.show(context, child: EditRoleWidget(roleId: roleId));
+    if (!context.mounted) return;
+    await _showRoleForm(context, EditRoleWidget(roleId: roleId));
   }
 
-  Future<void> updateRole(int RoleId, BuildContext context) async {
+  Future<void> updateRole(int roleId, BuildContext context) async {
     if (_writeInProgress) return;
     try {
       _writeInProgress = true;
@@ -158,13 +184,15 @@ class RoleController extends GetxController {
         "is_active": isActive.value,
       };
 
-      await service.updateRole(RoleId, data);
+      await service.updateRole(roleId, data);
 
       // Reload Category
       await getRoles();
 
       // Close BottomSheet
-      Navigator.pop(context);
+      if (context.mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
 
       ToastWidget.show(
         message: "Role updated successfully",
