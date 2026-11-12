@@ -112,10 +112,15 @@ class PurchaseRequestTableWidget extends StatelessWidget {
                           ),
                         ),
                         DataCell(
-                          Text(
-                            _warehouseName(controller, request['warehouse_id']),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Obx(
+                            () => Text(
+                              _warehouseName(
+                                controller,
+                                request['warehouse_id'],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         DataCell(
@@ -152,11 +157,11 @@ class PurchaseRequestTableWidget extends StatelessWidget {
                             itemBuilder: (_) => [
                               PopupMenuItem(
                                 value: 'edit',
-                                child: Text('Edit Request'.tr),
+                                child: Text('Edit'.tr),
                               ),
                               PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete request'.tr),
+                                child: Text('Delete'.tr),
                               ),
                             ],
                           ),
@@ -177,9 +182,10 @@ class PurchaseRequestTableWidget extends StatelessWidget {
   }
 
   String _warehouseName(PurchaseRequestController controller, dynamic value) {
+    final warehouses = controller.warehouseController.warehouseList.toList();
     final id = int.tryParse(value?.toString() ?? "");
     if (id == null) return '-';
-    final warehouse = controller.warehouseController.warehouseList
+    final warehouse = warehouses
         .where((item) => int.tryParse(item["id"].toString()) == id)
         .firstOrNull;
     final name = warehouse?["name"]?.toString().trim() ?? "";

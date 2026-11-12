@@ -19,13 +19,6 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
     final controller = Get.find<PurchaseRequestController>();
     final requestId = int.tryParse(purchaseRequest["id"].toString());
     final status = purchaseRequest["status"]?.toString() ?? "pending";
-    final warehouseId = int.tryParse(
-      purchaseRequest["warehouse_id"].toString(),
-    );
-    final warehouse = controller.warehouseController.warehouseList
-        .where((item) => int.tryParse(item["id"].toString()) == warehouseId)
-        .firstOrNull;
-    final warehouseName = warehouse?["name"]?.toString().trim() ?? "";
     final items = purchaseRequest["items"] is List
         ? List<Map<String, dynamic>>.from(purchaseRequest["items"])
         : <Map<String, dynamic>>[];
@@ -96,10 +89,15 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
             HomeSectionCard(
               child: Column(
                 children: [
-                  _infoRow(
-                    context,
-                    "Warehouse",
-                    warehouseName.isEmpty ? '-' : warehouseName,
+                  Obx(
+                    () => _infoRow(
+                      context,
+                      "Warehouse",
+                      _warehouseName(
+                        controller,
+                        purchaseRequest["warehouse_id"],
+                      ),
+                    ),
                   ),
                   const Divider(height: 20),
                   _infoRow(
@@ -147,27 +145,12 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
                   : Column(
                       children: List.generate(items.length, (index) {
                         final item = items[index];
-                        final productId = int.tryParse(
-                          item["product_id"].toString(),
-                        );
-                        final product = controller.productController.products
-                            .where(
-                              (product) =>
-                                  int.tryParse(product["id"].toString()) ==
-                                  productId,
-                            )
-                            .firstOrNull;
-                        final productName =
-                            product?["name"]?.toString().trim() ?? "";
-                        final name = productName.isEmpty
-                            ? (productId == null ? '-' : 'Product $productId')
-                            : productName;
                         return Column(
                           children: [
                             ListTile(
                               contentPadding: EdgeInsets.zero,
                               leading: const Icon(Icons.inventory_2_outlined),
-                              title: Text(name),
+                              title: Text(_productName(controller, item)),
                               subtitle: Text(
                                 "${_value(item["qty"])} ${_value(item["unit"])}",
                               ),
@@ -254,6 +237,30 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _warehouseName(PurchaseRequestController controller, dynamic value) {
+    final warehouses = controller.warehouseController.warehouseList.toList();
+    final id = int.tryParse(value?.toString() ?? "");
+    if (id == null) return '-';
+    final warehouse = warehouses
+        .where((item) => int.tryParse(item["id"].toString()) == id)
+        .firstOrNull;
+    final name = warehouse?["name"]?.toString().trim() ?? "";
+    return name.isEmpty ? '-' : name;
+  }
+
+  String _productName(
+    PurchaseRequestController controller,
+    Map<String, dynamic> item,
+  ) {
+    final productId = int.tryParse(item["product_id"].toString());
+    final product = controller.productController.products
+        .where((product) => int.tryParse(product["id"].toString()) == productId)
+        .firstOrNull;
+    final name = product?["name"]?.toString().trim() ?? "";
+    if (name.isNotEmpty) return name;
+    return productId == null ? '-' : 'Product $productId';
   }
 
   String _value(dynamic value) {

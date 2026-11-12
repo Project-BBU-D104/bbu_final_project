@@ -15,14 +15,8 @@ class CardPurchaseRequestWidget extends StatelessWidget {
     final controller = Get.find<PurchaseRequestController>();
     final requestId = int.tryParse(purchaseRequest["id"].toString());
     final status = purchaseRequest["status"]?.toString() ?? "pending";
-    final warehouseId = int.tryParse(
-      purchaseRequest["warehouse_id"].toString(),
-    );
-    final warehouse = controller.warehouseController.warehouseList
-        .where((item) => int.tryParse(item["id"].toString()) == warehouseId)
-        .firstOrNull;
-    final warehouseName = warehouse?["name"]?.toString().trim() ?? "";
     final reason = (purchaseRequest["reason"]?.toString() ?? "").trim();
+    final title = _value(purchaseRequest["request_no"]);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -45,53 +39,67 @@ class CardPurchaseRequestWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Icon(Icons.assignment_outlined, color: colors.primary),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      _value(purchaseRequest["request_no"]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    child: Tooltip(
+                      message: title,
+                      child: Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleLarge,
                       ),
                     ),
                   ),
-                  const Icon(Icons.chevron_right),
+                  PopupMenuButton<String>(
+                    tooltip: 'Actions'.tr,
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (requestId == null) return;
+                      if (value == 'edit') {
+                        controller.editPurchaseRequest(context, requestId);
+                      } else if (value == 'delete') {
+                        controller.deletePurchaseRequest(context, requestId);
+                      }
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.edit_outlined, size: 20),
+                            const SizedBox(width: 10),
+                            Text('Edit'.tr),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete_outline,
+                              size: 20,
+                              color: colors.error,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Delete'.tr,
+                              style: TextStyle(color: colors.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  _StatusChip(status: status),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    tooltip: 'Edit Request'.tr,
-                    onPressed: requestId == null
-                        ? null
-                        : () => controller.editPurchaseRequest(
-                            context,
-                            requestId,
-                          ),
-                    icon: const Icon(Icons.edit_outlined, size: 19),
-                  ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    tooltip: 'Delete request'.tr,
-                    onPressed: requestId == null
-                        ? null
-                        : () => controller.deletePurchaseRequest(
-                            context,
-                            requestId,
-                          ),
-                    color: colors.error,
-                    icon: const Icon(Icons.delete_outline, size: 19),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 10),
+              _StatusChip(status: status),
+              const SizedBox(height: 10),
               Text(
                 _value(purchaseRequest["request_type"]),
                 maxLines: 1,
@@ -100,12 +108,14 @@ class CardPurchaseRequestWidget extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              Text(
-                warehouseName.isEmpty ? '-' : warehouseName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
+              Obx(
+                () => Text(
+                  _warehouseName(controller, purchaseRequest["warehouse_id"]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -149,6 +159,17 @@ class CardPurchaseRequestWidget extends StatelessWidget {
       ],
     ),
   );
+
+  String _warehouseName(PurchaseRequestController controller, dynamic value) {
+    final warehouses = controller.warehouseController.warehouseList.toList();
+    final id = int.tryParse(value?.toString() ?? "");
+    if (id == null) return '-';
+    final warehouse = warehouses
+        .where((item) => int.tryParse(item["id"].toString()) == id)
+        .firstOrNull;
+    final name = warehouse?["name"]?.toString().trim() ?? "";
+    return name.isEmpty ? '-' : name;
+  }
 
   String _value(dynamic value) {
     final text = value?.toString().trim() ?? "";

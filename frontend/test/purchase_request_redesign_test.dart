@@ -245,6 +245,115 @@ void main() {
     expect(find.textContaining('Requested Items'), findsNothing);
   });
 
+  testWidgets('card shows warehouse when lookups arrive after first paint', (
+    tester,
+  ) async {
+    final c = Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    c.warehouseController.warehouseList.clear();
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: CardPurchaseRequestWidget(
+            purchaseRequest: purchaseRequestJson(1),
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Main'), findsNothing);
+    c.warehouseController.warehouseList.assignAll([
+      {'id': 1, 'name': 'Main'},
+    ]);
+    await tester.pump();
+    expect(find.text('Main'), findsOneWidget);
+  });
+
+  testWidgets('table shows warehouse when lookups arrive after first paint', (
+    tester,
+  ) async {
+    final c = Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    c.warehouseController.warehouseList.clear();
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: PurchaseRequestTableWidget(requests: [purchaseRequestJson(1)]),
+        ),
+      ),
+    );
+    expect(find.text('Main'), findsNothing);
+    c.warehouseController.warehouseList.assignAll([
+      {'id': 1, 'name': 'Main'},
+    ]);
+    await tester.pump();
+    expect(find.text('Main'), findsOneWidget);
+  });
+
+  testWidgets('detail shows warehouse when lookups arrive after first paint', (
+    tester,
+  ) async {
+    final c = Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    c.warehouseController.warehouseList.clear();
+    await pumpPurchaseRequestHost(
+      tester,
+      home: CardPurchaseRequestDetailWidget(
+        purchaseRequest: {
+          'id': 1,
+          'request_no': 'REQ-1',
+          'warehouse_id': 1,
+          'items': [],
+        },
+      ),
+    );
+    expect(find.text('Main'), findsNothing);
+    c.warehouseController.warehouseList.assignAll([
+      {'id': 1, 'name': 'Main'},
+    ]);
+    await tester.pump();
+    expect(find.text('Main'), findsOneWidget);
+  });
+
+  testWidgets('card exposes edit and delete in the actions menu', (
+    tester,
+  ) async {
+    Get.put(
+      PurchaseRequestController(
+        service: FakePurchaseRequestService(),
+        warehouses: FakeWarehouseController(),
+        products: FakeProductController(),
+      ),
+    );
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: CardPurchaseRequestWidget(
+            purchaseRequest: purchaseRequestJson(1),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byTooltip('Actions'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
   testWidgets('table localizes its headers in Khmer', (tester) async {
     Get.put(
       PurchaseRequestController(
