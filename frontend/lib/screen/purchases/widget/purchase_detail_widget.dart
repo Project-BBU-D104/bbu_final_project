@@ -122,9 +122,9 @@ class PurchaseDetailWidget extends StatelessWidget {
         ),
       );
 
-      Widget chip(String label) {
+      Widget chip(String raw, String label) {
         if (label.isEmpty) return const SizedBox.shrink();
-        final color = _statusColor(context, label);
+        final color = _statusColor(context, raw);
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
@@ -156,8 +156,11 @@ class PurchaseDetailWidget extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                chip(paymentStatus),
-                chip(status),
+                chip(
+                  current['payment_status']?.toString() ?? '',
+                  paymentStatus,
+                ),
+                chip(current['status']?.toString() ?? '', status),
               ],
             ),
             const SizedBox(height: 8),
@@ -169,10 +172,12 @@ class PurchaseDetailWidget extends StatelessWidget {
                   color: colors.onSurfaceVariant,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  _formatDate(current['purchase_date']),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
+                Expanded(
+                  child: Text(
+                    _formatDate(current['purchase_date']),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -463,16 +468,20 @@ class PurchaseDetailWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label.tr,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+          Expanded(
+            child: Text(
+              label.tr,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
+          const SizedBox(width: 12),
           Text(
             _formatCurrency(value),
+            textAlign: TextAlign.end,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: bold ? FontWeight.bold : FontWeight.w500,
               color: valueColor,

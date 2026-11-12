@@ -149,6 +149,22 @@ void main() {
     expect(s.lastUpdatedData!['invoice_no'], 'INV-UPDATED');
   });
 
+  testWidgets('form survives Khmer and large text on a narrow screen', (
+    tester,
+  ) async {
+    final c = await seed(tester, FakePurchaseService());
+    await pumpPurchaseHost(
+      tester,
+      home: PurchasesScreen(),
+      size: const Size(360, 720),
+      locale: const Locale('km', 'KH'),
+      textScale: 2,
+    );
+    c.addPurchase(tester.element(find.byType(PurchasesScreen)));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('wide screens host the form in a dialog', (tester) async {
     final c = await seed(tester, FakePurchaseService());
     await pumpPurchaseHost(

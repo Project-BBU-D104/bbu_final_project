@@ -6,6 +6,7 @@ import 'package:frontend/screen/purchases/purchases_screen.dart';
 import 'package:frontend/screen/purchases/widget/purchase_card_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_detail_widget.dart';
 import 'package:frontend/screen/purchases/widget/purchase_table_widget.dart';
+import 'package:frontend/themes/app_theme.dart';
 import 'package:get/get.dart';
 import 'purchase_test_support.dart';
 
@@ -90,6 +91,28 @@ void main() {
     expect(find.text('INV-2'), findsOneWidget);
     // Total and Due are both 10.00 in each of the two rows.
     expect(find.text('\$10.00'), findsNWidgets(4));
+  });
+
+  testWidgets('table keeps bounded columns with long text', (tester) async {
+    Get.put<PurchaseController>(
+      PurchaseController(service: FakePurchaseService()),
+    );
+    await pumpPurchaseHost(
+      tester,
+      size: const Size(1440, 900),
+      home: Scaffold(
+        body: PurchaseTableWidget(
+          purchases: [
+            purchaseJson(
+              1,
+              invoiceNo: 'INV-${'X' * 200}',
+              supplierName: 'S' * 200,
+            ),
+          ],
+        ),
+      ),
+    );
+    expect(tester.getSize(find.byType(DataTable)).width, lessThan(1500));
   });
 
   Future<PurchaseController> seedPurchase([
@@ -249,5 +272,35 @@ void main() {
     c.gotoPurchaseDetail(c.purchaseList.first);
     await tester.pumpAndSettle();
     expect(find.text('No items in this purchase'), findsOneWidget);
+  });
+
+  testWidgets('detail status colors survive Khmer labels', (tester) async {
+    final c = await seedPurchase();
+    c.purchaseList[0] = {...c.purchaseList.first, 'payment_status': 'paid'};
+    await pumpPurchaseHost(
+      tester,
+      home: PurchasesScreen(),
+      locale: const Locale('km', 'KH'),
+    );
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    final chip = tester.widget<Text>(find.text('បានបង់').first);
+    expect(chip.style?.color, AppTheme.light().colorScheme.primary);
+  });
+
+  testWidgets('detail survives Khmer and large text on a narrow screen', (
+    tester,
+  ) async {
+    final c = await seedPurchase();
+    await pumpPurchaseHost(
+      tester,
+      home: PurchasesScreen(),
+      size: const Size(360, 720),
+      locale: const Locale('km', 'KH'),
+      textScale: 1.3,
+    );
+    c.gotoPurchaseDetail(c.purchaseList.first);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }
