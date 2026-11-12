@@ -54,7 +54,7 @@ class RoleScreen extends StatelessWidget {
               ),
 
               Obx(() {
-                if (ctr.isLoading.value) {
+                if (ctr.isListLoading.value) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.6,
                     child: const Center(child: CircularProgressIndicator()),
@@ -117,7 +117,9 @@ class RoleScreen extends StatelessWidget {
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     final roles = ctr.searchRoleList.toList();
-                    final isMobile = constraints.maxWidth < 600;
+                    final isMobile =
+                        constraints.maxWidth < 800 ||
+                        MediaQuery.textScalerOf(context).scale(1) > 1.3;
 
                     if (isMobile) {
                       return ListView.builder(

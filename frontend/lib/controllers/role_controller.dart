@@ -14,9 +14,13 @@ class RoleController extends GetxController {
   final RoleService service;
 
   var isLoading = false.obs;
+  final isListLoading = false.obs;
   final loadError = RxnString();
   bool _loadingList = false;
   bool _writeInProgress = false;
+  bool _formOpen = false;
+  int _formSession = 0;
+  String _searchKeyword = '';
   final roleList = <Map<String, dynamic>>[].obs;
   final searchRoleList = <Map<String, dynamic>>[].obs;
   final roleNameController = TextEditingController();
@@ -38,12 +42,14 @@ class RoleController extends GetxController {
 
     if (_hasFreshCache) {
       roleList.value = List<Map<String, dynamic>>.from(_cache);
-      searchRoleList.value = roleList;
+      searchRole(_searchKeyword);
     } else {
       getRoles();
     }
 
     final search = Get.put(SearchController());
+    _searchKeyword = search.keyword.value;
+    searchRole(_searchKeyword);
 
     ever(search.keyword, (keyword) {
       searchRole(keyword);
@@ -60,13 +66,13 @@ class RoleController extends GetxController {
     if (_loadingList) return;
     try {
       _loadingList = true;
-      isLoading.value = true;
+      isListLoading.value = true;
       loadError.value = null;
       final resp = await service.getRoles();
       if (resp is List) {
         roleList.value = List<Map<String, dynamic>>.from(resp);
 
-        searchRoleList.value = roleList;
+        searchRole(_searchKeyword);
 
         _cache
           ..clear()
@@ -78,11 +84,12 @@ class RoleController extends GetxController {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {
       _loadingList = false;
-      isLoading.value = false;
+      isListLoading.value = false;
     }
   }
 
   void searchRole(String keyword) {
+    _searchKeyword = keyword;
     final search = keyword.trim().toLowerCase();
 
     if (search.isEmpty) {
@@ -91,13 +98,17 @@ class RoleController extends GetxController {
     }
 
     searchRoleList.value = roleList.where((role) {
-      return role["name"].toString().toLowerCase().contains(search);
+      return (role["name"] ?? "").toString().toLowerCase().contains(search);
     }).toList();
   }
 
   void addRole(BuildContext context) {
+    if (_formOpen) return;
+    _formOpen = true;
     clearRole();
-    _showRoleForm(context, const AddRoleWidget());
+    _showRoleForm(context, const AddRoleWidget()).whenComplete(() {
+      _formOpen = false;
+    });
   }
 
   Future<void> _showRoleForm(BuildContext context, Widget child) {
@@ -162,14 +173,22 @@ class RoleController extends GetxController {
   }
 
   Future<void> editRole(BuildContext context, int roleId) async {
-    final role = await service.getRoleById(roleId);
+    if (_formOpen) return;
+    final session = ++_formSession;
+    _formOpen = true;
+    try {
+      final role = await service.getRoleById(roleId);
+      if (session != _formSession || !context.mounted) return;
 
-    roleNameController.text = role["name"] ?? "";
-    roleDescriptionController.text = role["description"] ?? "";
-    isActive.value = role["is_active"] ?? false;
-
-    if (!context.mounted) return;
-    await _showRoleForm(context, EditRoleWidget(roleId: roleId));
+      roleNameController.text = role["name"]?.toString() ?? "";
+      roleDescriptionController.text = role["description"]?.toString() ?? "";
+      isActive.value = role["is_active"] == true;
+      await _showRoleForm(context, EditRoleWidget(roleId: roleId));
+    } catch (e) {
+      ToastWidget.show(message: e.toString(), type: ToastType.error);
+    } finally {
+      _formOpen = false;
+    }
   }
 
   Future<void> updateRole(int roleId, BuildContext context) async {

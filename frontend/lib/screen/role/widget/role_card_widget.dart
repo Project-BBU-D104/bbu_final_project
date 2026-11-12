@@ -5,7 +5,6 @@ import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
 
 class RoleCardWidget extends StatelessWidget {
-
   final Map<String, dynamic> role;
   RoleCardWidget({super.key, required this.role});
 
@@ -13,15 +12,15 @@ class RoleCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final roleId = int.tryParse(role["id"]?.toString() ?? "");
+    final createdAt = DateTime.tryParse(role["created_at"]?.toString() ?? "");
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Colors.grey.withValues(alpha: 0.2),
-        ),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -33,14 +32,14 @@ class RoleCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  role["name"],
+                  role["name"]?.toString() ?? "-",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
                 ),
-                
+
                 StatusWidget(
                   text: role["is_active"] == true ? "Active" : "Inactive",
                 ),
@@ -51,7 +50,7 @@ class RoleCardWidget extends StatelessWidget {
 
             /// Description
             Text(
-              role["description"],
+              role["description"]?.toString() ?? "-",
               style: TextStyle(
                 fontSize: 13,
                 height: 1.5,
@@ -59,7 +58,7 @@ class RoleCardWidget extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 8,),
+            SizedBox(height: 8),
 
             Row(
               children: [
@@ -68,12 +67,9 @@ class RoleCardWidget extends StatelessWidget {
                   size: 15,
                   color: Colors.black54,
                 ),
-                SizedBox(width: 5,),
+                SizedBox(width: 5),
                 Text(
-                  DateFormatter.formatDate(
-                    DateTime.parse(role["created_at"]),
-                  ),
-                  
+                  createdAt == null ? "-" : DateFormatter.formatDate(createdAt),
                 ),
                 Spacer(),
                 PopupMenuButton<String>(
@@ -81,11 +77,15 @@ class RoleCardWidget extends StatelessWidget {
                   onSelected: (value) {
                     switch (value) {
                       case "edit":
-                        ctr.editRole(context, role["id"]);
+                        if (roleId != null) {
+                          ctr.editRole(context, roleId);
+                        }
                         break;
 
                       case "delete":
-                        ctr.onDeleteRole(role["id"], context);
+                        if (roleId != null) {
+                          ctr.onDeleteRole(roleId, context);
+                        }
                         break;
                     }
                   },

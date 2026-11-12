@@ -43,6 +43,7 @@ class RoleTableWidget extends StatelessWidget {
                 DataColumn(label: Text('Actions')),
               ],
               rows: roles.map((role) {
+                final roleId = int.tryParse(role['id']?.toString() ?? '');
                 return DataRow(
                   cells: [
                     DataCell(
@@ -78,9 +79,13 @@ class RoleTableWidget extends StatelessWidget {
                         onSelected: (value) {
                           switch (value) {
                             case 'edit':
-                              controller.editRole(context, role['id']);
+                              if (roleId != null) {
+                                controller.editRole(context, roleId);
+                              }
                             case 'delete':
-                              controller.onDeleteRole(role['id'], context);
+                              if (roleId != null) {
+                                controller.onDeleteRole(roleId, context);
+                              }
                           }
                         },
                         itemBuilder: (context) => [

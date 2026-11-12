@@ -24,6 +24,7 @@ class UserController extends GetxController {
   var selectedUser = RxnString();
 
   final isLoading = false.obs;
+  final isListLoading = false.obs;
   final loadError = RxnString();
   bool _loadingList = false;
   bool _writeInProgress = false;
@@ -41,6 +42,9 @@ class UserController extends GetxController {
 
   final key = GlobalKey<FormState>();
   bool _editSheetOpen = false;
+  bool _formOpen = false;
+  int _formSession = 0;
+  String _searchKeyword = '';
 
   var isChecked = false.obs;
 
@@ -57,12 +61,14 @@ class UserController extends GetxController {
 
     if (_hasFreshCache) {
       userList.value = List<Map<String, dynamic>>.from(_cache);
-      searchUserList.value = userList;
+      searchUser(_searchKeyword);
     } else {
       getUserList();
     }
 
     final search = Get.put(SearchController());
+    _searchKeyword = search.keyword.value;
+    searchUser(_searchKeyword);
     ever(search.keyword, (keyword) {
       searchUser(keyword);
     });
@@ -82,7 +88,7 @@ class UserController extends GetxController {
     if (_loadingList) return;
     try {
       _loadingList = true;
-      isLoading.value = true;
+      isListLoading.value = true;
       loadError.value = null;
 
       final resp = await service.getUsers();
@@ -90,7 +96,7 @@ class UserController extends GetxController {
       if (resp is List) {
         userList.value = List<Map<String, dynamic>>.from(resp);
 
-        searchUserList.value = userList;
+        searchUser(_searchKeyword);
 
         _cache
           ..clear()
@@ -102,11 +108,12 @@ class UserController extends GetxController {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {
       _loadingList = false;
-      isLoading.value = false;
+      isListLoading.value = false;
     }
   }
 
   void searchUser(String keyword) {
+    _searchKeyword = keyword;
     final search = keyword.trim().toLowerCase();
 
     if (search.isEmpty) {
@@ -120,8 +127,12 @@ class UserController extends GetxController {
   }
 
   void addUser(BuildContext context) {
+    if (_formOpen) return;
+    _formOpen = true;
     clearUser();
-    _showUserForm(context, const AddUserWidget());
+    _showUserForm(context, const AddUserWidget()).whenComplete(() {
+      _formOpen = false;
+    });
   }
 
   Future<void> _showUserForm(BuildContext context, Widget child) {
@@ -199,10 +210,13 @@ class UserController extends GetxController {
 
   void editUser(BuildContext context, int userId) async {
     // The form key is shared, so a second sheet would duplicate the GlobalKey.
-    if (_editSheetOpen) return;
+    if (_editSheetOpen || _formOpen) return;
     _editSheetOpen = true;
+    _formOpen = true;
+    final session = ++_formSession;
     try {
       final user = await service.getUserById(userId);
+      if (session != _formSession) return;
 
       userPhotoController.text = user["photo"] ?? "";
       userNameController.text = user["name"] ?? "";
@@ -219,6 +233,7 @@ class UserController extends GetxController {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {
       _editSheetOpen = false;
+      _formOpen = false;
     }
   }
 

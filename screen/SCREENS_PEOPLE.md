@@ -83,6 +83,10 @@ or delete when no valid ID is available. Controllers retain 60-second caches,
 preserve search filtering through refreshes and writes, expose retryable load
 state, and guard overlapping list/form operations.
 
+Review hardening also covers malformed mobile-card dates/fields, invalid role
+action IDs, stale edit fetches, duplicate Add/Edit openings, and refreshes that
+retain visible records while loading.
+
 Focused verification: People & Access controller/list/form/detail/integration
 tests pass, existing rapid-edit/update regression tests pass, and changed
 controller/screen files have no analyzer diagnostics. Remaining manual QA:

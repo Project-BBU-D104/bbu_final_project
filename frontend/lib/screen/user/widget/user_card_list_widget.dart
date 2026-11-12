@@ -7,33 +7,27 @@ import 'package:intl/intl.dart';
 class UserCardListWidget extends StatelessWidget {
   final Map<String, dynamic> user;
 
-  const UserCardListWidget({
-    super.key,
-    required this.user,
-  });
+  const UserCardListWidget({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
+    final createdAt = DateTime.tryParse(user["created_at"]?.toString() ?? "");
     return GestureDetector(
       onTap: () {
         Get.find<UserController>().gotoUserDetail(user);
       },
       child: Card(
-        margin: const EdgeInsets.only(
-          bottom: 12,
-        ),
+        margin: const EdgeInsets.only(bottom: 12),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage: user["photo"] != null &&
-                        user["photo"].toString().isNotEmpty
+                backgroundImage:
+                    user["photo"] != null && user["photo"].toString().isNotEmpty
                     ? NetworkImage(user["photo"])
-                    : const AssetImage(
-                        "assets/images/default_avatar.png",
-                      ),
+                    : const AssetImage("assets/images/default_avatar.png"),
               ),
 
               const SizedBox(width: 15),
@@ -43,7 +37,7 @@ class UserCardListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user["name"],
+                      user["name"]?.toString() ?? "-",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -52,16 +46,14 @@ class UserCardListWidget extends StatelessWidget {
 
                     const SizedBox(height: 4),
 
-                    Text(user["email"] ?? ""),
+                    Text(user["email"]?.toString() ?? "-"),
 
                     const SizedBox(height: 4),
 
                     Text(
-                      user["created_at"] != null
-                          ? DateFormat("dd MMM yyyy").format(
-                              DateTime.parse(user["created_at"]),
-                            )
-                          : "",
+                      createdAt == null
+                          ? "-"
+                          : DateFormat("dd MMM yyyy").format(createdAt),
                     ),
                   ],
                 ),
