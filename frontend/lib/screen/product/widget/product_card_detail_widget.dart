@@ -87,7 +87,7 @@ class ProductCardDetailWidget extends StatelessWidget {
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: desktop
             ? null
-            : const CustomAppBar(title: 'Product Detail', useTheme: true),
+            : const CustomAppBar(title: 'Product Detail'),
         body: Obx(() {
           // Keep the detail in sync with the controller's current record
           // after an edit refreshes the list.

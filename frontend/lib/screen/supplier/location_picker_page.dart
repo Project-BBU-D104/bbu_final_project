@@ -191,7 +191,6 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
           ? null
           : CustomAppBar(
               title: 'Pick Location',
-              useTheme: true,
               onBack: () => Navigator.of(context).pop(),
             ),
       body: SafeArea(

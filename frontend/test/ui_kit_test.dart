@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/ui/app_empty_state.dart';
 import 'package:frontend/ui/app_form.dart';
@@ -8,6 +9,7 @@ import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_search_field.dart';
 import 'package:frontend/ui/app_table.dart';
 import 'package:frontend/ui/app_tokens.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 void main() {
@@ -442,6 +444,50 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
       expect(find.byType(BottomSheet), findsOneWidget);
+    });
+  });
+
+  group('shared surfaces', () {
+    testWidgets('the app bar follows the theme by default', (tester) async {
+      for (final theme in [AppTheme.light(), AppTheme.dark()]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: theme,
+            home: const Scaffold(appBar: CustomAppBar(title: 'Suppliers')),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final context = tester.element(find.byType(CustomAppBar));
+        expect(
+          tester.widget<AppBar>(find.byType(AppBar)).backgroundColor,
+          Theme.of(context).colorScheme.surface,
+        );
+      }
+    });
+
+    testWidgets('section cards use the shared card border', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: const Scaffold(
+            body: HomeSectionCard(
+              title: 'Contact details',
+              child: Text('x'),
+            ),
+          ),
+        ),
+      );
+      final card = tester.widget<Card>(find.byType(Card));
+      final shape = card.shape! as RoundedRectangleBorder;
+      expect(shape.borderRadius, BorderRadius.circular(AppTokens.radiusCard));
+      final theme = Theme.of(tester.element(find.byType(Card)));
+      expect(
+        shape.side.color,
+        Color.alphaBlend(
+          theme.colorScheme.onSurface.withValues(alpha: AppTokens.borderAlpha),
+          theme.cardColor,
+        ),
+      );
     });
   });
 

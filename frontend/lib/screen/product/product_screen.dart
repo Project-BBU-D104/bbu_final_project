@@ -20,7 +20,7 @@ class ProductScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Products', useTheme: true),
+          : const CustomAppBar(title: 'Products'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

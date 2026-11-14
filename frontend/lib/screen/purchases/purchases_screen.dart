@@ -18,7 +18,7 @@ class PurchasesScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Purchases', useTheme: true),
+          : const CustomAppBar(title: 'Purchases'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

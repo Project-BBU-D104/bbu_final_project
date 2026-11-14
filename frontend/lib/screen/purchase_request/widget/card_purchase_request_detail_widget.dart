@@ -121,7 +121,6 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
             ? null
             : const CustomAppBar(
                 title: 'Purchase Request Detail',
-                useTheme: true,
               ),
         body: Obx(() {
           final error = controller.formError.value;

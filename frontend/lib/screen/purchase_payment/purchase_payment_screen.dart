@@ -19,7 +19,7 @@ class PurchasePaymentScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Purchase Payments', useTheme: true),
+          : const CustomAppBar(title: 'Purchase Payments'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

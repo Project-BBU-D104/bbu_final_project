@@ -18,7 +18,7 @@ class UnitScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Units', useTheme: true),
+          : const CustomAppBar(title: 'Units'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

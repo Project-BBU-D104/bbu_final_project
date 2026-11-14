@@ -110,7 +110,7 @@ class UserDetailCardWidget extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'User Detail', useTheme: true),
+          : const CustomAppBar(title: 'User Detail'),
       body: user.isEmpty
           ? Center(child: Text('No user data found'.tr))
           : HomeTabLayout(

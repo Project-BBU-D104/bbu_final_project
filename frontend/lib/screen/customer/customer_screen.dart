@@ -18,7 +18,7 @@ class CustomerScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Customers', useTheme: true),
+          : const CustomAppBar(title: 'Customers'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

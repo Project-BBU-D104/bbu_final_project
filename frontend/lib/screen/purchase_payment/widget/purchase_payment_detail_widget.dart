@@ -99,7 +99,6 @@ class PurchasePaymentDetailWidget extends StatelessWidget {
             ? null
             : const CustomAppBar(
                 title: 'Purchase Payment Detail',
-                useTheme: true,
               ),
         body: HomeTabLayout(
           title: payment['payment_no']?.toString() ?? '-',

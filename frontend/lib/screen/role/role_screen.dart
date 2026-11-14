@@ -19,7 +19,7 @@ class RoleScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Roles', useTheme: true),
+          : const CustomAppBar(title: 'Roles'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

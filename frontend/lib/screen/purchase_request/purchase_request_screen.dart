@@ -18,7 +18,7 @@ class PurchaseRequestScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Purchase Requests', useTheme: true),
+          : const CustomAppBar(title: 'Purchase Requests'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

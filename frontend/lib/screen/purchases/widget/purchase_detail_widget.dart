@@ -69,7 +69,7 @@ class PurchaseDetailWidget extends StatelessWidget {
     final desktop = DesktopAppShell.isVisible(context);
     final appBar = desktop
         ? null
-        : const CustomAppBar(title: 'Purchase Detail', useTheme: true);
+        : const CustomAppBar(title: 'Purchase Detail');
 
     if (original == null) {
       return Scaffold(

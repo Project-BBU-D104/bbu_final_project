@@ -18,7 +18,7 @@ class CategoryScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Categories', useTheme: true),
+          : const CustomAppBar(title: 'Categories'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

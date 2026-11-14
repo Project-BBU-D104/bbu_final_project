@@ -19,7 +19,7 @@ class UserScreen extends StatelessWidget {
     return Scaffold(
       appBar: desktop
           ? null
-          : const CustomAppBar(title: 'Users', useTheme: true),
+          : const CustomAppBar(title: 'Users'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
