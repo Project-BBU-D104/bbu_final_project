@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/ui/app_empty_state.dart';
+import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_search_field.dart';
@@ -346,6 +347,101 @@ void main() {
         tester.widget<TextField>(find.byType(TextField)).decoration!.hintText,
         'Search Suppliers',
       );
+    });
+  });
+
+  group('form widgets', () {
+    Future<void> pumpForm(
+      WidgetTester tester,
+      Widget child, {
+      bool settle = true,
+    }) async {
+      await tester.pumpWidget(
+        MaterialApp(theme: AppTheme.light(), home: Scaffold(body: child)),
+      );
+      if (settle) {
+        await tester.pumpAndSettle();
+      } else {
+        await tester.pump();
+      }
+    }
+
+    testWidgets('form field validates and uses the shared decoration', (
+      tester,
+    ) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpForm(
+        tester,
+        Form(
+          key: formKey,
+          child: AppFormField(
+            label: 'Supplier Name',
+            validator: (value) => value == null || value.isEmpty
+                ? 'Supplier name is required'
+                : null,
+          ),
+        ),
+      );
+      formKey.currentState!.validate();
+      await tester.pumpAndSettle();
+      expect(find.text('Supplier name is required'), findsOneWidget);
+      final decoration = tester
+          .widget<InputDecorator>(find.byType(InputDecorator))
+          .decoration;
+      expect(decoration.filled, isTrue);
+      expect(
+        (decoration.enabledBorder! as OutlineInputBorder).borderRadius,
+        BorderRadius.circular(AppTokens.radiusControl),
+      );
+    });
+
+    testWidgets('form actions show a spinner while saving', (tester) async {
+      await pumpForm(
+        tester,
+        AppFormActions(onCancel: () {}, onSave: () {}, saving: true),
+        settle: false,
+      );
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Saving...'), findsOneWidget);
+      await pumpForm(tester, AppFormActions(onCancel: () {}, onSave: () {}));
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('Save'), findsOneWidget);
+    });
+
+    testWidgets('form shell opens a dialog on wide pages', (tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await pumpForm(tester, Builder(builder: (context) {
+        return TextButton(
+          onPressed: () => AppFormShell.show(context, const Text('form body')),
+          child: const Text('open'),
+        );
+      }));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(tester.getRect(find.byType(Dialog)).center.dy, closeTo(450, 2));
+    });
+
+    testWidgets('form shell opens a bottom sheet on narrow pages', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await pumpForm(tester, Builder(builder: (context) {
+        return TextButton(
+          onPressed: () => AppFormShell.show(context, const Text('form body')),
+          child: const Text('open'),
+        );
+      }));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.byType(BottomSheet), findsOneWidget);
     });
   });
 
