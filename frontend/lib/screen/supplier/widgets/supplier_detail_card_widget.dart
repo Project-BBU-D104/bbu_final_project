@@ -4,6 +4,8 @@ import 'package:frontend/global.dart';
 import 'package:frontend/models/supplier_model.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/utils/location_utils.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
@@ -69,30 +71,13 @@ class SupplierDetailCardWidget extends StatelessWidget {
     final active = theme.brightness == Brightness.light
         ? colors.primaryContainer
         : colors.primary;
-    return Theme(
-      data: theme.copyWith(
-        dividerColor: colors.onSurface.withValues(alpha: 0.08),
-        dividerTheme: DividerThemeData(
-          color: colors.onSurface.withValues(alpha: 0.08),
-          thickness: 1,
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(0, 48),
-            side: BorderSide(color: colors.onSurface.withValues(alpha: 0.12)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-      child: Scaffold(
-        appBar: desktop
-            ? null
-            : const CustomAppBar(title: 'Supplier Detail', useTheme: true),
-        body: original == null
-            ? Center(child: Text('No supplier data found'.tr))
-            : Obx(() {
+    return Scaffold(
+      appBar: desktop
+          ? null
+          : const CustomAppBar(title: 'Supplier Detail'),
+      body: original == null
+          ? Center(child: Text('No supplier data found'.tr))
+          : Obx(() {
                 final supplier = ctr.suppliers.firstWhere(
                   (s) => original.id != null && s.id == original.id,
                   orElse: () => original,
@@ -232,53 +217,67 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     ],
                   ),
                 );
-                return HomeTabLayout(
-                  translateTitle: false,
-                  title: supplier.name.isEmpty ? '-' : supplier.name,
-                  subtitle: 'Supplier Detail',
-                  leading: desktop
-                      ? IconButton.outlined(
-                          tooltip: 'Back'.tr,
-                          onPressed: () => Get.back(),
-                          icon: const Icon(Icons.arrow_back, size: 20),
-                        )
-                      : null,
-                  action: desktop ? _actions(context, supplier) : null,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (error.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              error,
-                              style: TextStyle(color: colors.error),
-                            ),
-                          ),
+                return AppPage(
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AppPageHeader(
+                          translateTitle: false,
+                          title: supplier.name.isEmpty ? '-' : supplier.name,
+                          subtitle: 'Supplier Detail',
+                          leading: desktop
+                              ? IconButton.outlined(
+                                  tooltip: 'Back'.tr,
+                                  onPressed: () => Get.back(),
+                                  icon: const Icon(Icons.arrow_back, size: 20),
+                                )
+                              : null,
+                          actions: desktop ? _actions(context, supplier) : null,
                         ),
-                      LayoutBuilder(
-                        builder: (context, constraints) =>
-                            constraints.maxWidth >= 900
-                            ? Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(child: contact),
-                                  const SizedBox(width: 24),
-                                  Expanded(child: location),
-                                ],
-                              )
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  contact,
-                                  const SizedBox(height: 24),
-                                  location,
-                                ],
+                        const SizedBox(height: 32),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (error.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Semantics(
+                                  liveRegion: true,
+                                  child: Text(
+                                    error,
+                                    style: TextStyle(color: colors.error),
+                                  ),
+                                ),
                               ),
-                      ),
-                    ],
+                            LayoutBuilder(
+                              builder: (context, constraints) =>
+                                  constraints.maxWidth >=
+                                      AppTokens.bpTwoColumn
+                                  ? Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(child: contact),
+                                        const SizedBox(width: 24),
+                                        Expanded(child: location),
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        contact,
+                                        const SizedBox(height: 24),
+                                        location,
+                                      ],
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),
@@ -290,7 +289,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
                   child: _actions(context, original),
                 ),
               ),
-      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/global.dart';
+import 'package:frontend/ui/app_form.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 
 class SupplierFormWidget extends StatefulWidget {
@@ -77,80 +79,29 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
     final c = widget.controller;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    InputDecoration decoration(
-      String label, {
-      Widget? suffix,
-      String? hint,
-    }) => InputDecoration(
-      labelText: label.tr,
-      hintText: hint?.tr,
-      suffixIcon: suffix,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
-    Widget heading(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Semantics(
-        header: true,
-        child: Text(
-          text.tr,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
     return Obx(() {
       final busy = c.isSaving.value;
       final error = c.formError.value;
-      Widget field(
-        String label,
-        TextEditingController text,
-        GlobalKey<FormFieldState<String>> key,
-        FocusNode focus,
-        String message,
-        TextInputType type,
-      ) => TextFormField(
-        key: key,
-        focusNode: focus,
-        controller: text,
+      final phone = AppFormField(
+        fieldKey: _phoneKey,
+        focusNode: _phoneFocus,
+        controller: c.supplierPhoneNumberController,
         enabled: !busy,
-        keyboardType: type,
-        textInputAction: TextInputAction.next,
-        decoration: decoration(label),
-        validator: (value) => (value ?? '').trim().isEmpty ? message.tr : null,
+        keyboardType: TextInputType.phone,
+        label: 'Phone Number',
+        validator: (value) => (value ?? '').isEmpty
+            ? 'Phone number is required'.tr
+            : null,
       );
-      final phone = field(
-        'Phone Number',
-        c.supplierPhoneNumberController,
-        _phoneKey,
-        _phoneFocus,
-        'Phone number is required',
-        TextInputType.phone,
-      );
-      final email = field(
-        'Email',
-        c.supplierEmailController,
-        _emailKey,
-        _emailFocus,
-        'Email is required',
-        TextInputType.emailAddress,
+      final email = AppFormField(
+        fieldKey: _emailKey,
+        focusNode: _emailFocus,
+        controller: c.supplierEmailController,
+        enabled: !busy,
+        keyboardType: TextInputType.emailAddress,
+        label: 'Email',
+        validator: (value) =>
+            (value ?? '').isEmpty ? 'Email is required'.tr : null,
       );
       return PopScope(
         canPop: !busy && !_picking,
@@ -178,7 +129,9 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: colors.primary.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                AppTokens.radiusControl,
+                              ),
                             ),
                             child: Icon(
                               Icons.business_outlined,
@@ -206,65 +159,73 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Divider(
-                          height: 1,
-                          color: colors.onSurface.withValues(alpha: 0.08),
-                        ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(height: 1),
                       ),
-                      heading('Contact details'),
-                      field(
-                        'Supplier Name',
-                        c.supplierNameController,
-                        _nameKey,
-                        _nameFocus,
-                        'Supplier name is required',
-                        TextInputType.name,
-                      ),
-                      const SizedBox(height: 20),
-                      LayoutBuilder(
-                        builder: (context, constraints) => Wrap(
-                          spacing: 16,
-                          runSpacing: 20,
-                          children: [
-                            for (final item in [phone, email])
-                              SizedBox(
-                                width: constraints.maxWidth >= 560
-                                    ? (constraints.maxWidth - 16) / 2
-                                    : constraints.maxWidth,
-                                child: item,
-                              ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      heading('Location details'),
-                      TextFormField(
-                        controller: c.supplierMapController,
-                        readOnly: true,
-                        enabled: !busy && !_picking,
-                        onTap: _pick,
-                        decoration: decoration(
-                          'Map',
-                          hint: 'Pick Location',
-                          suffix: IconButton(
-                            tooltip: 'Pick Location'.tr,
-                            onPressed: busy || _picking ? null : _pick,
-                            icon: const Icon(
-                              Icons.location_on_outlined,
-                              size: 20,
+                      AppFormSection(
+                        title: 'Contact details',
+                        children: [
+                          AppFormField(
+                            fieldKey: _nameKey,
+                            focusNode: _nameFocus,
+                            controller: c.supplierNameController,
+                            enabled: !busy,
+                            keyboardType: TextInputType.name,
+                            label: 'Supplier Name',
+                            validator: (value) => (value ?? '').isEmpty
+                                ? 'Supplier name is required'.tr
+                                : null,
+                          ),
+                          const SizedBox(height: 20),
+                          LayoutBuilder(
+                            builder: (context, constraints) => Wrap(
+                              spacing: 16,
+                              runSpacing: 20,
+                              children: [
+                                for (final item in [phone, email])
+                                  SizedBox(
+                                    width:
+                                        constraints.maxWidth >=
+                                            AppTokens.bpFormPair
+                                        ? (constraints.maxWidth - 16) / 2
+                                        : constraints.maxWidth,
+                                    child: item,
+                                  ),
+                              ],
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 28),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: c.supplierAddressController,
-                        enabled: !busy,
-                        minLines: 2,
-                        maxLines: 4,
-                        decoration: decoration('Address'),
+                      AppFormSection(
+                        title: 'Location details',
+                        children: [
+                          AppFormField(
+                            controller: c.supplierMapController,
+                            readOnly: true,
+                            enabled: !busy && !_picking,
+                            onTap: _pick,
+                            label: 'Map',
+                            hint: 'Pick Location',
+                            suffix: IconButton(
+                              tooltip: 'Pick Location'.tr,
+                              onPressed: busy || _picking ? null : _pick,
+                              icon: const Icon(
+                                Icons.location_on_outlined,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          AppFormField(
+                            controller: c.supplierAddressController,
+                            enabled: !busy,
+                            minLines: 2,
+                            maxLines: 4,
+                            label: 'Address',
+                          ),
+                        ],
                       ),
                       if (widget.showStatus)
                         Padding(
@@ -294,60 +255,16 @@ class _SupplierFormWidgetState extends State<SupplierFormWidget> {
                             ),
                           ),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Divider(
-                          height: 1,
-                          color: colors.onSurface.withValues(alpha: 0.08),
-                        ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(height: 1),
                       ),
-                      Wrap(
-                        alignment: WrapAlignment.end,
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          OutlinedButton(
-                            onPressed: busy || _picking
-                                ? null
-                                : () => Navigator.of(context).pop(),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(100, 48),
-                              side: BorderSide(
-                                color: colors.onSurface.withValues(alpha: 0.12),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Text('Cancel'.tr),
-                          ),
-                          FilledButton(
-                            onPressed: busy || _picking ? null : _submit,
-                            style: FilledButton.styleFrom(
-                              minimumSize: const Size(112, 48),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: busy
-                                ? Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: colors.onPrimary,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text('Saving...'.tr),
-                                    ],
-                                  )
-                                : Text('Save'.tr),
-                          ),
-                        ],
+                      AppFormActions(
+                        saving: busy,
+                        onCancel: busy || _picking
+                            ? null
+                            : () => Navigator.of(context).pop(),
+                        onSave: busy || _picking ? null : _submit,
                       ),
                     ],
                   ),

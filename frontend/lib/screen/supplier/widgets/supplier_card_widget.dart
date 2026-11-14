@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/supplier_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/models/supplier_model.dart';
+import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/utils/location_utils.dart';
 import 'package:frontend/widget/status_widget.dart';
@@ -18,97 +19,82 @@ class SupplierCardWidget extends StatelessWidget {
         ? theme.colorScheme.primaryContainer
         : theme.colorScheme.primary;
     final inactiveColor = theme.colorScheme.onSurface;
-    return Card(
-      color: theme.cardColor,
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => Get.find<SupplierController>().gotoSupplierDetail(item),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+    return AppListCard(
+      onTap: () => Get.find<SupplierController>().gotoSupplierDetail(item),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.business_outlined,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Tooltip(
-                      message: item.name,
-                      child: Text(
-                        item.name.isEmpty ? '-' : item.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleLarge,
-                      ),
-                    ),
-                  ),
-                ],
+              Icon(
+                Icons.business_outlined,
+                color: theme.colorScheme.primary,
               ),
-              const SizedBox(height: 12),
-              Text(item.phone.isEmpty ? '-' : item.phone),
-              const SizedBox(height: 8),
-              Tooltip(
-                message: item.email ?? '',
-                child: Text(
-                  (item.email ?? '').isEmpty ? '-' : item.email!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Tooltip(
+                  message: item.name,
+                  child: Text(
+                    item.name.isEmpty ? '-' : item.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleLarge,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  StatusWidget(
-                    text: (item.status == true ? 'Active' : 'Inactive').tr,
-                    color: item.status == true ? activeColor : inactiveColor,
-                  ),
-                  Text(
-                    item.createdAt == null
-                        ? '-'
-                        : DateFormatter.formatDate(item.createdAt),
-                  ),
-                  IconButton(
-                    tooltip: 'Call supplier'.tr,
-                    onPressed: item.phone.trim().isEmpty
-                        ? null
-                        : () => callPhone(item.phone),
-                    icon: const Icon(Icons.phone_outlined),
-                  ),
-                  IconButton(
-                    tooltip: 'Email supplier'.tr,
-                    onPressed: (item.email ?? '').trim().isEmpty
-                        ? null
-                        : () => openEmail(item.email!),
-                    icon: const Icon(Icons.email_outlined),
-                  ),
-                  IconButton(
-                    tooltip: 'Open location'.tr,
-                    onPressed: usableMapValue(item.map) == null
-                        ? null
-                        : () => openGoogleMap(item.map!),
-                    icon: const Icon(Icons.location_on_outlined),
-                  ),
-                ],
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          Text(item.phone.isEmpty ? '-' : item.phone),
+          const SizedBox(height: 8),
+          Tooltip(
+            message: item.email ?? '',
+            child: Text(
+              (item.email ?? '').isEmpty ? '-' : item.email!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              StatusWidget(
+                text: (item.status == true ? 'Active' : 'Inactive').tr,
+                color: item.status == true ? activeColor : inactiveColor,
+              ),
+              Text(
+                item.createdAt == null
+                    ? '-'
+                    : DateFormatter.formatDate(item.createdAt),
+              ),
+              IconButton(
+                tooltip: 'Call supplier'.tr,
+                onPressed: item.phone.trim().isEmpty
+                    ? null
+                    : () => callPhone(item.phone),
+                icon: const Icon(Icons.phone_outlined),
+              ),
+              IconButton(
+                tooltip: 'Email supplier'.tr,
+                onPressed: (item.email ?? '').trim().isEmpty
+                    ? null
+                    : () => openEmail(item.email!),
+                icon: const Icon(Icons.email_outlined),
+              ),
+              IconButton(
+                tooltip: 'Open location'.tr,
+                onPressed: usableMapValue(item.map) == null
+                    ? null
+                    : () => openGoogleMap(item.map!),
+                icon: const Icon(Icons.location_on_outlined),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

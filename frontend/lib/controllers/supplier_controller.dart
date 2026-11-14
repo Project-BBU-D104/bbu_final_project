@@ -5,7 +5,7 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_add_widget.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_edit_widget.dart';
 import 'package:frontend/services/main_service/supplier_service.dart';
-import 'package:frontend/widget/bottom_sheets.dart';
+import 'package:frontend/ui/app_form.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
 
@@ -128,28 +128,7 @@ class SupplierController extends GetxController {
   Future<void> _showForm(BuildContext context, Widget child) async {
     _formOpen = true;
     try {
-      if (MediaQuery.sizeOf(context).width >= 840) {
-        await showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => Dialog(
-            constraints: const BoxConstraints(maxWidth: 720),
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: child,
-          ),
-        );
-      } else {
-        await AppBottomSheets.show(
-          context,
-          child: child,
-          isDismissible: false,
-          enableDrag: false,
-          constraints: const BoxConstraints(maxWidth: 760),
-        );
-      }
+      await AppFormShell.show(context, child);
     } finally {
       _formOpen = false;
     }

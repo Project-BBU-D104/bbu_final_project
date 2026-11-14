@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/app_tokens.dart';
+import 'package:get/get.dart';
 
 /// The shared "nothing here yet" block.
 class AppEmptyState extends StatelessWidget {
@@ -29,7 +30,11 @@ class AppEmptyState extends StatelessWidget {
         children: [
           Icon(icon, size: 40, color: colors.onSurfaceVariant),
           const SizedBox(height: AppSpacing.lg),
-          Text(message, textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
+          Text(
+            message.tr,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium,
+          ),
         ],
       ),
     );
