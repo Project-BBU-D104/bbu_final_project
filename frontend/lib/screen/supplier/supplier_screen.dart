@@ -148,7 +148,7 @@ class SupplierScreen extends StatelessWidget {
                                     content.maxWidth >= AppTokens.bpTable &&
                                     MediaQuery.textScalerOf(
                                       context,
-                                    ).scale(16) <=
+                                    ).scale(16) <
                                         20.8;
                                 return RefreshIndicator(
                                   onRefresh: controller.onRefresh,

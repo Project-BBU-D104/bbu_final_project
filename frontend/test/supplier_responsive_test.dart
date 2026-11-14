@@ -25,7 +25,7 @@ void main() {
       tester,
       home: SupplierScreen(),
       size: const Size(1440, 900),
-      textScale: 1.4,
+      textScale: 1.3,
     );
     expect(find.byType(SupplierCardWidget), findsWidgets);
     expect(find.byType(SupplierTableWidget), findsNothing);
