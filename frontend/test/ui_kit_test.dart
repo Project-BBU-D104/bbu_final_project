@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_table.dart';
 import 'package:frontend/ui/app_tokens.dart';
 
 void main() {
@@ -207,6 +208,78 @@ void main() {
       final rect = tester.getRect(find.byKey(const Key('content')));
       expect(rect.width, AppTokens.contentMaxWidth);
       expect(rect.center.dx, 700);
+    });
+  });
+
+  group('AppTable', () {
+    Future<void> pumpTable(
+      WidgetTester tester,
+      double width, {
+      void Function(String row)? onRowTap,
+    }) async {
+      tester.view.physicalSize = Size(width, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: AppTable<String>(
+              rows: const ['Alpha', 'Beta'],
+              onRowTap: onRowTap,
+              columns: [
+                AppTableColumn<String>(
+                  title: 'Supplier',
+                  flex: 2,
+                  builder: (_, row) => Text(row),
+                ),
+                AppTableColumn<String>(
+                  title: 'Status',
+                  width: 132,
+                  builder: (_, row) => const Text('Active'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('table renders its headings rows and card chrome', (
+      tester,
+    ) async {
+      await pumpTable(tester, 1400);
+      expect(find.byType(DataTable), findsOneWidget);
+      final table = tester.widget<DataTable>(find.byType(DataTable));
+      expect(table.dataRowMaxHeight, lessThanOrEqualTo(76));
+      expect(table.headingRowHeight, 48);
+      expect(find.text('Supplier'), findsOneWidget);
+      expect(find.text('Status'), findsOneWidget);
+      expect(find.text('Alpha'), findsOneWidget);
+      expect(find.text('Beta'), findsOneWidget);
+      expect(
+        tester.getSize(find.byType(DataTable)).width,
+        closeTo(tester.getSize(find.byType(Card)).width, 2),
+      );
+      final theme = Theme.of(tester.element(find.byType(AppTable<String>)));
+      expect(tester.widget<Card>(find.byType(Card)).color, theme.cardColor);
+    });
+
+    testWidgets('table keeps its minimum width and scrolls instead', (
+      tester,
+    ) async {
+      await pumpTable(tester, 400);
+      expect(tester.getSize(find.byType(DataTable)).width, 960);
+    });
+
+    testWidgets('tapping a row reports that row', (tester) async {
+      String? tapped;
+      await pumpTable(tester, 1400, onRowTap: (row) => tapped = row);
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      expect(tapped, 'Alpha');
     });
   });
 
