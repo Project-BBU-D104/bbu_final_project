@@ -3,7 +3,7 @@ import 'package:frontend/global.dart';
 import 'package:frontend/screen/profile/widget/change_password_widget.dart';
 import 'package:frontend/screen/profile/widget/edit_profile_widget.dart';
 import 'package:frontend/services/main_service/profile_service.dart';
-import 'package:frontend/widget/bottom_sheets.dart';
+import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
@@ -55,21 +55,33 @@ class ProfileController extends GetxController {
         : (storedRole?.toString() ?? "");
   }
 
-  void openEditProfile(BuildContext context) {
+  bool _isFormOpen = false;
+
+  Future<void> openEditProfile(BuildContext context) async {
+    if (_isFormOpen) return;
+    _isFormOpen = true;
     nameCtrl.text = username.value;
     emailCtrl.text = email.value;
     phoneCtrl.text = phone.value;
     photoCtrl.text = photo.value;
-
-    AppBottomSheets.show(context, child: EditProfileWidget());
+    try {
+      await AppFormShell.show(context, const EditProfileWidget());
+    } finally {
+      _isFormOpen = false;
+    }
   }
 
-  void openChangePassword(BuildContext context) {
+  Future<void> openChangePassword(BuildContext context) async {
+    if (_isFormOpen) return;
+    _isFormOpen = true;
     currentPasswordCtrl.clear();
     newPasswordCtrl.clear();
     confirmPasswordCtrl.clear();
-
-    AppBottomSheets.show(context, child: ChangePasswordWidget());
+    try {
+      await AppFormShell.show(context, ChangePasswordWidget());
+    } finally {
+      _isFormOpen = false;
+    }
   }
 
   Future<void> onUpdateProfile(BuildContext context) async {

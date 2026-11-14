@@ -96,7 +96,8 @@ Future<void> openSheet(WidgetTester tester, String label) async {
 }
 
 Future<void> tapButton(WidgetTester tester, String label) async {
-  final finder = find.widgetWithText(ElevatedButton, label);
+  final filled = find.widgetWithText(FilledButton, label);
+  final finder = filled.evaluate().isNotEmpty ? filled : find.widgetWithText(ElevatedButton, label);
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);

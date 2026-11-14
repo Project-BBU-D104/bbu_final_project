@@ -1,4 +1,10 @@
 const Map<String, String> enUS = {
+  "Edit Profile": "Edit Profile",
+  "Update your personal and contact information.": "Update your personal and contact information.",
+  "Photo URL": "Photo URL",
+  "Name is required": "Name is required",
+  "Enter a valid email": "Enter a valid email",
+  "Profile updated successfully": "Profile updated successfully",
   "Contact details": "Contact details",
   "Location details": "Location details",
   "Tap the map or enter coordinates.": "Tap the map or enter coordinates.",

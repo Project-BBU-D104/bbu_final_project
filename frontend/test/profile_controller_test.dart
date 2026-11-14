@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,6 +12,7 @@ import 'package:frontend/screen/profile/widget/change_password_widget.dart';
 import 'package:frontend/services/main_service/profile_service.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
+import 'package:frontend/ui/app_form.dart';
 
 class FakeStorageService implements IStorageService {
   Map<String, dynamic> stored = {};
@@ -88,9 +89,9 @@ class FakeProfileService implements ProfileService {
 
   @override
   Future<dynamic> updateProfile(Map<String, dynamic> data) async {
+    updateCalls.add(data);
     if (updateGate != null) await updateGate!.future;
     if (failure != null) throw failure!;
-    updateCalls.add(data);
     return updateResult ?? {'id': 5, ...data};
   }
 
@@ -130,7 +131,8 @@ Future<void> openPassword(WidgetTester tester) async {
 }
 
 Future<void> tapButton(WidgetTester tester, String label) async {
-  final finder = find.widgetWithText(ElevatedButton, label);
+  final filled = find.widgetWithText(FilledButton, label);
+  final finder = filled.evaluate().isNotEmpty ? filled : find.widgetWithText(ElevatedButton, label);
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -227,7 +229,8 @@ void main() {
     await tester.pump();
     await tapButton(tester, 'Save');
 
-    expect(service.updateCalls, isEmpty);
+    expect(service.updateCalls, hasLength(1));
+    expect(ctr.nameCtrl.text, 'New Name');
     expect(storageFake.stored, before);
     expect(storageFake.writeCalls, 0);
     expect(ctr.isSaving.value, isFalse);
@@ -301,4 +304,104 @@ void main() {
 
     await closeToasts(tester);
   });
+  testWidgets('edit form uses kit sections and prefilled values', (tester) async {
+    final ctr = await pumpProfile(tester, FakeProfileService());
+    await openEdit(tester);
+    expect(find.byType(AppFormSection), findsNWidgets(2));
+    expect(find.byType(AppFormField), findsNWidgets(4));
+    expect(find.byType(AppFormActions), findsOneWidget);
+    expect(ctr.nameCtrl.text, 'Old Name');
+    expect(ctr.emailCtrl.text, 'old@example.com');
+    expect(ctr.phoneCtrl.text, '000');
+    expect(ctr.photoCtrl.text, 'old.png');
+  });
+
+  for (final width in [839.0, 840.0]) {
+    testWidgets('edit uses adaptive presentation at desktop boundary $width', (tester) async {
+      tester.view.physicalSize = Size(width, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await pumpProfile(tester, FakeProfileService());
+      await openEdit(tester);
+      expect(find.ancestor(of: find.byType(EditProfileWidget), matching: find.byType(width < 840 ? BottomSheet : Dialog)), findsOneWidget);
+    });
+  }
+
+  for (final control in ['Cancel', 'Close']) {
+    testWidgets('edit $control discards only the draft', (tester) async {
+      final service = FakeProfileService();
+      final ctr = await pumpProfile(tester, service);
+      await openEdit(tester);
+      ctr.nameCtrl.text = 'Draft';
+      final target = control == 'Close' ? find.byTooltip('Close') : find.widgetWithText(OutlinedButton, 'Cancel');
+      await tester.ensureVisible(target);
+      await tester.tap(target);
+      await tester.pumpAndSettle();
+      await openEdit(tester);
+      expect(ctr.nameCtrl.text, 'Old Name');
+      expect(service.updateCalls, isEmpty);
+    });
+  }
+
+  testWidgets('edit rejects invalid input and focuses the first error', (tester) async {
+    final service = FakeProfileService();
+    final ctr = await pumpProfile(tester, service);
+    await openEdit(tester);
+    ctr.nameCtrl.text = '   ';
+    ctr.emailCtrl.text = 'invalid';
+    await tapButton(tester, 'Save');
+    expect(find.text('Name is required'), findsOneWidget);
+    expect(find.text('Enter a valid email'), findsOneWidget);
+    TextField field(TextEditingController c) => tester.widgetList<TextField>(find.byType(TextField)).singleWhere((f) => f.controller == c);
+    expect(field(ctr.nameCtrl).focusNode!.hasFocus, isTrue);
+    ctr.nameCtrl.text = 'Name';
+    await tapButton(tester, 'Save');
+    expect(field(ctr.emailCtrl).focusNode!.hasFocus, isTrue);
+    expect(service.updateCalls, isEmpty);
+  });
+
+  testWidgets('edit busy state prevents changes dismissal and duplicate writes', (tester) async {
+    final service = FakeProfileService()..updateGate = Completer<void>();
+    final ctr = await pumpProfile(tester, service);
+    await openEdit(tester);
+    final context = tester.element(find.byType(EditProfileWidget));
+    final first = ctr.onUpdateProfile(context);
+    final second = ctr.onUpdateProfile(context);
+    await tester.pump();
+    expect(service.updateCalls, hasLength(1));
+    expect(tester.widgetList<TextField>(find.byType(TextField)).every((f) => f.enabled == false), isTrue);
+    expect(tester.widget<FilledButton>(find.descendant(of: find.byType(EditProfileWidget), matching: find.byType(FilledButton))).onPressed, isNull);
+    expect(tester.widget<OutlinedButton>(find.widgetWithText(OutlinedButton, 'Cancel')).onPressed, isNull);
+    expect(tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.close)).onPressed, isNull);
+    await Navigator.of(context).maybePop();
+    await tester.pump();
+    expect(find.byType(EditProfileWidget), findsOneWidget);
+    service.updateGate!.complete();
+    await Future.wait([first, second]);
+    await tester.pumpAndSettle();
+    expect(find.byType(EditProfileWidget), findsNothing);
+    await closeToasts(tester);
+  });
+
+  testWidgets('repeated account action opens one form', (tester) async {
+    final ctr = await pumpProfile(tester, FakeProfileService());
+    final context = tester.element(find.byType(ProfileScreen));
+    ctr.openEditProfile(context);
+    ctr.openEditProfile(context);
+    ctr.openChangePassword(context);
+    await tester.pumpAndSettle();
+    expect(find.byType(EditProfileWidget), findsOneWidget);
+    expect(find.byType(ChangePasswordWidget), findsNothing);
+    await tester.ensureVisible(find.widgetWithText(OutlinedButton, 'Cancel'));
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
+    await tester.pumpAndSettle();
+    ctr.openChangePassword(context);
+    ctr.openChangePassword(context);
+    await tester.pumpAndSettle();
+    expect(find.byType(ChangePasswordWidget), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
 }
+
