@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/test_product_scanner_page.dart';
 import 'package:get/get.dart';
 
@@ -62,13 +63,8 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 48),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: AppTokens.controlHeight),
       child: TextField(
         controller: _textController,
         decoration: InputDecoration(
@@ -94,7 +90,6 @@ class _SearchWidgetState extends State<SearchWidget> {
               }),
             ],
           ),
-          border: InputBorder.none,
         ),
       ),
     );

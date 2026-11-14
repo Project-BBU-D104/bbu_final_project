@@ -2,6 +2,8 @@ import 'package:flutter/material.dart' hide SearchController;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/widget/search_widget.dart';
+import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/ui/app_search_field.dart';
 import 'package:get/get.dart';
 
 void main() {
@@ -12,28 +14,22 @@ void main() {
   ) async {
     await tester.pumpWidget(
       GetMaterialApp(
-        theme: ThemeData.dark(),
-        home: const Scaffold(body: SearchWidget(title: 'Search')),
+        theme: AppTheme.dark(),
+        home: const Scaffold(body: AppSearchField(title: 'Search')),
       ),
     );
     await tester.enterText(find.byType(TextField), 'alpha');
     await tester.pump(const Duration(milliseconds: 600));
-    final decoration =
-        tester
-                .widget<Container>(
-                  find
-                      .ancestor(
-                        of: find.byType(TextField),
-                        matching: find.byType(Container),
-                      )
-                      .first,
-                )
-                .decoration
-            as BoxDecoration;
+    // The field fills the search bounds without a second inset surface.
     expect(
-      decoration.color,
-      Theme.of(tester.element(find.byType(TextField))).colorScheme.surface,
+      tester.getRect(find.byType(TextField)),
+      tester.getRect(find.byType(AppSearchField)),
     );
+    final input = tester.widget<TextField>(find.byType(TextField));
+    expect(input.decoration!.border, isNull);
+    final theme = Theme.of(tester.element(find.byType(TextField)));
+    expect(theme.inputDecorationTheme.enabledBorder, isA<OutlineInputBorder>());
+    expect(theme.inputDecorationTheme.focusedBorder, isA<OutlineInputBorder>());
     await tester.tap(find.byTooltip('Clear search'));
     await tester.pump(const Duration(milliseconds: 600));
     expect(Get.find<SearchController>().keyword.value, isEmpty);
