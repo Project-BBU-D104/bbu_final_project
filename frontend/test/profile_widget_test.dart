@@ -96,8 +96,7 @@ Future<void> openSheet(WidgetTester tester, String label) async {
 }
 
 Future<void> tapButton(WidgetTester tester, String label) async {
-  final filled = find.widgetWithText(FilledButton, label);
-  final finder = filled.evaluate().isNotEmpty ? filled : find.widgetWithText(ElevatedButton, label);
+  final finder = find.widgetWithText(FilledButton, label);
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -122,8 +121,9 @@ void main() {
     Get.reset();
   });
 
-  testWidgets('edit sheet replaces the placeholder and opens from the screen',
-      (tester) async {
+  testWidgets('edit sheet replaces the placeholder and opens from the screen', (
+    tester,
+  ) async {
     final service = FakeProfileService();
     await pumpProfile(tester, service);
 
@@ -133,8 +133,9 @@ void main() {
     expect(find.text('Edit Profile Widget'), findsNothing);
   });
 
-  testWidgets('blank name and invalid email never call the service',
-      (tester) async {
+  testWidgets('blank name and invalid email never call the service', (
+    tester,
+  ) async {
     final service = FakeProfileService();
     final ctr = await pumpProfile(tester, service);
 
@@ -171,27 +172,29 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('short password and mismatched confirmation never call the service',
-      (tester) async {
-    final service = FakeProfileService();
-    final ctr = await pumpProfile(tester, service);
+  testWidgets(
+    'short password and mismatched confirmation never call the service',
+    (tester) async {
+      final service = FakeProfileService();
+      final ctr = await pumpProfile(tester, service);
 
-    await openSheet(tester, 'Change Password');
-    expect(find.byType(ChangePasswordWidget), findsOneWidget);
-    ctr.currentPasswordCtrl.text = 'oldpass123';
-    ctr.newPasswordCtrl.text = 'short';
-    ctr.confirmPasswordCtrl.text = 'short';
-    await tester.pump();
-    await tapButton(tester, 'Update Password');
-    expect(service.passwordCalls, isEmpty);
+      await openSheet(tester, 'Change Password');
+      expect(find.byType(ChangePasswordWidget), findsOneWidget);
+      ctr.currentPasswordCtrl.text = 'oldpass123';
+      ctr.newPasswordCtrl.text = 'short';
+      ctr.confirmPasswordCtrl.text = 'short';
+      await tester.pump();
+      await tapButton(tester, 'Update Password');
+      expect(service.passwordCalls, isEmpty);
 
-    ctr.newPasswordCtrl.text = 'newpass123';
-    ctr.confirmPasswordCtrl.text = 'newpass12';
-    await tester.pump();
-    await tapButton(tester, 'Update Password');
-    expect(service.passwordCalls, isEmpty);
-    expect(find.byType(ChangePasswordWidget), findsOneWidget);
-  });
+      ctr.newPasswordCtrl.text = 'newpass123';
+      ctr.confirmPasswordCtrl.text = 'newpass12';
+      await tester.pump();
+      await tapButton(tester, 'Update Password');
+      expect(service.passwordCalls, isEmpty);
+      expect(find.byType(ChangePasswordWidget), findsOneWidget);
+    },
+  );
 
   testWidgets('valid password change closes the sheet', (tester) async {
     final service = FakeProfileService();

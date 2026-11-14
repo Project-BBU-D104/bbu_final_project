@@ -13,22 +13,38 @@ import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 void main() {
-  testWidgets('secure shared field preserves raw validation and submission', (tester) async {
+  testWidgets('secure shared field preserves raw validation and submission', (
+    tester,
+  ) async {
     final controller = TextEditingController(text: '  abcdef  ');
     addTearDown(controller.dispose);
     final key = GlobalKey<FormState>();
     String? validatedPassword;
     String? submittedValue;
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: Form(
-      key: key,
-      child: AppFormField(label: 'Password', controller: controller,
-        obscureText: true, trimValue: false, autocorrect: false,
-        enableSuggestions: false, autofillHints: const [AutofillHints.newPassword],
-        textInputAction: TextInputAction.done,
-        validator: (value) { validatedPassword = value; return null; },
-        onFieldSubmitted: (value) => submittedValue = value,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            key: key,
+            child: AppFormField(
+              label: 'Password',
+              controller: controller,
+              obscureText: true,
+              trimValue: false,
+              autocorrect: false,
+              enableSuggestions: false,
+              autofillHints: const [AutofillHints.newPassword],
+              textInputAction: TextInputAction.done,
+              validator: (value) {
+                validatedPassword = value;
+                return null;
+              },
+              onFieldSubmitted: (value) => submittedValue = value,
+            ),
+          ),
+        ),
       ),
-    ))));
+    );
     key.currentState!.validate();
     expect(validatedPassword, '  abcdef  ');
     final field = tester.widget<TextField>(find.byType(TextField));
@@ -44,24 +60,41 @@ void main() {
   });
 
   for (final multiline in [false, true]) {
-    testWidgets('shared field keeps trimmed validation and multiline=$multiline', (tester) async {
-      final controller = TextEditingController(text: '  value  ');
-      addTearDown(controller.dispose);
-      final key = GlobalKey<FormState>();
-      String? validatedValue;
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: Form(key: key,
-        child: AppFormField(label: 'Name', controller: controller,
-          minLines: multiline ? 2 : null, maxLines: multiline ? 4 : null,
-          validator: (value) { validatedValue = value; return null; }),
-      ))));
-      key.currentState!.validate();
-      expect(validatedValue, 'value');
-      expect(controller.text, '  value  ');
-      final field = tester.widget<TextField>(find.byType(TextField));
-      expect(field.obscureText, isFalse);
-      expect(field.minLines, multiline ? 2 : null);
-      expect(field.maxLines, multiline ? 4 : null);
-    });
+    testWidgets(
+      'shared field keeps trimmed validation and multiline=$multiline',
+      (tester) async {
+        final controller = TextEditingController(text: '  value  ');
+        addTearDown(controller.dispose);
+        final key = GlobalKey<FormState>();
+        String? validatedValue;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Form(
+                key: key,
+                child: AppFormField(
+                  label: 'Name',
+                  controller: controller,
+                  minLines: multiline ? 2 : null,
+                  maxLines: multiline ? 4 : null,
+                  validator: (value) {
+                    validatedValue = value;
+                    return null;
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        key.currentState!.validate();
+        expect(validatedValue, 'value');
+        expect(controller.text, '  value  ');
+        final field = tester.widget<TextField>(find.byType(TextField));
+        expect(field.obscureText, isFalse);
+        expect(field.minLines, multiline ? 2 : null);
+        expect(field.maxLines, multiline ? 4 : null);
+      },
+    );
   }
   group('shared theme', () {
     for (final theme in [AppTheme.light(), AppTheme.dark()]) {
@@ -72,10 +105,7 @@ void main() {
         expect(card.elevation, 0);
         expect(card.margin, EdgeInsets.zero);
         final shape = card.shape as RoundedRectangleBorder;
-        expect(
-          shape.borderRadius,
-          BorderRadius.circular(AppTokens.radiusCard),
-        );
+        expect(shape.borderRadius, BorderRadius.circular(AppTokens.radiusCard));
         expect(
           shape.side.color,
           Color.alphaBlend(
@@ -257,7 +287,11 @@ void main() {
           theme: AppTheme.light(),
           home: Scaffold(
             body: AppPage(
-              child: const SizedBox(key: Key('content'), width: 1400, height: 10),
+              child: const SizedBox(
+                key: Key('content'),
+                width: 1400,
+                height: 10,
+              ),
             ),
           ),
         ),
@@ -351,10 +385,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.light(),
           home: Scaffold(
-            body: AppListCard(
-              onTap: () => taps++,
-              child: const Text('Alpha'),
-            ),
+            body: AppListCard(onTap: () => taps++, child: const Text('Alpha')),
           ),
         ),
       );
@@ -409,7 +440,10 @@ void main() {
       bool settle = true,
     }) async {
       await tester.pumpWidget(
-        MaterialApp(theme: AppTheme.light(), home: Scaffold(body: child)),
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(body: child),
+        ),
       );
       if (settle) {
         await tester.pumpAndSettle();
@@ -465,12 +499,18 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await pumpForm(tester, Builder(builder: (context) {
-        return TextButton(
-          onPressed: () => AppFormShell.show(context, const Text('form body')),
-          child: const Text('open'),
-        );
-      }));
+      await pumpForm(
+        tester,
+        Builder(
+          builder: (context) {
+            return TextButton(
+              onPressed: () =>
+                  AppFormShell.show(context, const Text('form body')),
+              child: const Text('open'),
+            );
+          },
+        ),
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsOneWidget);
@@ -484,12 +524,18 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await pumpForm(tester, Builder(builder: (context) {
-        return TextButton(
-          onPressed: () => AppFormShell.show(context, const Text('form body')),
-          child: const Text('open'),
-        );
-      }));
+      await pumpForm(
+        tester,
+        Builder(
+          builder: (context) {
+            return TextButton(
+              onPressed: () =>
+                  AppFormShell.show(context, const Text('form body')),
+              child: const Text('open'),
+            );
+          },
+        ),
+      );
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
@@ -520,10 +566,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.light(),
           home: const Scaffold(
-            body: HomeSectionCard(
-              title: 'Contact details',
-              child: Text('x'),
-            ),
+            body: HomeSectionCard(title: 'Contact details', child: Text('x')),
           ),
         ),
       );

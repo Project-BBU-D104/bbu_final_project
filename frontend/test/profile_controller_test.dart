@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -83,6 +83,7 @@ class FakeProfileService implements ProfileService {
   Map<String, dynamic>? passwordResult;
   Exception? failure;
   Completer<void>? updateGate;
+  Completer<void>? passwordGate;
 
   final updateCalls = <Map<String, dynamic>>[];
   final passwordCalls = <Map<String, dynamic>>[];
@@ -97,8 +98,9 @@ class FakeProfileService implements ProfileService {
 
   @override
   Future<dynamic> changePassword(Map<String, dynamic> data) async {
-    if (failure != null) throw failure!;
     passwordCalls.add(data);
+    if (passwordGate != null) await passwordGate!.future;
+    if (failure != null) throw failure!;
     return passwordResult ?? {'message': 'Password changed successfully.'};
   }
 }
@@ -131,8 +133,7 @@ Future<void> openPassword(WidgetTester tester) async {
 }
 
 Future<void> tapButton(WidgetTester tester, String label) async {
-  final filled = find.widgetWithText(FilledButton, label);
-  final finder = filled.evaluate().isNotEmpty ? filled : find.widgetWithText(ElevatedButton, label);
+  final finder = find.widgetWithText(FilledButton, label);
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -161,8 +162,9 @@ void main() {
     Get.reset();
   });
 
-  testWidgets('update sends only profile fields and preserves the session',
-      (tester) async {
+  testWidgets('update sends only profile fields and preserves the session', (
+    tester,
+  ) async {
     final service = FakeProfileService()
       ..updateResult = {
         'id': 99,
@@ -217,8 +219,9 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('update failure leaves storage and the sheet unchanged',
-      (tester) async {
+  testWidgets('update failure leaves storage and the sheet unchanged', (
+    tester,
+  ) async {
     final service = FakeProfileService()..failure = Exception('boom');
     final ctr = await pumpProfile(tester, service);
     final before = Map<String, dynamic>.from(storageFake.stored);
@@ -261,8 +264,9 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('wrong current password does not log the user out',
-      (tester) async {
+  testWidgets('wrong current password does not log the user out', (
+    tester,
+  ) async {
     final service = FakeProfileService()
       ..failure = Exception('Current password is incorrect');
     final ctr = await pumpProfile(tester, service);
@@ -304,7 +308,9 @@ void main() {
 
     await closeToasts(tester);
   });
-  testWidgets('edit form uses kit sections and prefilled values', (tester) async {
+  testWidgets('edit form uses kit sections and prefilled values', (
+    tester,
+  ) async {
     final ctr = await pumpProfile(tester, FakeProfileService());
     await openEdit(tester);
     expect(find.byType(AppFormSection), findsNWidgets(2));
@@ -317,14 +323,22 @@ void main() {
   });
 
   for (final width in [839.0, 840.0]) {
-    testWidgets('edit uses adaptive presentation at desktop boundary $width', (tester) async {
+    testWidgets('edit uses adaptive presentation at desktop boundary $width', (
+      tester,
+    ) async {
       tester.view.physicalSize = Size(width, 1000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await pumpProfile(tester, FakeProfileService());
       await openEdit(tester);
-      expect(find.ancestor(of: find.byType(EditProfileWidget), matching: find.byType(width < 840 ? BottomSheet : Dialog)), findsOneWidget);
+      expect(
+        find.ancestor(
+          of: find.byType(EditProfileWidget),
+          matching: find.byType(width < 840 ? BottomSheet : Dialog),
+        ),
+        findsOneWidget,
+      );
     });
   }
 
@@ -334,7 +348,9 @@ void main() {
       final ctr = await pumpProfile(tester, service);
       await openEdit(tester);
       ctr.nameCtrl.text = 'Draft';
-      final target = control == 'Close' ? find.byTooltip('Close') : find.widgetWithText(OutlinedButton, 'Cancel');
+      final target = control == 'Close'
+          ? find.byTooltip('Close')
+          : find.widgetWithText(OutlinedButton, 'Cancel');
       await tester.ensureVisible(target);
       await tester.tap(target);
       await tester.pumpAndSettle();
@@ -344,7 +360,9 @@ void main() {
     });
   }
 
-  testWidgets('edit rejects invalid input and focuses the first error', (tester) async {
+  testWidgets('edit rejects invalid input and focuses the first error', (
+    tester,
+  ) async {
     final service = FakeProfileService();
     final ctr = await pumpProfile(tester, service);
     await openEdit(tester);
@@ -353,7 +371,9 @@ void main() {
     await tapButton(tester, 'Save');
     expect(find.text('Name is required'), findsOneWidget);
     expect(find.text('Enter a valid email'), findsOneWidget);
-    TextField field(TextEditingController c) => tester.widgetList<TextField>(find.byType(TextField)).singleWhere((f) => f.controller == c);
+    TextField field(TextEditingController c) => tester
+        .widgetList<TextField>(find.byType(TextField))
+        .singleWhere((f) => f.controller == c);
     expect(field(ctr.nameCtrl).focusNode!.hasFocus, isTrue);
     ctr.nameCtrl.text = 'Name';
     await tapButton(tester, 'Save');
@@ -361,28 +381,58 @@ void main() {
     expect(service.updateCalls, isEmpty);
   });
 
-  testWidgets('edit busy state prevents changes dismissal and duplicate writes', (tester) async {
-    final service = FakeProfileService()..updateGate = Completer<void>();
-    final ctr = await pumpProfile(tester, service);
-    await openEdit(tester);
-    final context = tester.element(find.byType(EditProfileWidget));
-    final first = ctr.onUpdateProfile(context);
-    final second = ctr.onUpdateProfile(context);
-    await tester.pump();
-    expect(service.updateCalls, hasLength(1));
-    expect(tester.widgetList<TextField>(find.byType(TextField)).every((f) => f.enabled == false), isTrue);
-    expect(tester.widget<FilledButton>(find.descendant(of: find.byType(EditProfileWidget), matching: find.byType(FilledButton))).onPressed, isNull);
-    expect(tester.widget<OutlinedButton>(find.widgetWithText(OutlinedButton, 'Cancel')).onPressed, isNull);
-    expect(tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.close)).onPressed, isNull);
-    await Navigator.of(context).maybePop();
-    await tester.pump();
-    expect(find.byType(EditProfileWidget), findsOneWidget);
-    service.updateGate!.complete();
-    await Future.wait([first, second]);
-    await tester.pumpAndSettle();
-    expect(find.byType(EditProfileWidget), findsNothing);
-    await closeToasts(tester);
-  });
+  testWidgets(
+    'edit busy state prevents changes dismissal and duplicate writes',
+    (tester) async {
+      final service = FakeProfileService()..updateGate = Completer<void>();
+      final ctr = await pumpProfile(tester, service);
+      await openEdit(tester);
+      final context = tester.element(find.byType(EditProfileWidget));
+      final first = ctr.onUpdateProfile(context);
+      final second = ctr.onUpdateProfile(context);
+      await tester.pump();
+      expect(service.updateCalls, hasLength(1));
+      expect(
+        tester
+            .widgetList<TextField>(find.byType(TextField))
+            .every((f) => f.enabled == false),
+        isTrue,
+      );
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.descendant(
+                of: find.byType(EditProfileWidget),
+                matching: find.byType(FilledButton),
+              ),
+            )
+            .onPressed,
+        isNull,
+      );
+      expect(
+        tester
+            .widget<OutlinedButton>(
+              find.widgetWithText(OutlinedButton, 'Cancel'),
+            )
+            .onPressed,
+        isNull,
+      );
+      expect(
+        tester
+            .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.close))
+            .onPressed,
+        isNull,
+      );
+      await Navigator.of(context).maybePop();
+      await tester.pump();
+      expect(find.byType(EditProfileWidget), findsOneWidget);
+      service.updateGate!.complete();
+      await Future.wait([first, second]);
+      await tester.pumpAndSettle();
+      expect(find.byType(EditProfileWidget), findsNothing);
+      await closeToasts(tester);
+    },
+  );
 
   testWidgets('repeated account action opens one form', (tester) async {
     final ctr = await pumpProfile(tester, FakeProfileService());
@@ -403,5 +453,252 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-}
+  testWidgets(
+    'password visibility toggles independently and resets on reopen',
+    (tester) async {
+      final ctr = await pumpProfile(tester, FakeProfileService());
+      await openPassword(tester);
+      final controllers = [
+        ctr.currentPasswordCtrl,
+        ctr.newPasswordCtrl,
+        ctr.confirmPasswordCtrl,
+      ];
+      TextField field(int i) => tester
+          .widgetList<TextField>(find.byType(TextField))
+          .singleWhere((f) => f.controller == controllers[i]);
+      for (var i = 0; i < 3; i++) {
+        controllers[i].text = 'secret$i';
+        expect(field(i).obscureText, isTrue);
+        final button = find.descendant(
+          of: find.byWidgetPredicate(
+            (w) => w is AppFormField && w.controller == controllers[i],
+          ),
+          matching: find.byType(IconButton),
+        );
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(field(i).obscureText, isFalse);
+        expect(tester.widget<IconButton>(button).tooltip, 'Hide password');
+        expect(controllers[i].text, 'secret$i');
+        for (var j = i + 1; j < 3; j++) {
+          expect(field(j).obscureText, isTrue);
+        }
+      }
+      await tester.ensureVisible(find.widgetWithText(OutlinedButton, 'Cancel'));
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
+      await tester.pumpAndSettle();
+      await openPassword(tester);
+      for (var i = 0; i < 3; i++) {
+        expect(field(i).obscureText, isTrue);
+        expect(controllers[i].text, isEmpty);
+      }
+    },
+  );
 
+  testWidgets(
+    'password validation preserves whitespace and exact confirmation',
+    (tester) async {
+      final service = FakeProfileService();
+      final ctr = await pumpProfile(tester, service);
+      await openPassword(tester);
+      ctr.currentPasswordCtrl.text = ' oldpass123 ';
+      ctr.newPasswordCtrl.text = '  abcdef  ';
+      ctr.confirmPasswordCtrl.text = 'abcdef';
+      await tapButton(tester, 'Update Password');
+      expect(find.text('Passwords do not match'), findsOneWidget);
+      expect(service.passwordCalls, isEmpty);
+      ctr.confirmPasswordCtrl.text = '  abcdef  ';
+      await tapButton(tester, 'Update Password');
+      expect(service.passwordCalls.single, {
+        'current_password': ' oldpass123 ',
+        'new_password': '  abcdef  ',
+      });
+      expect(
+        service.passwordCalls.single.containsKey('confirm_password'),
+        isFalse,
+      );
+      await closeToasts(tester);
+    },
+  );
+
+  testWidgets(
+    'password requires current value and eight exact new characters',
+    (tester) async {
+      final service = FakeProfileService();
+      final ctr = await pumpProfile(tester, service);
+      await openPassword(tester);
+      ctr.newPasswordCtrl.text = '1234567';
+      ctr.confirmPasswordCtrl.text = '1234567';
+      await tapButton(tester, 'Update Password');
+      expect(find.text('Current password is required'), findsOneWidget);
+      expect(service.passwordCalls, isEmpty);
+      ctr.currentPasswordCtrl.text = 'old';
+      ctr.newPasswordCtrl.text = '12345678';
+      ctr.confirmPasswordCtrl.text = '12345678';
+      await tapButton(tester, 'Update Password');
+      expect(service.passwordCalls.single['new_password'], '12345678');
+      await closeToasts(tester);
+    },
+  );
+
+  testWidgets(
+    'password editing supports autofill paste and keyboard submission',
+    (tester) async {
+      final service = FakeProfileService();
+      final ctr = await pumpProfile(tester, service);
+      await openPassword(tester);
+      expect(find.byType(AutofillGroup), findsOneWidget);
+      final controllers = [
+        ctr.currentPasswordCtrl,
+        ctr.newPasswordCtrl,
+        ctr.confirmPasswordCtrl,
+      ];
+      for (var i = 0; i < 3; i++) {
+        final target = find.byWidgetPredicate(
+          (w) => w is TextField && w.controller == controllers[i],
+        );
+        final field = tester.widget<TextField>(target);
+        expect(field.autofillHints, [
+          i == 0 ? AutofillHints.password : AutofillHints.newPassword,
+        ]);
+        expect(field.autocorrect, isFalse);
+        expect(field.enableSuggestions, isFalse);
+        expect(field.enableInteractiveSelection, isTrue);
+        await tester.ensureVisible(target);
+        await tester.enterText(target, i == 0 ? 'oldpass123' : 'newpass123');
+        await tester.testTextInput.receiveAction(
+          i == 2 ? TextInputAction.done : TextInputAction.next,
+        );
+        await tester.pumpAndSettle();
+        if (i < 2) {
+          final next = tester
+              .widgetList<TextField>(find.byType(TextField))
+              .singleWhere((w) => w.controller == controllers[i + 1]);
+          expect(next.focusNode!.hasFocus, isTrue);
+        }
+      }
+      expect(service.passwordCalls, hasLength(1));
+      expect(find.byType(ChangePasswordWidget), findsNothing);
+      await closeToasts(tester);
+    },
+  );
+
+  testWidgets('password failure permits retry and preserves the session', (
+    tester,
+  ) async {
+    final service = FakeProfileService()
+      ..failure = Exception('incorrect password');
+    final ctr = await pumpProfile(tester, service);
+    await openPassword(tester);
+    ctr.currentPasswordCtrl.text = 'oldpass123';
+    ctr.newPasswordCtrl.text = 'newpass123';
+    ctr.confirmPasswordCtrl.text = 'newpass123';
+    await tapButton(tester, 'Update Password');
+    expect(ctr.currentPasswordCtrl.text, 'oldpass123');
+    expect(ctr.newPasswordCtrl.text, 'newpass123');
+    expect(ctr.confirmPasswordCtrl.text, 'newpass123');
+    expect(storageFake.stored['token'], 'tok');
+    expect((storageFake.stored['user']['role'] as Map)['name'], 'Cashier');
+    expect(ctr.isSaving.value, isFalse);
+    expect(find.byType(ChangePasswordWidget), findsOneWidget);
+    await closeToasts(tester);
+    service.failure = null;
+    await tapButton(tester, 'Update Password');
+    expect(service.passwordCalls, hasLength(2));
+    expect(find.byType(ChangePasswordWidget), findsNothing);
+    expect(ctr.currentPasswordCtrl.text, isEmpty);
+    expect(ctr.newPasswordCtrl.text, isEmpty);
+    expect(ctr.confirmPasswordCtrl.text, isEmpty);
+    await closeToasts(tester);
+  });
+
+  testWidgets('password busy state blocks dismissal and duplicate submission', (
+    tester,
+  ) async {
+    final service = FakeProfileService()..passwordGate = Completer<void>();
+    addTearDown(() {
+      if (!service.passwordGate!.isCompleted) service.passwordGate!.complete();
+    });
+    final ctr = await pumpProfile(tester, service);
+    await openPassword(tester);
+    ctr.currentPasswordCtrl.text = 'oldpass123';
+    ctr.newPasswordCtrl.text = 'newpass123';
+    ctr.confirmPasswordCtrl.text = 'newpass123';
+    final context = tester.element(find.byType(ChangePasswordWidget));
+    final first = ctr.onChangePassword(context);
+    final second = ctr.onChangePassword(context);
+    await tester.pump();
+    expect(service.passwordCalls, hasLength(1));
+    expect(
+      tester
+          .widgetList<TextField>(find.byType(TextField))
+          .every((f) => f.enabled == false),
+      isTrue,
+    );
+    final modal = find.byType(ChangePasswordWidget);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.descendant(of: modal, matching: find.byType(FilledButton)),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<OutlinedButton>(find.widgetWithText(OutlinedButton, 'Cancel'))
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.close))
+          .onPressed,
+      isNull,
+    );
+    await Navigator.of(context).maybePop();
+    await tester.pump();
+    expect(modal, findsOneWidget);
+    service.passwordGate!.complete();
+    await Future.wait([first, second]);
+    await tester.pumpAndSettle();
+    expect(modal, findsNothing);
+    expect(ctr.isSaving.value, isFalse);
+    await closeToasts(tester);
+  });
+
+  for (final control in ['Cancel', 'Close', 'Back']) {
+    testWidgets('password dismissal via $control clears secrets', (
+      tester,
+    ) async {
+      final ctr = await pumpProfile(tester, FakeProfileService());
+      await openPassword(tester);
+      ctr.currentPasswordCtrl.text = 'oldpass123';
+      ctr.newPasswordCtrl.text = 'newpass123';
+      ctr.confirmPasswordCtrl.text = 'newpass123';
+      if (control == 'Back') {
+        await Navigator.of(
+          tester.element(find.byType(ChangePasswordWidget)),
+        ).maybePop();
+      } else {
+        final target = control == 'Close'
+            ? find.byTooltip('Close')
+            : find.widgetWithText(OutlinedButton, 'Cancel');
+        await tester.ensureVisible(target);
+        await tester.tap(target);
+      }
+      await tester.pumpAndSettle();
+      expect(ctr.currentPasswordCtrl.text, isEmpty);
+      expect(ctr.newPasswordCtrl.text, isEmpty);
+      expect(ctr.confirmPasswordCtrl.text, isEmpty);
+      await openPassword(tester);
+      expect(
+        tester
+            .widgetList<TextField>(find.byType(TextField))
+            .every((w) => w.obscureText),
+        isTrue,
+      );
+    });
+  }
+}

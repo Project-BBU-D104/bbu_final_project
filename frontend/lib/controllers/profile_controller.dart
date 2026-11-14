@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
   ProfileController({ProfileService? service})
-      : service = service ?? ProfileService();
+    : service = service ?? ProfileService();
 
   final ProfileService service;
 
@@ -78,8 +78,13 @@ class ProfileController extends GetxController {
     newPasswordCtrl.clear();
     confirmPasswordCtrl.clear();
     try {
-      await AppFormShell.show(context, ChangePasswordWidget());
+      await AppFormShell.show(context, const ChangePasswordWidget());
     } finally {
+      if (!isClosed) {
+        currentPasswordCtrl.clear();
+        newPasswordCtrl.clear();
+        confirmPasswordCtrl.clear();
+      }
       _isFormOpen = false;
     }
   }
