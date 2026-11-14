@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_tokens.dart';
 
 void main() {
@@ -110,6 +111,103 @@ void main() {
         expect(theme.bottomSheetTheme.backgroundColor, theme.cardColor);
       });
     }
+  });
+
+  group('AppPage and AppPageHeader', () {
+    Future<void> pumpHeader(WidgetTester tester, double width) async {
+      tester.view.physicalSize = Size(width, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: AppPage(
+              child: AppPageHeader(
+                title: 'Suppliers',
+                subtitle: 'Manage supplier contacts and locations.',
+                actions: FilledButton(
+                  onPressed: () {},
+                  child: const Text('Add Supplier'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('header exposes exactly one semantic title', (tester) async {
+      await pumpHeader(tester, 390);
+      final headers = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .where((s) => s.properties.header == true)
+          .toList();
+      expect(headers, hasLength(1));
+      expect(
+        find.descendant(
+          of: find.byWidget(headers.first),
+          matching: find.text('Suppliers'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('page gutter is compact below 600 and wide above', (
+      tester,
+    ) async {
+      await pumpHeader(tester, 390);
+      expect(tester.getRect(find.text('Suppliers')).left, 16);
+      await pumpHeader(tester, 1200);
+      expect(tester.getRect(find.text('Suppliers')).left, 32);
+    });
+
+    testWidgets('actions sit beside the title on a wide page', (tester) async {
+      await pumpHeader(tester, 1200);
+      final title = tester.getRect(find.text('Suppliers'));
+      final add = tester.getRect(
+        find.widgetWithText(FilledButton, 'Add Supplier'),
+      );
+      expect(add.left, greaterThan(title.right));
+      expect(add.top, closeTo(title.top, 24));
+    });
+
+    testWidgets('actions drop below the title on a narrow page', (
+      tester,
+    ) async {
+      await pumpHeader(tester, 390);
+      final title = tester.getRect(find.text('Suppliers'));
+      final add = tester.getRect(
+        find.widgetWithText(FilledButton, 'Add Supplier'),
+      );
+      expect(add.top, greaterThan(title.bottom));
+      // Right aligned to the content edge.
+      expect(add.right, closeTo(374, 0.1));
+    });
+
+    testWidgets('page content is capped at the max width and centered', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1400, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: AppPage(
+              child: const SizedBox(key: Key('content'), width: 1400, height: 10),
+            ),
+          ),
+        ),
+      );
+      final rect = tester.getRect(find.byKey(const Key('content')));
+      expect(rect.width, AppTokens.contentMaxWidth);
+      expect(rect.center.dx, 700);
+    });
   });
 
   group('tokens', () {
