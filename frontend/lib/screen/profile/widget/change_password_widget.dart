@@ -71,6 +71,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
             const SizedBox(height: AppSpacing.lg),
             for (var i = 0; i < 3; i++) ...[
               AppFormField(
+                wrapErrors: true,
                 label: labels[i],
                 controller: controllers[i],
                 fieldKey: _keys[i],

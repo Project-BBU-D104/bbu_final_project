@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -136,17 +137,34 @@ void main() {
                   await tester.showKeyboard(last);
                   await tester.pumpAndSettle();
                   ctr.nameCtrl.clear();
+                  ctr.emailCtrl.text = 'invalid';
+                  ctr.newPasswordCtrl.text = '1234567';
+                  ctr.confirmPasswordCtrl.text = 'different';
                   await tester.ensureVisible(find.byType(FilledButton));
                   await tester.tap(find.byType(FilledButton));
                   await tester.pumpAndSettle();
-                  final error = password
-                      ? 'Current password is required'
-                      : 'Name is required';
-                  expect(find.text(error.tr), findsOneWidget);
-                  expect(
-                    tester.getRect(find.text(error.tr)).bottom,
-                    lessThanOrEqualTo(340),
-                  );
+                  final errors = password
+                      ? [
+                          'Current password is required',
+                          'Password must be at least 8 characters',
+                          'Passwords do not match',
+                        ]
+                      : ['Name is required', 'Enter a valid email'];
+                  for (final error in errors) {
+                    final errorText = find.text(error.tr).last;
+                    expect(errorText, findsOneWidget);
+                    await tester.ensureVisible(errorText);
+                    await tester.pumpAndSettle();
+                    final paragraph = tester.renderObject<RenderParagraph>(
+                      errorText,
+                    );
+                    expect(paragraph.didExceedMaxLines, isFalse, reason: error);
+                    final rect = tester.getRect(errorText);
+                    expect(rect.left, greaterThanOrEqualTo(0));
+                    expect(rect.right, lessThanOrEqualTo(360));
+                    expect(rect.top, greaterThanOrEqualTo(0));
+                    expect(rect.bottom, lessThanOrEqualTo(340));
+                  }
                 }
                 expect(tester.takeException(), isNull);
                 await tester.pumpWidget(const SizedBox.shrink());

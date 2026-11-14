@@ -701,4 +701,47 @@ void main() {
       );
     });
   }
+  for (final width in [839.0, 840.0]) {
+    for (final password in [false, true]) {
+      testWidgets(
+        'account opener stays locked through reverse transition $width password=$password',
+        (tester) async {
+          tester.view.physicalSize = Size(width, 1000);
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+          final ctr = await pumpProfile(tester, FakeProfileService());
+          final host = tester.element(find.byType(ProfileScreen));
+          Future<void> open() => password
+              ? ctr.openChangePassword(host)
+              : ctr.openEditProfile(host);
+          var completed = false;
+          final first = open().whenComplete(() => completed = true);
+          await tester.pumpAndSettle();
+          final modal = find.byType(
+            password ? ChangePasswordWidget : EditProfileWidget,
+          );
+          Navigator.of(tester.element(modal)).pop();
+          await tester.pump(const Duration(milliseconds: 1));
+          expect(
+            completed,
+            isFalse,
+            reason: 'the outgoing form still owns its form key',
+          );
+          open();
+          await tester.pump(const Duration(milliseconds: 1));
+          expect(modal, findsOneWidget);
+          expect(tester.takeException(), isNull);
+          await tester.pumpAndSettle();
+          await first;
+          expect(completed, isTrue);
+          expect(modal, findsNothing);
+          open();
+          await tester.pumpAndSettle();
+          expect(modal, findsOneWidget);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
 }

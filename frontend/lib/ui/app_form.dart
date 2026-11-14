@@ -64,6 +64,7 @@ class AppFormField extends StatelessWidget {
     this.enableSuggestions = true,
     this.autofillHints,
     this.onFieldSubmitted,
+    this.wrapErrors = false,
   });
 
   final String label;
@@ -93,6 +94,9 @@ class AppFormField extends StatelessWidget {
   final Iterable<String>? autofillHints;
   final ValueChanged<String>? onFieldSubmitted;
 
+  /// Allow translated validation messages to occupy as many lines as needed.
+  final bool wrapErrors;
+
   @override
   Widget build(BuildContext context) => TextFormField(
     key: fieldKey,
@@ -110,6 +114,10 @@ class AppFormField extends StatelessWidget {
     enableSuggestions: enableSuggestions,
     autofillHints: autofillHints,
     onFieldSubmitted: onFieldSubmitted,
+    errorBuilder: wrapErrors
+        ? (context, error) =>
+              Text(error, softWrap: true, overflow: TextOverflow.visible)
+        : null,
     decoration: InputDecoration(
       labelText: label.tr,
       hintText: hint?.tr,

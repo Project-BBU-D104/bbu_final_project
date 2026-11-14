@@ -57,6 +57,21 @@ class ProfileController extends GetxController {
 
   bool _isFormOpen = false;
 
+  Future<void> _showAccountForm(BuildContext context, Widget child) async {
+    ModalRoute<dynamic>? route;
+    await AppFormShell.show(
+      context,
+      Builder(
+        builder: (modalContext) {
+          route = ModalRoute.of(modalContext);
+          return child;
+        },
+      ),
+    );
+    // A popped route still owns its form key during the reverse transition.
+    await route?.completed;
+  }
+
   Future<void> openEditProfile(BuildContext context) async {
     if (_isFormOpen) return;
     _isFormOpen = true;
@@ -65,7 +80,7 @@ class ProfileController extends GetxController {
     phoneCtrl.text = phone.value;
     photoCtrl.text = photo.value;
     try {
-      await AppFormShell.show(context, const EditProfileWidget());
+      await _showAccountForm(context, const EditProfileWidget());
     } finally {
       _isFormOpen = false;
     }
@@ -78,7 +93,7 @@ class ProfileController extends GetxController {
     newPasswordCtrl.clear();
     confirmPasswordCtrl.clear();
     try {
-      await AppFormShell.show(context, const ChangePasswordWidget());
+      await _showAccountForm(context, const ChangePasswordWidget());
     } finally {
       if (!isClosed) {
         currentPasswordCtrl.clear();

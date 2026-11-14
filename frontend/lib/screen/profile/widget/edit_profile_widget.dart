@@ -48,6 +48,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
   Widget build(BuildContext context) => Obx(() {
     final saving = ctr.isSaving.value;
     final email = AppFormField(
+      wrapErrors: true,
       label: 'Email Address',
       controller: ctr.emailCtrl,
       fieldKey: _keys[2],
@@ -58,6 +59,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
           _emailPattern.hasMatch(value ?? '') ? null : 'Enter a valid email'.tr,
     );
     final phone = AppFormField(
+      wrapErrors: true,
       label: 'Phone Number',
       controller: ctr.phoneCtrl,
       fieldKey: _keys[3],
@@ -80,6 +82,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
             title: 'Personal information',
             children: [
               AppFormField(
+                wrapErrors: true,
                 label: 'Full Name',
                 controller: ctr.nameCtrl,
                 fieldKey: _keys[0],
@@ -90,6 +93,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
               ),
               const SizedBox(height: AppSpacing.lg),
               AppFormField(
+                wrapErrors: true,
                 label: 'Photo URL',
                 controller: ctr.photoCtrl,
                 fieldKey: _keys[1],
