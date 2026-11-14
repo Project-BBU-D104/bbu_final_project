@@ -58,6 +58,12 @@ class AppFormField extends StatelessWidget {
     this.suffix,
     this.minLines,
     this.maxLines,
+    this.obscureText = false,
+    this.trimValue = true,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
+    this.autofillHints,
+    this.onFieldSubmitted,
   });
 
   final String label;
@@ -68,7 +74,7 @@ class AppFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final TextEditingController? controller;
 
-  /// Receives the trimmed value.
+  /// Receives a trimmed value unless [trimValue] is false (for passwords).
   final String? Function(String?)? validator;
 
   final TextInputType? keyboardType;
@@ -80,6 +86,12 @@ class AppFormField extends StatelessWidget {
   final Widget? suffix;
   final int? minLines;
   final int? maxLines;
+  final bool obscureText;
+  final bool trimValue;
+  final bool autocorrect;
+  final bool enableSuggestions;
+  final Iterable<String>? autofillHints;
+  final ValueChanged<String>? onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) => TextFormField(
@@ -92,7 +104,12 @@ class AppFormField extends StatelessWidget {
     keyboardType: keyboardType,
     textInputAction: textInputAction,
     minLines: minLines,
-    maxLines: maxLines,
+    maxLines: obscureText ? 1 : maxLines,
+    obscureText: obscureText,
+    autocorrect: autocorrect,
+    enableSuggestions: enableSuggestions,
+    autofillHints: autofillHints,
+    onFieldSubmitted: onFieldSubmitted,
     decoration: InputDecoration(
       labelText: label.tr,
       hintText: hint?.tr,
@@ -100,7 +117,7 @@ class AppFormField extends StatelessWidget {
     ),
     validator: validator == null
         ? null
-        : (value) => validator!((value ?? '').trim()),
+        : (value) => validator!(trimValue ? (value ?? '').trim() : value ?? ''),
   );
 }
 

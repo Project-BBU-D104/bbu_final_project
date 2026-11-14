@@ -13,6 +13,56 @@ import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 void main() {
+  testWidgets('secure shared field preserves raw validation and submission', (tester) async {
+    final controller = TextEditingController(text: '  abcdef  ');
+    addTearDown(controller.dispose);
+    final key = GlobalKey<FormState>();
+    String? validatedPassword;
+    String? submittedValue;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: Form(
+      key: key,
+      child: AppFormField(label: 'Password', controller: controller,
+        obscureText: true, trimValue: false, autocorrect: false,
+        enableSuggestions: false, autofillHints: const [AutofillHints.newPassword],
+        textInputAction: TextInputAction.done,
+        validator: (value) { validatedPassword = value; return null; },
+        onFieldSubmitted: (value) => submittedValue = value,
+      ),
+    ))));
+    key.currentState!.validate();
+    expect(validatedPassword, '  abcdef  ');
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.obscureText, isTrue);
+    expect(field.maxLines, 1);
+    expect(field.autocorrect, isFalse);
+    expect(field.enableSuggestions, isFalse);
+    expect(field.autofillHints, [AutofillHints.newPassword]);
+    await tester.showKeyboard(find.byType(TextField));
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    expect(submittedValue, '  abcdef  ');
+    expect(controller.text, '  abcdef  ');
+  });
+
+  for (final multiline in [false, true]) {
+    testWidgets('shared field keeps trimmed validation and multiline=$multiline', (tester) async {
+      final controller = TextEditingController(text: '  value  ');
+      addTearDown(controller.dispose);
+      final key = GlobalKey<FormState>();
+      String? validatedValue;
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: Form(key: key,
+        child: AppFormField(label: 'Name', controller: controller,
+          minLines: multiline ? 2 : null, maxLines: multiline ? 4 : null,
+          validator: (value) { validatedValue = value; return null; }),
+      ))));
+      key.currentState!.validate();
+      expect(validatedValue, 'value');
+      expect(controller.text, '  value  ');
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.obscureText, isFalse);
+      expect(field.minLines, multiline ? 2 : null);
+      expect(field.maxLines, multiline ? 4 : null);
+    });
+  }
   group('shared theme', () {
     for (final theme in [AppTheme.light(), AppTheme.dark()]) {
       final name = theme.brightness.name;
