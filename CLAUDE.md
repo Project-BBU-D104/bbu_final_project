@@ -10,7 +10,7 @@ Inventory management system: `backend/` (FastAPI + SQLModel) and `frontend/` (Fl
 - Never Push code to Github or similar without asking the user.
 - Never Push or commit the Plan that generate by any Agent.
 - Never add Co-Authored-By trailers to commit messages.
-- When redesigning a screen, always use all supplier screens (main, edit, create, and detail) in `frontend/lib/screen/supplier/` as the reference for layout, styling, responsive behavior, and interactions, adapting them to the screen's needs.
+- Every screen must use the shared UI kit in `frontend/lib/ui/` (`AppPage`, `AppPageHeader`, `AppTable`, `AppListCard`, `AppEmptyState`, `AppSearchField`, `AppFormSection`, `AppFormField`, `AppFormActions`, `AppFormShell`) and the tokens in `AppTokens` / `AppSpacing`. Do not hardcode radii, colors, spacing, button sizes or breakpoints in a screen, and do not inline `style:` overrides for look values — take them from the kit or let `AppTheme` supply them. If a needed value is not in `AppTokens`, add it there first. The supplier screens in `frontend/lib/screen/supplier/` are the reference implementation.
 
 ### Project Structure & Module Organization
 
