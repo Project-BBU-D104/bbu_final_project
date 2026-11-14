@@ -62,10 +62,9 @@ class RoleFormWidget extends StatelessWidget {
                               for (final field in [
                                 TextFormField(
                                   controller: ctr.roleNameController,
-                                  decoration: _decoration(
-                                    context,
-                                    'Role Name'.tr,
-                                    'Enter Role Name'.tr,
+                                  decoration: InputDecoration(
+                                    labelText: 'Role Name'.tr,
+                                    hintText: 'Enter Role Name'.tr,
                                   ),
                                   validator: (value) =>
                                       value == null || value.trim().isEmpty
@@ -76,11 +75,11 @@ class RoleFormWidget extends StatelessWidget {
                                   controller: ctr.roleDescriptionController,
                                   minLines: 3,
                                   maxLines: 6,
-                                  decoration: _decoration(
-                                    context,
-                                    'Description'.tr,
-                                    'Enter Description'.tr,
-                                  ).copyWith(alignLabelWithHint: true),
+                                  decoration: InputDecoration(
+                                    labelText: 'Description'.tr,
+                                    hintText: 'Enter Description'.tr,
+                                    alignLabelWithHint: true,
+                                  ),
                                 ),
                               ])
                                 SizedBox(
@@ -138,30 +137,6 @@ class RoleFormWidget extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  InputDecoration _decoration(BuildContext context, String label, String hint) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
       ),
     );
   }

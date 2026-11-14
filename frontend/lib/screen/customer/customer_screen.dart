@@ -3,8 +3,8 @@ import 'package:frontend/controllers/customer_controller.dart';
 import 'package:frontend/screen/customer/widget/customer_card_widget.dart';
 import 'package:frontend/screen/customer/widget/customer_table_widget.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/ui/app_search_field.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
-import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class CustomerScreen extends StatelessWidget {
@@ -150,17 +150,8 @@ class CustomerScreen extends StatelessWidget {
                                     width: content.maxWidth < 420
                                         ? content.maxWidth
                                         : 420,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.08),
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: const SearchWidget(
-                                        title: 'Search Customers',
-                                      ),
+                                    child: const AppSearchField(
+                                      title: 'Search Customers',
                                     ),
                                   ),
                                   Obx(

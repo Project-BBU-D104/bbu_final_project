@@ -50,28 +50,6 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
     final c = widget.controller;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    InputDecoration decoration(String label, {String? hint}) => InputDecoration(
-      labelText: label.tr,
-      hintText: hint?.tr,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
     return Obx(() {
       final busy = c.isSaving.value;
       final error = c.formError.value;
@@ -153,9 +131,9 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
                         controller: c.nameController,
                         enabled: !busy,
                         textInputAction: TextInputAction.next,
-                        decoration: decoration(
-                          'Category Name',
-                          hint: 'Enter Category Name',
+                        decoration: InputDecoration(
+                          labelText: 'Category Name'.tr,
+                          hintText: 'Enter Category Name'.tr,
                         ),
                         validator: (value) => (value ?? '').trim().isEmpty
                             ? 'Category name is required'.tr
@@ -167,9 +145,9 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
                         enabled: !busy,
                         minLines: 3,
                         maxLines: 6,
-                        decoration: decoration(
-                          'Description',
-                          hint: 'Enter Description',
+                        decoration: InputDecoration(
+                          labelText: 'Description'.tr,
+                          hintText: 'Enter Description'.tr,
                         ),
                       ),
                       if (error.isNotEmpty)

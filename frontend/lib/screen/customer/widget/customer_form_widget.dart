@@ -68,28 +68,6 @@ class _CustomerFormWidgetState extends State<CustomerFormWidget> {
     final c = widget.controller;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    InputDecoration decoration(String label, {String? hint}) => InputDecoration(
-      labelText: label.tr,
-      hintText: hint?.tr,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
     return Obx(() {
       final uploading =
           Get.isRegistered<ImageUploadController>() &&
@@ -175,9 +153,9 @@ class _CustomerFormWidgetState extends State<CustomerFormWidget> {
                         enabled: !busy,
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
-                        decoration: decoration(
-                          'Customer Name',
-                          hint: 'Enter Customer Name',
+                        decoration: InputDecoration(
+                          labelText: 'Customer Name'.tr,
+                          hintText: 'Enter Customer Name'.tr,
                         ),
                         validator: (value) => (value ?? '').trim().isEmpty
                             ? 'Customer name is required'.tr
@@ -189,9 +167,9 @@ class _CustomerFormWidgetState extends State<CustomerFormWidget> {
                         enabled: !busy,
                         keyboardType: TextInputType.phone,
                         textInputAction: TextInputAction.next,
-                        decoration: decoration(
-                          'Phone Number',
-                          hint: 'Enter Phone Number',
+                        decoration: InputDecoration(
+                          labelText: 'Phone Number'.tr,
+                          hintText: 'Enter Phone Number'.tr,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -200,9 +178,9 @@ class _CustomerFormWidgetState extends State<CustomerFormWidget> {
                         enabled: !busy,
                         minLines: 3,
                         maxLines: 6,
-                        decoration: decoration(
-                          'Address',
-                          hint: 'Enter Address',
+                        decoration: InputDecoration(
+                          labelText: 'Address'.tr,
+                          hintText: 'Enter Address'.tr,
                         ),
                       ),
                       CheckboxListTile(

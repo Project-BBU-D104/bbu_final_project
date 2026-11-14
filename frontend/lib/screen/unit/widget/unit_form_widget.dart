@@ -61,28 +61,6 @@ class _UnitFormWidgetState extends State<UnitFormWidget> {
     final c = widget.controller;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    InputDecoration decoration(String label, {String? hint}) => InputDecoration(
-      labelText: label.tr,
-      hintText: hint?.tr,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
     return Obx(() {
       final busy = c.isSaving.value;
       final error = c.formError.value;
@@ -164,9 +142,9 @@ class _UnitFormWidgetState extends State<UnitFormWidget> {
                         controller: c.unitNameController,
                         enabled: !busy,
                         textInputAction: TextInputAction.next,
-                        decoration: decoration(
-                          'Unit Name',
-                          hint: 'Enter Unit Name',
+                        decoration: InputDecoration(
+                          labelText: 'Unit Name'.tr,
+                          hintText: 'Enter Unit Name'.tr,
                         ),
                         validator: (value) => (value ?? '').trim().isEmpty
                             ? 'Unit name is required'.tr
@@ -179,9 +157,9 @@ class _UnitFormWidgetState extends State<UnitFormWidget> {
                         controller: c.unitShortNameController,
                         enabled: !busy,
                         textInputAction: TextInputAction.next,
-                        decoration: decoration(
-                          'Short Name',
-                          hint: 'Enter Short Name',
+                        decoration: InputDecoration(
+                          labelText: 'Short Name'.tr,
+                          hintText: 'Enter Short Name'.tr,
                         ),
                         validator: (value) => (value ?? '').trim().isEmpty
                             ? 'Short name is required'.tr
@@ -193,9 +171,9 @@ class _UnitFormWidgetState extends State<UnitFormWidget> {
                         enabled: !busy,
                         minLines: 3,
                         maxLines: 6,
-                        decoration: decoration(
-                          'Description',
-                          hint: 'Enter Description',
+                        decoration: InputDecoration(
+                          labelText: 'Description'.tr,
+                          hintText: 'Enter Description'.tr,
                         ),
                       ),
                       CheckboxListTile(

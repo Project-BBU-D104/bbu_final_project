@@ -19,41 +19,6 @@ class PurchasePaymentFormWidget extends StatelessWidget {
     if (picked != null) ctr.pickPurchaseDate(picked);
   }
 
-  InputDecoration _decoration(
-    BuildContext context,
-    String label, {
-    String? hint,
-    Widget? suffix,
-    bool alignLabel = false,
-  }) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return InputDecoration(
-      labelText: label.tr,
-      hintText: hint?.tr,
-      suffixIcon: suffix,
-      alignLabelWithHint: alignLabel,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
-  }
-
   Widget _heading(BuildContext context, String text) {
     final theme = Theme.of(context);
     return Padding(
@@ -176,10 +141,9 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: _decoration(
-                          context,
-                          'Amount',
-                          hint: 'Enter Amount',
+                        decoration: InputDecoration(
+                          labelText: 'Amount'.tr,
+                          hintText: 'Enter Amount'.tr,
                         ),
                         validator: (value) {
                           final amount = double.tryParse(value?.trim() ?? '');
@@ -197,10 +161,9 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                         onTap: busy ? null : () => _pickDate(context),
                         borderRadius: BorderRadius.circular(12),
                         child: InputDecorator(
-                          decoration: _decoration(
-                            context,
-                            'Payment Date',
-                            suffix: Icon(
+                          decoration: InputDecoration(
+                            labelText: 'Payment Date'.tr,
+                            suffixIcon: Icon(
                               Icons.calendar_today_outlined,
                               size: 20,
                               color: colors.onSurfaceVariant,
@@ -219,11 +182,10 @@ class PurchasePaymentFormWidget extends StatelessWidget {
                         enabled: !busy,
                         minLines: 2,
                         maxLines: 4,
-                        decoration: _decoration(
-                          context,
-                          'Note',
-                          hint: 'Enter Note',
-                          alignLabel: true,
+                        decoration: InputDecoration(
+                          labelText: 'Note'.tr,
+                          hintText: 'Enter Note'.tr,
+                          alignLabelWithHint: true,
                         ),
                       ),
                       if (error.isNotEmpty)
@@ -315,14 +277,14 @@ class PurchasePaymentFormWidget extends StatelessWidget {
 
     return [
       InputDecorator(
-        decoration: _decoration(context, 'Purchase'),
+        decoration: InputDecoration(labelText: 'Purchase'.tr),
         child: Text(
           "${purchase?['invoice_no'] ?? ''} - Due: ${purchase?['due_amount'] ?? ''}",
         ),
       ),
       const SizedBox(height: 20),
       InputDecorator(
-        decoration: _decoration(context, 'Payment No'),
+        decoration: InputDecoration(labelText: 'Payment No'.tr),
         child: Text(ctr.paymentNoCtrl.text),
       ),
     ];
@@ -350,7 +312,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
       return DropdownButtonFormField<int>(
         key: ValueKey('purchase-${ctr.selectedPurchaseId.value}'),
         initialValue: ctr.selectedPurchaseId.value,
-        decoration: _decoration(context, 'Select Purchase'),
+        decoration: InputDecoration(labelText: 'Select Purchase'.tr),
         items: purchases.map((purchase) {
           return DropdownMenuItem<int>(
             value: int.tryParse(purchase['id'].toString()),
@@ -383,7 +345,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
       return DropdownButtonFormField<int>(
         key: ValueKey('payment-type-${ctr.selectedPaymentTypeId.value}'),
         initialValue: ctr.selectedPaymentTypeId.value,
-        decoration: _decoration(context, 'Select Payment Type'),
+        decoration: InputDecoration(labelText: 'Select Payment Type'.tr),
         items: ctr.paymentTypeCtr.paymentTypeList.map((paymentType) {
           return DropdownMenuItem<int>(
             value: int.tryParse(paymentType["id"].toString()),
@@ -414,7 +376,7 @@ class PurchasePaymentFormWidget extends StatelessWidget {
       return DropdownButtonFormField<int>(
         key: ValueKey('currency-${ctr.selectedCurrencyId.value}'),
         initialValue: ctr.selectedCurrencyId.value,
-        decoration: _decoration(context, 'Select Currency'),
+        decoration: InputDecoration(labelText: 'Select Currency'.tr),
         items: ctr.currencyCtr.currencyList.map((currency) {
           return DropdownMenuItem<int>(
             value: int.tryParse(currency["id"].toString()),

@@ -119,7 +119,7 @@ void main() {
     );
     Get.put(RoleController(service: FakeWebRoleService()));
     await tester.pumpWidget(
-      GetMaterialApp(home: Scaffold(body: UserFormWidget())),
+      GetMaterialApp(theme: AppTheme.light(), home: Scaffold(body: UserFormWidget())),
     );
     await tester.pumpAndSettle();
   }
@@ -135,7 +135,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     Get.put(RoleController(service: service ?? FakeWebRoleService()));
     await tester.pumpWidget(
-      GetMaterialApp(home: Scaffold(body: RoleFormWidget())),
+      GetMaterialApp(theme: AppTheme.light(), home: Scaffold(body: RoleFormWidget())),
     );
     await tester.pumpAndSettle();
   }

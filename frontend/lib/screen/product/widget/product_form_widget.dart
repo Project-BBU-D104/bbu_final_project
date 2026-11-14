@@ -135,39 +135,6 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
     );
   }
 
-  InputDecoration _decoration(
-    BuildContext context,
-    String label, {
-    Widget? suffix,
-    String? hint,
-  }) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return InputDecoration(
-      labelText: label.tr,
-      hintText: hint?.tr,
-      suffixIcon: suffix,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -265,10 +232,9 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
                                 focusNode: _nameNode,
                                 enabled: enabled,
                                 textInputAction: TextInputAction.next,
-                                decoration: _decoration(
-                                  context,
-                                  'Product Name',
-                                  hint: 'Enter Product Name',
+                                decoration: InputDecoration(
+                                  labelText: 'Product Name'.tr,
+                                  hintText: 'Enter Product Name'.tr,
                                 ),
                                 validator: _validateName,
                               ),
@@ -278,11 +244,10 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
                                 focusNode: _barcodeNode,
                                 enabled: enabled,
                                 textInputAction: TextInputAction.next,
-                                decoration: _decoration(
-                                  context,
-                                  'Barcode',
-                                  hint: 'Enter Barcode',
-                                  suffix: IconButton(
+                                decoration: InputDecoration(
+                                  labelText: 'Barcode'.tr,
+                                  hintText: 'Enter Barcode'.tr,
+                                  suffixIcon: IconButton(
                                     tooltip: 'Scan Barcode'.tr,
                                     icon: const Icon(
                                       Icons.qr_code_scanner,
@@ -372,10 +337,9 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
                                               decimal: true,
                                             ),
                                         textInputAction: TextInputAction.next,
-                                        decoration: _decoration(
-                                          context,
-                                          'Cost Price',
-                                          hint: 'Enter Cost Price',
+                                        decoration: InputDecoration(
+                                          labelText: 'Cost Price'.tr,
+                                          hintText: 'Enter Cost Price'.tr,
                                         ),
                                         validator: _validatePrice,
                                       ),
@@ -388,10 +352,9 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
                                             const TextInputType.numberWithOptions(
                                               decimal: true,
                                             ),
-                                        decoration: _decoration(
-                                          context,
-                                          'Sale Price',
-                                          hint: 'Enter Sale Price',
+                                        decoration: InputDecoration(
+                                          labelText: 'Sale Price'.tr,
+                                          hintText: 'Enter Sale Price'.tr,
                                         ),
                                         validator: _validatePrice,
                                       ),
@@ -444,10 +407,9 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
                                 enabled: enabled,
                                 minLines: 3,
                                 maxLines: 8,
-                                decoration: _decoration(
-                                  context,
-                                  'Description',
-                                  hint: 'This is a sample description',
+                                decoration: InputDecoration(
+                                  labelText: 'Description'.tr,
+                                  hintText: 'This is a sample description'.tr,
                                 ),
                               ),
                             ],
@@ -573,7 +535,10 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
         initialValue: available ? selected : null,
         isExpanded: true,
         focusNode: focusNode,
-        decoration: _decoration(context, requiredLabel, hint: hint),
+        decoration: InputDecoration(
+          labelText: requiredLabel.tr,
+          hintText: hint.tr,
+        ),
         items: items
             .map(
               (item) => DropdownMenuItem<String>(

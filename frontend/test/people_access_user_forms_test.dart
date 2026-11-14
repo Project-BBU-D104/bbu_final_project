@@ -1,3 +1,4 @@
+import 'package:frontend/themes/app_theme.dart';
 // ignore_for_file: must_call_super
 
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ void main() {
       ),
     );
     await tester.pumpWidget(
-      GetMaterialApp(home: Scaffold(body: UserFormWidget())),
+      GetMaterialApp(theme: AppTheme.light(), home: Scaffold(body: UserFormWidget())),
     );
     await tester.pump();
 
@@ -103,7 +104,7 @@ void main() {
       ),
     );
     await tester.pumpWidget(
-      GetMaterialApp(home: Scaffold(body: UserFormWidget())),
+      GetMaterialApp(theme: AppTheme.light(), home: Scaffold(body: UserFormWidget())),
     );
     await tester.pump();
 

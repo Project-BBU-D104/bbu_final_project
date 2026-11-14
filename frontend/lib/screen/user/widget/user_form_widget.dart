@@ -164,30 +164,6 @@ class UserFormWidget extends StatelessWidget {
     );
   }
 
-  InputDecoration _decoration(BuildContext context, String label, String hint) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      filled: true,
-      fillColor: Color.alphaBlend(
-        colors.onSurface.withValues(alpha: 0.025),
-        theme.cardColor,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.1)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colors.primary, width: 1.5),
-      ),
-    );
-  }
-
   Widget _header(BuildContext context) {
     return Row(
       children: [
@@ -239,7 +215,7 @@ class UserFormWidget extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
-      decoration: _decoration(context, label, hint),
+      decoration: InputDecoration(labelText: label, hintText: hint),
       validator: required
           ? (value) => value == null || value.trim().isEmpty
                 ? 'Please enter username'.tr
@@ -261,7 +237,10 @@ class UserFormWidget extends StatelessWidget {
             )
             ? ctr.selectedRole.value
             : null,
-        decoration: _decoration(context, 'Role'.tr, 'Select Role'.tr),
+        decoration: InputDecoration(
+          labelText: 'Role'.tr,
+          hintText: 'Select Role'.tr,
+        ),
         items: roleCtr.roleList
             .map(
               (role) => DropdownMenuItem<String>(
@@ -291,10 +270,9 @@ class UserFormWidget extends StatelessWidget {
             )
             ? ctr.selectedSystemConfiguration.value
             : null,
-        decoration: _decoration(
-          context,
-          'System Configuration'.tr,
-          'Select System Configuration'.tr,
+        decoration: InputDecoration(
+          labelText: 'System Configuration'.tr,
+          hintText: 'Select System Configuration'.tr,
         ),
         items: ctr.systemConfigurationCtr.systemConfigurationList
             .map(
