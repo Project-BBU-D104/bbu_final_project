@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/ui/app_empty_state.dart';
+import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_search_field.dart';
 import 'package:frontend/ui/app_table.dart';
 import 'package:frontend/ui/app_tokens.dart';
+import 'package:get/get.dart';
 
 void main() {
   group('shared theme', () {
@@ -280,6 +284,68 @@ void main() {
       await tester.tap(find.text('Alpha'));
       await tester.pumpAndSettle();
       expect(tapped, 'Alpha');
+    });
+  });
+
+  group('list card, empty state and search field', () {
+    tearDown(Get.reset);
+
+    testWidgets('list card uses the shared card chrome and reacts to taps', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: AppListCard(
+              onTap: () => taps++,
+              child: const Text('Alpha'),
+            ),
+          ),
+        ),
+      );
+      final card = tester.widget<Card>(find.byType(Card));
+      expect(card.elevation, 0);
+      final theme = Theme.of(tester.element(find.byType(AppListCard)));
+      expect(card.color, theme.cardColor);
+      final shape = card.shape! as RoundedRectangleBorder;
+      expect(shape.borderRadius, BorderRadius.circular(AppTokens.radiusCard));
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      expect(taps, 1);
+    });
+
+    testWidgets('empty state shows its message and icon', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: AppEmptyState(
+              message: 'No suppliers yet',
+              icon: Icons.inventory_2_outlined,
+            ),
+          ),
+        ),
+      );
+      expect(find.text('No suppliers yet'), findsOneWidget);
+      expect(find.byIcon(Icons.inventory_2_outlined), findsOneWidget);
+    });
+
+    testWidgets('search field wraps the shared search widget', (tester) async {
+      Get.testMode = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(body: AppSearchField(title: 'Search Suppliers')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(TextField), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).decoration!.hintText,
+        'Search Suppliers',
+      );
     });
   });
 
