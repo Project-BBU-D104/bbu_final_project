@@ -6,6 +6,7 @@ import 'package:frontend/screen/supplier/widgets/supplier_add_widget.dart';
 import 'package:frontend/screen/supplier/widgets/supplier_edit_widget.dart';
 import 'package:frontend/services/main_service/supplier_service.dart';
 import 'package:frontend/ui/app_form.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
 
@@ -201,6 +202,14 @@ class SupplierController extends GetxController {
     if (context.mounted && route is PopupRoute && route.isCurrent) {
       navigator.pop();
     }
+    ToastWidget.show(
+      message:
+          (supplierId == null
+                  ? 'Supplier created successfully'
+                  : 'Supplier updated successfully')
+              .tr,
+      type: ToastType.success,
+    );
     await getSuppliers();
   }
 

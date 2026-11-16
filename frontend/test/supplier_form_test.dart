@@ -145,6 +145,36 @@ void main() {
     expect(c.searchSuppliers.length, 1);
     expect(c.suppliers.length, 2);
   });
+  testWidgets('status save notifies before a slow list refresh finishes', (
+    tester,
+  ) async {
+    final s = DelayedRefreshService();
+    final c = await seed(tester, s);
+    c.gotoSupplierDetail(c.suppliers.first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    expect(c.status.value, false);
+    s.refresh = Completer<dynamic>();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(s.lastUpdatedData?['status'], false);
+    expect(c.suppliers.first.status, false);
+    expect(find.byType(SupplierEditWidget), findsNothing);
+    expect(find.text('Inactive'), findsOneWidget);
+    expect(find.text('Supplier updated successfully'), findsOneWidget);
+
+    s.refresh!.complete(s.items);
+    await tester.pumpAndSettle();
+    Get.closeAllSnackbars();
+    await tester.pumpAndSettle();
+  });
   testWidgets(
     'refresh failure after committed save does not offer resubmission',
     (tester) async {

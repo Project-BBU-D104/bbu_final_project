@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/sales_report_utils.dart';
 import 'package:frontend/widget/record_actions_menu.dart';
 import 'package:intl/intl.dart';
 
@@ -19,7 +20,7 @@ class PaymentCardListWidget extends StatelessWidget {
     final sale = payment["sale"];
     final customer = sale["customer"];
 
-    final amount = payment["amount"];
+    final amount = parseAmount(payment["amount"]);
     final invoice = sale["invoice_no"];
     final method = payment["payment_method"];
     final status = sale["payment_status"];

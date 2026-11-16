@@ -393,6 +393,8 @@ const Map<String, String> enUS = {
   'Supplier Information': 'Supplier Information',
   'Created': 'Created',
   'Edit Supplier': 'Edit Supplier',
+  'Supplier created successfully': 'Supplier created successfully',
+  'Supplier updated successfully': 'Supplier updated successfully',
   'Search Customers by name or ID': 'Search Customers by name or ID',
   'Total Customers': 'Total Customers',
   'Active Customers': 'Active Customers',

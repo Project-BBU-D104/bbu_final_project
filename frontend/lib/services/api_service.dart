@@ -63,20 +63,24 @@ class ApiService {
   }
 
   /// GET ALL
-  Future<dynamic> get(String endpoint) async {
+  Future<dynamic> get(String endpoint, {bool forceRefresh = false}) async {
     final response = await _client.get(
       _buildUri(endpoint, trailingSlash: !endpoint.contains('/')),
-      headers: headers,
+      headers: {...headers, if (forceRefresh) 'Cache-Control': 'no-cache'},
     );
 
     return _handleResponse(response, endpoint: endpoint);
   }
 
   /// GET BY ID
-  Future<dynamic> getById(String endpoint, String id) async {
+  Future<dynamic> getById(
+    String endpoint,
+    String id, {
+    bool forceRefresh = false,
+  }) async {
     final response = await _client.get(
       _buildUri("$endpoint/$id"),
-      headers: headers,
+      headers: {...headers, if (forceRefresh) 'Cache-Control': 'no-cache'},
     );
 
     return _handleResponse(response, endpoint: endpoint);

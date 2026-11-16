@@ -390,6 +390,9 @@ const Map<String, String> kmKH = {
   'Supplier Information': 'ព័ត៌មានអ្នកផ្គត់ផ្គង់',
   'Created': 'បានបង្កើត',
   'Edit Supplier': 'កែប្រែអ្នកផ្គត់ផ្គង់',
+  'Supplier created successfully': 'បានបង្កើតអ្នកផ្គត់ផ្គង់ដោយជោគជ័យ',
+  'Supplier updated successfully':
+      'បានធ្វើបច្ចុប្បន្នភាពអ្នកផ្គត់ផ្គង់ដោយជោគជ័យ',
   'Search Customers by name or ID': 'ស្វែងរកអ្នកទិញដោយឈ្មោះឬ ID',
   'Total Customers': 'ចំនួនសរុបអតិថិជន',
   'Active Customers': 'អតិថិជនសកម្ម',

@@ -418,4 +418,16 @@ void main() {
     expect(find.text('Alice'), findsOneWidget);
     expect(find.text('SALE-3'), findsOneWidget);
   });
+
+  testWidgets('payments list renders an API decimal string amount',
+      (tester) async {
+    final paymentService = FakeSalePaymentService(
+      payments: [paymentFixture()..['amount'] = '6.00'],
+    );
+    await pumpScreen(tester, paymentService: paymentService);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(PaymentCardListWidget), findsOneWidget);
+    expect(find.text('6'), findsOneWidget);
+  });
 }
