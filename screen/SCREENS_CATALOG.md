@@ -101,18 +101,18 @@
 
 ## Redesign notes
 
-**Done (2026-11): Products workflow** — 5 of 10 screens.
+**Done (2026-11): Products workflow** — 4 of 11 screens.
 - Products list: lazy themed cards below 760px of available width / table at or above, content centered at max 1240px, distinct loading/empty/no-match/failure states with retry banner, search and category filter compose.
 - Product detail: image stacked below 900px / beside at or above, wrapping HomeSectionCard rows, SafeArea footer, confirmed deletion, Edit guarded while opening.
 - Add/Edit product: one shared `product_form_widget.dart` with HomeSectionCard sections, inline validation in English and Khmer, duplicate-submission guard, draft retention on failed writes, native image upload (web shows an unavailable message).
 - Verification: 205 Flutter tests pass, targeted analysis 0 new diagnostics, `flutter build web` exits 0.
 
-**Done (2026-11): Categories workflow** — 3 of 10 screens.
+**Done (2026-11): Categories workflow** — 3 of 11 screens.
 - Categories list: lazy themed cards below 800px of available width / table at or above, content centered at max 1240px, distinct loading/error/empty/no-match states with retry and add actions, keyboard-activatable rows.
 - Add/Edit category: one shared `category_form_widget.dart` (dialog at/above 840px, bottom sheet below), inline validation in English and Khmer, duplicate-submission guard, dismissal blocked while saving, draft retention on failed writes, late-fetch route guard.
 - Verification: 281 Flutter tests pass with 1 web-only test skipped; `flutter analyze` reports no diagnostics in the changed files (repository baseline: 57 existing issues elsewhere); `flutter build web` exits 0; changed Dart files are `dart format` clean (the two locale maps excluded, already unformatted at baseline).
 
-**Done (2026-11): Units workflow** — 3 of 10 screens.
+**Done (2026-11): Units workflow** — 3 of 11 screens.
 - Units list: lazy themed cards below 800px of available width / table at or above (short-name and status chips, created/updated dates), content centered at max 1240px, distinct loading/error/empty/no-match states with retry and add actions, keyboard-activatable rows.
 - Add/Edit unit: one shared `unit_form_widget.dart` (dialog at/above 840px, bottom sheet below), required name and short-name validation in English and Khmer, Active checkbox, duplicate-submission guard, dismissal blocked while saving, draft retention on failed writes, late-fetch route guard; deleting stays on the list.
 - Verification: 308 Flutter tests pass with 1 web-only test skipped; `flutter analyze` reports no diagnostics in the changed files (56 existing issues elsewhere, one fewer than baseline — the rewrite removed a legacy `use_build_context_synchronously` info); `flutter build web` exits 0; changed Dart files are `dart format` clean (the two locale maps excluded, already unformatted at baseline).
