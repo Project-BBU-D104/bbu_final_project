@@ -36,14 +36,9 @@ Future<void> main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  runApp(const MyApp());
-
-  // runApp(
-  //   DevicePreview(
-  //     enabled: !kReleaseMode,
-  //     builder: (context) => const MyApp(),
-  //   ),
-  // );
+  runApp(
+    DevicePreview(enabled: kDebugMode, builder: (context) => const MyApp()),
+  );
 }
 
 Future<void> _initConfig() async {
@@ -103,14 +98,16 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
     final themeController = Get.find<ThemeController>();
+    final previewEnabled = DevicePreview.isEnabled(context);
+    final previewLocale = previewEnabled ? DevicePreview.locale(context) : null;
 
     return Obx(
       () => GetMaterialApp(
         debugShowCheckedModeBanner: false,
 
         useInheritedMediaQuery: true,
-        locale: DevicePreview.isEnabled(context)
-            ? DevicePreview.locale(context)
+        locale: previewEnabled
+            ? previewLocale
             : languageController.locale.value,
         fallbackLocale: const Locale("en", "US"),
 
