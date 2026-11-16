@@ -43,6 +43,13 @@ class WarehouseScreen extends StatelessWidget {
                         AppPageHeader(
                           title: 'Warehouses',
                           subtitle: 'Manage warehouse locations and stock.',
+                          leading: desktop
+                              ? IconButton.outlined(
+                                  tooltip: 'Back'.tr,
+                                  onPressed: () => Get.back(),
+                                  icon: const Icon(Icons.arrow_back),
+                                )
+                              : null,
                           actions: Wrap(
                             spacing: AppSpacing.md,
                             runSpacing: AppSpacing.md,

@@ -42,6 +42,13 @@ class WarehouseStockScreen extends StatelessWidget {
                         title: 'Warehouse Stock',
                         subtitle:
                             'Manage products and quantities by warehouse.',
+                        leading: DesktopAppShell.isVisible(context)
+                            ? IconButton.outlined(
+                                tooltip: 'Back'.tr,
+                                onPressed: () => Get.back(),
+                                icon: const Icon(Icons.arrow_back),
+                              )
+                            : null,
                         actions: Wrap(
                           spacing: AppSpacing.md,
                           runSpacing: AppSpacing.md,

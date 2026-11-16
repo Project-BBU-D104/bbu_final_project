@@ -43,6 +43,13 @@ class StockAdjustmentScreen extends StatelessWidget {
                         title: 'Stock Adjustment',
                         subtitle:
                             'Review stock corrections and their quantities.',
+                        leading: DesktopAppShell.isVisible(context)
+                            ? IconButton.outlined(
+                                tooltip: 'Back'.tr,
+                                onPressed: () => Get.back(),
+                                icon: const Icon(Icons.arrow_back),
+                              )
+                            : null,
                         actions: Wrap(
                           spacing: AppSpacing.md,
                           runSpacing: AppSpacing.md,
