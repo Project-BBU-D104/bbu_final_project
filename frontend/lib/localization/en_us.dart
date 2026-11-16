@@ -1,4 +1,132 @@
 const Map<String, String> enUS = {
+  "Add Warehouse Stock": "Add Warehouse Stock",
+  "Edit Warehouse Stock": "Edit Warehouse Stock",
+  "Search Warehouse Stock": "Search Warehouse Stock",
+  "Do you want to delete this warehouse stock?":
+      "Do you want to delete this warehouse stock?",
+  "Do you want to delete this stock transfer?":
+      "Do you want to delete this stock transfer?",
+  "Choose different warehouses": "Choose different warehouses",
+  "Unable to load stock transfers. Please try again.":
+      "Unable to load stock transfers. Please try again.",
+  "Unable to save stock transfer. Please try again.":
+      "Unable to save stock transfer. Please try again.",
+  "Unable to open stock transfer. Please try again.":
+      "Unable to open stock transfer. Please try again.",
+  "Unable to delete stock transfer. Please try again.":
+      "Unable to delete stock transfer. Please try again.",
+  "Transfer saved, but related stock could not be refreshed.":
+      "Transfer saved, but related stock could not be refreshed.",
+  "Unavailable warehouse": "Unavailable warehouse",
+  "From warehouse": "From warehouse",
+  "To warehouse": "To warehouse",
+  "Transfer Information": "Transfer Information",
+  "Reference number": "Reference number",
+  "Leave blank to generate automatically":
+      "Leave blank to generate automatically",
+  "Transfer date": "Transfer date",
+  "Product in source warehouse": "Product in source warehouse",
+  "Select a source warehouse first": "Select a source warehouse first",
+  "No available stock in this warehouse":
+      "No available stock in this warehouse",
+  "Available quantity": "Available quantity",
+  "Add item": "Add item",
+  "Transferred items": "Transferred items",
+  "Product lines": "Product lines",
+  "Total quantity": "Total quantity",
+  "No stock transfers yet": "No stock transfers yet",
+  "No matching stock transfers": "No matching stock transfers",
+  "Stock transfer unavailable": "Stock transfer unavailable",
+  "Manage stock movements between warehouses.":
+      "Manage stock movements between warehouses.",
+  "No transfer items recorded.": "No transfer items recorded.",
+  'Adjusted Quantity': 'Adjusted Quantity',
+  'Do you want to delete this stock adjustment?':
+      'Do you want to delete this stock adjustment?',
+  "Product and warehouse": "Product and warehouse",
+  "Adjustment type and quantity": "Adjustment type and quantity",
+  "Current and resulting stock": "Current and resulting stock",
+  "Reference and reason": "Reference and reason",
+  "Preview reverses the original movement before applying your changes.":
+      "Preview reverses the original movement before applying your changes.",
+  "Current stock unknown": "Current stock unknown",
+  "Enter a whole quantity greater than zero":
+      "Enter a whole quantity greater than zero",
+  "Unable to load current stock. Please try again.":
+      "Unable to load current stock. Please try again.",
+  "Quantity exceeds available stock.": "Quantity exceeds available stock.",
+  "Sign in again to save this adjustment.":
+      "Sign in again to save this adjustment.",
+  "Unable to load stock adjustments. Please try again.":
+      "Unable to load stock adjustments. Please try again.",
+  "Unable to save stock adjustment. Please try again.":
+      "Unable to save stock adjustment. Please try again.",
+  "Unable to open stock adjustment. Please try again.":
+      "Unable to open stock adjustment. Please try again.",
+  "Unable to delete stock adjustment. Please try again.":
+      "Unable to delete stock adjustment. Please try again.",
+  "Review stock corrections and their quantities.":
+      "Review stock corrections and their quantities.",
+  "Stock adjustments": "Stock adjustments",
+  "No stock adjustments yet": "No stock adjustments yet",
+  "No matching stock adjustments": "No matching stock adjustments",
+  "Stock adjustment unavailable": "Stock adjustment unavailable",
+  "Please select an adjustment type": "Please select an adjustment type",
+  "Stock Change": "Stock Change",
+  "Created at": "Created at",
+  "Updated at": "Updated at",
+  "Products and quantities": "Products and quantities",
+  "Enter a whole quantity of zero or more":
+      "Enter a whole quantity of zero or more",
+  "Select each product only once": "Select each product only once",
+  "Add at least one product": "Add at least one product",
+  "Unable to load warehouse stock. Please try again.":
+      "Unable to load warehouse stock. Please try again.",
+  "Unable to save warehouse stock. Please try again.":
+      "Unable to save warehouse stock. Please try again.",
+  "Unable to open warehouse stock. Please try again.":
+      "Unable to open warehouse stock. Please try again.",
+  "Unable to delete warehouse stock. Please try again.":
+      "Unable to delete warehouse stock. Please try again.",
+  "Unable to load stock options. Please try again.":
+      "Unable to load stock options. Please try again.",
+  "Manage products and quantities by warehouse.":
+      "Manage products and quantities by warehouse.",
+  "No matching warehouse stock": "No matching warehouse stock",
+  "Loading warehouse stock": "Loading warehouse stock",
+  "Warehouse stock unavailable": "Warehouse stock unavailable",
+  "Remove product": "Remove product",
+  "Add product": "Add product",
+  "Unavailable": "Unavailable",
+  "Search": "Search",
+  "Warehouses": "Warehouses",
+  "Warehouse Detail": "Warehouse Detail",
+  "Warehouse details": "Warehouse details",
+  "Add Warehouse": "Add Warehouse",
+  "Edit Warehouse": "Edit Warehouse",
+  "Warehouse Name": "Warehouse Name",
+  "Reference No": "Reference No",
+  "Location": "Location",
+  "Please enter warehouse name": "Please enter warehouse name",
+  "Please enter location": "Please enter location",
+  "Search Warehouses": "Search Warehouses",
+  "Manage warehouse locations and stock.":
+      "Manage warehouse locations and stock.",
+  "No warehouses yet": "No warehouses yet",
+  "No matching warehouses": "No matching warehouses",
+  "Warehouse unavailable": "Warehouse unavailable",
+  "Not available": "Not available",
+  "No warehouse stock yet": "No warehouse stock yet",
+  "Unable to load warehouses. Please try again.":
+      "Unable to load warehouses. Please try again.",
+  "Unable to save warehouse. Please try again.":
+      "Unable to save warehouse. Please try again.",
+  "Unable to open warehouse. Please try again.":
+      "Unable to open warehouse. Please try again.",
+  "Unable to delete warehouse. Please try again.":
+      "Unable to delete warehouse. Please try again.",
+  "Do you want to delete this warehouse?":
+      "Do you want to delete this warehouse?",
   "Change Password": "Change Password",
   "Choose a new password for your account.":
       "Choose a new password for your account.",

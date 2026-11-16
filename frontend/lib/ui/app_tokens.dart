@@ -5,6 +5,10 @@
 class AppTokens {
   const AppTokens._();
 
+  static const double formMaxHeightFactor = 0.9;
+
+  static const double tableMaxScaledBodySize = 20.8;
+
   /// Cards, tables and list rows.
   static const double radiusCard = 16;
 

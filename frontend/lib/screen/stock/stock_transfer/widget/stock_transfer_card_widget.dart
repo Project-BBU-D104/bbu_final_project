@@ -1,162 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_transfer_controller.dart';
+import 'package:frontend/ui/app_list_card.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/date_formatter.dart';
 import 'package:get/get.dart';
 
-class StockTransferCardWidget extends StatelessWidget {
-  final Map<String, dynamic> stockTransfer;
-  const StockTransferCardWidget({super.key, required this.stockTransfer});
-
-  @override
-  Widget build(BuildContext context) {
-    final items = stockTransfer['product_transfer_items'] as List? ?? [];
-    final itemNames = items
-        .map((item) => item['product']?['name']?.toString() ?? 'Product')
-        .join(', ');
-    final totalQuantity = items.fold<int>(
+// Display helpers are feature-local and use one local-time policy everywhere.
+String transferDate(Map<String, dynamic> transfer) => DateFormatter.formatDate(
+  DateTime.tryParse(transfer['transfer_date']?.toString() ?? '')?.toLocal(),
+);
+List<Map<String, dynamic>> transferRows(Map<String, dynamic> transfer) =>
+    (transfer['product_transfer_items'] as List? ?? [])
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+int transferTotal(Map<String, dynamic> transfer) =>
+    transferRows(transfer).fold<int>(
       0,
       (sum, item) => sum + (int.tryParse(item['qty']?.toString() ?? '') ?? 0),
     );
+String transferWarehouse(Map<String, dynamic> transfer, String key) =>
+    transfer[key] is Map ? transfer[key]['name']?.toString() ?? '-' : '-';
 
-    return GestureDetector(
-      onTap: () => Get.find<ProductTransferController>()
-          .gotoStockTransferDetail(stockTransfer),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// TOP ROW (ID + QTY)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "#${stockTransfer['reference_no']}",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.green.shade300),
-                  ),
-                  child: Text(
-                    "Qty: $totalQuantity",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            /// TITLE
-            Text(
-              itemNames.isEmpty ? 'No items' : itemNames,
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+class StockTransferCardWidget extends StatelessWidget {
+  const StockTransferCardWidget({super.key, required this.stockTransfer});
+  final Map<String, dynamic> stockTransfer;
+  @override
+  Widget build(BuildContext context) {
+    final c = Get.find<ProductTransferController>();
+    return AppListCard(
+      onTap: () => c.gotoStockTransferDetail(stockTransfer),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            stockTransfer['reference_no']?.toString() ?? '-',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            '${'From warehouse'.tr}: ${transferWarehouse(stockTransfer, 'from_warehouse')}',
+          ),
+          Text(
+            '${'To warehouse'.tr}: ${transferWarehouse(stockTransfer, 'to_warehouse')}',
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            '${'Product lines'.tr}: ${transferRows(stockTransfer).length} · ${'Total quantity'.tr}: ${transferTotal(stockTransfer)}',
+          ),
+          Text('${'Transfer date'.tr}: ${transferDate(stockTransfer)}'),
+          Wrap(
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.sm,
+            children: [
+              TextButton.icon(
+                onPressed: () => c.editStockTransfer(context, stockTransfer),
+                icon: const Icon(Icons.edit_outlined),
+                label: Text('Edit'.tr),
               ),
-            ),
-
-            const SizedBox(height: 14),
-
-            /// SOURCE - DESTINATION BOX
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.grey.shade200),
+              TextButton.icon(
+                onPressed: () =>
+                    c.onDeleteStockTransfer(context, stockTransfer['id']),
+                icon: const Icon(Icons.delete_outline),
+                label: Text('Delete'.tr),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "SOURCE",
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        stockTransfer['from_warehouse']?['name'] ?? '',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const Icon(Icons.sync_alt, color: Colors.green),
-
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "DESTINATION",
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        stockTransfer['to_warehouse']?['name'] ?? '',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            /// BOTTOM ROW (DATE + STATUS)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                    SizedBox(width: 6),
-                    Text(
-                      DateFormatter.formatDate(
-                        DateTime.tryParse(
-                          stockTransfer['transfer_date']?.toString() ?? '',
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -1,139 +1,81 @@
 # Stock
 
-## Warehouses — `frontend/lib/screen/stock/warehouse/warehouse_screen.dart`
-- **Route:** `/warehouse`
-- **Purpose:** Manages warehouse records.
-- **Navigation:** Manage; add/edit/detail actions in feature. Detail route receives selected warehouse.
-- **UI:** Search, table/card list, CRUD actions.
-- **State/data:** `WarehouseController`, `WarehouseBinding`, warehouse service/model.
-- **Custom widgets:** Adjacent warehouse table/card/add/edit/detail widgets; shared search/view-toggle/app bar.
-- **Current design issues:** Responsive list variants; specifics unclear.
+Integration verification: 2026-11-16. All 15 screens are implemented and verified by focused automated tests. Manual QA remains pending; this is not a production sign-off. The full suite retains one unrelated baseline failure.
 
-## Add warehouse — `frontend/lib/screen/stock/warehouse/widget/add_warehouse_widget.dart`
-- **Route:** None; form hosting unclear.
-- **Purpose:** Creates a warehouse.
-- **Navigation:** Warehouse list add action; save/cancel returns to host.
-- **UI:** Warehouse form and actions.
-- **State/data:** `WarehouseController`, warehouse service/model.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+## Screens
 
-## Edit warehouse — `frontend/lib/screen/stock/warehouse/widget/edit_warehouse_widget.dart`
-- **Route:** None; form hosting unclear.
-- **Purpose:** Updates a warehouse.
-- **Navigation:** Warehouse list edit action; save/cancel returns to host.
-- **UI:** Prefilled form and actions.
-- **State/data:** `WarehouseController`, selected warehouse.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+| Screen | File | Route / host | Status |
+|---|---|---|---|
+| Warehouses: List | [Source](../frontend/lib/screen/stock/warehouse/warehouse_screen.dart) | `/warehouse` | Implemented; automated checks passed |
+| Warehouses: Add | [Source](../frontend/lib/screen/stock/warehouse/widget/add_warehouse_widget.dart) | Adaptive form | Implemented; automated checks passed |
+| Warehouses: Edit | [Source](../frontend/lib/screen/stock/warehouse/widget/edit_warehouse_widget.dart) | Adaptive form | Implemented; automated checks passed |
+| Warehouses: Detail | [Source](../frontend/lib/screen/stock/warehouse/widget/ware_house_detail_widget.dart) | `/warehouse-detail` | Implemented; automated checks passed |
+| Warehouse stock: List | [Source](../frontend/lib/screen/stock/warehouse_stock/warehouse_stock_screen.dart) | `/warehouse-stock` | Implemented; automated checks passed |
+| Warehouse stock: Add | [Source](../frontend/lib/screen/stock/warehouse_stock/widget/add_warehouse_stock_widget.dart) | Adaptive form; multiple rows | Implemented; automated checks passed |
+| Warehouse stock: Edit | [Source](../frontend/lib/screen/stock/warehouse_stock/widget/edit_warehouse_stock_widget.dart) | Adaptive form; exactly one row | Implemented; automated checks passed |
+| Adjustments: List | [Source](../frontend/lib/screen/stock/stock_adjustment/stock_adjustment_screen.dart) | `/stock-adjustment` | Implemented; automated checks passed |
+| Adjustments: Add | [Source](../frontend/lib/screen/stock/stock_adjustment/widget/add_stock_adjustment_widget.dart) | Adaptive form | Implemented; automated checks passed |
+| Adjustments: Edit | [Source](../frontend/lib/screen/stock/stock_adjustment/widget/edit_stock_adjustment_type_widget.dart) | Adaptive form; live reversal preview | Implemented; automated checks passed |
+| Adjustments: Detail | [Source](../frontend/lib/screen/stock/stock_adjustment/widget/stock_adjustment_detail_widget.dart) | `/stock-adjustment-detail` | Implemented; automated checks passed |
+| Transfers: List | [Source](../frontend/lib/screen/stock/stock_transfer/stock_transfer_screen.dart) | `/stock-transfer` | Implemented; automated checks passed |
+| Transfers: Add | [Source](../frontend/lib/screen/stock/stock_transfer/widget/add_stock_transfer_widget.dart) | Adaptive form; fresh stock preflight | Implemented; automated checks passed |
+| Transfers: Edit | [Source](../frontend/lib/screen/stock/stock_transfer/widget/edit_stock_transfer_widget.dart) | Adaptive form; original-source addback | Implemented; automated checks passed |
+| Transfers: Detail | [Source](../frontend/lib/screen/stock/stock_transfer/widget/stock_transfer_detail_card_widget.dart) | `/stock-transfer-detail` | Implemented; automated checks passed |
 
-## Warehouse detail — `frontend/lib/screen/stock/warehouse/widget/ware_house_detail_widget.dart`
-- **Route:** `/warehouse-detail`; route registered, caller unclear.
-- **Purpose:** Reviews a warehouse record.
-- **Navigation:** Intended from warehouse list; caller not found in scan.
-- **UI:** Scaffold, warehouse detail cards.
-- **State/data:** Warehouse argument/controller source unclear.
-- **Custom widgets:** `warehouse_card_widget.dart`, app bar.
-- **Current design issues:** Caller uncertainty.
+## Layout and navigation
 
-## Warehouse stock — `frontend/lib/screen/stock/warehouse_stock/warehouse_stock_screen.dart`
-- **Route:** `/warehouse-stock`
-- **Purpose:** Views and manages stock at warehouses.
-- **Navigation:** Manage; add/edit actions from stock list.
-- **UI:** Search/list and stock controls.
-- **State/data:** `WarehouseStockController`, binding, warehouse stock service/model.
-- **Custom widgets:** `warehouse_stock_table_widget.dart`, `warehouse_stock_card_widget.dart`, add/edit widgets.
-- **Current design issues:** Responsive list variants; specifics unclear.
+All four lists preserve `DesktopAppShell`, use the shared UI kit and `AppTokens`/`AppSpacing`, and choose cards or tables from available content width (799/800 boundary). Large text falls back to cards. Lists have persistent shared search, counts, lazy scrolling, pull-to-refresh, and distinct loading, failed-load, empty, no-match, and retained-record refresh-error states.
 
-## Add warehouse stock — `frontend/lib/screen/stock/warehouse_stock/widget/add_warehouse_stock_widget.dart`
-- **Route:** None; form hosting unclear.
-- **Purpose:** Adds stock to a warehouse record.
-- **Navigation:** Warehouse stock action; save/cancel returns to host.
-- **UI:** Stock form and actions.
-- **State/data:** `WarehouseStockController`, warehouse/product/stock data.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+Each feature shares Add/Edit form content behind its existing adapters. `AppFormShell.show` opens a dialog at the desktop breakpoint and a bottom sheet below it. Forms validate inline, focus invalid fields, preserve rejected drafts, and guard writes and dismissal while saving. Warehouse stock form lookups stay local and cannot overwrite another controller's active warehouse search.
 
-## Edit warehouse stock — `frontend/lib/screen/stock/warehouse_stock/widget/edit_warehouse_stock_widget.dart`
-- **Route:** None; form hosting unclear.
-- **Purpose:** Edits a warehouse stock record.
-- **Navigation:** Warehouse stock action; save/cancel returns to host.
-- **UI:** Prefilled stock form and actions.
-- **State/data:** `WarehouseStockController`, selected stock record.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+Warehouse list/card/table selection calls `WarehouseController.gotoWarehouseDetail` with the existing map argument. Adjustment and transfer controllers retain their existing detail route/map contracts. Detail screens reuse bound controllers and the newest matching records, provide safe unavailable states and Back actions, and expose no write controls for unavailable arguments. Compact detail actions wrap in safe footers; desktop actions use page headers. Successful deletes leave list routes intact and close only their originating current detail routes.
 
-## Stock adjustments — `frontend/lib/screen/stock/stock_adjustment/stock_adjustment_screen.dart`
-- **Route:** `/stock-adjustment`
-- **Purpose:** Records and reviews stock adjustments.
-- **Navigation:** Manage; add/edit/detail actions.
-- **UI:** Search, table/card list, add action and detail navigation.
-- **State/data:** `StockAdjustmentController`, binding, stock adjustment service/model.
-- **Custom widgets:** Feature table/card/add/edit/detail widgets; shared view toggle/search.
-- **Current design issues:** Responsive layouts; specific styling unclear.
+## Stock correctness and integration fixes
 
-## Add stock adjustment — `frontend/lib/screen/stock/stock_adjustment/widget/add_stock_adjustment_widget.dart`
-- **Route:** None; form host unclear.
-- **Purpose:** Creates an adjustment for stock.
-- **Navigation:** Adjustment list add action; save/cancel returns to host.
-- **UI:** Adjustment form, type/quantity and actions.
-- **State/data:** `StockAdjustmentController`, adjustment model/service and stock data.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+- Warehouse stock Add serializes multiple unique product rows, including zero quantities. Edit permits exactly one row in both UI and controller. Successful edits retain the committed quantity even if list readback fails; a dismissing form cannot submit its movement again.
+- Adjustment Edit reverses the original movement from live stock before applying the draft. A changed pair uses that pair's live stock. Unknown lookup results block saving, stale responses cannot overwrite current selections, and derived previous/new quantities remain server-owned.
+- Transfers merge duplicate products, retain rows on source changes, and add original quantities back exactly once only for the original source. Submission fetches fresh source stock and guards the whole preflight/write. Late Add/Edit/detail responses and completed-save readbacks cannot open over, write from, or pop another route.
+- `frontend/lib/utils/stock_refresh.dart` provides `Future<void> refreshStockReadModels()`. It refreshes existing Warehouse/Product instances independently, skips uninstantiated lazy bindings, and uses `getProducts(showLoading: false)`. All three stock-mutation features call it; existing feature-specific warehouse-stock list refreshes are retained.
+- Readback failures never become retryable save failures. The API client also treats malformed successful response bodies as committed for the four Stock endpoints on POST/PUT/DELETE only; GETs, rejected writes, other endpoints, and backend behavior retain their contracts.
+- Repeated warehouse-stock/transfer delete actions open one confirmation. Existing feature test support files remain separate. Shared threshold tokens are declared once; all source locale keys are retained, duplicate keys are absent, two differing Khmer phrasings are reconciled, and five missing form/search/confirmation labels now have English/Khmer copy.
 
-## Edit stock adjustment — `frontend/lib/screen/stock/stock_adjustment/widget/edit_stock_adjustment_type_widget.dart`
-- **Route:** No named route; exact host unclear.
-- **Purpose:** Updates an adjustment/type record.
-- **Navigation:** Adjustment feature action; save/cancel returns to host.
-- **UI:** Prefilled form and actions.
-- **State/data:** `StockAdjustmentController`, selected adjustment.
-- **Custom widgets:** None established.
-- **Current design issues:** Host presentation unclear.
+## Verification results
 
-## Stock adjustment detail — `frontend/lib/screen/stock/stock_adjustment/widget/stock_adjustment_detail_widget.dart`
-- **Route:** `/stock-adjustment-detail`, selected adjustment argument.
-- **Purpose:** Reviews one stock adjustment.
-- **Navigation:** Adjustment list selection; back returns to list.
-- **UI:** Scaffold and adjustment detail.
-- **State/data:** Adjustment argument, `StockAdjustmentController`.
-- **Custom widgets:** Feature adjustment card/detail components.
-- **Current design issues:** Specific issues unclear.
+All commands ran from the isolated integration worktree, using fake services and the public example environment file. No live credentials or API mutations were used.
 
-## Stock transfers — `frontend/lib/screen/stock/stock_transfer/stock_transfer_screen.dart`
-- **Route:** `/stock-transfer`
-- **Purpose:** Records and reviews transfers between warehouses.
-- **Navigation:** Manage; create/edit/detail actions.
-- **UI:** Search/list, table/card modes and transfer actions.
-- **State/data:** `ProductTransferController`, binding, transfer service/models.
-- **Custom widgets:** Feature transfer table/card/add/edit/detail widgets.
-- **Current design issues:** Specific issues unclear.
+| Check | Actual result |
+|---|---|
+| Focused Stock/controller/form/list/detail/localization/refresh/API-response tests | 248 passed, 0 failures |
+| Affected purchase, purchase-request, purchase-payment, and API-authentication tests | 100 passed, 0 failures |
+| Full Flutter suite | 843 passed, 1 skipped, 1 pre-existing failure |
+| Baseline full Flutter suite before integration | 595 passed, 1 skipped, 1 failure |
+| `flutter analyze --no-pub` | 17 existing diagnostics; 0 added; baseline 37 |
+| `flutter build web --no-pub` | Passed |
+| Changed Dart formatting | All 60 files formatted; format gate passed |
+| `git diff --check` | Passed |
+| Source/main preservation | HEAD, staged diff, Git status, tracked/untracked implementation and document hashes unchanged |
 
-## Add stock transfer — `frontend/lib/screen/stock/stock_transfer/widget/add_stock_transfer_widget.dart`
-- **Route:** None; form host unclear.
-- **Purpose:** Creates a stock transfer.
-- **Navigation:** Transfer list add action; save/cancel returns to host.
-- **UI:** Source/destination, item form and actions.
-- **State/data:** `ProductTransferController`, warehouse/product/transfer data.
-- **Custom widgets:** None established.
-- **Current design issues:** Multi-part form; host constraints unclear.
+The unchanged full-suite failure is `product_redesign_test.dart`: **category sheet and search use dark surfaces** (`Bad state: No element`, original assertion at line 296). It reproduced before integration. It is outside Stock scope and remains a blocker to an entirely green repository suite. The web-only skip is retained. Analyzer diagnostics are compared by message/severity/path with line/column offsets ignored; no new diagnostics remain. Dependency Wasm dry-run warnings do not prevent the standard web build.
 
-## Edit stock transfer — `frontend/lib/screen/stock/stock_transfer/widget/edit_stock_transfer_widget.dart`
-- **Route:** None; form host unclear.
-- **Purpose:** Updates a stock transfer.
-- **Navigation:** Transfer list edit action; save/cancel returns to host.
-- **UI:** Prefilled transfer form and actions.
-- **State/data:** `ProductTransferController`, selected transfer.
-- **Custom widgets:** None established.
-- **Current design issues:** Multi-part form; host constraints unclear.
+Automated coverage includes real-shell width probes at 390/840/1024/1440, isolated 799/800 content boundaries, English/Khmer and light/dark cases, large text, keyboard insets, focus/keyboard activation, safe invalid arguments, missing relations/dates, retained drafts, duplicate-save guards, stale requests, and committed-write/readback separation. These tests do not establish real-device or backend concurrency behavior.
 
-## Stock transfer detail — `frontend/lib/screen/stock/stock_transfer/widget/stock_transfer_detail_card_widget.dart`
-- **Route:** `/stock-transfer-detail`, selected transfer argument.
-- **Purpose:** Reviews one stock transfer.
-- **Navigation:** Transfer list; controller opens detail with selected transfer.
-- **UI:** Scaffold and transfer detail cards.
-- **State/data:** Transfer argument/model.
-- **Custom widgets:** Transfer card and item detail components.
-- **Current design issues:** Specific issues unclear.
+## Pending manual QA
 
-## Redesign notes
+- Complete a live create/edit/delete journey for each feature, including multi-row stock Add and one-row Edit.
+- Verify Warehouse → warehouse stock → adjustment → transfer quantities against a live API, concurrent stock depletion/replenishment, and real failed-readback recovery without repeating mutations.
+- Capture browser screenshots and exercise resizing, long Khmer labels, light/dark themes, physical keyboard focus, mobile keyboards, and large-text layouts.
+- Check TalkBack/VoiceOver and browser screen-reader announcements, focus order, and control labels on actual devices.
+- Resolve the unrelated baseline Product test before requiring a completely green full suite.
 
+## Integration provenance
+
+Common baseline: `cb5dd7f3e496cb7fa8451100f723e1bb567dc8f1`. Integration workspace: `.superpowers/worktrees/stock-integration`, branch `stock/integration`; the Stock changes are recorded separately for local integration into `main`, with all source worktrees retained. Sources were read-only and integrated in the order below. All implementation changes happened to be committed; untracked source files were plans/designs or handoff notes and were excluded. No generated plans/designs, environments, secrets, caches, build outputs, or backend changes are part of the implementation diff.
+
+| Order | Feature | Source folder under `.superpowers/worktrees/` | Source HEAD | Screens |
+|---|---|---|---|---:|
+| 1 | Warehouses | `warehouses` | `531243e` | 4 |
+| 2 | Warehouse stock | `warehouse-stock` | `5561bea` | 3 |
+| 3 | Adjustments | `adjustments` | `bcb160e` | 4 |
+| 4 | Transfers | `transfers` | `ab90e12` | 4 |
+
+The pre-existing main-workspace `SCREENS_INDEX.md` and Catalog inventory edits are preserved separately as uncommitted changes and excluded from the Stock integration commit. Final review was performed inline by the integrating agent, honoring the request to execute the integration itself; no independent reviewer or live QA sign-off is claimed. Detailed execution logs, source manifests, normalized diagnostics, and preservation snapshots are in the ignored `.superpowers/` folder inside the integration worktree.

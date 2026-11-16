@@ -1,97 +1,130 @@
-import 'package:flutter/material.dart';
-import 'package:frontend/controllers/warehouse_stock_controller.dart';
-import 'package:frontend/screen/stock/warehouse_stock/widget/warehouse_stock_card_widget.dart';
-import 'package:frontend/screen/stock/warehouse_stock/widget/warehouse_stock_table_widget.dart';
-import 'package:frontend/widget/custom_app_bar.dart';
-import 'package:frontend/widget/search_widget.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:get/get.dart';
+import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/controllers/warehouse_stock_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/ui/app_empty_state.dart';
+import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_search_field.dart';
+import 'package:frontend/ui/app_tokens.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
+import 'widget/warehouse_stock_card_widget.dart';
+import 'widget/warehouse_stock_table_widget.dart';
 
 class WarehouseStockScreen extends StatelessWidget {
   WarehouseStockScreen({super.key});
-
   final ctr = Get.find<WarehouseStockController>();
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: "Warehouse Stock"),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: [
-                SizedBox(height: 4),
-
-                SearchWidget(title: "Search Warehouse Stock"),
-                
-                SizedBox(height: 10),
-                 
-                Obx(() {
-                  if (ctr.isLoading.value) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  }
-
-                  if (ctr.warehouseStockList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(child: Text("No Data Found".tr)),
-                    );
-                  }
-
-                  if (ctr.searchwarehouseStockList.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(child: Text("Search Data Not Found".tr)),
-                    );
-                  }
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final stocks = ctr.searchwarehouseStockList
-                          .map(
-                            (stock) => Map<String, dynamic>.from(stock as Map),
-                          )
-                          .toList();
-                      final isMobile = constraints.maxWidth < 600;
-
-                      if (isMobile) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: stocks.length,
-                          padding: const EdgeInsets.only(bottom: 70),
-                          itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: WarehouseStockCardWidget(
-                              warehouseStock: stocks[index],
+  Widget build(BuildContext context) => Scaffold(
+    appBar: DesktopAppShell.isVisible(context)
+        ? null
+        : const CustomAppBar(title: 'Warehouse Stock'),
+    body: AppPage(
+      child: LayoutBuilder(
+        builder: (context, constraints) => Obx(() {
+          final loading = ctr.isLoading.value;
+          final error = ctr.loadError.value;
+          final rows = ctr.searchwarehouseStockList.toList();
+          final table =
+              constraints.maxWidth >= AppTokens.bpTable &&
+              MediaQuery.textScalerOf(context).scale(16) <=
+                  AppTokens.tableMaxScaledBodySize;
+          return RefreshIndicator(
+            onRefresh: ctr.onRefresh,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppPageHeader(
+                        title: 'Warehouse Stock',
+                        subtitle:
+                            'Manage products and quantities by warehouse.',
+                        actions: Wrap(
+                          spacing: AppSpacing.md,
+                          runSpacing: AppSpacing.md,
+                          children: [
+                            IconButton.outlined(
+                              tooltip: 'Refresh'.tr,
+                              onPressed: loading ? null : ctr.onRefresh,
+                              icon: const Icon(Icons.refresh),
                             ),
-                          ),
-                        );
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 70),
-                        child: WarehouseStockTableWidget(
-                          warehouseStocks: stocks,
+                            FilledButton.icon(
+                              onPressed:
+                                  ctr.isSaving.value || ctr.isOpeningEdit.value
+                                  ? null
+                                  : () => ctr.addWarehouseStock(context),
+                              icon: const Icon(Icons.add),
+                              label: Text('Add Warehouse Stock'.tr),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  );
-                }),
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      const AppSearchField(title: 'Search Warehouse Stock'),
+                      const SizedBox(height: AppSpacing.md),
+                      Wrap(
+                        spacing: AppSpacing.md,
+                        children: [
+                          Text(
+                            '${rows.length} / ${ctr.warehouseStockList.length} ${'Warehouse Stock'.tr}',
+                          ),
+                          if (ctr.searchQuery.value.isNotEmpty)
+                            TextButton(
+                              onPressed: () =>
+                                  Get.find<SearchController>().clear(),
+                              child: Text('Clear search'.tr),
+                            ),
+                        ],
+                      ),
+                      if (loading) const LinearProgressIndicator(),
+                      if (error.isNotEmpty)
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(error),
+                            TextButton(
+                              onPressed: loading ? null : ctr.onRefresh,
+                              child: Text('Retry'.tr),
+                            ),
+                          ],
+                        ),
+                      if (ctr.formError.value.isNotEmpty)
+                        Text(ctr.formError.value),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
+                  ),
+                ),
+                if (rows.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: AppEmptyState(
+                      message: loading
+                          ? 'Loading warehouse stock'
+                          : error.isNotEmpty
+                          ? 'Warehouse stock unavailable'
+                          : ctr.warehouseStockList.isEmpty
+                          ? 'No warehouse stock yet'
+                          : 'No matching warehouse stock',
+                    ),
+                  )
+                else if (table)
+                  SliverToBoxAdapter(
+                    child: WarehouseStockTableWidget(warehouseStocks: rows),
+                  )
+                else
+                  SliverList.builder(
+                    itemCount: rows.length,
+                    itemBuilder: (_, index) =>
+                        WarehouseStockCardWidget(warehouseStock: rows[index]),
+                  ),
               ],
             ),
-          ),
-        ),
+          );
+        }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ctr.addWarehouseStock(context);
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+    ),
+  );
 }

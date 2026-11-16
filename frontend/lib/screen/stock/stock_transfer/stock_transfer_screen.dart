@@ -1,110 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_transfer_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_card_widget.dart';
 import 'package:frontend/screen/stock/stock_transfer/widget/stock_transfer_table_widget.dart';
-import 'package:frontend/widget/app_cached_image.dart';
+import 'package:frontend/ui/app_empty_state.dart';
+import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_search_field.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
-import 'package:frontend/widget/search_widget.dart';
 import 'package:get/get.dart';
 
 class StockTransferScreen extends StatelessWidget {
   StockTransferScreen({super.key});
-
   final ctr = Get.find<ProductTransferController>();
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: "Stock Transfer"),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              SearchWidget(title: "Search Stock Transfer".tr),
-             
-              SizedBox(height: 10),
-
-              Obx(() {
-                if (ctr.isLoading.value) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (ctr.stockTransfer.isEmpty) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AppCachedImage(
-                            assetPath: 'assets/images/empty.png',
-                            width: 120,
-                            fit: BoxFit.contain,
-                          ),
-                          Text(
-                            "No data found".tr,
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                if (ctr.searchStockTransferList.isEmpty) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(
-                      child: Text(
-                        "No data found".tr,
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                    ),
-                  );
-                }
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    final transfers = ctr.searchStockTransferList.toList();
-                    final isMobile = constraints.maxWidth < 600;
-
-                    if (isMobile) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: transfers.length,
-                        padding: const EdgeInsets.only(bottom: 100),
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: StockTransferCardWidget(
-                            stockTransfer: transfers[index],
-                          ),
+  Widget build(BuildContext context) => Scaffold(
+    appBar: DesktopAppShell.isVisible(context)
+        ? null
+        : const CustomAppBar(title: 'Stock Transfer'),
+    body: AppPage(
+      child: LayoutBuilder(
+        builder: (context, content) => Obx(() {
+          final items = ctr.searchStockTransferList.toList();
+          final loading = ctr.isLoading.value;
+          final error = ctr.loadError.value;
+          final table =
+              content.maxWidth >= AppTokens.bpTable &&
+              MediaQuery.textScalerOf(context).scale(16) <=
+                  AppTokens.tableMaxScaledBodySize;
+          return RefreshIndicator(
+            onRefresh: ctr.onRefresh,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppPageHeader(
+                        title: 'Stock Transfer',
+                        subtitle: 'Manage stock movements between warehouses.',
+                        actions: Wrap(
+                          spacing: AppSpacing.md,
+                          runSpacing: AppSpacing.md,
+                          children: [
+                            IconButton.outlined(
+                              tooltip: 'Refresh'.tr,
+                              onPressed: loading ? null : ctr.onRefresh,
+                              icon: const Icon(Icons.refresh),
+                            ),
+                            FilledButton.icon(
+                              onPressed: ctr.isSaving.value
+                                  ? null
+                                  : () => ctr.addStockTransfer(context),
+                              icon: const Icon(Icons.add),
+                              label: Text('Add Stock Transfer'.tr),
+                            ),
+                          ],
                         ),
-                      );
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 100),
-                      child: StockTransferTableWidget(
-                        stockTransfers: transfers,
                       ),
-                    );
-                  },
-                );
-              }),
-            ],
-          ),
-        ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      const AppSearchField(title: 'Search Stock Transfer'),
+                      const SizedBox(height: AppSpacing.md),
+                      Text('${items.length} ${'Stock Transfer'.tr}'),
+                      const SizedBox(height: AppSpacing.lg),
+                      if (loading && ctr.stockTransfer.isNotEmpty)
+                        const LinearProgressIndicator(),
+                      if (error.isNotEmpty)
+                        Wrap(
+                          spacing: AppSpacing.md,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(error.tr),
+                            TextButton(
+                              onPressed: loading ? null : ctr.onRefresh,
+                              child: Text('Retry'.tr),
+                            ),
+                          ],
+                        ),
+                      if (ctr.formError.isNotEmpty)
+                        Text(ctr.formError.value.tr),
+                    ],
+                  ),
+                ),
+                if (loading && ctr.stockTransfer.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (items.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: AppEmptyState(
+                      message: error.isNotEmpty
+                          ? ''
+                          : ctr.stockTransfer.isEmpty
+                          ? 'No stock transfers yet'
+                          : 'No matching stock transfers',
+                    ),
+                  )
+                else if (table)
+                  SliverToBoxAdapter(
+                    child: StockTransferTableWidget(stockTransfers: items),
+                  )
+                else
+                  SliverList.builder(
+                    itemCount: items.length,
+                    itemBuilder: (_, index) =>
+                        StockTransferCardWidget(stockTransfer: items[index]),
+                  ),
+              ],
+            ),
+          );
+        }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ctr.addStockTransfer(context);
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+    ),
+  );
 }

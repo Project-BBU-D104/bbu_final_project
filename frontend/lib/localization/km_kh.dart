@@ -1,4 +1,127 @@
 const Map<String, String> kmKH = {
+  "Add Warehouse Stock": "បន្ថែមស្តុកក្នុងឃ្លាំង",
+  "Edit Warehouse Stock": "កែប្រែស្តុកក្នុងឃ្លាំង",
+  "Search Warehouse Stock": "ស្វែងរកស្តុកក្នុងឃ្លាំង",
+  "Do you want to delete this warehouse stock?":
+      "តើអ្នកចង់លុបស្តុកក្នុងឃ្លាំងនេះមែនទេ?",
+  "Do you want to delete this stock transfer?":
+      "តើអ្នកចង់លុបការផ្ទេរស្តុកនេះមែនទេ?",
+  "Choose different warehouses": "ជ្រើសរើសឃ្លាំងផ្សេងគ្នា",
+  "Unable to load stock transfers. Please try again.":
+      "មិនអាចផ្ទុកការផ្ទេរស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to save stock transfer. Please try again.":
+      "មិនអាចរក្សាទុកការផ្ទេរស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to open stock transfer. Please try again.":
+      "មិនអាចបើកការផ្ទេរស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to delete stock transfer. Please try again.":
+      "មិនអាចលុបការផ្ទេរស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Transfer saved, but related stock could not be refreshed.":
+      "បានរក្សាទុកការផ្ទេរ ប៉ុន្តែមិនអាចផ្ទុកស្តុកពាក់ព័ន្ធឡើងវិញបានទេ។",
+  "Unavailable warehouse": "ឃ្លាំងមិនអាចប្រើបាន",
+  "From warehouse": "ពីឃ្លាំង",
+  "To warehouse": "ទៅឃ្លាំង",
+  "Transfer Information": "ព័ត៌មានការផ្ទេរ",
+  "Reference number": "លេខយោង",
+  "Leave blank to generate automatically": "ទុកទទេដើម្បីបង្កើតដោយស្វ័យប្រវត្តិ",
+  "Transfer date": "កាលបរិច្ឆេទផ្ទេរ",
+  "Product in source warehouse": "ផលិតផលក្នុងឃ្លាំងដើម",
+  "Select a source warehouse first": "ជ្រើសរើសឃ្លាំងដើមជាមុន",
+  "No available stock in this warehouse": "មិនមានស្តុកក្នុងឃ្លាំងនេះទេ",
+  "Available quantity": "បរិមាណដែលមាន",
+  "Add item": "បន្ថែមទំនិញ",
+  "Transferred items": "ទំនិញដែលបានផ្ទេរ",
+  "Product lines": "មុខទំនិញ",
+  "Total quantity": "បរិមាណសរុប",
+  "No stock transfers yet": "មិនទាន់មានការផ្ទេរស្តុកទេ",
+  "No matching stock transfers": "គ្មានការផ្ទេរស្តុកដែលត្រូវនឹងការស្វែងរក",
+  "Stock transfer unavailable": "ការផ្ទេរស្តុកមិនអាចបង្ហាញបាន",
+  "Manage stock movements between warehouses.":
+      "គ្រប់គ្រងការផ្លាស់ទីស្តុករវាងឃ្លាំង។",
+  "No transfer items recorded.": "មិនមានទំនិញផ្ទេរដែលបានកត់ត្រាទេ។",
+  'Adjusted Quantity': 'បរិមាណកែតម្រូវ',
+  'Do you want to delete this stock adjustment?':
+      'តើអ្នកចង់លុបការកែតម្រូវស្តុកនេះមែនទេ?',
+  "Product and warehouse": "ផលិតផល និងឃ្លាំង",
+  "Adjustment type and quantity": "ប្រភេទកែតម្រូវ និងបរិមាណ",
+  "Current and resulting stock": "ស្តុកបច្ចុប្បន្ន និងស្តុកលទ្ធផល",
+  "Reference and reason": "លេខយោង និងមូលហេតុ",
+  "Preview reverses the original movement before applying your changes.":
+      "ការមើលជាមុនដកចលនាដើមចេញ មុននឹងអនុវត្តការកែប្រែរបស់អ្នក។",
+  "Current stock unknown": "មិនទាន់ដឹងស្តុកបច្ចុប្បន្ន",
+  "Enter a whole quantity greater than zero": "បញ្ចូលចំនួនគត់ធំជាងសូន្យ",
+  "Unable to load current stock. Please try again.":
+      "មិនអាចផ្ទុកស្តុកបច្ចុប្បន្នបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Quantity exceeds available stock.": "បរិមាណលើសពីស្តុកដែលមាន។",
+  "Sign in again to save this adjustment.":
+      "សូមចូលគណនីម្តងទៀត ដើម្បីរក្សាទុកការកែតម្រូវនេះ។",
+  "Unable to load stock adjustments. Please try again.":
+      "មិនអាចផ្ទុកការកែតម្រូវស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to save stock adjustment. Please try again.":
+      "មិនអាចរក្សាទុកការកែតម្រូវស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to open stock adjustment. Please try again.":
+      "មិនអាចបើកការកែតម្រូវស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to delete stock adjustment. Please try again.":
+      "មិនអាចលុបការកែតម្រូវស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Review stock corrections and their quantities.":
+      "ពិនិត្យការកែតម្រូវស្តុក និងបរិមាណរបស់វា។",
+  "Stock adjustments": "ការកែតម្រូវស្តុក",
+  "No stock adjustments yet": "មិនទាន់មានការកែតម្រូវស្តុក",
+  "No matching stock adjustments": "គ្មានការកែតម្រូវស្តុកដែលត្រូវគ្នា",
+  "Stock adjustment unavailable": "មិនមានទិន្នន័យការកែតម្រូវស្តុក",
+  "Please select an adjustment type": "សូមជ្រើសរើសប្រភេទកែតម្រូវ",
+  "Stock Change": "ការផ្លាស់ប្តូរស្តុក",
+  "Created at": "កាលបរិច្ឆេទបង្កើត",
+  "Updated at": "កាលបរិច្ឆេទកែប្រែ",
+  "Products and quantities": "ផលិតផល និងបរិមាណ",
+  "Enter a whole quantity of zero or more":
+      "បញ្ចូលបរិមាណជាចំនួនគត់សូន្យ ឬច្រើនជាងនេះ",
+  "Select each product only once": "ជ្រើសរើសផលិតផលនីមួយៗតែម្តង",
+  "Add at least one product": "បន្ថែមផលិតផលយ៉ាងហោចណាស់មួយ",
+  "Unable to load warehouse stock. Please try again.":
+      "មិនអាចផ្ទុកស្តុកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to save warehouse stock. Please try again.":
+      "មិនអាចរក្សាទុកស្តុកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to open warehouse stock. Please try again.":
+      "មិនអាចបើកស្តុកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to delete warehouse stock. Please try again.":
+      "មិនអាចលុបស្តុកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to load stock options. Please try again.":
+      "មិនអាចផ្ទុកជម្រើសស្តុកបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Manage products and quantities by warehouse.":
+      "គ្រប់គ្រងផលិតផល និងបរិមាណតាមឃ្លាំង។",
+  "No matching warehouse stock": "គ្មានស្តុកឃ្លាំងដែលត្រូវនឹងការស្វែងរក",
+  "Loading warehouse stock": "កំពុងផ្ទុកស្តុកឃ្លាំង",
+  "Warehouse stock unavailable": "មិនមានស្តុកឃ្លាំង",
+  "Remove product": "ដកផលិតផលចេញ",
+  "Add product": "បន្ថែមផលិតផល",
+  "Unavailable": "មិនមាន",
+  "Search": "ស្វែងរក",
+  "Warehouses": "ឃ្លាំង",
+  "Warehouse Detail": "ព័ត៌មានលម្អិតឃ្លាំង",
+  "Warehouse details": "ព័ត៌មានឃ្លាំង",
+  "Add Warehouse": "បន្ថែមឃ្លាំង",
+  "Edit Warehouse": "កែប្រែឃ្លាំង",
+  "Warehouse Name": "ឈ្មោះឃ្លាំង",
+  "Reference No": "លេខយោង",
+  "Location": "ទីតាំង",
+  "Please enter warehouse name": "សូមបញ្ចូលឈ្មោះឃ្លាំង",
+  "Please enter location": "សូមបញ្ចូលទីតាំង",
+  "Search Warehouses": "ស្វែងរកឃ្លាំង",
+  "Manage warehouse locations and stock.": "គ្រប់គ្រងទីតាំងឃ្លាំង និងស្តុក។",
+  "No warehouses yet": "មិនទាន់មានឃ្លាំង",
+  "No matching warehouses": "គ្មានឃ្លាំងដែលត្រូវគ្នា",
+  "Warehouse unavailable": "មិនអាចបង្ហាញឃ្លាំងបាន",
+  "Not available": "មិនមានព័ត៌មាន",
+  "No warehouse stock yet": "មិនទាន់មានស្តុកឃ្លាំងទេ",
+  "Unable to load warehouses. Please try again.":
+      "មិនអាចទាញយកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to save warehouse. Please try again.":
+      "មិនអាចរក្សាទុកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to open warehouse. Please try again.":
+      "មិនអាចបើកឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to delete warehouse. Please try again.":
+      "មិនអាចលុបឃ្លាំងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Do you want to delete this warehouse?": "តើអ្នកចង់លុបឃ្លាំងនេះមែនទេ?",
   "Change Password": "ប្តូរពាក្យសម្ងាត់",
   "Choose a new password for your account.":
       "ជ្រើសរើសពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក។",

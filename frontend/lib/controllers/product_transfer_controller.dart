@@ -5,8 +5,10 @@ import 'package:frontend/screen/stock/stock_transfer/widget/add_stock_transfer_w
 import 'package:frontend/screen/stock/stock_transfer/widget/edit_stock_transfer_widget.dart';
 import 'package:frontend/services/main_service/warehouse_stock_service.dart';
 import 'package:frontend/services/main_service/product_transfer_service.dart';
-import 'package:frontend/widget/bottom_sheets.dart';
-import 'package:frontend/widget/toast_widget.dart';
+import 'package:frontend/ui/app_form.dart';
+import 'package:frontend/controllers/warehouse_controller.dart';
+import 'package:frontend/controllers/warehouse_stock_controller.dart';
+import 'package:frontend/utils/stock_refresh.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
 
@@ -14,9 +16,30 @@ class ProductTransferController extends GetxController {
   var isLoading = false.obs;
   var isSaving = false.obs;
   var isStockLoading = false.obs;
+  final isOpeningEdit = false.obs;
+  final searchQuery = ''.obs;
   final Rx<DateTime> selectedDate = DateTime.now().obs;
-  final ProductTransferService service = ProductTransferService();
-  final WarehouseStockService warehouseStockService = WarehouseStockService();
+  ProductTransferController({
+    ProductTransferService? service,
+    WarehouseStockService? warehouseStockService,
+    Future<void> Function()? onStockChanged,
+  }) : service = service ?? ProductTransferService(),
+       warehouseStockService = warehouseStockService ?? WarehouseStockService(),
+       _onStockChanged = onStockChanged ?? refreshStockReadModels;
+
+  final ProductTransferService service;
+  final WarehouseStockService warehouseStockService;
+  final Future<void> Function() _onStockChanged;
+  final loadError = ''.obs;
+  final formError = ''.obs;
+  final stockError = ''.obs;
+  final draftError = ''.obs;
+  String get _query => searchQuery.value;
+  set _query(String value) => searchQuery.value = value;
+  Worker? _searchWorker;
+  int _listGeneration = 0, _stockGeneration = 0, _entryGeneration = 0;
+  bool _closed = false, _formOpen = false, _confirmingDelete = false;
+
   final stockTransfer = <Map<String, dynamic>>[].obs;
   final searchStockTransferList = <Map<String, dynamic>>[].obs;
   final warehouseStock = <Map<String, dynamic>>[].obs;
@@ -31,48 +54,57 @@ class ProductTransferController extends GetxController {
 
   final Rxn<Map<String, dynamic>> editingTransfer = Rxn<Map<String, dynamic>>();
 
-  // Separate caches: the transfer list and warehouse stock are different data.
-  static final List<Map<String, dynamic>> _transferCache = [];
-  static DateTime? _transferCachedAt;
-  static const Duration _transferCacheTtl = Duration(seconds: 60);
-
-  static bool get _hasFreshTransferCache =>
-      _transferCachedAt != null &&
-      DateTime.now().difference(_transferCachedAt!) < _transferCacheTtl;
-
-  static final List<Map<String, dynamic>> _stockCache = [];
-  static DateTime? _stockCachedAt;
-  static const Duration _stockCacheTtl = Duration(seconds: 60);
-
-  static bool get _hasFreshStockCache =>
-      _stockCachedAt != null &&
-      DateTime.now().difference(_stockCachedAt!) < _stockCacheTtl;
-
   @override
   void onInit() {
     super.onInit();
+    final search = Get.isRegistered<SearchController>()
+        ? Get.find<SearchController>()
+        : Get.put(SearchController());
+    _query = search.keyword.value;
+    _searchWorker = ever(search.keyword, searchStockTransfer);
+    onGetProductTransferList();
+    onGetWarehouseStock();
+  }
 
-    if (_hasFreshTransferCache) {
-      stockTransfer.value = List<Map<String, dynamic>>.from(_transferCache);
-      searchStockTransferList.value = stockTransfer;
-    } else {
-      onGetProductTransferList();
+  @override
+  void onClose() {
+    _closed = true;
+    _listGeneration++;
+    _stockGeneration++;
+    _entryGeneration++;
+    _searchWorker?.dispose();
+    quantityController.dispose();
+    productTransferRefController.dispose();
+    productTransferDate.dispose();
+    super.onClose();
+  }
+
+  Future<void> onRefresh() => onGetProductTransferList();
+
+  Future<void> _refreshAfterWrite() async {
+    await Future.wait([onGetProductTransferList(), onGetWarehouseStock()]);
+    if (_closed) return;
+    if (stockError.isNotEmpty && loadError.isEmpty) {
+      loadError.value =
+          'Transfer saved, but related stock could not be refreshed.';
     }
-
-    if (_hasFreshStockCache) {
-      warehouseStock.value = List<Map<String, dynamic>>.from(_stockCache);
-    } else {
-      onGetWarehouseStock();
+    try {
+      await _onStockChanged();
+      if (Get.isRegistered<WarehouseStockController>() &&
+          !Get.isPrepared<WarehouseStockController>()) {
+        await Get.find<WarehouseStockController>().getWarehouseStock();
+      }
+    } catch (_) {
+      if (!_closed) {
+        loadError.value =
+            'Transfer saved, but related stock could not be refreshed.';
+      }
     }
-    
-
-    final search = Get.put(SearchController());
-    ever(search.keyword, (keyword) {
-      searchStockTransfer(keyword);
-    });
   }
 
   void onClear() {
+    if (isSaving.value) return;
+    draftError.value = formError.value = stockError.value = '';
     selectedFromWarehouse.value = null;
     selectedToWarehouse.value = null;
     selectedProduct.value = null;
@@ -85,22 +117,27 @@ class ProductTransferController extends GetxController {
     selectedDate.value = DateTime.now();
   }
 
-  Future<void> onGetWarehouseStock() async {
-    try {
-      isStockLoading.value = true;
-      final response = await warehouseStockService.getWarehouseStock();
-      if (response is List) {
-        warehouseStock.value = List<Map<String, dynamic>>.from(response);
+  Future<void> onGetWarehouseStock() => _loadStock();
 
-        _stockCache
-          ..clear()
-          ..addAll(warehouseStock);
-        _stockCachedAt = DateTime.now();
+  Future<void> _loadStock() async {
+    final generation = ++_stockGeneration;
+    isStockLoading.value = true;
+    // A failed refresh must invalidate authorization from a warm snapshot.
+    stockError.value = 'Unable to load current stock. Please try again.';
+    try {
+      final response = await warehouseStockService.getWarehouseStock();
+      if (_closed || generation != _stockGeneration) return;
+      if (response is! List) throw const FormatException();
+      warehouseStock.assignAll(List<Map<String, dynamic>>.from(response));
+      stockError.value = '';
+    } catch (_) {
+      if (!_closed && generation == _stockGeneration) {
+        stockError.value = 'Unable to load current stock. Please try again.';
       }
-    } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
     } finally {
-      isStockLoading.value = false;
+      if (!_closed && generation == _stockGeneration) {
+        isStockLoading.value = false;
+      }
     }
   }
 
@@ -123,7 +160,8 @@ class ProductTransferController extends GetxController {
               selectedFromWarehouse.value &&
           int.tryParse(item['product']?['id']?.toString() ?? '') == productId,
     );
-    var available = int.tryParse(stock?['qty']?.toString() ?? '') ?? 0;
+    if (stock == null || stock['product'] is! Map) return 0;
+    var available = int.tryParse(stock['qty']?.toString() ?? '') ?? 0;
     final original = editingTransfer.value;
     if (original != null &&
         int.tryParse(
@@ -147,6 +185,7 @@ class ProductTransferController extends GetxController {
   }
 
   void selectFromWarehouse(int? warehouseId) {
+    if (isSaving.value) return;
     selectedFromWarehouse.value = warehouseId;
     quantityController.clear();
     quantity.value = null;
@@ -157,23 +196,27 @@ class ProductTransferController extends GetxController {
   }
 
   void addDraftItem() {
+    if (isSaving.value) return;
+    draftError.value = '';
+    if (stockError.isNotEmpty || isStockLoading.value) {
+      draftError.value = 'Unable to load current stock. Please try again.';
+      return;
+    }
     final productId = selectedProduct.value;
     final qty = int.tryParse(quantityController.text.trim());
     final fromId = selectedFromWarehouse.value;
     final toId = selectedToWarehouse.value;
 
     if (fromId == null || toId == null || fromId == toId) {
-      ToastWidget.show(
-        message: 'Select different source and destination warehouses.',
-        type: ToastType.error,
-      );
+      draftError.value = 'Choose different warehouses';
       return;
     }
-    if (productId == null || qty == null || qty <= 0) {
-      ToastWidget.show(
-        message: 'Select a stocked product and enter a positive quantity.',
-        type: ToastType.error,
-      );
+    if (productId == null) {
+      draftError.value = 'Select a product';
+      return;
+    }
+    if (qty == null || qty <= 0) {
+      draftError.value = 'Enter a whole quantity greater than zero';
       return;
     }
 
@@ -181,10 +224,7 @@ class ProductTransferController extends GetxController {
         .where((item) => item['product_id'] == productId)
         .fold<int>(0, (sum, item) => sum + (item['qty'] as int));
     if (currentQty + qty > availableQtyFor(productId)) {
-      ToastWidget.show(
-        message: 'Quantity exceeds available stock.',
-        type: ToastType.error,
-      );
+      draftError.value = 'Quantity exceeds available stock.';
       return;
     }
 
@@ -216,36 +256,34 @@ class ProductTransferController extends GetxController {
     quantity.value = null;
   }
 
-  void removeDraftItem(int index) => transferItems.removeAt(index);
+  void removeDraftItem(int index) {
+    if (!isSaving.value) transferItems.removeAt(index);
+  }
 
   int get totalDraftQuantity =>
       transferItems.fold<int>(0, (total, item) => total + (item['qty'] as int));
 
   Future<void> onGetProductTransferList() async {
+    final generation = ++_listGeneration;
+    isLoading.value = true;
     try {
-      isLoading.value = true;
-
-      final resp = await service.getProductTransfers();
-
-      if (resp is List) {
-        stockTransfer.value = List<Map<String, dynamic>>.from(resp);
-
-        // search
-        searchStockTransferList.value = stockTransfer;
-
-        _transferCache
-          ..clear()
-          ..addAll(stockTransfer);
-        _transferCachedAt = DateTime.now();
+      final response = await service.getProductTransfers();
+      if (_closed || generation != _listGeneration) return;
+      if (response is! List) throw const FormatException();
+      stockTransfer.assignAll(List<Map<String, dynamic>>.from(response));
+      searchStockTransfer(_query);
+      loadError.value = '';
+    } catch (_) {
+      if (!_closed && generation == _listGeneration) {
+        loadError.value = 'Unable to load stock transfers. Please try again.';
       }
-    } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {
-      isLoading.value = false;
+      if (!_closed && generation == _listGeneration) isLoading.value = false;
     }
   }
 
   void searchStockTransfer(String keyword) {
+    _query = keyword;
     final search = keyword.trim().toLowerCase();
 
     if (search.isEmpty) {
@@ -277,6 +315,7 @@ class ProductTransferController extends GetxController {
   }
 
   Future<void> pickDate(BuildContext context) async {
+    if (isSaving.value) return;
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate.value,
@@ -284,108 +323,185 @@ class ProductTransferController extends GetxController {
       lastDate: DateTime(2100),
     );
 
-    if (picked != null) {
+    if (!_closed && !isSaving.value && picked != null) {
       selectedDate.value = picked;
     }
   }
 
   String get formattedDate {
-    return selectedDate.value.toString().split(" ")[0];
+    return selectedDate.value.toLocal().toString().split(" ")[0];
   }
 
   Future<void> addStockTransfer(BuildContext context) async {
+    if (_closed || isSaving.value || isOpeningEdit.value || _formOpen) return;
+    final route = ModalRoute.of(context);
+    final entry = ++_entryGeneration;
     onClear();
-    await onGetWarehouseStock();
-    if (!context.mounted) return;
-    AppBottomSheets.show(context, child: AddStockTransferWidget());
+    _formOpen = true;
+    try {
+      await onGetWarehouseStock();
+      if (_closed ||
+          entry != _entryGeneration ||
+          !context.mounted ||
+          route?.isCurrent != true) {
+        return;
+      }
+      await AppFormShell.show(context, AddStockTransferWidget());
+    } finally {
+      _formOpen = false;
+    }
   }
 
-  Future<void> onSaveStockTransfer(BuildContext context) async {
-    if (!_validateDraft()) return;
+  Future<void> onSaveStockTransfer(BuildContext context) => _save(context);
+
+  bool validateDraft() {
+    draftError.value = '';
+    if (selectedFromWarehouse.value == null ||
+        selectedToWarehouse.value == null ||
+        selectedFromWarehouse.value == selectedToWarehouse.value) {
+      draftError.value = 'Choose different warehouses';
+    } else if (transferItems.isEmpty) {
+      draftError.value = 'Add at least one product';
+    } else if (stockError.isNotEmpty || isStockLoading.value) {
+      draftError.value = 'Unable to load current stock. Please try again.';
+    } else {
+      final totals = <int, int>{};
+      for (final item in transferItems) {
+        final id = int.tryParse(item['product_id']?.toString() ?? '');
+        final qty = int.tryParse(item['qty']?.toString() ?? '');
+        if (id == null || qty == null || qty <= 0) {
+          draftError.value = 'Enter a whole quantity greater than zero';
+          break;
+        }
+        totals[id] = (totals[id] ?? 0) + qty;
+        if (totals[id]! > availableQtyFor(id)) {
+          draftError.value = 'Quantity exceeds available stock.';
+          break;
+        }
+      }
+    }
+    return draftError.isEmpty;
+  }
+
+  Future<void> _save(
+    BuildContext context, {
+    Map<String, dynamic>? original,
+  }) async {
+    if (_closed || isSaving.value) return;
+    final route = ModalRoute.of(context), navigator = Navigator.of(context);
+    isSaving.value = true;
+    formError.value = '';
     try {
-      isSaving.value = true;
-      final data = {
-        "from_warehouse_id": selectedFromWarehouse.value,
-        "to_warehouse_id": selectedToWarehouse.value,
-        "reference_no": productTransferRefController.text.trim().isEmpty
+      await onGetWarehouseStock();
+      if (_closed ||
+          !context.mounted ||
+          route?.isCurrent != true ||
+          !validateDraft()) {
+        return;
+      }
+      final data = <String, dynamic>{
+        'from_warehouse_id': selectedFromWarehouse.value,
+        'to_warehouse_id': selectedToWarehouse.value,
+        'reference_no':
+            original == null && productTransferRefController.text.trim().isEmpty
             ? null
             : productTransferRefController.text.trim(),
-        "transfer_date": selectedDate.value.toUtc().toIso8601String(),
-        "product_transfer_items": transferItems
+        'transfer_date': selectedDate.value.toUtc().toIso8601String(),
+        'product_transfer_items': transferItems
             .map(
-              (item) => {"product_id": item['product_id'], "qty": item['qty']},
+              (item) => {'product_id': item['product_id'], 'qty': item['qty']},
             )
             .toList(),
       };
-
-      await service.createProductTransfer(data);
-
-      ToastWidget.show(
-        message: "Stock transfer created successfully",
-        type: ToastType.success,
-      );
-
-      // Reload Product Transfer
-      await onGetProductTransferList();
-      await onGetWarehouseStock();
-
-      // Close BottomSheet
-      if (context.mounted) Navigator.pop(context);
-
-      // Clear textfields
-      onClear();
-    } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
-    } finally {
+      try {
+        if (original == null) {
+          await service.createProductTransfer(data);
+        } else {
+          await service.updateProductTransfer(original['id'], data);
+          if (!_closed) {
+            final index = stockTransfer.indexWhere(
+              (r) => r['id'] == original['id'],
+            );
+            if (index >= 0) {
+              stockTransfer[index] = {
+                ...original,
+                ...data,
+                'product_transfer_items': transferItems
+                    .map((r) => Map<String, dynamic>.from(r))
+                    .toList(),
+                'from_warehouse': _warehouse(selectedFromWarehouse.value),
+                'to_warehouse': _warehouse(selectedToWarehouse.value),
+              };
+            }
+          }
+        }
+      } catch (_) {
+        if (!_closed) {
+          formError.value = 'Unable to save stock transfer. Please try again.';
+        }
+        return;
+      }
+      // Any successful HTTP response is committed, including an empty body.
+      if (_closed) return;
+      ++_listGeneration;
+      ++_stockGeneration;
+      await _refreshAfterWrite();
+      if (_closed) return;
       isSaving.value = false;
+      onClear();
+      if (context.mounted &&
+          route is PopupRoute &&
+          route.isCurrent &&
+          navigator.canPop()) {
+        navigator.pop();
+      }
+    } finally {
+      if (!_closed) isSaving.value = false;
     }
   }
 
-  bool _validateDraft() {
-    if (selectedFromWarehouse.value == null ||
-        selectedToWarehouse.value == null ||
-        selectedFromWarehouse.value == selectedToWarehouse.value ||
-        transferItems.isEmpty) {
-      ToastWidget.show(
-        message: 'Choose different warehouses and add at least one item.',
-        type: ToastType.error,
-      );
-      return false;
-    }
-    for (final item in transferItems) {
-      final productId = int.tryParse(item['product_id']?.toString() ?? '');
-      final qty = int.tryParse(item['qty']?.toString() ?? '');
-      if (productId == null ||
-          qty == null ||
-          qty <= 0 ||
-          qty > availableQtyFor(productId)) {
-        ToastWidget.show(
-          message: 'A transfer quantity exceeds available source stock.',
-          type: ToastType.error,
-        );
-        return false;
-      }
-    }
-    return true;
+  Map<String, dynamic>? _warehouse(int? id) {
+    if (!Get.isRegistered<WarehouseController>()) return null;
+    final rows = Get.find<WarehouseController>().warehouseList;
+    final row = rows.firstWhereOrNull((r) => r['id'] == id);
+    return row == null ? null : Map<String, dynamic>.from(row);
   }
 
   Future<void> gotoStockTransferDetail(
     Map<String, dynamic> stockTransfer,
   ) async {
+    if (_closed || isSaving.value) return;
     final id = int.tryParse(stockTransfer['id']?.toString() ?? '');
     if (id == null) {
       Get.toNamed(AppRoutes.stockTransferDetail, arguments: stockTransfer);
       return;
     }
 
+    final entry = ++_entryGeneration;
+    final route = Get.rawRoute;
     try {
       final response = await service.getProductTransferById(id);
+      if (_closed ||
+          entry != _entryGeneration ||
+          !identical(Get.rawRoute, route) ||
+          route?.isCurrent == false) {
+        return;
+      }
       final transfer = response is Map
           ? Map<String, dynamic>.from(response)
           : stockTransfer;
+      final index = this.stockTransfer.indexWhere((r) => r['id'] == id);
+      if (index >= 0) this.stockTransfer[index] = transfer;
+      searchStockTransfer(_query);
       Get.toNamed(AppRoutes.stockTransferDetail, arguments: transfer);
     } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      if (_closed ||
+          entry != _entryGeneration ||
+          !identical(Get.rawRoute, route) ||
+          route?.isCurrent == false) {
+        return;
+      }
+      formError.value = 'Unable to open stock transfer. Please try again.';
       Get.toNamed(AppRoutes.stockTransferDetail, arguments: stockTransfer);
     }
   }
@@ -394,17 +510,34 @@ class ProductTransferController extends GetxController {
     BuildContext context,
     Map<String, dynamic> stockTransfer,
   ) async {
+    if (_closed || isSaving.value || isOpeningEdit.value || _formOpen) return;
+    final entry = ++_entryGeneration;
+    final route = ModalRoute.of(context);
+    isOpeningEdit.value = true;
     try {
-      final transfer = await service.getProductTransferById(
+      final response = await service.getProductTransferById(
         stockTransfer["id"],
       );
 
+      if (_closed ||
+          entry != _entryGeneration ||
+          !context.mounted ||
+          route?.isCurrent != true) {
+        return;
+      }
+      if (response is! Map) throw const FormatException();
+      final transfer = Map<String, dynamic>.from(response);
+      onClear();
       editingTransfer.value = transfer;
       selectedFromWarehouse.value = int.tryParse(
-        transfer['from_warehouse']?['id']?.toString() ?? '',
+        transfer['from_warehouse_id']?.toString() ??
+            transfer['from_warehouse']?['id']?.toString() ??
+            '',
       );
       selectedToWarehouse.value = int.tryParse(
-        transfer['to_warehouse']?['id']?.toString() ?? '',
+        transfer['to_warehouse_id']?.toString() ??
+            transfer['to_warehouse']?['id']?.toString() ??
+            '',
       );
       productTransferRefController.text =
           transfer['reference_no']?.toString() ?? '';
@@ -415,100 +548,95 @@ class ProductTransferController extends GetxController {
           DateTime.now();
       final items = transfer['product_transfer_items'] as List? ?? [];
       transferItems.assignAll(
-        items
-            .map((item) {
-              final product = item['product'] is Map
-                  ? Map<String, dynamic>.from(item['product'] as Map)
-                  : <String, dynamic>{};
-              return {
-                'product_id': int.tryParse(
-                  item['product_id']?.toString() ??
-                      product['id']?.toString() ??
-                      '',
-                ),
-                'product': product,
-                'qty': int.tryParse(item['qty']?.toString() ?? '') ?? 0,
-              };
-            })
-            .where((item) => item['product_id'] != null),
+        items.map((item) {
+          final product = item['product'] is Map
+              ? Map<String, dynamic>.from(item['product'] as Map)
+              : <String, dynamic>{};
+          return {
+            'product_id': int.tryParse(
+              item['product_id']?.toString() ?? product['id']?.toString() ?? '',
+            ),
+            'product': product,
+            'qty': int.tryParse(item['qty']?.toString() ?? '') ?? 0,
+          };
+        }),
       );
       await onGetWarehouseStock();
-      if (!context.mounted) return;
-      AppBottomSheets.show(context, child: EditStockTransferWidget());
+      if (_closed ||
+          entry != _entryGeneration ||
+          !context.mounted ||
+          route?.isCurrent != true) {
+        return;
+      }
+      _formOpen = true;
+      isOpeningEdit.value = false;
+      await AppFormShell.show(context, EditStockTransferWidget());
     } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
+      if (!_closed &&
+          entry == _entryGeneration &&
+          context.mounted &&
+          route?.isCurrent == true) {
+        formError.value = 'Unable to open stock transfer. Please try again.';
+      }
+    } finally {
+      _formOpen = false;
+      if (!_closed) isOpeningEdit.value = false;
     }
   }
 
   Future<void> onUpdate(
     BuildContext context,
     Map<String, dynamic> stockTransfer,
-  ) async {
-    if (!_validateDraft()) return;
-    try {
-      isSaving.value = true;
+  ) => _save(context, original: stockTransfer);
 
-      final data = {
-        "from_warehouse_id": selectedFromWarehouse.value,
-        "to_warehouse_id": selectedToWarehouse.value,
-        "reference_no": productTransferRefController.text.trim(),
-        "transfer_date": selectedDate.value.toUtc().toIso8601String(),
-        "product_transfer_items": transferItems
-            .map(
-              (item) => {"product_id": item['product_id'], "qty": item['qty']},
-            )
-            .toList(),
-      };
-
-      await service.updateProductTransfer(stockTransfer["id"], data);
-      ToastWidget.show(
-        message: "Stock transfer updated successfully",
-        type: ToastType.success,
-      );
-
-      await onGetProductTransferList();
-      await onGetWarehouseStock();
-
-      // Close BottomSheet
-      if (context.mounted) Navigator.pop(context);
-
-      onClear();
-    } catch (e) {
-      ToastWidget.show(message: e.toString(), type: ToastType.error);
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  void onDeleteStockTransfer(
+  Future<void> onDeleteStockTransfer(
     BuildContext context,
-    int productTransferId,
-  ) async {
-    final messengerContext = context;
+    int productTransferId, {
+    bool closeDetailOnSuccess = false,
+  }) async {
+    if (_closed ||
+        isSaving.value ||
+        isOpeningEdit.value ||
+        _formOpen ||
+        _confirmingDelete) {
+      return;
+    }
+    final route = ModalRoute.of(context), navigator = Navigator.of(context);
+    _confirmingDelete = true;
     showConfirmDialog(
-      context: messengerContext,
-      message: "Do you want to delete this stock transfer?".tr,
+      context: context,
+      message: 'Do you want to delete this stock transfer?'.tr,
       onConfirm: () async {
+        if (_closed || isSaving.value) return;
+        isSaving.value = true;
+        formError.value = '';
         try {
           await service.deleteProductTransfer(productTransferId);
-
-          // Refresh category list
-          await onGetProductTransferList();
-          await onGetWarehouseStock();
-
-          if (messengerContext.mounted) Navigator.pop(messengerContext);
-
-          ToastWidget.show(
-            message: "Stock transfer deleted successfully".tr,
-            type: ToastType.success,
-          );
-        } catch (e) {
-          ToastWidget.show(message: e.toString(), type: ToastType.error);
+        } catch (_) {
+          if (!_closed) {
+            formError.value =
+                'Unable to delete stock transfer. Please try again.';
+            isSaving.value = false;
+          }
+          return;
+        }
+        if (_closed) return;
+        ++_listGeneration;
+        ++_stockGeneration;
+        stockTransfer.removeWhere((r) => r['id'] == productTransferId);
+        searchStockTransfer(_query);
+        await _refreshAfterWrite();
+        if (_closed) return;
+        isSaving.value = false;
+        if (closeDetailOnSuccess &&
+            context.mounted &&
+            route?.isCurrent == true &&
+            route?.settings.name == AppRoutes.stockTransferDetail &&
+            navigator.canPop()) {
+          navigator.pop();
         }
       },
-      onCancel: () {
-        // Do nothing
-      },
-    );
+      onCancel: () {},
+    ).whenComplete(() => _confirmingDelete = false);
   }
 }

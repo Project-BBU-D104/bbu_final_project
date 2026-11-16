@@ -1,395 +1,182 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/stock_adjustment_controller.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_empty_state.dart';
+import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'stock_adjustment_card_widget.dart';
 
 class StockAdjustmentDetailWidget extends StatelessWidget {
   StockAdjustmentDetailWidget({super.key});
-
   final ctr = Get.find<StockAdjustmentController>();
+  String _date(dynamic value) {
+    final date = DateTime.tryParse('$value');
+    return date == null
+        ? '-'
+        : DateFormat.yMMMd().add_jm().format(date.toLocal());
+  }
 
+  Widget _value(String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+    child: Text('${label.tr}: $value'),
+  );
+  Widget _actions(BuildContext context, int id) => Wrap(
+    spacing: AppSpacing.md,
+    runSpacing: AppSpacing.md,
+    alignment: WrapAlignment.end,
+    children: [
+      OutlinedButton.icon(
+        onPressed: ctr.isSaving.value || ctr.isOpeningEdit.value
+            ? null
+            : () => ctr.onDeleteStockAdjustment(
+                id,
+                context,
+                closeDetailOnSuccess: true,
+              ),
+        icon: const Icon(Icons.delete_outline),
+        label: Text('Delete'.tr),
+      ),
+      FilledButton.icon(
+        onPressed: ctr.isSaving.value || ctr.isOpeningEdit.value
+            ? null
+            : () => ctr.editStockAdjustment(context, id),
+        icon: const Icon(Icons.edit_outlined),
+        label: Text('Edit'.tr),
+      ),
+    ],
+  );
   @override
   Widget build(BuildContext context) {
-
-    final Map<String, dynamic> data =
-    Get.arguments as Map<String, dynamic>;
-    
-    final product = data["product"];
-    final warehouse = data["warehouse"];
-
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: "Stock Adjustment Detail".tr,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// HEADER
-            _buildHeader(data),
-            const SizedBox(height: 16),
-            /// PRODUCT
-            _sectionTitle("Product"),
-            _buildProductCard(product),
-            const SizedBox(height: 16),
-            /// WAREHOUSE
-            _sectionTitle("Warehouse"),
-            _buildWarehouseCard(warehouse),
-            const SizedBox(height: 16),
-            /// STOCK CHANGE
-            _sectionTitle("Stock Change"),
-            _buildStockCard(data),
-            const SizedBox(height: 16),
-            /// REASON
-            _sectionTitle("Reason"),
-            _buildReasonCard(data), 
-          ],
-        ),
-      ),
-      bottomNavigationBar: _bottomActions(context, data),
-    );
-  }
-
-  Widget _buildHeader(Map data){
-    bool increase = data["adjustment_type"] == "increase";
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: increase
-            ? Colors.green.shade50
-            : Colors.red.shade50,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: increase
-                ? Colors.green
-                : Colors.red,
-            child: Icon(
-              increase
-                  ? Icons.add
-                  : Icons.remove,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                data["adjustment_type"],
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+    final argument = Get.arguments;
+    final original = argument is Map<String, dynamic> ? argument : null;
+    final id = int.tryParse('${original?['id']}');
+    final desktop = DesktopAppShell.isVisible(context);
+    return Obx(() {
+      final records = ctr.stockAdjustmentList.toList();
+      final data = records.firstWhereOrNull((e) => e['id'] == id) ?? original;
+      final error = ctr.formError.value;
+      // Keep action state reactive even when record metadata does not change.
+      final busy = ctr.isSaving.value || ctr.isOpeningEdit.value;
+      return Scaffold(
+        appBar: desktop
+            ? null
+            : const CustomAppBar(title: 'Stock Adjustment Detail'),
+        bottomNavigationBar: !desktop && id != null && id > 0
+            ? SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: _actions(context, id),
                 ),
-              ),
-
-              Text(
-                "Ref: ${data["reference_no"]}",
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductCard(Map product){
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                product["photo"],
-                width: 70,
-                height: 70,
-                fit: BoxFit.cover,
-                errorBuilder: (_,__,___){
-                  return Container(
-                    width:70,
-                    height:70,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.image),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product["name"],
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+              )
+            : null,
+        body: AppPage(
+          child: data == null || id == null || id <= 0
+              ? Column(
+                  children: [
+                    const AppEmptyState(
+                      message: 'Stock adjustment unavailable',
                     ),
-                  ),
-                  Text(
-                    "Barcode: ${product["barcode"]}",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
+                    TextButton.icon(
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: const Icon(Icons.arrow_back),
+                      label: Text('Back'.tr),
                     ),
-                  ),
-                  const SizedBox(height:5),
-                  Row(
+                  ],
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _chip(
-                        Icons.category,
-                        product["category"]["name"],
+                      AppPageHeader(
+                        title: 'Stock Adjustment Detail',
+                        leading: desktop
+                            ? IconButton(
+                                tooltip: 'Back'.tr,
+                                onPressed: busy
+                                    ? null
+                                    : () => Navigator.of(context).maybePop(),
+                                icon: const Icon(Icons.arrow_back),
+                              )
+                            : null,
+                        actions: desktop ? _actions(context, id) : null,
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      if (error.isNotEmpty) ...[
+                        Semantics(liveRegion: true, child: Text(error.tr)),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      HomeSectionCard(
+                        title: 'Stock Change',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              adjustmentChange(data),
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            _value(
+                              'Previous Stock',
+                              adjustmentValue(data['previous_qty']),
+                            ),
+                            _value(
+                              'New Quantity',
+                              adjustmentValue(data['new_qty']),
+                            ),
+                            _value(
+                              'Reference NO',
+                              adjustmentValue(data['reference_no']),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      HomeSectionCard(
+                        title: 'Product and warehouse',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _value(
+                              'Product',
+                              adjustmentRelation(data, 'product'),
+                            ),
+                            _value(
+                              'Barcode',
+                              adjustmentRelation(data, 'product', 'barcode'),
+                            ),
+                            _value(
+                              'Warehouse',
+                              adjustmentRelation(data, 'warehouse'),
+                            ),
+                            _value(
+                              'Location',
+                              adjustmentRelation(data, 'warehouse', 'location'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      HomeSectionCard(
+                        title: 'Reference and reason',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _value('Reason', adjustmentValue(data['reason'])),
+                            _value('User', adjustmentRelation(data, 'user')),
+                            _value('Created at', _date(data['created_at'])),
+                            _value('Updated at', _date(data['updated_at'])),
+                          ],
+                        ),
                       ),
                     ],
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWarehouseCard(Map warehouse){
-    return Card(
-      elevation:0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:[
-            Text(
-              warehouse["name"],
-              style: const TextStyle(
-                fontSize:18,
-                fontWeight:FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height:8),
-
-            _infoRow(
-              Icons.location_on,
-              warehouse["location"],
-            ),
-
-            _infoRow(
-              Icons.confirmation_number,
-              warehouse["reference_no"],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStockCard(Map data){
-    return Card(
-      elevation:0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding:const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment:MainAxisAlignment.spaceAround,
-          children:[
-            _qtyBox(
-              "Previous",
-              data["previous_qty"],
-            ),
-
-            const Icon(
-              Icons.arrow_forward,
-              size:30,
-            ),
-
-            _qtyBox(
-              "New",
-              data["new_qty"],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReasonCard(Map data){
-    return SizedBox(
-      width:double.infinity,
-      child: Card(
-        elevation:0,
-        child: Padding(
-          padding:const EdgeInsets.all(16),
-          child:Text(
-            data["reason"] ?? "-",
-            style:const TextStyle(
-              fontSize:15,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _qtyBox(String title,int qty){
-    return Column(
-      children:[
-        Text(
-          title,
-          style:TextStyle(
-            color:Colors.grey.shade600,
-          ),
-        ),
-        const SizedBox(height:5),
-        Text(
-          qty.toString(),
-          style:const TextStyle(
-            fontSize:26,
-            fontWeight:FontWeight.bold,
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget _chip(IconData icon,String text){
-    return Container(
-      padding:const EdgeInsets.symmetric(
-        horizontal:8,
-        vertical:5,
-      ),
-      decoration:BoxDecoration(
-        color:Colors.grey.shade100,
-        borderRadius:BorderRadius.circular(20),
-      ),
-      child:Row(
-        mainAxisSize:MainAxisSize.min,
-        children:[
-          Icon(
-            icon,
-            size:14,
-          ),
-          const SizedBox(width:4),
-          Text(
-            text,
-            style:const TextStyle(
-              fontSize:12,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _infoRow(IconData icon,String text){
-    return Padding(
-      padding:const EdgeInsets.only(bottom:8),
-      child:Row(
-        children:[
-          Icon(
-            icon,
-            size:18,
-            color:Colors.grey,
-          ),
-          const SizedBox(width:8),
-          Text(text)
-        ],
-      ),
-    );
-  }
-
-  Widget _sectionTitle(String text){
-    return Padding(
-      padding:const EdgeInsets.only(bottom:8),
-      child:Text(
-        text,
-        style:const TextStyle(
-          fontSize:18,
-          fontWeight:FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _bottomActions(BuildContext context, Map data){
-    return SafeArea(
-      child:Container(
-        padding:const EdgeInsets.all(16),
-        child:Row(
-          children:[
-            Expanded(
-              child:OutlinedButton.icon(
-                onPressed:(){
-                  ctr.onDeleteStockAdjustment(
-                    data["id"],
-                    context,
-                  );
-                },
-                icon:const Icon(Icons.delete_outline),
-                label:Text("Delete".tr),
-                style:OutlinedButton.styleFrom(
-                  foregroundColor:Colors.red,
-                  minimumSize:
-                  const Size.fromHeight(52),
-                  shape:RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.circular(14),
                   ),
                 ),
-              ),
-            ),
-
-            const SizedBox(width:12),
-
-            Expanded(
-              child:ElevatedButton.icon(
-                onPressed:(){
-                  ctr.editStockAdjustment(
-                    context,
-                    data["id"],
-                  );
-                },
-                icon:
-                const Icon(Icons.edit_outlined),
-                label:
-                Text("Edit".tr),
-                style:
-                ElevatedButton.styleFrom(
-                  backgroundColor:
-                  const Color(0xff1DB584),
-                  foregroundColor:
-                  Colors.white,
-                  minimumSize:
-                  const Size.fromHeight(52),
-                  shape:
-                  RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.circular(14),
-                  ),
-                ),
-              ),
-            )
-          ],
         ),
-      ),
-    );
+      );
+    });
   }
-
 }

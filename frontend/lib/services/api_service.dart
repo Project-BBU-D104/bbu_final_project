@@ -90,7 +90,7 @@ class ApiService {
       body: jsonEncode(data),
     );
 
-    return _handleResponse(response, endpoint: endpoint);
+    return _handleResponse(response, endpoint: endpoint, isMutation: true);
   }
 
   /// PUT
@@ -105,7 +105,7 @@ class ApiService {
       body: jsonEncode(data),
     );
 
-    return _handleResponse(response, endpoint: endpoint);
+    return _handleResponse(response, endpoint: endpoint, isMutation: true);
   }
 
   /// DELETE
@@ -115,7 +115,7 @@ class ApiService {
       headers: headers,
     );
 
-    return _handleResponse(response, endpoint: endpoint);
+    return _handleResponse(response, endpoint: endpoint, isMutation: true);
   }
 
   Uri _buildUri(String endpoint, {bool trailingSlash = false}) {
@@ -132,10 +132,30 @@ class ApiService {
     return Uri.parse('$cleanBaseUrl/$path');
   }
 
-  dynamic _handleResponse(http.Response response, {required String endpoint}) {
-    final dynamic body = response.body.isEmpty
-        ? null
-        : jsonDecode(response.body);
+  dynamic _handleResponse(
+    http.Response response, {
+    required String endpoint,
+    bool isMutation = false,
+  }) {
+    dynamic body;
+    try {
+      body = response.body.isEmpty ? null : jsonDecode(response.body);
+    } on FormatException {
+      // These controllers refresh after writes and do not need a response body.
+      // A committed stock movement must never be offered as a retryable save.
+      if (isMutation &&
+          const {
+            'warehouse',
+            'warehouse_stock',
+            'stock_adjustment',
+            'product_transfer',
+          }.contains(endpoint) &&
+          response.statusCode >= 200 &&
+          response.statusCode < 300) {
+        return null;
+      }
+      rethrow;
+    }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return body;
