@@ -17,6 +17,29 @@ void main() {
     Get.put<SupplierController>(controller);
   }
 
+  testWidgets('mobile supplier actions align left below the description', (
+    tester,
+  ) async {
+    await seed();
+    await pumpSupplierHost(
+      tester,
+      home: SupplierScreen(),
+      size: const Size(375, 812),
+    );
+    final subtitle = tester.getRect(
+      find.text('Manage supplier contacts and locations.'),
+    );
+    final refresh = tester.getRect(find.byTooltip('Refresh'));
+    final add = tester.getRect(
+      find.widgetWithText(FilledButton, 'Add Supplier'),
+    );
+    expect(refresh.left, closeTo(subtitle.left, 0.1));
+    expect(refresh.top, greaterThan(subtitle.bottom));
+    expect(add.left, greaterThan(refresh.right));
+    expect(add.center.dy, closeTo(refresh.center.dy, 0.1));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('a wide page falls back to cards when the text is scaled up', (
     tester,
   ) async {

@@ -30,6 +30,7 @@ class SupplierScreen extends StatelessWidget {
                   AppPageHeader(
                     title: 'Suppliers',
                     subtitle: 'Manage supplier contacts and locations.',
+                    compactActionsAlignment: Alignment.centerLeft,
                     leading: desktop
                         ? IconButton.outlined(
                             tooltip: 'Back'.tr,

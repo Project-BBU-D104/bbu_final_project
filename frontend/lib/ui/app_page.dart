@@ -44,6 +44,7 @@ class AppPageHeader extends StatelessWidget {
     this.subtitle,
     this.leading,
     this.actions,
+    this.compactActionsAlignment = Alignment.centerRight,
     this.translateTitle = true,
   });
 
@@ -55,6 +56,9 @@ class AppPageHeader extends StatelessWidget {
 
   /// e.g. a [Wrap] of buttons.
   final Widget? actions;
+
+  /// Alignment when actions appear below the title.
+  final AlignmentGeometry compactActionsAlignment;
 
   final bool translateTitle;
 
@@ -124,7 +128,7 @@ class AppPageHeader extends StatelessWidget {
           children: [
             titleBlock,
             const SizedBox(height: AppSpacing.lg),
-            Align(alignment: Alignment.centerRight, child: actionsBlock),
+            Align(alignment: compactActionsAlignment, child: actionsBlock),
           ],
         );
       },

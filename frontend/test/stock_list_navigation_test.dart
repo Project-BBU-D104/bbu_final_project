@@ -12,6 +12,7 @@ import 'package:frontend/screen/stock/stock_transfer/stock_transfer_screen.dart'
 import 'package:frontend/screen/stock/warehouse/warehouse_screen.dart';
 import 'package:frontend/screen/stock/warehouse_stock/warehouse_stock_screen.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/ui/app_page.dart';
 import 'package:get/get.dart';
 
 import 'stock_adjustment_test_support.dart';
@@ -48,6 +49,27 @@ void main() {
   };
 
   for (final entry in screens.entries) {
+    testWidgets('${entry.key} mobile actions align left', (tester) async {
+      await pumpSupplierHost(
+        tester,
+        home: entry.value(),
+        size: const Size(375, 812),
+      );
+      final header = find.byType(AppPageHeader);
+      final refresh = tester.getRect(find.byTooltip('Refresh'));
+      final add = tester.getRect(
+        find.descendant(of: header, matching: find.byType(FilledButton)),
+      );
+      final subtitle = tester.getRect(
+        find.text(tester.widget<AppPageHeader>(header).subtitle!),
+      );
+      expect(refresh.left, closeTo(tester.getRect(header).left, 0.1));
+      expect(refresh.top, greaterThan(subtitle.bottom));
+      expect(add.left, greaterThanOrEqualTo(refresh.left));
+      expect(add.top, greaterThanOrEqualTo(refresh.top));
+      expect(tester.takeException(), isNull);
+    });
+
     for (final width in [390.0, 840.0, 1440.0]) {
       for (final dark in [false, true]) {
         for (final locale in [

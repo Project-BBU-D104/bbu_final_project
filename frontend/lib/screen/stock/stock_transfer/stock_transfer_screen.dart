@@ -41,6 +41,7 @@ class StockTransferScreen extends StatelessWidget {
                       AppPageHeader(
                         title: 'Stock Transfer',
                         subtitle: 'Manage stock movements between warehouses.',
+                        compactActionsAlignment: Alignment.centerLeft,
                         leading: DesktopAppShell.isVisible(context)
                             ? IconButton.outlined(
                                 tooltip: 'Back'.tr,
