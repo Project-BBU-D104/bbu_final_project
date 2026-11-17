@@ -110,6 +110,23 @@ void main() {
   });
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  testWidgets('customer section updates late lookup failures and recovery', (
+    tester,
+  ) async {
+    final ctr = Get.put<SaleController>(CartController());
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    await pumpSalesPage(
+      tester,
+      CurrentSaleWidget(),
+      size: const Size(1440, 900),
+    );
+    ctr.customerLoadError.value = 'Customer lookup offline';
+    await tester.pump();
+    expect(find.text('Customer lookup offline'), findsOneWidget);
+    ctr.customerLoadError.value = '';
+    await tester.pump();
+    expect(find.text('Customer lookup offline'), findsNothing);
+  });
   testWidgets(
     'compact landscape Khmer checkout keeps controls reachable at 2x',
     (tester) async {

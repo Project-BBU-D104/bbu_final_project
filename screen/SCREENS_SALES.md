@@ -1,12 +1,12 @@
 # Sales
 
-Implementation complete across the six routes and the existing payment Add/Edit forms. Both parallel branches were combined and verified on 2026-11-17 in `sales-integration-redesign`; manual QA listed below remains pending.
+Implementation and shared UI compliance repair are complete across the six routes and existing payment Add/Edit forms, verified on 2026-11-17 on `main`. Manual QA listed below remains pending.
 
 ## Sale product selection — `frontend/lib/screen/sale/sale_screen/sale_screen.dart`
 - **Route:** `/sale`
 - **Purpose:** Selects products and starts a customer sale.
 - **Navigation:** Manage, Home quick action, or sale history action; continue opens `/current-sale`.
-- **UI:** Shared page/header/search, lazy category groups and product grid at normal wide sizes, natural-height cards at compact widths or large text, and safe cart summary/footer.
+- **UI:** Shared page/header/search, lazy category groups and product grid at normal wide sizes, shared natural-height list surfaces at compact widths or large text, scrolling header/search, and a safe fixed cart summary/footer.
 - **State/data:** `SaleController`, `SaleBinding`, product/sale services and sale/cart models.
 - **Custom widgets:** `screen/sale/widget/card_item_widget.dart`, `payment_footer_widget.dart`, `select_customer_card_widget.dart`.
 - **Redesign:** Scoped product-name/barcode search, preserved scanner return contract and selected quantities, themed stock indication, distinct loading/error/empty/no-match states, and retry retaining visible data and cart. Customer selection occurs on Current Sale.
@@ -15,7 +15,7 @@ Implementation complete across the six routes and the existing payment Add/Edit 
 - **Route:** `/current-sale`
 - **Purpose:** Reviews the active cart and adjusts quantities before payment.
 - **Navigation:** Sale screen Continue opens this route. Payment confirms and creates the sale/payment directly, then opens `/payment-success`; Back to products retains the cart.
-- **UI:** Cart item rows, summary and payment/continue actions.
+- **UI:** Shared list-card cart rows and titled Customer, Payment Method and Order Summary section cards; guarded mobile app bar and explicit workflow return/payment actions.
 - **State/data:** `SaleController`, active cart and sale item models.
 - **Custom widgets:** `screen/sale/current_sale/widget/current_sale_item_widget.dart`, `summary_order_widget.dart`.
 - **Redesign:** Shared grouped sections, paired wide layout and stacked large-text fallback, guarded quantities/customer/method selectors, recoverable lookup failures, and explicit empty-cart return action. The inactive Draft button was replaced by Back to products. Confirmation locks before its first await; only successful payment clears the cart. Failed payment retains the draft and attempts sale cleanup, with explicit uncertain-state feedback if cleanup fails.
@@ -35,7 +35,7 @@ Implementation complete across the six routes and the existing payment Add/Edit 
 - **Navigation:** Checkout completion opens this route with a receipt map; Back to Sale retains the existing Home boundary in the route stack.
 - **UI:** Success state, receipt summary and follow-up buttons.
 - **State/data:** Receipt route argument; sale/payment models.
-- **Custom widgets:** Shared page/header and theme-native receipt/action surfaces; existing injectable `ReportExportController`.
+- **Custom widgets:** Shared page/header/app bar and AppSectionCard receipt surface; existing injectable `ReportExportController`.
 - **Redesign:** Scrollable, wrapping receipt values work on short screens, both themes/locales and large text; missing arguments show an unavailable state. The decorative animation sequence was removed. Guarded PDF export preserves all six fields, currency formatting and cancellation/failure handling. The shared PDF generator embeds the bundled Khmer font when needed; visual shaping quality still needs manual inspection.
 
 ## Sales list — `frontend/lib/screen/sale/sale_list/sale_list_screen.dart`
@@ -53,7 +53,7 @@ Implementation complete across the six routes and the existing payment Add/Edit 
 - **Navigation:** Sales list card; back returns to list.
 - **UI:** Shared page/header with Back/New Sale/Delete, grouped invoice/customer/items/payment/amount sections, paired wide layout and stacked large-text fallback.
 - **State/data:** Sale argument from `SaleListController`, sale models.
-- **Custom widgets:** Local sale detail/card components.
+- **Custom widgets:** AppSectionCard for Invoice, Items and Payment; no Home surface dependency.
 - **Redesign:** Defensive decimal-string/date/nested-map presentation, line prices/subtotals, all existing financial totals and visible delete errors. Invalid route arguments show a safe unavailable state. Confirmed deletion is guarded against duplicate requests and cannot pop a newer route after a held write.
 
 ## Redesign notes
@@ -66,16 +66,17 @@ Implementation complete across the six routes and the existing payment Add/Edit 
 
 ## Verification — 2026-11-17
 
-- `flutter test --no-pub --reporter expanded`: **1,028 passed, one web-only test skipped, zero failures** on the final combined tree.
+- `flutter test --no-pub --reporter expanded`: **1,123 passed, one web-only test skipped, zero failures** after the compliance repair.
 - `flutter analyze --no-pub`: **17 pre-existing diagnostics**, none in changed Dart files. The command remains nonzero because those baseline diagnostics are still present.
 - `flutter build web --no-pub`: **exit 0**. Flutter reports existing Wasm dry-run warnings; the standard web build succeeds.
 - Explicit changed-file Dart formatting gate (excluding the pre-existing whole-locale-map formatting baseline): passed. `git diff --check`: passed. Generated platform-registrant churn from dependency preparation was restored.
-- Focused final-review regressions: **44 passed**, including actual-shell held checkout/payment writes, cross-pass navigation, responsive management layouts and API line-price rendering.
+- Shared-surface tests were observed failing before implementation, then passing. Existing held checkout/payment writes, cross-pass navigation, responsive management layouts, failed refresh/save/export, API line prices and route-safe deletion regressions remain in the passing full suite.
 - Added integration coverage includes successful/legacy-fallback sale creation and payment/cleanup cache invalidation, independent queries across history/detail/new-sale/payment-save routes, en/km copy coverage, distinct initial load/error states, paired layouts, first-error focus and linked validation summary.
 
 ## Remaining manual checks and limitations
 
-- Live browser/API walks and compact/wide screenshots; physical scanner/camera cancellation and return; keyboard-only and spoken TalkBack/VoiceOver/NVDA checks.
+- Live browser/API walks; physical scanner/camera cancellation and return; keyboard-only focus visibility and spoken TalkBack/VoiceOver/NVDA checks.
+- Captured 48 populated widget screenshots (six routes ? compact/wide ? light/dark ? English/Khmer) in `frontend/build/sales-ui-compliance/` and inspected representative layouts. These VM captures load bundled fonts for content; mobile app-bar text/Cupertino glyphs still use test fallback fonts, and the capture excludes the desktop sidebar. They support surface/layout inspection, not live-browser, app-bar typography or focus validation.
 - Visual Khmer receipt PDF shaping, line wrapping and exported-file save/retrieval on the target devices. Automated tests verify glyph availability and the export data contract, not visual shaping quality.
 - The existing product web-only upload test remains skipped in the VM suite. Both agent sessions attempted Chrome execution and stalled during test loading; no Chrome pass is claimed for this integration.
 - Shared report-export feedback still contains legacy raw error/path copy; this inherited minor remains outside the integration fix pass.

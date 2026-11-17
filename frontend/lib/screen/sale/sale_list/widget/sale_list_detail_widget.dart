@@ -4,7 +4,7 @@ import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/screen/sale/sale_presentation.dart';
-import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_empty_state.dart';
 import 'package:frontend/ui/app_status_badge.dart';
@@ -65,8 +65,8 @@ class SaleListDetailWidget extends StatelessWidget {
     final items = sale['sale_items'] is List
         ? sale['sale_items'] as List
         : const [];
-    final invoice = HomeSectionCard(
-      title: 'Invoice'.tr,
+    final invoice = AppSectionCard(
+      title: 'Invoice',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -77,8 +77,8 @@ class SaleListDetailWidget extends StatelessWidget {
         ],
       ),
     );
-    final itemSection = HomeSectionCard(
-      title: 'Items'.tr,
+    final itemSection = AppSectionCard(
+      title: 'Items',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -94,8 +94,8 @@ class SaleListDetailWidget extends StatelessWidget {
         ],
       ),
     );
-    final payment = HomeSectionCard(
-      title: 'Payment'.tr,
+    final payment = AppSectionCard(
+      title: 'Payment',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

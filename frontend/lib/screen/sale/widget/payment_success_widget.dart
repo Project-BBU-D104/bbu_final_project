@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -58,28 +59,25 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
               if (receipt.isEmpty)
                 const AppEmptyState(message: 'Receipt unavailable')
               else
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Icon(Icons.check_circle_outline),
-                        for (final row in rows)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.sm,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(row[0].toString()),
-                                Text(row[1].toString()),
-                              ],
-                            ),
+                AppSectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Icon(Icons.check_circle_outline),
+                      for (final row in rows)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.sm,
                           ),
-                      ],
-                    ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(row[0].toString()),
+                              Text(row[1].toString()),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               const SizedBox(height: AppSpacing.lg),
@@ -94,6 +92,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                     ),
                   ),
                 ),
+              const SizedBox(height: AppSpacing.md),
               OutlinedButton(
                 onPressed: returnToSale,
                 child: Text('Back to Sale'.tr),

@@ -1,4 +1,3 @@
-import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -66,27 +65,10 @@ class CurrentSaleWidget extends StatelessWidget {
                       final details = Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          AppSectionCard(
-                            title: 'Customer',
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                IgnorePointer(
-                                  ignoring: ctr.checkoutBusy,
-                                  child: SelectCustomerCardWidget(
-                                    enabled: !ctr.checkoutBusy,
-                                  ),
-                                ),
-                                if (ctr.customerLoadError.value.isNotEmpty)
-                                  Text(ctr.customerLoadError.value),
-                                if (ctr.customerLoadError.value.isNotEmpty)
-                                  TextButton(
-                                    onPressed: ctr.checkoutBusy
-                                        ? null
-                                        : ctr.loadCustomers,
-                                    child: Text('Retry'.tr),
-                                  ),
-                              ],
+                          IgnorePointer(
+                            ignoring: ctr.checkoutBusy,
+                            child: SelectCustomerCardWidget(
+                              enabled: !ctr.checkoutBusy,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.lg),

@@ -17,10 +17,94 @@ import 'package:get/get.dart';
 import 'sale_test_support.dart';
 import 'sales_navigation_test.dart' show NavigationSaleController;
 import 'customer_test_support.dart' show setUpCustomerTests;
+import 'package:frontend/ui/app_section_card.dart';
+import 'payment_success_widget_test.dart' as receipt_fixtures;
+import 'dart:async';
 
 void main() {
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  for (final detail in [false, true]) {
+    testWidgets(
+      'long ${detail ? 'invoice' : 'transaction'} in compact Khmer at 2x',
+      (tester) async {
+        final longValue = List.filled(12, 'វិក្កយបត្រលក់វែង').join(' ');
+        final fake = receipt_fixtures.FakeReportExportController();
+        if (detail) {
+          Get.put(SaleListController(service: SaleTestSaleService()));
+        }
+        await pumpSalesPage(
+          tester,
+          const Scaffold(),
+          size: const Size(844, 390),
+          locale: const Locale('km', 'KH'),
+          textScale: 2,
+        );
+        Get.to(
+          () => detail
+              ? const SaleListDetailWidget()
+              : PaymentSuccessWidget(exportController: fake),
+          arguments: detail
+              ? {...saleJson(1), 'invoice_no': longValue}
+              : {...receipt_fixtures.receipt, 'transaction_id': longValue},
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(longValue), findsOneWidget);
+        final controls = detail
+            ? [
+                find.byTooltip('Back'.tr),
+                find.text('New Sale'.tr),
+                find.text('Delete'.tr),
+              ]
+            : [find.text('Back to Sale'.tr), find.text('Export Receipt'.tr)];
+        for (final control in controls) {
+          await tester.ensureVisible(control);
+          await tester.pumpAndSettle();
+          expect(control.hitTestable(), findsOneWidget);
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+  testWidgets('receipt uses shared surface without changing export rows', (
+    tester,
+  ) async {
+    final fake = receipt_fixtures.FakeReportExportController()
+      ..held = Completer<String?>();
+    final data = {
+      ...receipt_fixtures.receipt,
+      'payment_date': '2026-11-08T11:30:00',
+    };
+    await pumpSalesPage(tester, const Scaffold(), size: const Size(1440, 900));
+    Get.to(() => PaymentSuccessWidget(exportController: fake), arguments: data);
+    await tester.pumpAndSettle();
+    expect(find.byType(AppSectionCard), findsOneWidget);
+    const rows = [
+      ['Customer', 'Alice'],
+      ['Payment Method', 'Cash'],
+      ['Date', '08-11-2026 11:30'],
+      ['Transaction ID', 'SALE-1'],
+      ['Subtotal', r'$8.00'],
+      ['Total', r'$10.00'],
+    ];
+    for (final row in rows) {
+      for (final text in row) {
+        expect(find.text(text), findsOneWidget);
+      }
+    }
+    await tester.ensureVisible(find.text('Export Receipt'));
+    await tester.tap(find.text('Export Receipt'));
+    await tester.pump();
+    await tester.tap(find.text('Exporting...'));
+    expect(fake.calls, hasLength(1));
+    expect(fake.calls.single.rows, rows);
+    fake.held!.completeError(Exception('disk full'));
+    await tester.pumpAndSettle();
+    expect(find.text('SALE-1'), findsOneWidget);
+    expect(find.text(r'$10.00'), findsOneWidget);
+    Get.closeAllSnackbars();
+    await tester.pumpAndSettle();
+  });
   for (final route in [
     '/sale',
     '/current-sale',

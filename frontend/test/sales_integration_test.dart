@@ -8,7 +8,7 @@ import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/themes/app_theme.dart';
-import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/screen/payment/widget/payment_form_widget.dart';
 import 'package:frontend/screen/payment/payment_screen.dart';
 import 'package:frontend/screen/sale/sale_list/sale_list_screen.dart';
@@ -93,7 +93,7 @@ Future<void> _openDetail(
 }
 
 Finder _section(String title) => find.byWidgetPredicate(
-  (widget) => widget is HomeSectionCard && widget.title == title,
+  (widget) => widget is AppSectionCard && widget.title?.tr == title,
 );
 
 Finder _field(String label) => find.byWidgetPredicate(

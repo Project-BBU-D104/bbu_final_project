@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:flutter/material.dart';
@@ -14,45 +15,65 @@ class SelectCustomerCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: !enabled
-          ? null
-          : () => AppBottomSheets.show<void>(
-              context,
-              child: _CustomerPicker(controller: ctr),
-            ),
-      child: Obx(() {
-        final customer = ctr.selectedCustomer.value;
-        return Row(
+    return Obx(
+      () => AppSectionCard(
+        title: 'Customer',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CircleAvatar(
-              child: ClipOval(
-                child: AppCachedImage(
-                  url: customer?['photo']?.toString(),
-                  width: AppTokens.controlHeight,
-                  height: AppTokens.controlHeight,
-                  fallbackIcon: Icons.person_outline,
-                ),
-              ),
+            InkWell(
+              onTap: !enabled
+                  ? null
+                  : () => AppBottomSheets.show<void>(
+                      context,
+                      child: _CustomerPicker(controller: ctr),
+                    ),
+              child: Obx(() {
+                final customer = ctr.selectedCustomer.value;
+                return Row(
+                  children: [
+                    CircleAvatar(
+                      child: ClipOval(
+                        child: AppCachedImage(
+                          url: customer?['photo']?.toString(),
+                          width: AppTokens.controlHeight,
+                          height: AppTokens.controlHeight,
+                          fallbackIcon: Icons.person_outline,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            customer?['name']?.toString() ??
+                                'Select Customer'.tr,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            customer?['phone']?.toString() ??
+                                'Please select a customer for this sale.'.tr,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.expand_more),
+                  ],
+                );
+              }),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(customer?['name']?.toString() ?? 'Select Customer'.tr),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    customer?['phone']?.toString() ??
-                        'Please select a customer for this sale.'.tr,
-                  ),
-                ],
+            if (ctr.customerLoadError.value.isNotEmpty)
+              Text(ctr.customerLoadError.value),
+            if (ctr.customerLoadError.value.isNotEmpty)
+              TextButton(
+                onPressed: enabled ? ctr.loadCustomers : null,
+                child: Text('Retry'.tr),
               ),
-            ),
-            const Icon(Icons.expand_more),
           ],
-        );
-      }),
+        ),
+      ),
     );
   }
 }
