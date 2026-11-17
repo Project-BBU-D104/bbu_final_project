@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/search_controller.dart';
@@ -8,6 +9,68 @@ import 'package:get/get.dart';
 
 void main() {
   tearDown(Get.reset);
+
+  testWidgets('scoped search isolates input and synchronizes external clear', (
+    tester,
+  ) async {
+    final first = SearchController();
+    final second = SearchController();
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              AppSearchField(title: 'Search', searchController: first),
+              AppSearchField(title: 'Search', searchController: second),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.enterText(find.byType(TextField).first, 'alpha');
+    expect(first.keyword.value, 'alpha');
+    expect(second.keyword.value, isEmpty);
+    first.clear();
+    await tester.pump();
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller!.text,
+      isEmpty,
+    );
+  });
+
+  testWidgets('scoped scanner trims results and tolerates disposal', (
+    tester,
+  ) async {
+    final controller = SearchController();
+    var pending = Completer<String?>();
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: AppSearchField(
+            title: 'Search',
+            showScan: true,
+            searchController: controller,
+            barcodeScanner: () => pending.future,
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byTooltip('Scan Barcode'));
+    pending.complete(' 12345 ');
+    await tester.pump();
+    expect(controller.keyword.value, '12345');
+    pending = Completer<String?>();
+    await tester.tap(find.byTooltip('Scan Barcode'));
+    pending.complete(null);
+    await tester.pump();
+    expect(controller.keyword.value, '12345');
+    pending = Completer<String?>();
+    await tester.tap(find.byTooltip('Scan Barcode'));
+    await tester.pumpWidget(const SizedBox());
+    pending.complete('other');
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('search surface follows theme and clear action is labeled', (
     tester,

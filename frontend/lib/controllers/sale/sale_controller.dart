@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/services/main_service/customer_service.dart';
@@ -14,12 +15,26 @@ import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class SaleController extends GetxController {
-  final SaleService service = SaleService();
-  final ProductService productService = ProductService();
-  final CustomerService customerService = CustomerService();
-  final CurrencyService currencyService = CurrencyService();
-  final PaymentTypeService paymentTypeService = PaymentTypeService();
-  final SalePaymentService salePaymentService = SalePaymentService();
+  SaleController({
+    SaleService? service,
+    ProductService? productService,
+    CustomerService? customerService,
+    CurrencyService? currencyService,
+    PaymentTypeService? paymentTypeService,
+    SalePaymentService? salePaymentService,
+  }) : service = service ?? SaleService(),
+       productService = productService ?? ProductService(),
+       customerService = customerService ?? CustomerService(),
+       currencyService = currencyService ?? CurrencyService(),
+       paymentTypeService = paymentTypeService ?? PaymentTypeService(),
+       salePaymentService = salePaymentService ?? SalePaymentService();
+
+  final SaleService service;
+  final ProductService productService;
+  final CustomerService customerService;
+  final CurrencyService currencyService;
+  final PaymentTypeService paymentTypeService;
+  final SalePaymentService salePaymentService;
   final categories = <Map<String, dynamic>>[].obs;
   final customers = <Map<String, dynamic>>[].obs;
   final paymentTypes = <Map<String, dynamic>>[].obs;
@@ -32,7 +47,26 @@ class SaleController extends GetxController {
   final isPaymentTypesLoading = false.obs;
   final isProcessingPayment = false.obs;
 
-  final searchCtr = Get.put(SearchController());
+  final searchCtr = SearchController();
+  final productLoadError = ''.obs;
+  final customerLoadError = ''.obs;
+  final paymentTypesLoadError = ''.obs;
+  final currencyLoadError = ''.obs;
+  final checkoutError = ''.obs;
+  final isConfirmingPayment = false.obs;
+  bool get checkoutBusy =>
+      isConfirmingPayment.value || isProcessingPayment.value;
+  bool get canCheckout =>
+      !checkoutBusy &&
+      cart.isNotEmpty &&
+      selectedCustomer.value != null &&
+      selectedPaymentType.value != null;
+
+  @override
+  void onClose() {
+    searchCtr.onClose();
+    super.onClose();
+  }
 
   /// Categories with products filtered by the search keyword.
   /// Categories that have no matching products are hidden while searching.
@@ -74,74 +108,111 @@ class SaleController extends GetxController {
 
   /// The sale grid and cart total are priced in the shop's default currency.
   Future<void> loadCurrency() async {
+    currencyLoadError.value = '';
     try {
       final response = await currencyService.getCurrencies();
-      if (response is List) {
+      if (response is! List) throw const FormatException('Expected list');
+      {
         final currencies = List<Map<String, dynamic>>.from(response);
         currency.value =
             currencies.firstWhereOrNull((c) => c['is_default'] == true) ??
             currencies.firstOrNull;
       }
     } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      currencyLoadError.value = 'Unable to load currency. Please try again.'.tr;
     }
   }
 
   Future<void> loadPaymentTypes() async {
+    paymentTypesLoadError.value = '';
     try {
       isPaymentTypesLoading.value = true;
       final response = await paymentTypeService.getPaymentTypes();
-      if (response is List) {
+      if (response is! List) throw const FormatException('Expected list');
+      {
         paymentTypes.value = List<Map<String, dynamic>>.from(
           response,
         ).where((paymentType) => paymentType['status'] == true).toList();
-        if (selectedPaymentType.value == null && paymentTypes.isNotEmpty) {
-          selectedPaymentType.value = paymentTypes.first;
-        }
+        selectedPaymentType.value =
+            paymentTypes.firstWhereOrNull(
+              (row) => row['id'] == selectedPaymentType.value?['id'],
+            ) ??
+            paymentTypes.firstOrNull;
       }
     } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      paymentTypesLoadError.value =
+          'Unable to load payment types. Please try again.'.tr;
     } finally {
       isPaymentTypesLoading.value = false;
     }
   }
 
   void selectPaymentType(Map<String, dynamic> paymentType) {
+    if (checkoutBusy) return;
     selectedPaymentType.value = paymentType;
   }
 
   Future<void> loadCustomers() async {
+    customerLoadError.value = '';
     try {
       isCustomersLoading.value = true;
       final response = await customerService.getCustomers();
-      if (response is List) {
+      if (response is! List) throw const FormatException('Expected list');
+      {
         customers.value = List<Map<String, dynamic>>.from(response);
-        if (selectedCustomer.value == null && customers.isNotEmpty) {
-          selectedCustomer.value = customers.first;
-        }
+        selectedCustomer.value =
+            customers.firstWhereOrNull(
+              (row) => row['id'] == selectedCustomer.value?['id'],
+            ) ??
+            customers.firstOrNull;
       }
     } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      customerLoadError.value =
+          'Unable to load customers. Please try again.'.tr;
     } finally {
       isCustomersLoading.value = false;
     }
   }
 
   void selectCustomer(Map<String, dynamic> customer) {
+    if (checkoutBusy) return;
     selectedCustomer.value = customer;
   }
 
   Future<void> loadProductCategories() async {
+    productLoadError.value = '';
     try {
       isLoading.value = true;
       final response = await service.getProductCategories();
-      if (response is List) {
-        final categoryList = List<Map<String, dynamic>>.from(response);
+      if (response is! List) throw const FormatException('Expected list');
+      {
+        final categoryList = response.map<Map<String, dynamic>>((rawCategory) {
+          if (rawCategory is! Map) {
+            throw const FormatException('Invalid category');
+          }
+          final category = Map<String, dynamic>.from(rawCategory);
+          final rawProducts = category['products'] ?? [];
+          if (rawProducts is! List) {
+            throw const FormatException('Invalid products');
+          }
+          category['products'] = rawProducts.map<Map<String, dynamic>>((
+            rawProduct,
+          ) {
+            if (rawProduct is! Map) {
+              throw const FormatException('Invalid product');
+            }
+            final product = Map<String, dynamic>.from(rawProduct);
+            final id = int.tryParse(product['id']?.toString() ?? '');
+            if (id == null) throw const FormatException('Invalid product ID');
+            return {...product, 'id': id};
+          }).toList();
+          return category;
+        }).toList();
         await _mergeProductBarcodes(categoryList);
         categories.value = categoryList;
       }
     } catch (error) {
-      ToastWidget.show(message: error.toString(), type: ToastType.error);
+      productLoadError.value = 'Unable to load products. Please try again.'.tr;
     } finally {
       isLoading.value = false;
     }
@@ -190,12 +261,14 @@ class SaleController extends GetxController {
   }
 
   void addProduct(Map<String, dynamic> product) {
+    if (checkoutBusy) return;
     final id = product['id'] as int;
     final quantity = (cart[id]?['qty'] as int? ?? 0) + 1;
     cart[id] = {...product, 'qty': quantity};
   }
 
   void changeQuantity(int productId, int change) {
+    if (checkoutBusy) return;
     final product = cart[productId];
     if (product == null) return;
 
@@ -227,6 +300,7 @@ class SaleController extends GetxController {
   }
 
   Future<void> onPayment() async {
+    if (checkoutBusy) return;
     final customer = selectedCustomer.value;
     final paymentType = selectedPaymentType.value;
     final userId = int.tryParse(
@@ -235,105 +309,130 @@ class SaleController extends GetxController {
 
     if (selectedProducts.isEmpty || customer == null || paymentType == null) {
       ToastWidget.show(
-        message: 'Select a customer, payment type, and at least one product.',
+        message:
+            'Select a customer, payment type, and at least one product.'.tr,
         type: ToastType.error,
       );
       return;
     }
     if (userId == null) {
       ToastWidget.show(
-        message: 'Unable to identify the logged-in user.',
+        message: 'Unable to identify the logged-in user.'.tr,
         type: ToastType.error,
       );
       return;
     }
     if (isProcessingPayment.value) return;
 
-    final method = paymentType['name']?.toString() ?? '';
-    final confirmed = await Get.dialog<bool>(
-      AlertDialog(
-        title: const Text('Confirm payment'),
-        content: Text(
-          'Charge ${CurrencyFormatter.format(subtotal, currency.value)} to '
-          '${customer['name'] ?? 'customer'} using $method?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Get.back(result: true),
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
-      barrierDismissible: false,
-    );
-    if (confirmed != true) return;
-
-    isProcessingPayment.value = true;
-    int? saleId;
+    isConfirmingPayment.value = true;
+    checkoutError.value = '';
     try {
-      final now = DateTime.now().toUtc();
-      final reference = 'SALE-${now.microsecondsSinceEpoch}';
-      final saleResponse = await _createSale({
-        'user_id': userId,
-        'customer_id': customer['id'],
-        'sale_date': now.toIso8601String(),
-        'status': 'completed',
-        'payment_method': method,
-        'sale_items': selectedProducts
-            .map(
-              (product) => {'product_id': product['id'], 'qty': product['qty']},
-            )
-            .toList(),
-      });
-
-      saleId = int.tryParse(saleResponse['id']?.toString() ?? '');
-      final amount = double.tryParse(
-        saleResponse['total_amount']?.toString() ?? '',
+      final confirmedProducts = selectedProducts
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList();
+      final method = paymentType['name']?.toString() ?? '';
+      final confirmed = await Get.dialog<bool>(
+        AlertDialog(
+          title: Text('Confirm payment'.tr),
+          content: Text(
+            'Charge @amount to @customer using @method?'.trParams({
+              'amount': CurrencyFormatter.format(subtotal, currency.value),
+              'customer': customer['name']?.toString() ?? '',
+              'method': method,
+            }),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: Text('Cancel'.tr),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(result: true),
+              child: Text('Confirm'.tr),
+            ),
+          ],
+        ),
+        barrierDismissible: false,
       );
-      if (saleId == null || amount == null) {
-        throw Exception('The sale response did not include an ID and total.');
-      }
+      if (confirmed != true) return;
 
-      await salePaymentService.createSalePayment({
-        'user_id': userId,
-        'sale_id': saleId,
-        'amount': amount,
-        'payment_method': method,
-        'reference_no': reference,
-        'payment_date': now.toIso8601String(),
-        'note': 'Sale payment',
-        'created_at': now.toIso8601String(),
-      });
+      isProcessingPayment.value = true;
+      int? saleId;
+      try {
+        final now = DateTime.now().toUtc();
+        final reference = 'SALE-${now.microsecondsSinceEpoch}';
+        final saleResponse = await _createSale({
+          'user_id': userId,
+          'customer_id': customer['id'],
+          'sale_date': now.toIso8601String(),
+          'status': 'completed',
+          'payment_method': method,
+          'sale_items': confirmedProducts
+              .map(
+                (product) => {
+                  'product_id': product['id'],
+                  'qty': product['qty'],
+                },
+              )
+              .toList(),
+        });
 
-      final receipt = {
-        'customer': customer['name']?.toString() ?? '',
-        'payment_method': method,
-        'payment_date': now.toIso8601String(),
-        'transaction_id': reference,
-        'subtotal': saleResponse['subtotal'] ?? subtotal,
-        'total': amount,
-        'currency': currency.value,
-      };
-      cart.clear();
-      selectedCustomer.value = null;
-      selectedPaymentType.value = null;
-      Get.offNamed(AppRoutes.paymentSuccess, arguments: receipt);
-    } catch (error) {
-      if (saleId != null) {
-        try {
-          await service.deleteSale(saleId);
-        } catch (_) {}
+        SaleListController.invalidateCache();
+        saleId = int.tryParse(saleResponse['id']?.toString() ?? '');
+        final amount = double.tryParse(
+          saleResponse['total_amount']?.toString() ?? '',
+        );
+        if (saleId == null ||
+            amount == null ||
+            !amount.isFinite ||
+            amount <= 0) {
+          throw Exception('The sale response did not include an ID and total.');
+        }
+
+        await salePaymentService.createSalePayment({
+          'user_id': userId,
+          'sale_id': saleId,
+          'amount': amount,
+          'payment_method': method,
+          'reference_no': reference,
+          'payment_date': now.toIso8601String(),
+          'note': 'Sale payment',
+          'created_at': now.toIso8601String(),
+        });
+        SaleListController.invalidateCache();
+
+        final receipt = {
+          'customer': customer['name']?.toString() ?? '',
+          'payment_method': method,
+          'payment_date': now.toIso8601String(),
+          'transaction_id': reference,
+          'subtotal': saleResponse['subtotal'] ?? subtotal,
+          'total': amount,
+          'currency': currency.value,
+        };
+        cart.clear();
+        selectedCustomer.value = null;
+        selectedPaymentType.value = null;
+        Get.offNamed(AppRoutes.paymentSuccess, arguments: receipt);
+      } catch (error) {
+        checkoutError.value =
+            'Unable to complete payment. Please try again.'.tr;
+        if (saleId != null) {
+          try {
+            await service.deleteSale(saleId);
+            SaleListController.invalidateCache();
+          } catch (_) {
+            checkoutError.value =
+                'The sale may have been created. Check Sales before trying again.'
+                    .tr;
+          }
+        }
+        ToastWidget.show(message: checkoutError.value, type: ToastType.error);
+      } finally {
+        isProcessingPayment.value = false;
       }
-      ToastWidget.show(
-        message: error.toString().replaceFirst('Exception: ', ''),
-        type: ToastType.error,
-      );
     } finally {
-      isProcessingPayment.value = false;
+      isConfirmingPayment.value = false;
     }
   }
 
@@ -351,8 +450,7 @@ class SaleController extends GetxController {
       // Older deployed backends require invoice_no even though the current
       // backend generates it automatically. Send one only for that case.
       final now = DateTime.now();
-      final date =
-          '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}';
+      final date = '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}';
       final time =
           '${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
 

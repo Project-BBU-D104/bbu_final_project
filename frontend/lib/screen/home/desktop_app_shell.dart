@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/home_controller.dart';
+import 'package:frontend/controllers/payment_controller.dart';
+import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
@@ -60,6 +62,12 @@ class _AppSidebar extends StatelessWidget {
   final String route;
 
   void _openTab(int index) {
+    if ((Get.isRegistered<SaleController>() &&
+            Get.find<SaleController>().checkoutBusy) ||
+        (Get.isRegistered<PaymentController>() &&
+            Get.find<PaymentController>().isSaving.value)) {
+      return;
+    }
     if (Get.isRegistered<HomeController>()) {
       final controller = Get.find<HomeController>();
       Get.until(
@@ -80,6 +88,12 @@ class _AppSidebar extends StatelessWidget {
         ? Get.find<HomeController>()
         : null;
     final canViewReport = controller?.canViewReport ?? storage.hasRole('Admin');
+    final saleController = Get.isRegistered<SaleController>()
+        ? Get.find<SaleController>()
+        : null;
+    final paymentController = Get.isRegistered<PaymentController>()
+        ? Get.find<PaymentController>()
+        : null;
     final destinations = [
       (label: 'Home', icon: Icons.home_outlined, selected: Icons.home),
       (
@@ -102,7 +116,7 @@ class _AppSidebar extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    Widget rail(int? selected) {
+    Widget rail(int? selected, {bool blocked = false}) {
       final profileSelected = selected == destinations.length;
       return NavigationRail(
         backgroundColor: colors.surface,
@@ -114,7 +128,7 @@ class _AppSidebar extends StatelessWidget {
         selectedIndex: selected != null && selected < destinations.length
             ? selected
             : null,
-        onDestinationSelected: _openTab,
+        onDestinationSelected: blocked ? null : _openTab,
         labelType: NavigationRailLabelType.all,
         scrollable: true,
         trailingAtBottom: true,
@@ -141,7 +155,7 @@ class _AppSidebar extends StatelessWidget {
           child: Semantics(
             selected: profileSelected,
             child: TextButton(
-              onPressed: () => _openTab(destinations.length),
+              onPressed: blocked ? null : () => _openTab(destinations.length),
               style: TextButton.styleFrom(
                 foregroundColor: profileSelected
                     ? colors.primary
@@ -166,11 +180,19 @@ class _AppSidebar extends StatelessWidget {
       );
     }
 
-    return controller == null
+    return controller == null &&
+            saleController == null &&
+            paymentController == null
         ? rail(null)
         : Obx(() {
-            final selected = controller.selectedIndex.value;
-            return rail(route == AppRoutes.home ? selected : null);
+            final selected = controller?.selectedIndex.value;
+            final blocked =
+                (saleController?.checkoutBusy ?? false) ||
+                (paymentController?.isSaving.value ?? false);
+            return rail(
+              route == AppRoutes.home ? selected : null,
+              blocked: blocked,
+            );
           });
   }
 }

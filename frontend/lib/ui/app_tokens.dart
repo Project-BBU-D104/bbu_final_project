@@ -4,6 +4,8 @@
 /// breakpoints: take them from here (or let `AppTheme` supply them).
 class AppTokens {
   const AppTokens._();
+  static const double saleProductTileMaxExtent = 240;
+  static const double saleProductTileAspectRatio = 0.78;
 
   static const double formMaxHeightFactor = 0.9;
 

@@ -18,9 +18,9 @@ import 'package:get/get.dart';
 class FakeStorageService implements IStorageService {
   @override
   Map<String, dynamic> get lastUserLoginRead => {
-        'token': 'token',
-        'user': {'id': 7},
-      };
+    'token': 'token',
+    'user': {'id': 7},
+  };
 
   @override
   String get currentUserRole => 'cashier';
@@ -55,7 +55,7 @@ class FakeStorageService implements IStorageService {
 
 class FakeSalePaymentService implements SalePaymentService {
   FakeSalePaymentService({List<Map<String, dynamic>>? payments})
-      : payments = payments ?? [];
+    : payments = payments ?? [];
 
   List<Map<String, dynamic>> payments;
   Exception? failure;
@@ -123,34 +123,33 @@ class FakeSaleService implements SaleService {
 }
 
 Map<String, dynamic> saleFixture({double due = 50.0}) => {
-      'id': 3,
-      'invoice_no': 'SALE-3',
-      'due_amount': due,
-      'payment_status': 'unpaid',
-      'customer': {'name': 'Alice'},
-    };
+  'id': 3,
+  'invoice_no': 'SALE-3',
+  'due_amount': due,
+  'payment_status': 'unpaid',
+  'customer': {'name': 'Alice'},
+};
 
 Map<String, dynamic> paymentFixture({
   int id = 11,
   num amount = 40.0,
   double saleDue = 60.0,
-}) =>
-    {
-      'id': id,
-      'amount': amount,
-      'payment_method': 'Cash',
-      'reference_no': 'REF-1',
-      'payment_date': '2026-11-01T00:00:00Z',
-      'note': 'Existing',
-      'user': {'id': 7},
-      'sale': {
-        'id': 3,
-        'invoice_no': 'SALE-3',
-        'due_amount': saleDue,
-        'payment_status': 'Partial',
-        'customer': {'name': 'Alice'},
-      },
-    };
+}) => {
+  'id': id,
+  'amount': amount,
+  'payment_method': 'Cash',
+  'reference_no': 'REF-1',
+  'payment_date': '2026-11-01T00:00:00Z',
+  'note': 'Existing',
+  'user': {'id': 7},
+  'sale': {
+    'id': 3,
+    'invoice_no': 'SALE-3',
+    'due_amount': saleDue,
+    'payment_status': 'Partial',
+    'customer': {'name': 'Alice'},
+  },
+};
 
 Future<void> closeToasts(WidgetTester tester) async {
   Get.closeAllSnackbars();
@@ -158,11 +157,14 @@ Future<void> closeToasts(WidgetTester tester) async {
 }
 
 Future<void> openAddSheet(WidgetTester tester) async {
-  await tester.tap(find.byType(FloatingActionButton));
+  await tester.tap(find.widgetWithText(FilledButton, 'Add Payment'));
   await tester.pumpAndSettle();
 }
 
-Future<void> fillValidPayment(PaymentController ctr, {String amount = '25.5'}) async {
+Future<void> fillValidPayment(
+  PaymentController ctr, {
+  String amount = '25.5',
+}) async {
   ctr.selectedSaleId.value = 3;
   ctr.amountCtrl.text = amount;
   ctr.methodCtrl.text = 'Cash';
@@ -172,7 +174,7 @@ Future<void> fillValidPayment(PaymentController ctr, {String amount = '25.5'}) a
 }
 
 Future<void> tapSave(WidgetTester tester, String label) async {
-  final finder = find.widgetWithText(ElevatedButton, label);
+  final finder = find.widgetWithText(FilledButton, label);
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -234,8 +236,9 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('rejects zero, negative, non-numeric and over-due amounts',
-      (tester) async {
+  testWidgets('rejects zero, negative, non-numeric and over-due amounts', (
+    tester,
+  ) async {
     final paymentService = FakeSalePaymentService();
     final ctr = await pumpScreen(tester, paymentService: paymentService);
 
@@ -262,14 +265,10 @@ void main() {
   });
 
   testWidgets('edit prefills and updates only editable fields', (tester) async {
-    final paymentService = FakeSalePaymentService(
-      payments: [paymentFixture()],
-    );
+    final paymentService = FakeSalePaymentService(payments: [paymentFixture()]);
     final ctr = await pumpScreen(tester, paymentService: paymentService);
 
-    await tester.tap(find.byIcon(Icons.more_vert));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Edit'));
+    await tester.tap(find.byTooltip('Edit'));
     await tester.pumpAndSettle();
 
     expect(find.byType(EditPaymentWidget), findsOneWidget);
@@ -317,9 +316,7 @@ void main() {
       sales: [saleFixture(due: 10.0)],
     );
 
-    await tester.tap(find.byIcon(Icons.more_vert));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Edit'));
+    await tester.tap(find.byTooltip('Edit'));
     await tester.pumpAndSettle();
 
     ctr.amountCtrl.text = '50.01';
@@ -336,8 +333,9 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('service failure keeps the sheet open and resets isSaving',
-      (tester) async {
+  testWidgets('service failure keeps the sheet open and resets isSaving', (
+    tester,
+  ) async {
     final paymentService = FakeSalePaymentService()
       ..failure = Exception('boom');
     final ctr = await pumpScreen(tester, paymentService: paymentService);
@@ -354,37 +352,35 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('delete cancels without a call and confirms without leaving screen',
-      (tester) async {
-    final paymentService = FakeSalePaymentService(
-      payments: [paymentFixture()],
-    );
-    await pumpScreen(tester, paymentService: paymentService);
+  testWidgets(
+    'delete cancels without a call and confirms without leaving screen',
+    (tester) async {
+      final paymentService = FakeSalePaymentService(
+        payments: [paymentFixture()],
+      );
+      await pumpScreen(tester, paymentService: paymentService);
 
-    await tester.tap(find.byIcon(Icons.more_vert));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete'));
-    await tester.pumpAndSettle();
-    expect(find.byType(AlertDialog).evaluate().isEmpty, isTrue);
+      await tester.tap(find.byTooltip('Delete'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog).evaluate().isEmpty, isTrue);
 
-    await tester.tap(find.text('Cancel'));
-    await tester.pumpAndSettle();
-    expect(paymentService.deleteCalls, isEmpty);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(paymentService.deleteCalls, isEmpty);
 
-    await tester.tap(find.byIcon(Icons.more_vert));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete'));
-    await tester.pumpAndSettle();
-    final callsBefore = paymentService.getPaymentsCalls;
-    await tester.tap(find.text('Ok'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Delete'));
+      await tester.pumpAndSettle();
+      final callsBefore = paymentService.getPaymentsCalls;
+      await tester.tap(find.text('Ok'));
+      await tester.pumpAndSettle();
 
-    expect(paymentService.deleteCalls, [11]);
-    expect(paymentService.getPaymentsCalls, greaterThan(callsBefore));
-    expect(find.byType(PaymentScreen), findsOneWidget);
+      expect(paymentService.deleteCalls, [11]);
+      expect(paymentService.getPaymentsCalls, greaterThan(callsBefore));
+      expect(find.byType(PaymentScreen), findsOneWidget);
 
-    await closeToasts(tester);
-  });
+      await closeToasts(tester);
+    },
+  );
 
   testWidgets('two rapid saves make one request', (tester) async {
     final paymentService = FakeSalePaymentService()..createGate = Completer();
@@ -408,10 +404,10 @@ void main() {
     await closeToasts(tester);
   });
 
-  testWidgets('payments list renders card data from the service', (tester) async {
-    final paymentService = FakeSalePaymentService(
-      payments: [paymentFixture()],
-    );
+  testWidgets('payments list renders card data from the service', (
+    tester,
+  ) async {
+    final paymentService = FakeSalePaymentService(payments: [paymentFixture()]);
     await pumpScreen(tester, paymentService: paymentService);
 
     expect(find.byType(PaymentCardListWidget), findsOneWidget);
@@ -419,8 +415,9 @@ void main() {
     expect(find.text('SALE-3'), findsOneWidget);
   });
 
-  testWidgets('payments list renders an API decimal string amount',
-      (tester) async {
+  testWidgets('payments list renders an API decimal string amount', (
+    tester,
+  ) async {
     final paymentService = FakeSalePaymentService(
       payments: [paymentFixture()..['amount'] = '6.00'],
     );
@@ -428,6 +425,6 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(PaymentCardListWidget), findsOneWidget);
-    expect(find.text('6'), findsOneWidget);
+    expect(find.text(r'$6.00'), findsOneWidget);
   });
 }

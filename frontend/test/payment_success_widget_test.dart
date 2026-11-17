@@ -1,3 +1,5 @@
+import 'sale_test_support.dart';
+import 'package:frontend/ui/app_page.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -74,7 +76,10 @@ Widget app(ReportExportController controller) {
   return GetMaterialApp(
     initialRoute: '/',
     getPages: [
-      GetPage(name: '/', page: () => const Scaffold(body: Text('home'))),
+      GetPage(
+        name: '/',
+        page: () => const Scaffold(body: Text('home')),
+      ),
       GetPage(
         name: AppRoutes.paymentSuccess,
         page: () => PaymentSuccessWidget(exportController: controller),
@@ -106,6 +111,44 @@ Future<void> settleToast(WidgetTester tester) async {
 }
 
 void main() {
+  for (final dark in [false, true]) {
+    for (final khmer in [false, true]) {
+      for (final scale in [1.0, 2.0]) {
+        testWidgets(
+          'receipt short shell dark=$dark khmer=$khmer scale=$scale',
+          (tester) async {
+            await pumpSalesPage(
+              tester,
+              const Scaffold(),
+              size: const Size(844, 390),
+              dark: dark,
+              locale: Locale(khmer ? 'km' : 'en', khmer ? 'KH' : 'US'),
+              textScale: scale,
+              desktopShell: true,
+              route: AppRoutes.paymentSuccess,
+            );
+            Get.to(
+              () => PaymentSuccessWidget(
+                exportController: FakeReportExportController(),
+              ),
+              arguments: receipt,
+            );
+            await tester.pumpAndSettle();
+            final buttons = find.byType(OutlinedButton);
+            await tester.ensureVisible(buttons.last);
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
+    }
+  }
+  testWidgets('receipt uses shared scrollable page', (tester) async {
+    final fake = FakeReportExportController();
+    await openSuccess(tester, fake, receipt);
+    expect(find.byType(AppPage), findsOneWidget);
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
+  });
   tearDown(() {
     Get.closeAllSnackbars();
     Get.reset();
@@ -200,8 +243,7 @@ void main() {
     tester,
   ) async {
     setLargeView(tester);
-    final fake = FakeReportExportController()
-      ..error = Exception('disk full');
+    final fake = FakeReportExportController()..error = Exception('disk full');
 
     await openSuccess(tester, fake, receipt);
     await tester.tap(find.text('Export Receipt'));
@@ -221,8 +263,7 @@ void main() {
     tester,
   ) async {
     setLargeView(tester);
-    final fake = FakeReportExportController()
-      ..held = Completer<String?>();
+    final fake = FakeReportExportController()..held = Completer<String?>();
 
     await openSuccess(tester, fake, receipt);
 

@@ -7,25 +7,61 @@ import 'package:get/get.dart';
 class SearchWidget extends StatefulWidget {
   final String title;
   final bool showScan;
+  final SearchController? searchController;
+  final Future<String?> Function()? barcodeScanner;
 
-  const SearchWidget({super.key, required this.title, this.showScan = false});
+  const SearchWidget({
+    super.key,
+    required this.title,
+    this.showScan = false,
+    this.searchController,
+    this.barcodeScanner,
+  });
 
   @override
   State<SearchWidget> createState() => _SearchWidgetState();
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  late final SearchController ctr;
+  late SearchController ctr;
+  Worker? _syncWorker;
   late final TextEditingController _textController;
 
   @override
   void initState() {
     super.initState();
-    ctr = Get.isRegistered<SearchController>()
-        ? Get.find<SearchController>()
-        : Get.put(SearchController());
+    ctr =
+        widget.searchController ??
+        (Get.isRegistered<SearchController>()
+            ? Get.find<SearchController>()
+            : Get.put(SearchController()));
     _textController = TextEditingController(text: ctr.keyword.value);
     _textController.addListener(_onTextChanged);
+    _bindSync();
+  }
+
+  void _bindSync() {
+    _syncWorker = ever<String>(ctr.keyword, (value) {
+      if (_textController.text == value) return;
+      _textController.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.collapsed(offset: value.length),
+      );
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant SearchWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchController == widget.searchController) return;
+    _syncWorker?.dispose();
+    ctr =
+        widget.searchController ??
+        (Get.isRegistered<SearchController>()
+            ? Get.find<SearchController>()
+            : Get.put(SearchController()));
+    _textController.text = ctr.keyword.value;
+    _bindSync();
   }
 
   void _onTextChanged() {
@@ -34,6 +70,7 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   void dispose() {
+    _syncWorker?.dispose();
     _textController
       ..removeListener(_onTextChanged)
       ..dispose();
@@ -41,9 +78,11 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   Future<void> _scanBarcode() async {
-    final code = await Get.to<String>(
-      () => const TestProductScannerPage(returnImmediately: true),
-    );
+    final code = widget.barcodeScanner != null
+        ? await widget.barcodeScanner!()
+        : await Get.to<String>(
+            () => const TestProductScannerPage(returnImmediately: true),
+          );
 
     if (!mounted || code == null || code.trim().isEmpty) return;
 
@@ -69,6 +108,7 @@ class _SearchWidgetState extends State<SearchWidget> {
         controller: _textController,
         decoration: InputDecoration(
           hintText: widget.title.tr,
+          labelText: widget.title.tr,
           prefixIcon: const Icon(Icons.search),
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,

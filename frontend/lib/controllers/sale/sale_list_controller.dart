@@ -5,8 +5,19 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
-class SaleListController extends GetxController{
-  
+
+class SaleListController extends GetxController {
+  SaleListController({SaleService? service})
+    : service = service ?? SaleService();
+  final loadError = ''.obs;
+  final deletingIds = <int>{}.obs;
+  static void invalidateCache() {
+    _cache.clear();
+    _cachedAt = null;
+  }
+
+  Future<void> onRefresh() => onGetSaleList();
+
   var isLoading = false.obs;
 
   static final List<Map<String, dynamic>> _cache = [];
@@ -14,24 +25,23 @@ class SaleListController extends GetxController{
   static const Duration _cacheTtl = Duration(seconds: 60);
 
   static bool get _hasFreshCache =>
-      _cachedAt != null &&
-      DateTime.now().difference(_cachedAt!) < _cacheTtl;
+      _cachedAt != null && DateTime.now().difference(_cachedAt!) < _cacheTtl;
 
- @override
+  @override
   void onInit() {
     super.onInit();
 
-    if(_hasFreshCache){
+    if (_hasFreshCache) {
       saleList.value = List<Map<String, dynamic>>.from(_cache);
-    }else{
+    } else {
       onGetSaleList();
     }
   }
 
-  final SaleService service = SaleService();
-    final saleList = <Map<String, dynamic>> [].obs;
+  final SaleService service;
+  final saleList = <Map<String, dynamic>>[].obs;
 
-  final searchCtr = Get.put(SearchController());
+  final searchCtr = SearchController();
 
   List<Map<String, dynamic>> get filteredSaleList {
     final keyword = searchCtr.keyword.value.trim().toLowerCase();
@@ -57,69 +67,78 @@ class SaleListController extends GetxController{
     }).toList();
   }
 
-  void gotoSaleListDetail(Map<String, dynamic> sale){
+  void gotoSaleListDetail(Map<String, dynamic> sale) {
     Get.toNamed(AppRoutes.saleListDetail, arguments: sale);
   }
 
-
-void onNewSale(){
+  void onNewSale() {
     Get.toNamed(AppRoutes.sale);
   }
 
-
-    Future <void> onGetSaleList() async{
-    try{
+  Future<void> onGetSaleList() async {
+    try {
       isLoading.value = true;
 
-    final resp =  await service.getSales();
+      final resp = await service.getSales();
 
-      if(resp is List){
+      if (resp is! List) throw const FormatException('Invalid sales response');
+      saleList.value = List<Map<String, dynamic>>.from(resp);
+      loadError.value = '';
 
-        saleList.value = List<Map<String, dynamic>>.from(resp);
-
-        _cache
-          ..clear()
-          ..addAll(saleList);
-        _cachedAt = DateTime.now();
-      }
-    }catch(e){
-      ToastWidget.show(
-        message: e.toString(),
-        type: ToastType.error,
-      );
-    }finally{
+      _cache
+        ..clear()
+        ..addAll(saleList);
+      _cachedAt = DateTime.now();
+    } catch (e) {
+      loadError.value = 'Unable to load sales. Please try again.';
+    } finally {
       isLoading.value = false;
     }
-  }  
+  }
 
-  Future<void> onDeleteSale(int saleId,BuildContext context) async{
-    showConfirmDialog(
-      context: context,
-      message: "Do you want to delete this sale?".tr,
-      onConfirm: () async {
-        try{
-          await service.deleteSale(saleId);
+  Future<void> onDeleteSale(int saleId, BuildContext context) async {
+    if (!deletingIds.add(saleId)) return;
+    final origin = ModalRoute.of(context);
+    var confirmed = false;
+    try {
+      await showConfirmDialog(
+        context: context,
+        message: "Do you want to delete this sale?".tr,
+        onConfirm: () async {
+          confirmed = true;
+          try {
+            await service.deleteSale(saleId);
+            invalidateCache();
 
-          Get.back();
+            if (context.mounted && (origin?.isCurrent ?? false)) {
+              Navigator.of(context).pop();
+            }
 
-          // Refresh category list
-          await onGetSaleList();
+            // Refresh recorded sales
+            await onGetSaleList();
 
-          ToastWidget.show(
-            message: "Category deleted successfully".tr,
-            type: ToastType.success,
-          );
+            ToastWidget.show(
+              message: "Sale deleted successfully".tr,
+              type: ToastType.success,
+            );
+          } catch (e) {
+            loadError.value = 'Unable to delete sale. Please try again.';
+          } finally {
+            deletingIds.remove(saleId);
+          }
+        },
+        onCancel: () {
+          deletingIds.remove(saleId);
+        },
+      );
+    } finally {
+      if (!confirmed) deletingIds.remove(saleId);
+    }
+  }
 
-        }catch(e){
-          ToastWidget.show(
-            message: e.toString(),
-            type: ToastType.error,
-          );
-        }
-      },
-      onCancel: () {
-        // Do nothing
-      },
-    );
+  @override
+  void onClose() {
+    searchCtr.onClose();
+    super.onClose();
   }
 }

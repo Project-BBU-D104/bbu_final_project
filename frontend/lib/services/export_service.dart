@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show rootBundle;
 
 import 'dart:io';
 import 'dart:typed_data';
@@ -55,21 +56,17 @@ class ExportService {
     // Excel opens the first sheet; drop the empty default sheet after
     // creating Report (delete() no-ops when only one sheet remains).
     excel.delete('Sheet1');
-    
+
     // Company letterhead
     for (final row in excelLetterHeadRows(letterhead)) {
       sheet.appendRow(row.map(_cellValue).toList());
     }
 
     // Add title
-    sheet.appendRow([
-      TextCellValue(title),
-    ]);
+    sheet.appendRow([TextCellValue(title)]);
 
     // Add headers
-    sheet.appendRow(
-      headers.map((e) => TextCellValue(e)).toList(),
-    );
+    sheet.appendRow(headers.map((e) => TextCellValue(e)).toList());
 
     // Add data
     for (final row in rows) {
@@ -97,7 +94,22 @@ class ExportService {
     LetterHeadData letterhead = defaultLetterHead,
     double? summaryTotal,
   }) async {
-    final pdf = pw.Document();
+    final hasKhmer = RegExp(
+      r'[\u1780-\u17ff]',
+    ).hasMatch([title, ...headers, ...rows.expand((row) => row)].join(' '));
+    final khmerFont = hasKhmer
+        ? pw.Font.ttf(await rootBundle.load('fonts/NotoSansKhmer.ttf'))
+        : null;
+    final pdf = pw.Document(
+      theme: khmerFont == null
+          ? null
+          : pw.ThemeData.withFont(
+              base: khmerFont,
+              bold: khmerFont,
+              italic: khmerFont,
+              boldItalic: khmerFont,
+            ),
+    );
     final letterheadWidget = await buildPdfLetterHead(
       title: title,
       data: letterhead,
@@ -116,14 +128,10 @@ class ExportService {
         footer: (context) {
           return pw.Container(
             alignment: pw.Alignment.centerRight,
-            margin: const pw.EdgeInsets.only(
-              top: 15,
-            ),
+            margin: const pw.EdgeInsets.only(top: 15),
             child: pw.Text(
               'Page ${context.pageNumber} of ${context.pagesCount}',
-              style: const pw.TextStyle(
-                fontSize: 9,
-              ),
+              style: const pw.TextStyle(fontSize: 9),
             ),
           );
         },
@@ -145,9 +153,7 @@ class ExportService {
                 color: PdfColors.blueGrey800,
               ),
 
-              cellStyle: const pw.TextStyle(
-                fontSize: 10,
-              ),
+              cellStyle: const pw.TextStyle(fontSize: 10),
 
               cellAlignment: pw.Alignment.centerLeft,
 
@@ -209,11 +215,7 @@ class ExportService {
     required List<String> headers,
     required List<List<dynamic>> rows,
   }) async {
-    final bytes = await generatePdf(
-      title: title,
-      headers: headers,
-      rows: rows,
-    );
+    final bytes = await generatePdf(title: title, headers: headers, rows: rows);
 
     await Printing.layoutPdf(
       onLayout: (format) async => bytes,
@@ -230,11 +232,7 @@ class ExportService {
     required List<String> headers,
     required List<List<dynamic>> rows,
   }) async {
-    final bytes = await generatePdf(
-      title: title,
-      headers: headers,
-      rows: rows,
-    );
+    final bytes = await generatePdf(title: title, headers: headers, rows: rows);
 
     await Printing.layoutPdf(
       onLayout: (format) async => bytes,
@@ -331,11 +329,6 @@ class ExportService {
   // ==========================================
 
   static String _safeName(String name) {
-    return name
-        .replaceAll(
-          RegExp(r'[<>:"/\\|?*]'),
-          '_',
-        )
-        .replaceAll(' ', '_');
+    return name.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_').replaceAll(' ', '_');
   }
 }

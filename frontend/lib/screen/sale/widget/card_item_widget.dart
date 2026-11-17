@@ -1,12 +1,10 @@
+import 'package:frontend/widget/app_cached_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/currency_formatter.dart';
+import 'package:get/get.dart';
 
 class CardItemWidget extends StatelessWidget {
-  final Map<String, dynamic> product;
-  final int quantity;
-  final Map<String, dynamic>? currency;
-  final VoidCallback onTap;
-
   const CardItemWidget({
     super.key,
     required this.product,
@@ -14,127 +12,72 @@ class CardItemWidget extends StatelessWidget {
     this.currency,
     required this.onTap,
   });
-
+  final Map<String, dynamic> product;
+  final int quantity;
+  final Map<String, dynamic>? currency;
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
     final photo = product['photo']?.toString() ?? '';
-    final price = double.tryParse(product['sale_price']?.toString() ?? '') ?? 0;
-    final stockQty = product['qty'] is num
-        ? (product['qty'] as num).toInt()
-        : int.tryParse(product['qty']?.toString() ?? '') ?? 0;
-
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: photo.isEmpty
-                      ? const Center(
-                          child: Icon(Icons.inventory_2_outlined, size: 44),
-                        )
-                      : Image.network(
-                          photo,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Center(
-                                child: Icon(
-                                  Icons.inventory_2_outlined,
-                                  size: 44,
-                                ),
-                              ),
-                        ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product['name']?.toString() ?? '',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+    return Semantics(
+      button: true,
+      label: 'Add @name, quantity @quantity'.trParams({
+        'name': product['name']?.toString() ?? '',
+        'quantity': '$quantity',
+      }),
+      child: Card(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTokens.radiusCard),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: LayoutBuilder(
+              builder: (context, bounds) => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (bounds.hasBoundedHeight)
+                    Expanded(
+                      child: AppCachedImage(
+                        url: photo,
+                        fit: BoxFit.contain,
+                        fallbackIcon: Icons.inventory_2_outlined,
                       ),
-                      const SizedBox(height: 4),
-                      Text(CurrencyFormatter.format(price, currency)),
-                    ],
+                    )
+                  else
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: AppCachedImage(
+                        url: photo,
+                        fit: BoxFit.contain,
+                        fallbackIcon: Icons.inventory_2_outlined,
+                      ),
+                    ),
+                  Text(
+                    product['name']?.toString() ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                  Text(
+                    CurrencyFormatter.format(
+                      double.tryParse(
+                            product['sale_price']?.toString() ?? '',
+                          ) ??
+                          0,
+                      currency,
+                    ),
+                  ),
+                  if ((double.tryParse(product['qty']?.toString() ?? '') ??
+                          0) <=
+                      0)
+                    Text('Sold out'.tr),
+                  Text(
+                    'Quantity: @quantity'.trParams({'quantity': '$quantity'}),
+                  ),
+                ],
+              ),
             ),
-            if (stockQty <= 0)
-              Positioned(
-                top: 8,
-                left: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE53935),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    'Sold out',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            if (quantity > 0)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  constraints: const BoxConstraints(
-                    minWidth: 28,
-                    minHeight: 28,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 7),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00C896),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    '$quantity',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
       ),
     );

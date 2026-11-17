@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/widget/app_cached_image.dart';
@@ -5,7 +6,8 @@ import 'package:frontend/widget/bottom_sheets.dart';
 import 'package:get/get.dart';
 
 class SelectCustomerCardWidget extends StatelessWidget {
-  SelectCustomerCardWidget({super.key});
+  SelectCustomerCardWidget({super.key, this.enabled = true});
+  final bool enabled;
 
   final SaleController ctr = Get.find<SaleController>();
 
@@ -15,13 +17,15 @@ class SelectCustomerCardWidget extends StatelessWidget {
     return Card(
       color: theme.cardColor,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => AppBottomSheets.show<void>(
-          context,
-          child: _CustomerPicker(controller: ctr),
-        ),
+        borderRadius: BorderRadius.circular(AppTokens.radiusControl),
+        onTap: !enabled
+            ? null
+            : () => AppBottomSheets.show<void>(
+                context,
+                child: _CustomerPicker(controller: ctr),
+              ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Obx(() {
             final customer = ctr.selectedCustomer.value;
             return Row(
@@ -31,13 +35,13 @@ class SelectCustomerCardWidget extends StatelessWidget {
                   child: ClipOval(
                     child: AppCachedImage(
                       url: customer?['photo']?.toString(),
-                      width: 40,
-                      height: 40,
+                      width: AppTokens.controlHeight,
+                      height: AppTokens.controlHeight,
                       fallbackIcon: Icons.person_outline,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +52,7 @@ class SelectCustomerCardWidget extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         customer?['phone']?.toString() ??
                             'Please select a customer for this sale.'.tr,
@@ -101,9 +105,9 @@ class _CustomerPickerState extends State<_CustomerPicker> {
     final theme = Theme.of(context);
     final controller = widget.controller;
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.65,
+      height: MediaQuery.sizeOf(context).height * AppTokens.formMaxHeightFactor,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -122,18 +126,18 @@ class _CustomerPickerState extends State<_CustomerPicker> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search Customers'.tr,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppTokens.radiusControl),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Expanded(
               child: Obx(() {
                 if (controller.isCustomersLoading.value) {
@@ -155,7 +159,7 @@ class _CustomerPickerState extends State<_CustomerPicker> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('No customers found'.tr),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         TextButton(
                           onPressed: () => controller.loadCustomers(),
                           child: Text('Retry'.tr),
@@ -180,8 +184,8 @@ class _CustomerPickerState extends State<_CustomerPicker> {
                         child: ClipOval(
                           child: AppCachedImage(
                             url: customer['photo']?.toString(),
-                            width: 40,
-                            height: 40,
+                            width: AppTokens.controlHeight,
+                            height: AppTokens.controlHeight,
                             fallbackIcon: Icons.person_outline,
                           ),
                         ),

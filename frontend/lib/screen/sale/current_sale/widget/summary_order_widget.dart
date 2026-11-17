@@ -1,161 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/currency_formatter.dart';
+import 'package:get/get.dart';
 
 class SummaryOrderWidget extends StatelessWidget {
+  const SummaryOrderWidget({super.key, required this.subtotal, this.currency});
   final double subtotal;
   final Map<String, dynamic>? currency;
-
-  const SummaryOrderWidget({super.key, required this.subtotal, this.currency});
-
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final labelColor =
-        theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurface;
-    final valueColor =
-        theme.textTheme.bodyLarge?.color ?? theme.colorScheme.onSurface;
-    final greenColor = successColor;
-    final dividerColor = theme.dividerColor;
-
-    return Card(
-      color: theme.cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.dividerColor, width: 1),
+  Widget build(BuildContext context) => Card(
+    color: Theme.of(context).cardColor,
+    child: Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Order Summary'.tr),
+          Text(CurrencyFormatter.format(subtotal, currency)),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Order Summary',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: valueColor,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            _buildRow(
-              label: 'Items Subtotal',
-              value: CurrencyFormatter.format(subtotal, currency),
-              labelColor: labelColor,
-              valueColor: valueColor,
-            ),
-            const SizedBox(height: 12),
-            Divider(color: dividerColor, height: 1),
-            const SizedBox(height: 12),
-
-            _buildRow(
-              label: 'Tax',
-              value: CurrencyFormatter.format(0, currency),
-              labelColor: labelColor,
-              valueColor: valueColor,
-            ),
-            const SizedBox(height: 12),
-            Divider(color: dividerColor, height: 1),
-            const SizedBox(height: 12),
-
-            _buildRow(
-              label: 'Discount',
-              value: '-${CurrencyFormatter.format(0, currency)}',
-              labelColor: labelColor,
-              valueColor: greenColor,
-              icon: Icons.local_offer_outlined,
-            ),
-            const SizedBox(height: 16),
-            Divider(color: dividerColor, height: 1),
-            const SizedBox(height: 16),
-
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Total',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      CurrencyFormatter.format(subtotal, currency),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: greenColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRow({
-    required String label,
-    required String value,
-    required Color labelColor,
-    required Color valueColor,
-    String? badge,
-    Color? badgeBg,
-    IconData? icon,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Text(label, style: TextStyle(fontSize: 15, color: labelColor)),
-            if (icon != null) ...[
-              const SizedBox(width: 6),
-              Icon(icon, size: 16, color: labelColor),
-            ],
-            if (badge != null) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: badgeBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  badge,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF374151),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: valueColor,
-          ),
-        ),
-      ],
-    );
-  }
+    ),
+  );
 }

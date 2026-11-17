@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -293,19 +294,16 @@ void main() {
 
     final theme = Theme.of(tester.element(find.byType(SearchWidget)));
 
-    final searchBox = tester.widget<Container>(
-      find
-          .descendant(
-            of: find.byType(SearchWidget),
-            matching: find.byType(Container),
-          )
-          .first,
-    );
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.decoration!.fillColor, isNull);
+    expect(theme.inputDecorationTheme.filled, isTrue);
     expect(
-      (searchBox.decoration! as BoxDecoration).color,
-      theme.colorScheme.surface,
+      theme.inputDecorationTheme.fillColor,
+      Color.alphaBlend(
+        theme.colorScheme.onSurface.withValues(alpha: AppTokens.controlAlpha),
+        theme.cardColor,
+      ),
     );
-
     await tester.tap(find.byType(FilterWidget));
     await tester.pumpAndSettle();
 
