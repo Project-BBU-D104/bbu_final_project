@@ -66,7 +66,7 @@ Implementation and shared UI compliance repair are complete across the six route
 
 ## Verification — 2026-11-17
 
-- `flutter test --no-pub --reporter expanded`: **1,123 passed, one web-only test skipped, zero failures** after the compliance repair.
+- `flutter test --no-pub --reporter expanded`: **1,125 passed, one web-only test skipped, zero failures** after the compliance repair.
 - `flutter analyze --no-pub`: **17 pre-existing diagnostics**, none in changed Dart files. The command remains nonzero because those baseline diagnostics are still present.
 - `flutter build web --no-pub`: **exit 0**. Flutter reports existing Wasm dry-run warnings; the standard web build succeeds.
 - Explicit changed-file Dart formatting gate (excluding the pre-existing whole-locale-map formatting baseline): passed. `git diff --check`: passed. Generated platform-registrant churn from dependency preparation was restored.

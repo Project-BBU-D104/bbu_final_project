@@ -9,13 +9,56 @@ import 'package:frontend/screen/sale/widget/select_customer_card_widget.dart';
 import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/ui/app_empty_state.dart';
+import 'package:frontend/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class CurrentSaleWidget extends StatelessWidget {
   CurrentSaleWidget({super.key});
-  final ctr = Get.find<SaleController>();
+  final SaleController? _controller = Get.isRegistered<SaleController>()
+      ? Get.find<SaleController>()
+      : null;
+  SaleController get ctr => _controller!;
   @override
-  Widget build(BuildContext context) => Obx(
+  Widget build(BuildContext context) {
+    if (_controller == null) {
+      void backToProducts() {
+        if (Navigator.of(context).canPop()) {
+          Get.back();
+        } else {
+          Get.offNamed(AppRoutes.sale);
+        }
+      }
+
+      return Scaffold(
+        appBar: DesktopAppShell.isVisible(context)
+            ? null
+            : CustomAppBar(title: 'Current Sale', onBack: backToProducts),
+        body: AppPage(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const AppPageHeader(title: 'Current Sale'),
+                const SizedBox(height: AppSpacing.lg),
+                const AppEmptyState(
+                  message: 'No products selected',
+                  icon: Icons.shopping_cart_outlined,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                OutlinedButton(
+                  onPressed: backToProducts,
+                  child: Text('Back to products'.tr),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    return _cart(context);
+  }
+
+  Widget _cart(BuildContext context) => Obx(
     () => PopScope(
       canPop: !ctr.checkoutBusy,
       child: Scaffold(

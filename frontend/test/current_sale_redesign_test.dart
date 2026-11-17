@@ -6,6 +6,7 @@ import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/ui/app_form.dart';
+import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/screen/sale/current_sale/widget/current_sale_item_widget.dart';
 import 'package:frontend/screen/sale/current_sale/widget/summary_order_widget.dart';
 import 'package:frontend/screen/payment/sale_with_payment/widget/payment_method_card_widget.dart';
@@ -110,6 +111,41 @@ void main() {
   });
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  testWidgets('cold current sale entry recovers without a controller', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      GetMaterialApp(
+        translations: AppTranslation(),
+        locale: const Locale('en', 'US'),
+        initialRoute: '/current-sale',
+        getPages: [
+          GetPage(name: '/current-sale', page: () => CurrentSaleWidget()),
+          GetPage(
+            name: '/sale',
+            page: () => const Scaffold(body: Text('Products recovery')),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(AppPage), findsOneWidget);
+    expect(find.byType(AppPageHeader), findsOneWidget);
+    expect(find.text('No products selected'), findsOneWidget);
+    expect(
+      tester
+          .widget<OutlinedButton>(
+            find.widgetWithText(OutlinedButton, 'Back to products'),
+          )
+          .onPressed,
+      isNotNull,
+    );
+    await tester.tap(find.text('Back to products'));
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, '/sale');
+    expect(find.text('Products recovery'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('customer section updates late lookup failures and recovery', (
     tester,
   ) async {

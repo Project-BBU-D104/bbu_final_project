@@ -19,10 +19,17 @@ class CardItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final photo = product['photo']?.toString() ?? '';
+    final price = CurrencyFormatter.format(
+      double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
+      currency,
+    );
+    final soldOut =
+        (double.tryParse(product['qty']?.toString() ?? '') ?? 0) <= 0;
     return Semantics(
       button: true,
       excludeSemantics: true,
       onTap: onTap,
+      value: [price, if (soldOut) 'Sold out'.tr].join(', '),
       label: 'Add @name, quantity @quantity'.trParams({
         'name': product['name']?.toString() ?? '',
         'quantity': '$quantity',
@@ -57,14 +64,8 @@ class CardItemWidget extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              Text(
-                CurrencyFormatter.format(
-                  double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
-                  currency,
-                ),
-              ),
-              if ((double.tryParse(product['qty']?.toString() ?? '') ?? 0) <= 0)
-                Text('Sold out'.tr),
+              Text(price),
+              if (soldOut) Text('Sold out'.tr),
               Text('Quantity: @quantity'.trParams({'quantity': '$quantity'})),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' show SemanticsAction;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
@@ -18,6 +19,26 @@ class SellingController extends SaleController {
 void main() {
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  testWidgets(
+    'product button announces price and stock without duplicate actions',
+    (tester) async {
+      final ctr = Get.put<SaleController>(SellingController());
+      ctr.currency.value = {'symbol': r'$', 'code': 'USD'};
+      ctr.categories.add({
+        'name': 'Drinks',
+        'products': [saleProductJson(1, 'Water')],
+      });
+      await pumpSalesPage(tester, SaleScreen(), size: const Size(1440, 900));
+      final button = find.bySemanticsLabel('Add Water, quantity 0');
+      expect(button, findsOneWidget);
+      final semantics = tester.getSemantics(button).getSemanticsData();
+      expect(semantics.value, contains(r'$5.00'));
+      expect(semantics.value, contains('Sold out'));
+      final node = tester.getSemantics(button);
+      expect(semantics.hasAction(SemanticsAction.tap), isTrue);
+      expect(node.childrenCount, 0);
+    },
+  );
   testWidgets(
     'compact landscape Khmer products keep cart action reachable at 2x',
     (tester) async {
