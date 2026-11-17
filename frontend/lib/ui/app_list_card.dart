@@ -3,10 +3,11 @@ import 'package:frontend/ui/app_tokens.dart';
 
 /// The shared list row: a flat card with a hairline border.
 class AppListCard extends StatelessWidget {
-  const AppListCard({super.key, required this.child, this.onTap});
+  const AppListCard({super.key, required this.child, this.onTap, this.margin});
 
   final Widget child;
   final VoidCallback? onTap;
+  final EdgeInsetsGeometry? margin;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class AppListCard extends StatelessWidget {
     return Card(
       elevation: 0,
       color: theme.cardColor,
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      margin: margin ?? const EdgeInsets.only(bottom: AppSpacing.lg),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTokens.radiusCard),
         side: BorderSide(
