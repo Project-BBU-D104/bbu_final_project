@@ -1,3 +1,5 @@
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/payment_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -17,6 +19,9 @@ class PaymentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    appBar: DesktopAppShell.isVisible(context)
+        ? null
+        : CustomAppBar(title: 'Payment', onBack: () => _back(context)),
     body: AppPage(
       child: LayoutBuilder(
         builder: (context, bounds) => RefreshIndicator(
@@ -42,26 +47,28 @@ class PaymentScreen extends StatelessWidget {
                     children: [
                       AppPageHeader(
                         title: 'Payment',
-                        leading: IconButton(
-                          tooltip: 'Back'.tr,
-                          onPressed: () => Navigator.of(context).canPop()
-                              ? Get.back()
-                              : Get.offNamed(AppRoutes.home),
-                          icon: const Icon(Icons.arrow_back),
-                        ),
+                        compactActionsAlignment: Alignment.centerLeft,
+                        leading: DesktopAppShell.isVisible(context)
+                            ? IconButton.outlined(
+                                tooltip: 'Back'.tr,
+                                onPressed: () => _back(context),
+                                icon: const Icon(Icons.arrow_back),
+                              )
+                            : null,
                         actions: Wrap(
                           spacing: AppSpacing.md,
                           runSpacing: AppSpacing.md,
                           children: [
                             Obx(
-                              () => FilledButton(
+                              () => FilledButton.icon(
                                 onPressed: ctr.isOpeningForm.value
                                     ? null
                                     : () => ctr.addPayment(context),
-                                child: Text('Add Payment'.tr),
+                                icon: const Icon(Icons.add),
+                                label: Text('Add Payment'.tr),
                               ),
                             ),
-                            IconButton(
+                            IconButton.outlined(
                               tooltip: 'Refresh'.tr,
                               onPressed: ctr.onRefresh,
                               icon: const Icon(Icons.refresh),
@@ -140,4 +147,7 @@ class PaymentScreen extends StatelessWidget {
       ),
     ),
   );
+  void _back(BuildContext context) => Navigator.of(context).canPop()
+      ? Get.back()
+      : Get.offNamed(AppRoutes.home);
 }

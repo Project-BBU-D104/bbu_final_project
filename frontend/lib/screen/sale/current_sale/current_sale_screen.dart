@@ -1,3 +1,5 @@
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/screen/payment/sale_with_payment/widget/payment_method_card_widget.dart';
@@ -17,6 +19,14 @@ class CurrentSaleWidget extends StatelessWidget {
     () => PopScope(
       canPop: !ctr.checkoutBusy,
       child: Scaffold(
+        appBar: DesktopAppShell.isVisible(context)
+            ? null
+            : CustomAppBar(
+                title: 'Current Sale',
+                onBack: () {
+                  if (!ctr.checkoutBusy) Get.back();
+                },
+              ),
         body: AppPage(
           child: SingleChildScrollView(
             child: Column(

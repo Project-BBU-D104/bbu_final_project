@@ -11,6 +11,8 @@ import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/locator.dart';
 import 'package:frontend/services/storage_service.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
+import 'package:frontend/ui/app_page.dart';
 import 'sales_management_test_support.dart';
 import 'payment_crud_test.dart' as fixtures;
 
@@ -83,6 +85,16 @@ void main() {
                 ),
               );
               await tester.pumpAndSettle();
+              expect(
+                find.byType(CustomAppBar),
+                size.width >= 840 ? findsNothing : findsOneWidget,
+              );
+              expect(
+                tester
+                    .widget<AppPageHeader>(find.byType(AppPageHeader))
+                    .leading,
+                size.width >= 840 ? isNotNull : isNull,
+              );
               expect(tester.takeException(), isNull);
             },
           );

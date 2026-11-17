@@ -7,6 +7,7 @@ import 'package:frontend/screen/sale/widget/payment_success_widget.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'sale_test_support.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
@@ -76,6 +77,7 @@ void main() {
     await tester.tap(find.textContaining('Continue'));
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/current-sale');
+    expect(find.byType(CustomAppBar), findsOneWidget);
     await tester.ensureVisible(find.text('Back to products'));
     await tester.tap(find.text('Back to products'));
     await tester.pumpAndSettle();

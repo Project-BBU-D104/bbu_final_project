@@ -1,3 +1,5 @@
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -17,6 +19,9 @@ class SaleListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    appBar: DesktopAppShell.isVisible(context)
+        ? null
+        : CustomAppBar(title: 'Sale List', onBack: () => _back(context)),
     body: AppPage(
       child: LayoutBuilder(
         builder: (context, bounds) => RefreshIndicator(
@@ -42,22 +47,24 @@ class SaleListScreen extends StatelessWidget {
                     children: [
                       AppPageHeader(
                         title: 'Sale List',
-                        leading: IconButton(
-                          tooltip: 'Back'.tr,
-                          onPressed: () => Navigator.of(context).canPop()
-                              ? Get.back()
-                              : Get.offNamed(AppRoutes.home),
-                          icon: const Icon(Icons.arrow_back),
-                        ),
+                        compactActionsAlignment: Alignment.centerLeft,
+                        leading: DesktopAppShell.isVisible(context)
+                            ? IconButton.outlined(
+                                tooltip: 'Back'.tr,
+                                onPressed: () => _back(context),
+                                icon: const Icon(Icons.arrow_back),
+                              )
+                            : null,
                         actions: Wrap(
                           spacing: AppSpacing.md,
                           runSpacing: AppSpacing.md,
                           children: [
-                            FilledButton(
+                            FilledButton.icon(
                               onPressed: ctr.onNewSale,
-                              child: Text('New Sale'.tr),
+                              icon: const Icon(Icons.add),
+                              label: Text('New Sale'.tr),
                             ),
-                            IconButton(
+                            IconButton.outlined(
                               tooltip: 'Refresh'.tr,
                               onPressed: ctr.onRefresh,
                               icon: const Icon(Icons.refresh),
@@ -132,4 +139,7 @@ class SaleListScreen extends StatelessWidget {
       ),
     ),
   );
+  void _back(BuildContext context) => Navigator.of(context).canPop()
+      ? Get.back()
+      : Get.offNamed(AppRoutes.home);
 }

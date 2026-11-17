@@ -1,3 +1,5 @@
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/report_export_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -31,7 +33,17 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
         : null;
     final date = DateTime.tryParse(receipt['payment_date']?.toString() ?? '');
     final rows = _receiptRows(receipt, currency, date);
+    void returnToSale() =>
+        Get.offNamedUntil(AppRoutes.sale, ModalRoute.withName(AppRoutes.home));
     return Scaffold(
+      appBar: DesktopAppShell.isVisible(context)
+          ? null
+          : CustomAppBar(
+              title: receipt.isEmpty
+                  ? 'Receipt unavailable'
+                  : 'Payment successful',
+              onBack: returnToSale,
+            ),
       body: AppPage(
         child: SingleChildScrollView(
           child: Column(
@@ -83,10 +95,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                   ),
                 ),
               OutlinedButton(
-                onPressed: () => Get.offNamedUntil(
-                  AppRoutes.sale,
-                  ModalRoute.withName(AppRoutes.home),
-                ),
+                onPressed: returnToSale,
                 child: Text('Back to Sale'.tr),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -15,20 +16,22 @@ class SaleScreen extends StatelessWidget {
   final ctr = Get.find<SaleController>();
   @override
   Widget build(BuildContext context) => Scaffold(
+    appBar: DesktopAppShell.isVisible(context)
+        ? null
+        : CustomAppBar(title: 'Sale', onBack: () => _back(context)),
     body: AppPage(
       child: Column(
         children: [
           AppPageHeader(
             title: 'Sale',
+            compactActionsAlignment: Alignment.centerLeft,
             leading: DesktopAppShell.isVisible(context)
-                ? null
-                : IconButton(
+                ? IconButton.outlined(
                     tooltip: 'Back'.tr,
-                    onPressed: () => Navigator.of(context).canPop()
-                        ? Get.back()
-                        : Get.offNamed(AppRoutes.home),
+                    onPressed: () => _back(context),
                     icon: const Icon(Icons.arrow_back),
-                  ),
+                  )
+                : null,
           ),
           const SizedBox(height: AppSpacing.lg),
           AppSearchField(
@@ -141,6 +144,10 @@ class SaleScreen extends StatelessWidget {
       ),
     ),
   );
+  void _back(BuildContext context) => Navigator.of(context).canPop()
+      ? Get.back()
+      : Get.offNamed(AppRoutes.home);
+
   Widget _tile(Map<String, dynamic> product) => Obx(
     () => CardItemWidget(
       product: product,

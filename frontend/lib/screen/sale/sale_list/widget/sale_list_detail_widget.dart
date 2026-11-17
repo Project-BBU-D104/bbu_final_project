@@ -1,3 +1,6 @@
+import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/screen/home/desktop_app_shell.dart';
+import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/screen/sale/sale_presentation.dart';
@@ -24,16 +27,35 @@ class SaleListDetailWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sale = saleMap(Get.arguments);
+    final desktop = DesktopAppShell.isVisible(context);
+    void back() {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else {
+        Get.offNamed(AppRoutes.home);
+      }
+    }
+
+    final backControl = desktop
+        ? IconButton.outlined(
+            tooltip: 'Back'.tr,
+            onPressed: back,
+            icon: const Icon(Icons.arrow_back),
+          )
+        : null;
     if (sale.isEmpty) {
       return Scaffold(
+        appBar: desktop ? null : CustomAppBar(title: 'Sale', onBack: back),
         body: AppPage(
           child: ListView(
             children: [
-              const AppEmptyState(message: 'Sale details are unavailable.'),
-              TextButton(
-                onPressed: () => Navigator.maybePop(context),
-                child: Text('Back'.tr),
+              AppPageHeader(
+                title: 'Sale',
+                leading: backControl,
+                compactActionsAlignment: Alignment.centerLeft,
               ),
+              const AppEmptyState(message: 'Sale details are unavailable.'),
+              TextButton(onPressed: back, child: Text('Back'.tr)),
             ],
           ),
         ),
@@ -96,6 +118,7 @@ class SaleListDetailWidget extends StatelessWidget {
       ),
     );
     return Scaffold(
+      appBar: desktop ? null : CustomAppBar(title: 'Sale', onBack: back),
       body: AppPage(
         child: SingleChildScrollView(
           child: Column(
@@ -103,21 +126,19 @@ class SaleListDetailWidget extends StatelessWidget {
             children: [
               AppPageHeader(
                 title: 'Sale',
-                leading: IconButton(
-                  tooltip: 'Back'.tr,
-                  onPressed: () => Navigator.maybePop(context),
-                  icon: const Icon(Icons.arrow_back),
-                ),
+                leading: backControl,
+                compactActionsAlignment: Alignment.centerLeft,
                 actions: Wrap(
                   spacing: AppSpacing.md,
                   runSpacing: AppSpacing.md,
                   children: [
                     Obx(
-                      () => FilledButton(
+                      () => FilledButton.icon(
                         onPressed: ctr.deletingIds.isEmpty
                             ? ctr.onNewSale
                             : null,
-                        child: Text('New Sale'.tr),
+                        icon: const Icon(Icons.add),
+                        label: Text('New Sale'.tr),
                       ),
                     ),
                     Obx(
