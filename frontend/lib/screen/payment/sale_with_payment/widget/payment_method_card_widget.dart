@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/app_tokens.dart';
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:get/get.dart';
 
 class PaymentMethodCardWidget extends StatelessWidget {
@@ -21,57 +21,55 @@ class PaymentMethodCardWidget extends StatelessWidget {
   final VoidCallback? onRetry;
   final bool enabled;
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if ((loadError?.isNotEmpty ?? false) ||
-              (!isLoading && paymentTypes.isEmpty)) ...[
-            Text(
-              loadError?.isNotEmpty == true
-                  ? loadError!
-                  : 'No payment types available'.tr,
-            ),
-            TextButton(
-              onPressed: enabled ? onRetry : null,
-              child: Text('Retry'.tr),
-            ),
-          ],
-          DropdownButtonFormField<int>(
-            key: ValueKey(selectedPaymentType?['id']),
-            itemHeight: null,
-            isExpanded: true,
-            initialValue:
-                paymentTypes.any((p) => p['id'] == selectedPaymentType?['id'])
-                ? (selectedPaymentType?['id'] as int?)
-                : null,
-            decoration: InputDecoration(labelText: 'Payment Method'.tr),
-            hint: Text(
-              (isLoading
-                      ? 'Loading payment types...'
-                      : paymentTypes.isEmpty
-                      ? 'No payment types available'
-                      : 'Select payment type')
-                  .tr,
-            ),
-            items: paymentTypes
-                .map(
-                  (p) => DropdownMenuItem<int>(
-                    value: p['id'],
-                    child: Text(p['name']?.toString() ?? ''),
-                  ),
-                )
-                .toList(),
-            onChanged: isLoading || !enabled
-                ? null
-                : (id) => onChanged(
-                    paymentTypes.firstWhereOrNull((p) => p['id'] == id),
-                  ),
+  Widget build(BuildContext context) => AppSectionCard(
+    title: 'Payment Method',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if ((loadError?.isNotEmpty ?? false) ||
+            (!isLoading && paymentTypes.isEmpty)) ...[
+          Text(
+            loadError?.isNotEmpty == true
+                ? loadError!
+                : 'No payment types available'.tr,
+          ),
+          TextButton(
+            onPressed: enabled ? onRetry : null,
+            child: Text('Retry'.tr),
           ),
         ],
-      ),
+        DropdownButtonFormField<int>(
+          key: ValueKey(selectedPaymentType?['id']),
+          itemHeight: null,
+          isExpanded: true,
+          initialValue:
+              paymentTypes.any((p) => p['id'] == selectedPaymentType?['id'])
+              ? (selectedPaymentType?['id'] as int?)
+              : null,
+
+          hint: Text(
+            (isLoading
+                    ? 'Loading payment types...'
+                    : paymentTypes.isEmpty
+                    ? 'No payment types available'
+                    : 'Select payment type')
+                .tr,
+          ),
+          items: paymentTypes
+              .map(
+                (p) => DropdownMenuItem<int>(
+                  value: p['id'],
+                  child: Text(p['name']?.toString() ?? ''),
+                ),
+              )
+              .toList(),
+          onChanged: isLoading || !enabled
+              ? null
+              : (id) => onChanged(
+                  paymentTypes.firstWhereOrNull((p) => p['id'] == id),
+                ),
+        ),
+      ],
     ),
   );
 }

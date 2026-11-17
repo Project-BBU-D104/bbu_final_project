@@ -22,24 +22,6 @@ class SaleScreen extends StatelessWidget {
     body: AppPage(
       child: Column(
         children: [
-          AppPageHeader(
-            title: 'Sale',
-            compactActionsAlignment: Alignment.centerLeft,
-            leading: DesktopAppShell.isVisible(context)
-                ? IconButton.outlined(
-                    tooltip: 'Back'.tr,
-                    onPressed: () => _back(context),
-                    icon: const Icon(Icons.arrow_back),
-                  )
-                : null,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          AppSearchField(
-            title: 'Search',
-            showScan: true,
-            searchController: ctr.searchCtr,
-          ),
-          const SizedBox(height: AppSpacing.lg),
           Expanded(
             child: LayoutBuilder(
               builder: (context, bounds) => Obx(() {
@@ -57,6 +39,31 @@ class SaleScreen extends StatelessWidget {
                         AppTokens.tableMaxScaledBodySize;
                 return CustomScrollView(
                   slivers: [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AppPageHeader(
+                            title: 'Sale',
+                            compactActionsAlignment: Alignment.centerLeft,
+                            leading: DesktopAppShell.isVisible(context)
+                                ? IconButton.outlined(
+                                    tooltip: 'Back'.tr,
+                                    onPressed: () => _back(context),
+                                    icon: const Icon(Icons.arrow_back),
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppSearchField(
+                            title: 'Search',
+                            showScan: true,
+                            searchController: ctr.searchCtr,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                        ],
+                      ),
+                    ),
                     if (ctr.isLoading.value && ctr.categories.isEmpty)
                       const SliverToBoxAdapter(
                         child: Center(child: CircularProgressIndicator()),

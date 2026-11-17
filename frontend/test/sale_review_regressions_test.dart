@@ -59,6 +59,9 @@ void main() {
     expect(ctr.totalItems, 1);
     expect(ctr.selectedCustomer.value?['id'], 1);
     expect(ctr.selectedPaymentType.value?['id'], 1);
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, route);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(Get.currentRoute, route);
@@ -155,7 +158,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('New'), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    final decrease = find.byTooltip('Decrease quantity');
+    await tester.ensureVisible(decrease);
+    Focus.of(
+      tester.element(
+        find.descendant(of: decrease, matching: find.byType(Icon)),
+      ),
+    ).requestFocus();
+    await tester.pump();
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
     expect(ctr.totalItems, 0);

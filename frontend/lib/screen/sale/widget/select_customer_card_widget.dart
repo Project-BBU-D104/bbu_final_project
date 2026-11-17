@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
@@ -13,62 +14,45 @@ class SelectCustomerCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      color: theme.cardColor,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTokens.radiusControl),
-        onTap: !enabled
-            ? null
-            : () => AppBottomSheets.show<void>(
-                context,
-                child: _CustomerPicker(controller: ctr),
+    return InkWell(
+      onTap: !enabled
+          ? null
+          : () => AppBottomSheets.show<void>(
+              context,
+              child: _CustomerPicker(controller: ctr),
+            ),
+      child: Obx(() {
+        final customer = ctr.selectedCustomer.value;
+        return Row(
+          children: [
+            CircleAvatar(
+              child: ClipOval(
+                child: AppCachedImage(
+                  url: customer?['photo']?.toString(),
+                  width: AppTokens.controlHeight,
+                  height: AppTokens.controlHeight,
+                  fallbackIcon: Icons.person_outline,
+                ),
               ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Obx(() {
-            final customer = ctr.selectedCustomer.value;
-            return Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  child: ClipOval(
-                    child: AppCachedImage(
-                      url: customer?['photo']?.toString(),
-                      width: AppTokens.controlHeight,
-                      height: AppTokens.controlHeight,
-                      fallbackIcon: Icons.person_outline,
-                    ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(customer?['name']?.toString() ?? 'Select Customer'.tr),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    customer?['phone']?.toString() ??
+                        'Please select a customer for this sale.'.tr,
                   ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        customer?['name']?.toString() ?? 'Select Customer'.tr,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        customer?['phone']?.toString() ??
-                            'Please select a customer for this sale.'.tr,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.expand_more),
-              ],
-            );
-          }),
-        ),
-      ),
+                ],
+              ),
+            ),
+            const Icon(Icons.expand_more),
+          ],
+        );
+      }),
     );
   }
 }
@@ -102,7 +86,6 @@ class _CustomerPickerState extends State<_CustomerPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final controller = widget.controller;
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * AppTokens.formMaxHeightFactor,
@@ -114,9 +97,9 @@ class _CustomerPickerState extends State<_CustomerPicker> {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    'Select Customer'.tr,
-                    style: theme.textTheme.titleLarge,
+                  child: const AppFormSection(
+                    title: 'Select Customer',
+                    children: [],
                   ),
                 ),
                 IconButton(
@@ -132,9 +115,6 @@ class _CustomerPickerState extends State<_CustomerPicker> {
               decoration: InputDecoration(
                 hintText: 'Search Customers'.tr,
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTokens.radiusControl),
-                ),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -171,7 +151,7 @@ class _CustomerPickerState extends State<_CustomerPicker> {
 
                 return ListView.separated(
                   itemCount: customers.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  separatorBuilder: (_, _) => const Divider(),
                   itemBuilder: (context, index) {
                     final customer = customers[index];
                     final isSelected =
@@ -179,8 +159,6 @@ class _CustomerPickerState extends State<_CustomerPicker> {
                         customer['id'];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor:
-                            theme.colorScheme.surfaceContainerHighest,
                         child: ClipOval(
                           child: AppCachedImage(
                             url: customer['photo']?.toString(),
@@ -194,9 +172,7 @@ class _CustomerPickerState extends State<_CustomerPicker> {
                         customer['name']?.toString() ?? 'Customer'.tr,
                       ),
                       subtitle: Text(customer['phone']?.toString() ?? ''),
-                      trailing: isSelected
-                          ? Icon(Icons.check, color: theme.colorScheme.primary)
-                          : null,
+                      trailing: isSelected ? const Icon(Icons.check) : null,
                       onTap: () {
                         controller.selectCustomer(customer);
                         Navigator.pop(context);

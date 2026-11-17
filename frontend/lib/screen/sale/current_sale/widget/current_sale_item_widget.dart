@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -28,34 +29,30 @@ class CurrentSaleItemWidget extends StatelessWidget {
 
   final bool enabled;
   @override
-  Widget build(BuildContext context) => Card(
-    color: Theme.of(context).cardColor,
-    child: Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(productName),
-          Text(CurrencyFormatter.format(subtotal, currency)),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: AppSpacing.sm,
-            children: [
-              IconButton(
-                tooltip: 'Decrease quantity'.tr,
-                onPressed: enabled ? onDecrease : null,
-                icon: const Icon(Icons.remove),
-              ),
-              Text('$quantity'),
-              IconButton(
-                tooltip: 'Increase quantity'.tr,
-                onPressed: enabled ? onIncrease : null,
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
-        ],
-      ),
+  Widget build(BuildContext context) => AppListCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(productName),
+        Text(CurrencyFormatter.format(subtotal, currency)),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSpacing.sm,
+          children: [
+            IconButton(
+              tooltip: 'Decrease quantity'.tr,
+              onPressed: enabled ? onDecrease : null,
+              icon: const Icon(Icons.remove),
+            ),
+            Text('$quantity'),
+            IconButton(
+              tooltip: 'Increase quantity'.tr,
+              onPressed: enabled ? onIncrease : null,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+      ],
     ),
   );
 }

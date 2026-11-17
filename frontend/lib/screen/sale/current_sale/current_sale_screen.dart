@@ -1,3 +1,4 @@
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -65,21 +66,30 @@ class CurrentSaleWidget extends StatelessWidget {
                       final details = Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          IgnorePointer(
-                            ignoring: ctr.checkoutBusy,
-                            child: SelectCustomerCardWidget(
-                              enabled: !ctr.checkoutBusy,
+                          AppSectionCard(
+                            title: 'Customer',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                IgnorePointer(
+                                  ignoring: ctr.checkoutBusy,
+                                  child: SelectCustomerCardWidget(
+                                    enabled: !ctr.checkoutBusy,
+                                  ),
+                                ),
+                                if (ctr.customerLoadError.value.isNotEmpty)
+                                  Text(ctr.customerLoadError.value),
+                                if (ctr.customerLoadError.value.isNotEmpty)
+                                  TextButton(
+                                    onPressed: ctr.checkoutBusy
+                                        ? null
+                                        : ctr.loadCustomers,
+                                    child: Text('Retry'.tr),
+                                  ),
+                              ],
                             ),
                           ),
-                          if (ctr.customerLoadError.value.isNotEmpty)
-                            Text(ctr.customerLoadError.value),
-                          if (ctr.customerLoadError.value.isNotEmpty)
-                            TextButton(
-                              onPressed: ctr.checkoutBusy
-                                  ? null
-                                  : ctr.loadCustomers,
-                              child: Text('Retry'.tr),
-                            ),
+                          const SizedBox(height: AppSpacing.lg),
                           PaymentMethodCardWidget(
                             loadError: ctr.paymentTypesLoadError.value,
                             onRetry: ctr.loadPaymentTypes,
@@ -102,6 +112,7 @@ class CurrentSaleWidget extends StatelessWidget {
                                   : ctr.loadCurrency,
                               child: Text('Retry'.tr),
                             ),
+                          const SizedBox(height: AppSpacing.lg),
                           SummaryOrderWidget(
                             subtotal: ctr.subtotal,
                             currency: ctr.currency.value,
@@ -125,7 +136,13 @@ class CurrentSaleWidget extends StatelessWidget {
                           ],
                         );
                       }
-                      return Column(children: [items, details]);
+                      return Column(
+                        children: [
+                          items,
+                          const SizedBox(height: AppSpacing.lg),
+                          details,
+                        ],
+                      );
                     }),
                   ),
                 if (ctr.checkoutError.value.isNotEmpty)

@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
 import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_list_card.dart';
+import 'package:frontend/screen/sale/widget/card_item_widget.dart';
 import 'package:get/get.dart';
 import 'sale_test_support.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
@@ -16,6 +18,73 @@ class SellingController extends SaleController {
 void main() {
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  testWidgets(
+    'compact landscape Khmer products keep cart action reachable at 2x',
+    (tester) async {
+      final ctr = Get.put<SaleController>(SellingController());
+      final product = saleProductJson(
+        1,
+        'ទំនិញឈ្មោះវែងសម្រាប់ការលក់ និងការពិនិត្យ',
+      );
+      ctr.categories.add({
+        'name': 'Drinks',
+        'products': [product],
+      });
+      ctr.addProduct(product);
+      await pumpSalesPage(
+        tester,
+        SaleScreen(),
+        size: const Size(844, 390),
+        locale: const Locale('km', 'KH'),
+        textScale: 2,
+      );
+      await tester.scrollUntilVisible(
+        find.byType(CardItemWidget),
+        100,
+        scrollable: find
+            .descendant(
+              of: find.byType(CustomScrollView),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.ensureVisible(find.text(product['name'] as String));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(product['name'] as String).hitTestable(),
+        findsOneWidget,
+      );
+      expect(find.byType(FilledButton).hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets('product tiles use shared list surfaces', (tester) async {
+    final ctr = Get.put<SaleController>(SellingController());
+    ctr.categories.add({
+      'name': 'Drinks',
+      'products': [saleProductJson(1, 'Water')],
+    });
+    await pumpSalesPage(tester, SaleScreen(), size: const Size(1440, 900));
+    final tile = find.byType(CardItemWidget);
+    expect(
+      find.descendant(of: tile, matching: find.byType(AppListCard)),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<AppListCard>(
+            find.descendant(of: tile, matching: find.byType(AppListCard)),
+          )
+          .margin,
+      EdgeInsets.zero,
+    );
+    await tester.tap(tile);
+    await tester.pump();
+    expect(ctr.totalItems, 1);
+    expect(ctr.subtotal, 5);
+    expect(find.bySemanticsLabel('Add Water, quantity 1'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('exact barcode and clear-search keep selected quantities', (
     tester,
   ) async {
