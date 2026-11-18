@@ -5,7 +5,7 @@ import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/screen/user/widget/add_user_widget.dart';
 import 'package:frontend/screen/user/widget/edit_user_widget.dart';
 import 'package:frontend/services/main_service/user_service.dart';
-import 'package:frontend/widget/bottom_sheets.dart';
+import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
@@ -130,32 +130,9 @@ class UserController extends GetxController {
     if (_formOpen) return;
     _formOpen = true;
     clearUser();
-    _showUserForm(context, const AddUserWidget()).whenComplete(() {
+    AppFormShell.show(context, const AddUserWidget()).whenComplete(() {
       _formOpen = false;
     });
-  }
-
-  Future<void> _showUserForm(BuildContext context, Widget child) {
-    if (MediaQuery.sizeOf(context).width >= 840) {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => Dialog(
-          insetPadding: const EdgeInsets.all(32),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760, maxHeight: 760),
-            child: child,
-          ),
-        ),
-      );
-    }
-
-    return AppBottomSheets.show<void>(
-      context,
-      child: child,
-      isDismissible: false,
-      enableDrag: false,
-    );
   }
 
   Future<void> onSaveUser(BuildContext context) async {
@@ -228,7 +205,7 @@ class UserController extends GetxController {
           ?.toString();
       isChecked.value = user["is_active"] != true;
       if (!context.mounted) return;
-      await _showUserForm(context, EditUserWidget(userId: userId));
+      await AppFormShell.show(context, EditUserWidget(userId: userId));
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {

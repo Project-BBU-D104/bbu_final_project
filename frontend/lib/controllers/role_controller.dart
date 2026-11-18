@@ -3,7 +3,7 @@ import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/screen/role/widget/add_role_widget.dart';
 import 'package:frontend/screen/role/widget/edit_role_widget.dart';
 import 'package:frontend/services/main_service/role_service.dart';
-import 'package:frontend/widget/bottom_sheets.dart';
+import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controllers/search_controller.dart';
@@ -106,32 +106,9 @@ class RoleController extends GetxController {
     if (_formOpen) return;
     _formOpen = true;
     clearRole();
-    _showRoleForm(context, const AddRoleWidget()).whenComplete(() {
+    AppFormShell.show(context, const AddRoleWidget()).whenComplete(() {
       _formOpen = false;
     });
-  }
-
-  Future<void> _showRoleForm(BuildContext context, Widget child) {
-    if (MediaQuery.sizeOf(context).width >= 840) {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => Dialog(
-          insetPadding: const EdgeInsets.all(32),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 680, maxHeight: 680),
-            child: child,
-          ),
-        ),
-      );
-    }
-
-    return AppBottomSheets.show<void>(
-      context,
-      child: child,
-      isDismissible: false,
-      enableDrag: false,
-    );
   }
 
   Future<void> onSaveRole() async {
@@ -183,7 +160,7 @@ class RoleController extends GetxController {
       roleNameController.text = role["name"]?.toString() ?? "";
       roleDescriptionController.text = role["description"]?.toString() ?? "";
       isActive.value = role["is_active"] == true;
-      await _showRoleForm(context, EditRoleWidget(roleId: roleId));
+      await AppFormShell.show(context, EditRoleWidget(roleId: roleId));
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);
     } finally {

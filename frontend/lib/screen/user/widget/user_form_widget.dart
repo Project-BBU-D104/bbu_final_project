@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/role_controller.dart';
 import 'package:frontend/controllers/user_controller.dart';
+import 'package:frontend/ui/app_form.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/image_upload_widget.dart';
 import 'package:get/get.dart';
 
@@ -17,151 +18,112 @@ class UserFormWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Obx(
-      () => PopScope(
-        canPop: !ctr.isLoading.value,
+    return Obx(() {
+      final saving = ctr.isLoading.value;
+      return PopScope(
+        canPop: !saving,
         child: Material(
           color: theme.cardColor,
           child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 720),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    24,
-                    24,
-                    24,
-                    MediaQuery.viewInsetsOf(context).bottom + 24,
-                  ),
-                  child: Form(
-                    key: ctr.key,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _header(context),
-                        _section(
-                          title: 'Account details'.tr,
-                          children: [
-                            ImageUploadWidget(
-                              bucket: 'user',
-                              folder: 'users',
-                              imageUrl: ctr.userPhotoController.text,
-                              onUploaded: (url) =>
-                                  ctr.userPhotoController.text = url,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSpacing.xxl),
+                child: Form(
+                  key: ctr.key,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _header(context),
+                      const Divider(height: AppSpacing.xxl),
+                      AppFormSection(
+                        title: 'Account details',
+                        children: [
+                          ImageUploadWidget(
+                            bucket: 'user',
+                            folder: 'users',
+                            imageUrl: ctr.userPhotoController.text,
+                            onUploaded: (url) =>
+                                ctr.userPhotoController.text = url,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppFormField(
+                            label: 'Username',
+                            controller: ctr.userNameController,
+                            hint: 'Enter Username',
+                            enabled: !saving,
+                            maxLines: 1,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Please enter username'.tr
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          _pair(
+                            AppFormField(
+                              label: 'Email',
+                              controller: ctr.userEmailController,
+                              hint: 'Enter Email',
+                              keyboardType: TextInputType.emailAddress,
+                              enabled: !saving,
+                              maxLines: 1,
                             ),
-                            _field(
-                              context: context,
-                              label: 'Username'.tr,
-                              controller: ctr.userNameController,
-                              hint: 'Enter Username'.tr,
-                              required: true,
-                            ),
-                            LayoutBuilder(
-                              builder: (context, constraints) => Wrap(
-                                spacing: 16,
-                                runSpacing: 20,
-                                children: [
-                                  for (final field in [
-                                    _field(
-                                      context: context,
-                                      label: 'Email'.tr,
-                                      controller: ctr.userEmailController,
-                                      hint: 'Enter Email'.tr,
-                                      keyboardType: TextInputType.emailAddress,
-                                      bottomPadding: false,
-                                    ),
-                                    _field(
-                                      context: context,
-                                      label: 'Phone Number'.tr,
-                                      controller: ctr.userPhoneController,
-                                      hint: 'Enter Phone Number'.tr,
-                                      keyboardType: TextInputType.phone,
-                                      bottomPadding: false,
-                                    ),
-                                  ])
-                                    SizedBox(
-                                      width: constraints.maxWidth >= 560
-                                          ? (constraints.maxWidth - 16) / 2
-                                          : constraints.maxWidth,
-                                      child: field,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            _field(
-                              context: context,
-                              label: 'Password'.tr,
-                              controller: ctr.userPasswordController,
-                              hint: 'Enter Password'.tr,
-                              obscureText: true,
-                            ),
-                          ],
-                        ),
-                        _section(
-                          title: 'Access'.tr,
-                          children: [
-                            LayoutBuilder(
-                              builder: (context, constraints) => Wrap(
-                                spacing: 16,
-                                runSpacing: 20,
-                                children: [
-                                  for (final field in [
-                                    _roleField(context),
-                                    _configurationField(context),
-                                  ])
-                                    SizedBox(
-                                      width: constraints.maxWidth >= 560
-                                          ? (constraints.maxWidth - 16) / 2
-                                          : constraints.maxWidth,
-                                      child: field,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            Obx(
-                              () => CheckboxListTile(
-                                contentPadding: EdgeInsets.zero,
-                                value: ctr.isChecked.value,
-                                onChanged: ctr.isLoading.value
-                                    ? null
-                                    : (value) =>
-                                          ctr.isChecked.value = value ?? false,
-                                title: Text('Disable User'.tr),
-                                controlAffinity:
-                                    ListTileControlAffinity.leading,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: FilledButton(
-                            onPressed: ctr.isLoading.value
-                                ? null
-                                : () => _submit(context),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: successColor,
-                              foregroundColor: titleColor,
-                            ),
-                            child: Text(
-                              isEdit ? 'Update'.tr : 'Save'.tr,
-                              style: const TextStyle(fontSize: 17),
+                            AppFormField(
+                              label: 'Phone Number',
+                              controller: ctr.userPhoneController,
+                              hint: 'Enter Phone Number',
+                              keyboardType: TextInputType.phone,
+                              enabled: !saving,
+                              maxLines: 1,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppFormField(
+                            label: 'Password',
+                            controller: ctr.userPasswordController,
+                            hint: 'Enter Password',
+                            obscureText: true,
+                            enabled: !saving,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      AppFormSection(
+                        title: 'Access',
+                        children: [
+                          _pair(_roleField(), _configurationField()),
+                          Obx(
+                            () => CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: ctr.isChecked.value,
+                              onChanged: ctr.isLoading.value
+                                  ? null
+                                  : (value) =>
+                                        ctr.isChecked.value = value ?? false,
+                              title: Text('Disable User'.tr),
+                              controlAffinity: ListTileControlAffinity.leading,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      AppFormActions(
+                        saving: saving,
+                        saveLabel: isEdit ? 'Update' : 'Save',
+                        onCancel: () => Navigator.of(context).pop(),
+                        onSave: () => _submit(context),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _header(BuildContext context) {
@@ -172,7 +134,7 @@ class UserFormWidget extends StatelessWidget {
             isEdit ? 'Edit User'.tr : 'Add User'.tr,
             style: Theme.of(
               context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
         ),
         IconButton(
@@ -184,50 +146,25 @@ class UserFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _section({required String title, required List<Widget> children}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _pair(Widget first, Widget second) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Wrap(
+        spacing: AppSpacing.lg,
+        runSpacing: AppSpacing.lg,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 10),
-          ...children,
+          for (final field in [first, second])
+            SizedBox(
+              width: constraints.maxWidth >= AppTokens.bpFormPair
+                  ? (constraints.maxWidth - AppSpacing.lg) / 2
+                  : constraints.maxWidth,
+              child: field,
+            ),
         ],
       ),
     );
   }
 
-  Widget _field({
-    required BuildContext context,
-    required String label,
-    required TextEditingController controller,
-    required String hint,
-    bool required = false,
-    bool obscureText = false,
-    TextInputType? keyboardType,
-    bool bottomPadding = true,
-  }) {
-    final field = TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(labelText: label, hintText: hint),
-      validator: required
-          ? (value) => value == null || value.trim().isEmpty
-                ? 'Please enter username'.tr
-                : null
-          : null,
-    );
-    return bottomPadding
-        ? Padding(padding: const EdgeInsets.only(bottom: 12), child: field)
-        : field;
-  }
-
-  Widget _roleField(BuildContext context) {
+  Widget _roleField() {
     return Obx(
       () => DropdownButtonFormField<String>(
         isExpanded: true,
@@ -258,7 +195,7 @@ class UserFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _configurationField(BuildContext context) {
+  Widget _configurationField() {
     return Obx(
       () => DropdownButtonFormField<String>(
         isExpanded: true,
