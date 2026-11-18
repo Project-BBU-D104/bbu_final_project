@@ -27,6 +27,7 @@ void main() {
       'Unable to complete payment. Please try again.',
       'The sale may have been created. Check Sales before trying again.',
       'Add @name, quantity @quantity',
+      'Current Sale',
       'Back to products',
       'Payment successful',
       'Receipt unavailable',

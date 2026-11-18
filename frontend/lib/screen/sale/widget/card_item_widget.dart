@@ -1,6 +1,7 @@
 import 'package:frontend/widget/app_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/app_list_card.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 import 'package:get/get.dart';
 
@@ -38,37 +39,49 @@ class CardItemWidget extends StatelessWidget {
         margin: EdgeInsets.zero,
         onTap: onTap,
         child: LayoutBuilder(
-          builder: (context, bounds) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (bounds.hasBoundedHeight)
-                Expanded(
-                  child: AppCachedImage(
-                    url: photo,
-                    fit: BoxFit.contain,
-                    fallbackIcon: Icons.inventory_2_outlined,
-                  ),
-                )
-              else
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: AppCachedImage(
-                    url: photo,
-                    fit: BoxFit.contain,
-                    fallbackIcon: Icons.inventory_2_outlined,
-                  ),
-                ),
+          builder: (context, bounds) {
+            final grid = bounds.hasBoundedHeight;
+            final image = AppCachedImage(
+              url: photo,
+              fit: BoxFit.contain,
+              fallbackIcon: Icons.inventory_2_outlined,
+            );
+            final details = [
               Text(
                 product['name']?.toString() ?? '',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                maxLines: grid ? 2 : null,
+                overflow: grid ? TextOverflow.ellipsis : null,
               ),
               Text(price),
               if (soldOut) Text('Sold out'.tr),
               Text('Quantity: @quantity'.trParams({'quantity': '$quantity'})),
-            ],
-          ),
+            ];
+            if (grid) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: image),
+                  ...details,
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox.square(
+                  dimension: AppTokens.saleProductThumbnailSize,
+                  child: image,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: details,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

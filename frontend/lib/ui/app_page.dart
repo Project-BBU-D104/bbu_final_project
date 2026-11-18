@@ -4,12 +4,20 @@ import 'package:get/get.dart';
 
 /// The page shell: safe area, gutter and a capped content width.
 class AppPage extends StatelessWidget {
-  const AppPage({super.key, required this.child, this.maxWidth});
+  const AppPage({
+    super.key,
+    required this.child,
+    this.maxWidth,
+    this.verticalGutter,
+  });
 
   final Widget child;
 
   /// Defaults to [AppTokens.contentMaxWidth].
   final double? maxWidth;
+
+  /// Overrides top and bottom padding without changing horizontal alignment.
+  final double? verticalGutter;
 
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -21,7 +29,10 @@ class AppPage extends StatelessWidget {
         return Align(
           alignment: Alignment.topCenter,
           child: Padding(
-            padding: EdgeInsets.all(gutter),
+            padding: EdgeInsets.symmetric(
+              horizontal: gutter,
+              vertical: verticalGutter ?? gutter,
+            ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: maxWidth ?? AppTokens.contentMaxWidth,

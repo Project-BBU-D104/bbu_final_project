@@ -6,6 +6,7 @@ class AppTokens {
   const AppTokens._();
   static const double saleProductTileMaxExtent = 240;
   static const double saleProductTileAspectRatio = 0.78;
+  static const double saleProductThumbnailSize = 64;
 
   static const double formMaxHeightFactor = 0.9;
 
@@ -46,6 +47,9 @@ class AppTokens {
 
   /// Desktop shell, and dialog instead of bottom sheet.
   static const double bpDesktop = 840;
+
+  /// Minimum viewport height for the desktop sidebar on Sales routes.
+  static const double bpSaleShellMinHeight = 480;
 
   /// Two column detail layouts.
   static const double bpTwoColumn = 900;

@@ -25,6 +25,7 @@ const Map<String, String> kmKH = {
   "Add @name, quantity @quantity": "បន្ថែម @name ចំនួន @quantity",
   "Select payment type": "ជ្រើសប្រភេទបង់ប្រាក់",
   "Payment successful": "ការបង់ប្រាក់បានជោគជ័យ",
+  "Current Sale": "ការលក់បច្ចុប្បន្ន",
   "Order Summary": "សង្ខេបការបញ្ជាទិញ",
   "Transaction ID": "លេខប្រតិបត្តិការ",
   "Export Receipt": "នាំចេញបង្កាន់ដៃ",

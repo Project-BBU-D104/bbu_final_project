@@ -2,6 +2,14 @@
 
 Implementation and shared UI compliance repair are complete across the six routes and existing payment Add/Edit forms, verified on 2026-11-17 on `main`. Manual QA listed below remains pending.
 
+## Mobile follow-up — 2026-11-18
+
+- All six routes use mobile navigation below 480 logical pixels of viewport height, even when a landscape phone is wide enough to meet the desktop sidebar breakpoint. Other groups and normal desktop Sales retain their existing navigation.
+- Product selection uses compact thumbnails and wrapping details in narrow and short layouts. When the keyboard leaves little room, the focused search stays above the scrollable results; Continue returns after dismissal without losing the query or cart. Mobile cart rows align with checkout sections. Current Sale has a Khmer title, and the shared delete confirmation scrolls when large text needs more space. Payment Add/Edit use bottom sheets on short viewports so Save, Update, and Cancel can still be reached with the keyboard and inline validation visible.
+- The real shell is covered at 375 × 667, 844 × 390, 932 × 430, and 1440 × 900. Populated checks also cover 320 × 568, 2× text, keyboard and safe-area insets, payment Add/Edit draft retention, and reachable record/receipt actions. Inspected 36 populated widget captures in `frontend/build/sales-mobile-review/` (portrait, landscape and desktop; light English and dark Khmer). App-bar text uses the test fallback font in those captures; the captures do not establish real app-bar typography.
+- Verification: 1,197 Flutter tests passed, one known web-only test skipped; standard web build passed; analyzer reported 17 pre-existing diagnostics and none in changed files. Formatting and whitespace checks passed (the two pre-existing locale maps were excluded from whole-file Dart formatting).
+- The targeted Chrome widget run timed out while loading; it does not count as a browser pass. A live API/browser walk, physical-device keyboard/scanner tests, and spoken accessibility checks remain pending.
+
 ## Sale product selection — `frontend/lib/screen/sale/sale_screen/sale_screen.dart`
 - **Route:** `/sale`
 - **Purpose:** Selects products and starts a customer sale.

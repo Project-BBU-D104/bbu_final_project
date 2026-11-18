@@ -5,6 +5,7 @@ import 'package:frontend/controllers/payment_controller.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 
 /// Surrounds the navigator so pushed pages keep the same desktop sidebar.
@@ -20,7 +21,17 @@ class DesktopAppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final path = Uri.tryParse(route)?.path ?? route;
-    if (MediaQuery.sizeOf(context).width < 840 ||
+    final size = MediaQuery.sizeOf(context);
+    if (size.width < AppTokens.bpDesktop ||
+        (size.height < AppTokens.bpSaleShellMinHeight &&
+            const {
+              AppRoutes.sale,
+              AppRoutes.currentSale,
+              AppRoutes.salePayment,
+              AppRoutes.paymentSuccess,
+              AppRoutes.saleList,
+              AppRoutes.saleListDetail,
+            }.contains(path)) ||
         path.isEmpty ||
         path == '/' ||
         path == AppRoutes.login ||

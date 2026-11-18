@@ -85,7 +85,11 @@ class CurrentSaleWidget extends StatelessWidget {
                 else
                   LayoutBuilder(
                     builder: (context, bounds) => Obx(() {
+                      final alignment = DesktopAppShell.isVisible(context)
+                          ? CrossAxisAlignment.center
+                          : CrossAxisAlignment.stretch;
                       final items = Column(
+                        crossAxisAlignment: alignment,
                         children: ctr.selectedProducts.map((p) {
                           final price =
                               double.tryParse(
@@ -162,6 +166,7 @@ class CurrentSaleWidget extends StatelessWidget {
                         );
                       }
                       return Column(
+                        crossAxisAlignment: alignment,
                         children: [
                           items,
                           const SizedBox(height: AppSpacing.lg),

@@ -203,8 +203,13 @@ class AppFormActions extends StatelessWidget {
 class AppFormShell {
   const AppFormShell._();
 
-  static Future<void> show(BuildContext context, Widget child) async {
-    if (MediaQuery.sizeOf(context).width >= AppTokens.bpDesktop) {
+  static Future<void> show(
+    BuildContext context,
+    Widget child, {
+    bool preferBottomSheet = false,
+  }) async {
+    if (!preferBottomSheet &&
+        MediaQuery.sizeOf(context).width >= AppTokens.bpDesktop) {
       await showDialog<void>(
         context: context,
         barrierDismissible: false,

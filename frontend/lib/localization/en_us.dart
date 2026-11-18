@@ -25,6 +25,7 @@ const Map<String, String> enUS = {
   "Add @name, quantity @quantity": "Add @name, quantity @quantity",
   "Select payment type": "Select payment type",
   "Payment successful": "Payment successful",
+  "Current Sale": "Current Sale",
   "Order Summary": "Order Summary",
   "Transaction ID": "Transaction ID",
   "Export Receipt": "Export Receipt",

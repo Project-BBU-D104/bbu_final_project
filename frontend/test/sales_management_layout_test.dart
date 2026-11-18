@@ -137,13 +137,13 @@ void main() {
               await tester.pumpAndSettle();
               expect(
                 find.byType(CustomAppBar),
-                size.width >= 840 ? findsNothing : findsOneWidget,
+                size == const Size(1440, 900) ? findsNothing : findsOneWidget,
               );
               expect(
                 tester
                     .widget<AppPageHeader>(find.byType(AppPageHeader))
                     .leading,
-                size.width >= 840 ? isNotNull : isNull,
+                size == const Size(1440, 900) ? isNotNull : isNull,
               );
               expect(tester.takeException(), isNull);
             },

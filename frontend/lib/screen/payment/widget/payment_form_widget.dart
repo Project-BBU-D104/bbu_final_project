@@ -120,6 +120,13 @@ class _PaymentFormWidgetState extends State<PaymentFormWidget> {
   @override
   Widget build(BuildContext context) => Obx(() {
     final busy = ctr.isSaving.value;
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    final verticalPadding =
+        keyboard > 0 &&
+            MediaQuery.sizeOf(context).height - keyboard <
+                3 * AppTokens.controlHeight
+        ? AppSpacing.sm
+        : AppSpacing.lg;
     return PopScope(
       canPop: !busy,
       child: SafeArea(
@@ -127,8 +134,8 @@ class _PaymentFormWidgetState extends State<PaymentFormWidget> {
           padding: EdgeInsets.only(
             left: AppSpacing.lg,
             right: AppSpacing.lg,
-            top: AppSpacing.lg,
-            bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacing.lg,
+            top: verticalPadding,
+            bottom: keyboard + verticalPadding,
           ),
           child: SingleChildScrollView(
             child: Form(

@@ -145,6 +145,7 @@ Future<void> pumpSalesPage(
   double textScale = 1,
   bool desktopShell = false,
   String route = '/sale',
+  List<GetPage<dynamic>> getPages = const [],
 }) async {
   setUpCustomerTests();
   tester.view.physicalSize = size;
@@ -167,6 +168,7 @@ Future<void> pumpSalesPage(
             : child!,
       ),
       home: page,
+      getPages: getPages,
     ),
   );
   await tester.pump();

@@ -10,6 +10,7 @@ import 'package:frontend/services/main_service/sale_payment_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
 import 'package:frontend/utils/sales_report_utils.dart';
 import 'package:frontend/ui/app_form.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
@@ -191,6 +192,8 @@ class PaymentController extends GetxController {
   Future<void> showPaymentForm(BuildContext context) => AppFormShell.show(
     context,
     isEditing ? const EditPaymentWidget() : const AddPaymentWidget(),
+    preferBottomSheet:
+        MediaQuery.sizeOf(context).height < AppTokens.bpSaleShellMinHeight,
   );
 
   Future<void> onSavePayment(BuildContext context) async {
