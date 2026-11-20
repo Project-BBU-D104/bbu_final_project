@@ -8,9 +8,11 @@ class AppStatusBadge extends StatelessWidget {
     super.key,
     required this.label,
     this.tone = AppStatusTone.neutral,
+    this.compact = false,
   });
   final String label;
   final AppStatusTone tone;
+  final bool compact;
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme;
@@ -21,7 +23,12 @@ class AppStatusBadge extends StatelessWidget {
       AppStatusTone.neutral => (c.surfaceContainerHighest, c.onSurface),
     };
     return Container(
-      padding: const EdgeInsets.all(AppTokens.gutterCompact),
+      padding: compact
+          ? const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs,
+            )
+          : const EdgeInsets.all(AppTokens.gutterCompact),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(AppTokens.radiusPill),

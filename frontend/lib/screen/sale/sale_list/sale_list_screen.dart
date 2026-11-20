@@ -18,127 +18,149 @@ class SaleListScreen extends StatelessWidget {
       : Get.put(SaleListController());
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: DesktopAppShell.isVisible(context)
-        ? null
-        : CustomAppBar(title: 'Sale List', onBack: () => _back(context)),
-    body: AppPage(
-      child: LayoutBuilder(
-        builder: (context, bounds) => RefreshIndicator(
-          onRefresh: ctr.onRefresh,
-          child: Obx(() {
-            final rows = ctr.filteredSaleList;
-            final loading = ctr.isLoading.value;
-            final error = ctr.loadError.value;
-            final initialPending =
-                ctr.saleList.isEmpty && (loading || error.isNotEmpty);
-            final largeText =
-                MediaQuery.textScalerOf(context).scale(
-                  Theme.of(context).textTheme.bodyMedium?.fontSize ??
-                      AppSpacing.lg,
-                ) >
-                AppTokens.tableMaxScaledBodySize;
-            return CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppPageHeader(
-                        title: 'Sale List',
-                        compactActionsAlignment: Alignment.centerLeft,
-                        leading: DesktopAppShell.isVisible(context)
-                            ? IconButton.outlined(
-                                tooltip: 'Back'.tr,
-                                onPressed: () => _back(context),
-                                icon: const Icon(Icons.arrow_back),
-                              )
-                            : null,
-                        actions: Wrap(
-                          spacing: AppSpacing.md,
-                          runSpacing: AppSpacing.md,
-                          children: [
-                            FilledButton.icon(
-                              onPressed: ctr.onNewSale,
-                              icon: const Icon(Icons.add),
-                              label: Text('New Sale'.tr),
-                            ),
-                            IconButton.outlined(
-                              tooltip: 'Refresh'.tr,
-                              onPressed: ctr.onRefresh,
-                              icon: const Icon(Icons.refresh),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      AppSearchField(
-                        title: 'Search Sale',
-                        searchController: ctr.searchCtr,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      if (error.isNotEmpty)
-                        Semantics(
-                          liveRegion: true,
-                          child: Wrap(
-                            spacing: AppSpacing.md,
-                            runSpacing: AppSpacing.sm,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(error.tr),
-                              TextButton(
-                                onPressed: ctr.onRefresh,
-                                child: Text('Retry'.tr),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (loading) const LinearProgressIndicator(),
-                    ],
+  Widget build(BuildContext context) {
+    final desktop = DesktopAppShell.isVisible(context);
+    final shortViewport =
+        MediaQuery.sizeOf(context).height < AppTokens.bpSaleShellMinHeight;
+    final newSale = FilledButton.icon(
+      onPressed: ctr.onNewSale,
+      icon: const Icon(Icons.add),
+      label: Text('New Sale'.tr),
+    );
+    final refresh = IconButton.outlined(
+      tooltip: 'Refresh'.tr,
+      onPressed: ctr.onRefresh,
+      icon: const Icon(Icons.refresh),
+    );
+
+    return Scaffold(
+      appBar: desktop
+          ? null
+          : CustomAppBar(
+              title: 'Sale List',
+              onBack: () => _back(context),
+              actions: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
+                  child: IconButton(
+                    tooltip: 'Refresh'.tr,
+                    onPressed: ctr.onRefresh,
+                    icon: const Icon(Icons.refresh),
                   ),
                 ),
-                if (rows.isEmpty && !initialPending)
+              ],
+            ),
+      body: AppPage(
+        verticalGutter: desktop ? null : AppSpacing.md,
+        child: LayoutBuilder(
+          builder: (context, bounds) => RefreshIndicator(
+            onRefresh: ctr.onRefresh,
+            child: Obx(() {
+              final rows = ctr.filteredSaleList;
+              final loading = ctr.isLoading.value;
+              final error = ctr.loadError.value;
+              final initialPending =
+                  ctr.saleList.isEmpty && (loading || error.isNotEmpty);
+              final largeText =
+                  MediaQuery.textScalerOf(context).scale(
+                    Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                        AppSpacing.lg,
+                  ) >
+                  AppTokens.tableMaxScaledBodySize;
+              return CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
                   SliverToBoxAdapter(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        AppEmptyState(
-                          message: ctr.saleList.isEmpty
-                              ? 'No Sale Found'
-                              : 'No matching sales',
+                        if (desktop)
+                          AppPageHeader(
+                            title: 'Sale List',
+                            compactActionsAlignment: Alignment.centerLeft,
+                            leading: IconButton.outlined(
+                              tooltip: 'Back'.tr,
+                              onPressed: () => _back(context),
+                              icon: const Icon(Icons.arrow_back),
+                            ),
+                            actions: Wrap(
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.md,
+                              children: [newSale, refresh],
+                            ),
+                          )
+                        else
+                          newSale,
+                        const SizedBox(height: AppSpacing.lg),
+                        AppSearchField(
+                          title: 'Search Sale',
+                          searchController: ctr.searchCtr,
                         ),
-                        if (ctr.searchCtr.keyword.value.isNotEmpty)
-                          TextButton(
-                            onPressed: ctr.searchCtr.clear,
-                            child: Text('Clear search'.tr),
+                        const SizedBox(height: AppSpacing.lg),
+                        if (error.isNotEmpty)
+                          Semantics(
+                            liveRegion: true,
+                            child: Wrap(
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.sm,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(error.tr),
+                                TextButton(
+                                  onPressed: ctr.onRefresh,
+                                  child: Text('Retry'.tr),
+                                ),
+                              ],
+                            ),
                           ),
+                        if (loading) const LinearProgressIndicator(),
                       ],
                     ),
-                  )
-                else if (rows.isNotEmpty &&
-                    bounds.maxWidth >= AppTokens.bpTable &&
-                    !largeText)
-                  SliverToBoxAdapter(
-                    child: SaleTableWidget(
-                      sales: rows,
-                      onOpen: ctr.gotoSaleListDetail,
-                    ),
-                  )
-                else if (rows.isNotEmpty)
-                  SliverList.builder(
-                    itemCount: rows.length,
-                    itemBuilder: (context, index) => SaleCardWidget(
-                      sale: rows[index],
-                      onTap: () => ctr.gotoSaleListDetail(rows[index]),
-                    ),
                   ),
-              ],
-            );
-          }),
+                  if (rows.isEmpty && !initialPending)
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          AppEmptyState(
+                            message: ctr.saleList.isEmpty
+                                ? 'No Sale Found'
+                                : 'No matching sales',
+                          ),
+                          if (ctr.searchCtr.keyword.value.isNotEmpty)
+                            TextButton(
+                              onPressed: ctr.searchCtr.clear,
+                              child: Text('Clear search'.tr),
+                            ),
+                        ],
+                      ),
+                    )
+                  else if (rows.isNotEmpty &&
+                      bounds.maxWidth >= AppTokens.bpTable &&
+                      !shortViewport &&
+                      !largeText)
+                    SliverToBoxAdapter(
+                      child: SaleTableWidget(
+                        sales: rows,
+                        onOpen: ctr.gotoSaleListDetail,
+                      ),
+                    )
+                  else if (rows.isNotEmpty)
+                    SliverList.builder(
+                      itemCount: rows.length,
+                      itemBuilder: (context, index) => SaleCardWidget(
+                        sale: rows[index],
+                        onTap: () => ctr.gotoSaleListDetail(rows[index]),
+                      ),
+                    ),
+                ],
+              );
+            }),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
+
   void _back(BuildContext context) => Navigator.of(context).canPop()
       ? Get.back()
       : Get.offNamed(AppRoutes.home);

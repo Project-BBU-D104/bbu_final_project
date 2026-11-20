@@ -18,135 +18,151 @@ class PaymentScreen extends StatelessWidget {
       : Get.put(PaymentController());
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: DesktopAppShell.isVisible(context)
-        ? null
-        : CustomAppBar(title: 'Payment', onBack: () => _back(context)),
-    body: AppPage(
-      child: LayoutBuilder(
-        builder: (context, bounds) => RefreshIndicator(
-          onRefresh: ctr.onRefresh,
-          child: Obx(() {
-            final rows = ctr.filteredPaymentList;
-            final loading = ctr.isLoading.value;
-            final error = ctr.loadError.value;
-            final initialPending =
-                ctr.paymentList.isEmpty && (loading || error.isNotEmpty);
-            final largeText =
-                MediaQuery.textScalerOf(context).scale(
-                  Theme.of(context).textTheme.bodyMedium?.fontSize ??
-                      AppSpacing.lg,
-                ) >
-                AppTokens.tableMaxScaledBodySize;
-            return CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppPageHeader(
-                        title: 'Payment',
-                        compactActionsAlignment: Alignment.centerLeft,
-                        leading: DesktopAppShell.isVisible(context)
-                            ? IconButton.outlined(
-                                tooltip: 'Back'.tr,
-                                onPressed: () => _back(context),
-                                icon: const Icon(Icons.arrow_back),
-                              )
-                            : null,
-                        actions: Wrap(
-                          spacing: AppSpacing.md,
-                          runSpacing: AppSpacing.md,
-                          children: [
-                            Obx(
-                              () => FilledButton.icon(
-                                onPressed: ctr.isOpeningForm.value
-                                    ? null
-                                    : () => ctr.addPayment(context),
-                                icon: const Icon(Icons.add),
-                                label: Text('Add Payment'.tr),
-                              ),
-                            ),
-                            IconButton.outlined(
-                              tooltip: 'Refresh'.tr,
-                              onPressed: ctr.onRefresh,
-                              icon: const Icon(Icons.refresh),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      AppSearchField(
-                        title: 'Search Payment',
-                        searchController: ctr.searchCtr,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      if (error.isNotEmpty)
-                        Semantics(
-                          liveRegion: true,
-                          child: Wrap(
-                            spacing: AppSpacing.md,
-                            runSpacing: AppSpacing.sm,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(error.tr),
-                              TextButton(
-                                onPressed: ctr.onRefresh,
-                                child: Text('Retry'.tr),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (loading) const LinearProgressIndicator(),
-                    ],
-                  ),
-                ),
-                if (rows.isEmpty && !initialPending)
+  Widget build(BuildContext context) {
+    final desktop = DesktopAppShell.isVisible(context);
+    final shortViewport =
+        MediaQuery.sizeOf(context).height < AppTokens.bpSaleShellMinHeight;
+    final addPayment = Obx(
+      () => FilledButton.icon(
+        onPressed: ctr.isOpeningForm.value
+            ? null
+            : () => ctr.addPayment(context),
+        icon: const Icon(Icons.add),
+        label: Text('Add Payment'.tr),
+      ),
+    );
+
+    return Scaffold(
+      appBar: desktop
+          ? null
+          : CustomAppBar(
+              title: 'Payment',
+              onBack: () => _back(context),
+              showRefresh: true,
+              onRefresh: ctr.onRefresh,
+            ),
+      body: AppPage(
+        verticalGutter: desktop ? null : AppSpacing.md,
+        child: LayoutBuilder(
+          builder: (context, bounds) => RefreshIndicator(
+            onRefresh: ctr.onRefresh,
+            child: Obx(() {
+              final rows = ctr.filteredPaymentList;
+              final loading = ctr.isLoading.value;
+              final error = ctr.loadError.value;
+              final initialPending =
+                  ctr.paymentList.isEmpty && (loading || error.isNotEmpty);
+              final largeText =
+                  MediaQuery.textScalerOf(context).scale(
+                    Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                        AppSpacing.lg,
+                  ) >
+                  AppTokens.tableMaxScaledBodySize;
+              return CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
                   SliverToBoxAdapter(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        AppEmptyState(
-                          message: ctr.paymentList.isEmpty
-                              ? 'No payments found'
-                              : 'No matching payments',
+                        if (desktop)
+                          AppPageHeader(
+                            title: 'Payment',
+                            compactActionsAlignment: Alignment.centerLeft,
+                            leading: IconButton.outlined(
+                              tooltip: 'Back'.tr,
+                              onPressed: () => _back(context),
+                              icon: const Icon(Icons.arrow_back),
+                            ),
+                            actions: Wrap(
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.md,
+                              children: [
+                                addPayment,
+                                IconButton.outlined(
+                                  tooltip: 'Refresh'.tr,
+                                  onPressed: ctr.onRefresh,
+                                  icon: const Icon(Icons.refresh),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          addPayment,
+                        const SizedBox(height: AppSpacing.lg),
+                        AppSearchField(
+                          title: 'Search Payment',
+                          searchController: ctr.searchCtr,
                         ),
-                        if (ctr.searchCtr.keyword.value.isNotEmpty)
-                          TextButton(
-                            onPressed: ctr.searchCtr.clear,
-                            child: Text('Clear search'.tr),
+                        const SizedBox(height: AppSpacing.lg),
+                        if (error.isNotEmpty)
+                          Semantics(
+                            liveRegion: true,
+                            child: Wrap(
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.sm,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(error.tr),
+                                TextButton(
+                                  onPressed: ctr.onRefresh,
+                                  child: Text('Retry'.tr),
+                                ),
+                              ],
+                            ),
                           ),
+                        if (loading) const LinearProgressIndicator(),
                       ],
                     ),
-                  )
-                else if (rows.isNotEmpty &&
-                    bounds.maxWidth >= AppTokens.bpTable &&
-                    !largeText)
-                  SliverToBoxAdapter(
-                    child: PaymentTableWidget(
-                      payments: rows,
-                      onEdit: (payment) => ctr.editPayment(context, payment),
-                      onDelete: (payment) =>
-                          ctr.onDeletePayment(context, payment['id']),
-                    ),
-                  )
-                else if (rows.isNotEmpty)
-                  SliverList.builder(
-                    itemCount: rows.length,
-                    itemBuilder: (context, index) => PaymentCardListWidget(
-                      payment: rows[index],
-                      onEdit: () => ctr.editPayment(context, rows[index]),
-                      onDelete: () =>
-                          ctr.onDeletePayment(context, rows[index]['id']),
-                    ),
                   ),
-              ],
-            );
-          }),
+                  if (rows.isEmpty && !initialPending)
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          AppEmptyState(
+                            message: ctr.paymentList.isEmpty
+                                ? 'No payments found'
+                                : 'No matching payments',
+                          ),
+                          if (ctr.searchCtr.keyword.value.isNotEmpty)
+                            TextButton(
+                              onPressed: ctr.searchCtr.clear,
+                              child: Text('Clear search'.tr),
+                            ),
+                        ],
+                      ),
+                    )
+                  else if (rows.isNotEmpty &&
+                      bounds.maxWidth >= AppTokens.bpTable &&
+                      !shortViewport &&
+                      !largeText)
+                    SliverToBoxAdapter(
+                      child: PaymentTableWidget(
+                        payments: rows,
+                        onEdit: (payment) => ctr.editPayment(context, payment),
+                        onDelete: (payment) =>
+                            ctr.onDeletePayment(context, payment['id']),
+                      ),
+                    )
+                  else if (rows.isNotEmpty)
+                    SliverList.builder(
+                      itemCount: rows.length,
+                      itemBuilder: (context, index) => PaymentCardListWidget(
+                        payment: rows[index],
+                        onEdit: () => ctr.editPayment(context, rows[index]),
+                        onDelete: () =>
+                            ctr.onDeletePayment(context, rows[index]['id']),
+                      ),
+                    ),
+                ],
+              );
+            }),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
+
   void _back(BuildContext context) => Navigator.of(context).canPop()
       ? Get.back()
       : Get.offNamed(AppRoutes.home);

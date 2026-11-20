@@ -500,7 +500,7 @@ void main() {
           '/sale-list-detail',
         ]) {
           testWidgets(
-            'six sales routes follow supplier navigation placement $route $size dark=$dark km=$khmer',
+            'sales navigation placement $route $size dark=$dark km=$khmer',
             (tester) async {
               final sales = SaleTestSaleService();
               final payments = SaleTestPaymentService();
@@ -536,17 +536,27 @@ void main() {
                 desktop ? findsNothing : findsOneWidget,
               );
               expect(find.byType(AppPage), findsOneWidget);
-              expect(find.byType(AppPageHeader), findsOneWidget);
-              final header = tester.widget<AppPageHeader>(
-                find.byType(AppPageHeader),
-              );
-              if (!desktop) {
-                expect(header.leading, isNull);
+              final header = find.byType(AppPageHeader);
+              if (!desktop && ['/sale-list', '/sale-payment'].contains(route)) {
+                expect(header, findsNothing);
+                expect(
+                  find.text(
+                    (route == '/sale-list' ? 'Sale List' : 'Payment').tr,
+                  ),
+                  findsOneWidget,
+                );
+              } else if (!desktop) {
+                expect(tester.widget<AppPageHeader>(header).leading, isNull);
               } else if (![
                 '/current-sale',
                 '/payment-success',
               ].contains(route)) {
-                expect(header.leading, isA<IconButton>());
+                expect(
+                  tester.widget<AppPageHeader>(header).leading,
+                  isA<IconButton>(),
+                );
+              } else {
+                expect(header, findsOneWidget);
               }
               expect(tester.takeException(), isNull);
             },

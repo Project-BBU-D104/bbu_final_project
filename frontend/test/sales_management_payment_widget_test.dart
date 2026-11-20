@@ -18,4 +18,54 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('\$12.50'), findsOneWidget);
   });
+
+  testWidgets('payment card groups details and keeps actions visible', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var edits = 0;
+    var deletes = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PaymentCardListWidget(
+            payment: const {
+              'sale': {
+                'invoice_no': 'SALE-3',
+                'customer': {'name': 'Alice'},
+              },
+              'amount': '12.50',
+              'payment_method': 'Cash',
+              'payment_date': '2026-11-20',
+              'reference_no': 'REF-3',
+            },
+            onEdit: () => edits++,
+            onDelete: () => deletes++,
+          ),
+        ),
+      ),
+    );
+
+    final footerTop = tester.getTopLeft(find.text('Amount')).dy;
+    for (final (label, value) in [
+      ('Method', 'Cash'),
+      ('Date', '2026-11-20'),
+      ('Reference', 'REF-3'),
+    ]) {
+      final labelPosition = tester.getTopLeft(find.text(label));
+      final valuePosition = tester.getTopLeft(find.text(value));
+      expect(valuePosition.dx, labelPosition.dx);
+      expect(valuePosition.dy, greaterThan(labelPosition.dy));
+      expect(valuePosition.dy, lessThan(footerTop));
+    }
+    await tester.tap(find.byTooltip('Edit'));
+    await tester.tap(find.byTooltip('Delete'));
+    expect(edits, 1);
+    expect(deletes, 1);
+    expect(tester.takeException(), isNull);
+  });
 }

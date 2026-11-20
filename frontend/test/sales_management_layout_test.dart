@@ -28,10 +28,14 @@ void main() {
   tearDownAll(() => locator.reset());
   setUp(() => dotenv.testLoad(fileInput: 'API_URL=http://localhost'));
   tearDown(() => Get.reset());
-  for (final width in [900.0, 1440.0]) {
+  for (final (size, desktop, showTable) in [
+    (const Size(900, 900), true, false),
+    (const Size(1440, 900), true, true),
+    (const Size(932, 430), false, false),
+  ]) {
     for (final payment in [false, true]) {
       testWidgets(
-        'sidebar content width $width controls table fallback payment=$payment',
+        'management list chooses a layout at $size payment=$payment',
         (tester) async {
           if (payment) {
             Get.put(
@@ -56,20 +60,23 @@ void main() {
           await pumpSalesPage(
             tester,
             payment ? PaymentScreen() : SaleListScreen(),
-            size: Size(width, 900),
+            size: size,
             desktopShell: true,
             route: payment ? '/sale-payment' : '/sale-list',
           );
           await tester.pumpAndSettle();
           expect(
             find.byWidgetPredicate((widget) => widget is AppTable),
-            width == 1440 ? findsOneWidget : findsNothing,
+            showTable ? findsOneWidget : findsNothing,
           );
           expect(
             find.byType(AppListCard),
-            width == 900 ? findsOneWidget : findsNothing,
+            showTable ? findsNothing : findsOneWidget,
           );
-          expect(find.byType(CustomAppBar), findsNothing);
+          expect(
+            find.byType(CustomAppBar),
+            desktop ? findsNothing : findsOneWidget,
+          );
           expect(tester.takeException(), isNull);
         },
       );
@@ -139,12 +146,27 @@ void main() {
                 find.byType(CustomAppBar),
                 size == const Size(1440, 900) ? findsNothing : findsOneWidget,
               );
-              expect(
-                tester
-                    .widget<AppPageHeader>(find.byType(AppPageHeader))
-                    .leading,
-                size == const Size(1440, 900) ? isNotNull : isNull,
-              );
+              final desktop = size == const Size(1440, 900);
+              final pageHeader = find.byType(AppPageHeader);
+              if (desktop) {
+                expect(
+                  tester.widget<AppPageHeader>(pageHeader).leading,
+                  isNotNull,
+                );
+              } else {
+                expect(pageHeader, findsNothing);
+                expect(
+                  find.text((payment ? 'Payment' : 'Sale List').tr),
+                  findsOneWidget,
+                );
+                expect(
+                  find.descendant(
+                    of: find.byType(CustomAppBar),
+                    matching: find.byTooltip('Refresh'.tr),
+                  ),
+                  findsOneWidget,
+                );
+              }
               expect(tester.takeException(), isNull);
             },
           );

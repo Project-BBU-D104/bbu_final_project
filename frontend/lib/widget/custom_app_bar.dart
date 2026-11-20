@@ -62,7 +62,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         if (showRefresh)
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: 'Refresh'.tr,
             icon: Icon(
               Icons.refresh,
               color: useTheme
