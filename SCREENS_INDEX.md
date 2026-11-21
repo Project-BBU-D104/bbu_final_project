@@ -18,7 +18,7 @@ Inventory based on `frontend/lib/`, `routes/app_pages.dart`, route constants, an
 | Stock (done) | [screen/SCREENS_STOCK.md](screen/SCREENS_STOCK.md) | 15 | All 15 redesigned and verified by focused automated tests; live browser/device/accessibility QA pending. |
 | People & Access (done) | [screen/SCREENS_PEOPLE.md](screen/SCREENS_PEOPLE.md) | 7 | All seven aligned with supplier patterns on mobile and web: themed tables, desktop header actions, paired wide forms. Manual device/browser QA pending. |
 | Configuration | [screen/SCREENS_CONFIGURATION.md](screen/SCREENS_CONFIGURATION.md) | 10 | Payment types, currencies, and system configuration. |
-| Audit | [screen/SCREENS_AUDIT.md](screen/SCREENS_AUDIT.md) | 2 | Audit history and event detail. |
+| Audit (done) | [screen/SCREENS_AUDIT.md](screen/SCREENS_AUDIT.md) | 2 | Searchable history with action filters, mobile cards, and a paginated desktop table. Event detail shows recorded changes side by side on wide screens. |
 | Reports | [screen/SCREENS_REPORTS.md](screen/SCREENS_REPORTS.md) | 8 | Six report pages, PDF preview, and page-format dialog. |
 | Profile (done)| [screen/SCREENS_PROFILE.md](screen/SCREENS_PROFILE.md) | 2 | Account edit flows; the Profile tab is grouped under Home. |
 

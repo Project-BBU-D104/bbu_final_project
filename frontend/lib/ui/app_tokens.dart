@@ -45,6 +45,9 @@ class AppTokens {
   /// Cards below this width, table at or above it.
   static const double bpTable = 800;
 
+  /// Minimum width of the table surface before horizontal scrolling.
+  static const double tableMinWidth = 960;
+
   /// Desktop shell, and dialog instead of bottom sheet.
   static const double bpDesktop = 840;
 

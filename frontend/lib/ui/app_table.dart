@@ -92,7 +92,7 @@ class AppTable<T> extends StatelessWidget {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: math.max(960, constraints.maxWidth),
+              width: math.max(AppTokens.tableMinWidth, constraints.maxWidth),
               child: DataTable(
                 showCheckboxColumn: false,
                 headingRowHeight: 48,

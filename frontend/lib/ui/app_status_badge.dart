@@ -9,10 +9,12 @@ class AppStatusBadge extends StatelessWidget {
     required this.label,
     this.tone = AppStatusTone.neutral,
     this.compact = false,
+    this.maxLines,
   });
   final String label;
   final AppStatusTone tone;
   final bool compact;
+  final int? maxLines;
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme;
@@ -35,6 +37,8 @@ class AppStatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
+        maxLines: maxLines,
+        overflow: maxLines == null ? null : TextOverflow.ellipsis,
         style: Theme.of(
           context,
         ).textTheme.labelLarge?.copyWith(color: foreground),

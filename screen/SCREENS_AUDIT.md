@@ -1,22 +1,24 @@
-# Audit
+# Audit (done)
 
-## Audit logs — `frontend/lib/screen/audit_logs/audit_logs_screen.dart`
-- **Route:** `/audit-logs`
-- **Purpose:** Browses audit history.
-- **Navigation:** Manage → Audit Logs; selecting an event opens detail.
-- **UI:** Search/list cards and selection action.
-- **State/data:** `AuditLogController`, `AuditLogsBinding`, audit log service/model.
-- **Custom widgets:** `screen/audit_logs/widget/audit_card_widget.dart`, detail widget.
-- **Current design issues:** Specific layout/theme issues unclear.
+Both Audit screens use the shared Flutter UI kit with English and Khmer labels, light and dark themes, and layouts that adapt to the available width and text size.
 
-## Audit log detail — `frontend/lib/screen/audit_logs/widget/audit_log_detail_widget.dart`
-- **Route:** `/audit-log-detail`, selected event argument.
-- **Purpose:** Reviews the fields recorded for one audit event.
-- **Navigation:** Audit list selection; back returns to list.
-- **UI:** Scaffold with structured detail content.
-- **State/data:** Audit log argument/model.
-- **Custom widgets:** `audit_card_widget.dart`, shared app bar if used.
-- **Current design issues:** Dense detail layout may need responsive review; exact defect unclear.
+## Audit logs
 
-## Redesign notes
+- Route `/audit-logs`, opened from Manage → Audit Logs.
+- Events appear newest first. Search matches titles, actions, users, tables, record and event IDs, and timestamps. Search and the action filter work together.
+- Compact and large-text layouts use tappable cards. The wide layout uses a paginated table with a keyboard-accessible event link in each row.
+- Loading, empty history, no matches, and failed requests have distinct feedback. Refresh and retry retain the search and action filter. Previously loaded events remain visible if refresh fails.
+- Selecting an event opens its detail. The history is read-only.
 
+## Audit event detail
+
+- Route `/audit-log-detail`, opened with the selected event.
+- The header identifies the event. The summary shows action, user, recorded time, table, and record ID.
+- Recorded changes show before and after values side by side on wide layouts and stack them on compact layouts. Added and removed fields show which side is missing, and unchanged fields appear below changes.
+- Create and delete events can display one recorded snapshot. Legacy plain-text values remain readable. Recorded content is selectable, and opening the route without an event shows an unavailable state.
+
+## Verification
+
+The 15 focused Audit and Manage access tests passed. They cover read-only navigation, combined filters, refresh and retry, desktop pagination, added and removed fields, and large-text layout in Khmer dark mode. Targeted analysis reported no diagnostics, and the standard Flutter web build passed. The build's WebAssembly dry run reported dependency warnings in `get_storage` and `image`.
+
+Manual live API, browser, physical-device, and spoken screen-reader checks are pending.
