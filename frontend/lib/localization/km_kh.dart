@@ -6,10 +6,17 @@ const Map<String, String> kmKH = {
   "Select Sale": "ជ្រើសរើសការលក់",
   "No sale with outstanding balance": "មិនមានការលក់ដែលនៅជំពាក់ប្រាក់ទេ",
   "Please select a sale": "សូមជ្រើសរើសការលក់",
-  "Amount cannot exceed sale due": "ចំនួនប្រាក់មិនអាចលើសប្រាក់ជំពាក់នៃការលក់បានទេ",
+  "Amount cannot exceed sale due":
+      "ចំនួនប្រាក់មិនអាចលើសប្រាក់ជំពាក់នៃការលក់បានទេ",
   "Payment method is required": "សូមបញ្ចូលវិធីសាស្ត្រទូទាត់",
   "Reference is required": "សូមបញ្ចូលលេខយោង",
   "Export Error": "កំហុសនាំចេញ",
+  "Export / Print": "នាំចេញ / បោះពុម្ព",
+  "Print Preview": "មើលមុនបោះពុម្ព",
+  "Export PDF": "នាំចេញ PDF",
+  "Export Excel": "នាំចេញ Excel",
+  "No report data to export.": "មិនមានទិន្នន័យរបាយការណ៍សម្រាប់នាំចេញទេ។",
+  "Report saved to:": "របាយការណ៍បានរក្សាទុកនៅ៖",
   "Sold out": "អស់ស្តុក",
   "Please correct the highlighted fields.": "សូមកែតម្រូវព័ត៌មានដែលបានសម្គាល់។",
   "Sale Status": "ស្ថានភាពការលក់",
@@ -38,20 +45,34 @@ const Map<String, String> kmKH = {
   "Quantity: @quantity": "ចំនួន៖ @quantity",
   "No products selected": "មិនមានផលិតផលបានជ្រើស",
 
-  "Unable to load currency. Please try again.": "មិនអាចផ្ទុករូបិយប័ណ្ណបានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to complete payment. Please try again.": "មិនអាចបញ្ចប់ការបង់ប្រាក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Charge @amount to @customer using @method?": "គិតប្រាក់ @amount ពី @customer ដោយប្រើ @method?",
-  "Select a customer, payment type, and at least one product.": "សូមជ្រើសអតិថិជន ប្រភេទបង់ប្រាក់ និងផលិតផលយ៉ាងហោចណាស់មួយ។",
-  "Unable to load payment types. Please try again.": "មិនអាចផ្ទុកប្រភេទបង់ប្រាក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to identify the logged-in user.": "មិនអាចកំណត់អ្នកប្រើដែលបានចូលបានទេ។",
-  "The sale may have been created. Check Sales before trying again.": "ការលក់ប្រហែលជាត្រូវបានបង្កើត។ សូមពិនិត្យការលក់មុនព្យាយាមម្តងទៀត។",
-  "Unable to load products. Please try again.": "មិនអាចផ្ទុកផលិតផលបានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to load sales. Please try again.": "មិនអាចផ្ទុកការលក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to load payments. Please try again.": "មិនអាចផ្ទុកការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to delete sale. Please try again.": "មិនអាចលុបការលក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to delete payment. Please try again.": "មិនអាចលុបការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to save payment. Please try again.": "មិនអាចរក្សាទុកការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-  "Unable to refresh sale balance. Using the recorded balance.": "មិនអាចផ្ទុកសមតុល្យថ្មីបានទេ។ កំពុងប្រើសមតុល្យដែលបានកត់ត្រា។",
+  "Unable to load currency. Please try again.":
+      "មិនអាចផ្ទុករូបិយប័ណ្ណបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to complete payment. Please try again.":
+      "មិនអាចបញ្ចប់ការបង់ប្រាក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Charge @amount to @customer using @method?":
+      "គិតប្រាក់ @amount ពី @customer ដោយប្រើ @method?",
+  "Select a customer, payment type, and at least one product.":
+      "សូមជ្រើសអតិថិជន ប្រភេទបង់ប្រាក់ និងផលិតផលយ៉ាងហោចណាស់មួយ។",
+  "Unable to load payment types. Please try again.":
+      "មិនអាចផ្ទុកប្រភេទបង់ប្រាក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to identify the logged-in user.":
+      "មិនអាចកំណត់អ្នកប្រើដែលបានចូលបានទេ។",
+  "The sale may have been created. Check Sales before trying again.":
+      "ការលក់ប្រហែលជាត្រូវបានបង្កើត។ សូមពិនិត្យការលក់មុនព្យាយាមម្តងទៀត។",
+  "Unable to load products. Please try again.":
+      "មិនអាចផ្ទុកផលិតផលបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to load sales. Please try again.":
+      "មិនអាចផ្ទុកការលក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to load payments. Please try again.":
+      "មិនអាចផ្ទុកការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to delete sale. Please try again.":
+      "មិនអាចលុបការលក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to delete payment. Please try again.":
+      "មិនអាចលុបការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to save payment. Please try again.":
+      "មិនអាចរក្សាទុកការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to refresh sale balance. Using the recorded balance.":
+      "មិនអាចផ្ទុកសមតុល្យថ្មីបានទេ។ កំពុងប្រើសមតុល្យដែលបានកត់ត្រា។",
   "Sale details are unavailable.": "មិនមានព័ត៌មានលម្អិតនៃការលក់ទេ។",
   "Sale deleted successfully": "បានលុបការលក់ដោយជោគជ័យ",
   "No matching sales": "រកមិនឃើញការលក់ដែលត្រូវគ្នា",
@@ -309,6 +330,43 @@ const Map<String, String> kmKH = {
   "Purchase Payment Report": "របាយការណ៍ការទូទាត់ការទិញ",
   "Stock Ledger Report": "របាយការណ៍បញ្ជីស្តុក",
   "Profit and Loss Report": "របាយការណ៍ប្រាក់ចំណេញ និងខាត",
+  "Date Range Filter": "តម្រងជួរកាលបរិច្ឆេទ",
+  "Start date": "កាលបរិច្ឆេទចាប់ផ្តើម",
+  "End date": "កាលបរិច្ឆេទបញ្ចប់",
+  "Customize Report": "ប្ដូររបាយការណ៍",
+  "Show Chart": "បង្ហាញគំនូសតាង",
+  "Show Table": "បង្ហាញតារាង",
+  "Purchase Payment Chart": "គំនូសតាងការទូទាត់ការទិញ",
+  "No completed payments found": "មិនមានការទូទាត់ដែលបានបញ្ចប់",
+  "No purchase payments found": "មិនមានការទូទាត់ការទិញ",
+  "Unknown currency": "រូបិយប័ណ្ណមិនស្គាល់",
+  "Stock Movement Chart": "គំនូសតាងចលនាស្តុក",
+  "No stock movements found": "មិនមានចលនាស្តុក",
+  "Stock In Entries": "កំណត់ត្រាស្តុកចូល",
+  "Stock Out Entries": "កំណត់ត្រាស្តុកចេញ",
+  "Chart shows movement entries because product units vary.":
+      "គំនូសតាងបង្ហាញចំនួនកំណត់ត្រាចលនា ពីព្រោះឯកតាផលិតផលខុសគ្នា។",
+  "Adjustment In": "កែតម្រូវចូល",
+  "Adjustment Out": "កែតម្រូវចេញ",
+  "Transfer In": "ផ្ទេរចូល",
+  "Transfer Out": "ផ្ទេរចេញ",
+  "Type": "ប្រភេទ",
+  "In": "ចូល",
+  "Out": "ចេញ",
+  "Profit And Loss Chart": "គំនូសតាងប្រាក់ចំណេញ និងខាត",
+  "No completed sales found": "មិនមានការលក់ដែលបានបញ្ចប់",
+  "Net Sales": "ការលក់សុទ្ធ",
+  "Estimated Cost of Goods Sold": "ថ្លៃដើមទំនិញដែលបានលក់ (ប៉ាន់ស្មាន)",
+  "Estimated Gross Profit": "ប្រាក់ចំណេញដុលប៉ាន់ស្មាន",
+  "Incomplete": "មិនពេញលេញ",
+  "Gross profit is unavailable because one or more sale items have no current product cost.":
+      "មិនអាចគណនាប្រាក់ចំណេញដុលបានទេ ព្រោះទំនិញលក់មួយឬច្រើនមិនមានថ្លៃដើមបច្ចុប្បន្ន។",
+  "Gross profit is an estimate based on current product cost prices. Operating expenses, historical cost prices, and currency conversion are not included.":
+      "ប្រាក់ចំណេញដុលជាការប៉ាន់ស្មានដោយផ្អែកលើថ្លៃដើមផលិតផលបច្ចុប្បន្ន។ មិនរាប់បញ្ចូលចំណាយប្រតិបត្តិការ ថ្លៃដើមប្រវត្តិសាស្ត្រ និងការបម្លែងរូបិយប័ណ្ណទេ។",
+  "Cost and gross profit lines are hidden because some sale items have no current product cost.":
+      "លាក់បន្ទាត់ថ្លៃដើម និងប្រាក់ចំណេញដុល ព្រោះទំនិញលក់មួយចំនួនមិនមានថ្លៃដើមបច្ចុប្បន្ន។",
+  "Sales movement warehouse is unavailable from the API; transfer entries are shown as separate warehouse out/in movements. No running balance is shown.":
+      "API មិនផ្តល់ឃ្លាំងសម្រាប់ចលនាលក់ទេ។ កំណត់ត្រាផ្ទេរត្រូវបានបង្ហាញជាចលនាចេញ និងចូលដាច់ដោយឡែកតាមឃ្លាំង។ មិនបង្ហាញសមតុល្យរត់ទេ។",
   "Configuration Management": "ការគ្រប់គ្រងការកំណត់",
   "History Management": "ការគ្រប់គ្រងប្រវត្តិ",
   "Warehouse Stock": "ស្តុកក្នុងឃ្លាំង",
@@ -410,7 +468,8 @@ const Map<String, String> kmKH = {
   'Audit table': 'តារាង',
   'Record ID': 'លេខសម្គាល់កំណត់ត្រា',
   '@count audit events': 'ព្រឹត្តិការណ៍សវនកម្ម @count',
-  '@start–@end of @count audit events': 'ព្រឹត្តិការណ៍សវនកម្ម @start–@end ក្នុងចំណោម @count',
+  '@start–@end of @count audit events':
+      'ព្រឹត្តិការណ៍សវនកម្ម @start–@end ក្នុងចំណោម @count',
   'Previous audit page': 'ទំព័រមុន',
   'Next audit page': 'ទំព័របន្ទាប់',
   'Loading audit history': 'កំពុងផ្ទុកប្រវត្តិសវនកម្ម',

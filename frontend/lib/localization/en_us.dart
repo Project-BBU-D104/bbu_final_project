@@ -10,8 +10,15 @@ const Map<String, String> enUS = {
   "Payment method is required": "Payment method is required",
   "Reference is required": "Reference is required",
   "Export Error": "Export Error",
+  "Export / Print": "Export / Print",
+  "Print Preview": "Print Preview",
+  "Export PDF": "Export PDF",
+  "Export Excel": "Export Excel",
+  "No report data to export.": "No report data to export.",
+  "Report saved to:": "Report saved to:",
   "Sold out": "Sold out",
-  "Please correct the highlighted fields.": "Please correct the highlighted fields.",
+  "Please correct the highlighted fields.":
+      "Please correct the highlighted fields.",
   "Sale Status": "Sale Status",
   "Confirm payment": "Confirm payment",
 
@@ -38,21 +45,35 @@ const Map<String, String> enUS = {
   "Quantity: @quantity": "Quantity: @quantity",
   "No products selected": "No products selected",
 
-  "Unable to load currency. Please try again.": "Unable to load currency. Please try again.",
-  "Unable to complete payment. Please try again.": "Unable to complete payment. Please try again.",
-  "Charge @amount to @customer using @method?": "Charge @amount to @customer using @method?",
-  "Select a customer, payment type, and at least one product.": "Select a customer, payment type, and at least one product.",
-  "Unable to load payment types. Please try again.": "Unable to load payment types. Please try again.",
-  "Unable to identify the logged-in user.": "Unable to identify the logged-in user.",
-  "The sale may have been created. Check Sales before trying again.": "The sale may have been created. Check Sales before trying again.",
-  "Unable to load products. Please try again.": "Unable to load products. Please try again.",
+  "Unable to load currency. Please try again.":
+      "Unable to load currency. Please try again.",
+  "Unable to complete payment. Please try again.":
+      "Unable to complete payment. Please try again.",
+  "Charge @amount to @customer using @method?":
+      "Charge @amount to @customer using @method?",
+  "Select a customer, payment type, and at least one product.":
+      "Select a customer, payment type, and at least one product.",
+  "Unable to load payment types. Please try again.":
+      "Unable to load payment types. Please try again.",
+  "Unable to identify the logged-in user.":
+      "Unable to identify the logged-in user.",
+  "The sale may have been created. Check Sales before trying again.":
+      "The sale may have been created. Check Sales before trying again.",
+  "Unable to load products. Please try again.":
+      "Unable to load products. Please try again.",
 
-  "Unable to load sales. Please try again.": "Unable to load sales. Please try again.",
-  "Unable to load payments. Please try again.": "Unable to load payments. Please try again.",
-  "Unable to delete sale. Please try again.": "Unable to delete sale. Please try again.",
-  "Unable to delete payment. Please try again.": "Unable to delete payment. Please try again.",
-  "Unable to save payment. Please try again.": "Unable to save payment. Please try again.",
-  "Unable to refresh sale balance. Using the recorded balance.": "Unable to refresh sale balance. Using the recorded balance.",
+  "Unable to load sales. Please try again.":
+      "Unable to load sales. Please try again.",
+  "Unable to load payments. Please try again.":
+      "Unable to load payments. Please try again.",
+  "Unable to delete sale. Please try again.":
+      "Unable to delete sale. Please try again.",
+  "Unable to delete payment. Please try again.":
+      "Unable to delete payment. Please try again.",
+  "Unable to save payment. Please try again.":
+      "Unable to save payment. Please try again.",
+  "Unable to refresh sale balance. Using the recorded balance.":
+      "Unable to refresh sale balance. Using the recorded balance.",
   "Sale details are unavailable.": "Sale details are unavailable.",
   "Sale deleted successfully": "Sale deleted successfully",
   "No matching sales": "No matching sales",
@@ -314,6 +335,43 @@ const Map<String, String> enUS = {
   "Purchase Payment Report": "Purchase Payment Report",
   "Stock Ledger Report": "Stock Ledger Report",
   "Profit and Loss Report": "Profit and Loss Report",
+  "Date Range Filter": "Date Range Filter",
+  "Start date": "Start date",
+  "End date": "End date",
+  "Customize Report": "Customize Report",
+  "Show Chart": "Show Chart",
+  "Show Table": "Show Table",
+  "Purchase Payment Chart": "Purchase Payment Chart",
+  "No completed payments found": "No completed payments found",
+  "No purchase payments found": "No purchase payments found",
+  "Unknown currency": "Unknown currency",
+  "Stock Movement Chart": "Stock Movement Chart",
+  "No stock movements found": "No stock movements found",
+  "Stock In Entries": "Stock In Entries",
+  "Stock Out Entries": "Stock Out Entries",
+  "Chart shows movement entries because product units vary.":
+      "Chart shows movement entries because product units vary.",
+  "Adjustment In": "Adjustment In",
+  "Adjustment Out": "Adjustment Out",
+  "Transfer In": "Transfer In",
+  "Transfer Out": "Transfer Out",
+  "Type": "Type",
+  "In": "In",
+  "Out": "Out",
+  "Profit And Loss Chart": "Profit And Loss Chart",
+  "No completed sales found": "No completed sales found",
+  "Net Sales": "Net Sales",
+  "Estimated Cost of Goods Sold": "Estimated Cost of Goods Sold",
+  "Estimated Gross Profit": "Estimated Gross Profit",
+  "Incomplete": "Incomplete",
+  "Gross profit is unavailable because one or more sale items have no current product cost.":
+      "Gross profit is unavailable because one or more sale items have no current product cost.",
+  "Gross profit is an estimate based on current product cost prices. Operating expenses, historical cost prices, and currency conversion are not included.":
+      "Gross profit is an estimate based on current product cost prices. Operating expenses, historical cost prices, and currency conversion are not included.",
+  "Cost and gross profit lines are hidden because some sale items have no current product cost.":
+      "Cost and gross profit lines are hidden because some sale items have no current product cost.",
+  "Sales movement warehouse is unavailable from the API; transfer entries are shown as separate warehouse out/in movements. No running balance is shown.":
+      "Sales movement warehouse is unavailable from the API; transfer entries are shown as separate warehouse out/in movements. No running balance is shown.",
   "Configuration Management": "Configuration Management",
   "History Management": "History Management",
   "Warehouse Stock": "Warehouse Stock",

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -14,6 +13,8 @@ class PdfPreviewScreen extends StatelessWidget {
   final List<String> headers;
   final List<List<dynamic>> rows;
   final double? summaryTotal;
+  final List<String> notes;
+  final PdfPageFormat initialPageFormat;
 
   const PdfPreviewScreen({
     super.key,
@@ -21,6 +22,8 @@ class PdfPreviewScreen extends StatelessWidget {
     required this.headers,
     required this.rows,
     this.summaryTotal,
+    this.notes = const [],
+    this.initialPageFormat = PdfPageFormat.a4,
   });
 
   @override
@@ -35,7 +38,7 @@ class PdfPreviewScreen extends StatelessWidget {
       ),
 
       body: PdfPreview(
-        initialPageFormat: PdfPageFormat.a4,
+        initialPageFormat: initialPageFormat,
         allowPrinting: true,
         allowSharing: true,
         canChangeOrientation: true,
@@ -46,6 +49,7 @@ class PdfPreviewScreen extends StatelessWidget {
             title: title,
             headers: headers,
             rows: rows,
+            notes: notes,
             pageFormat: format,
             letterhead: defaultLetterHead,
             summaryTotal: summaryTotal,

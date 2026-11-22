@@ -21,12 +21,14 @@ class ExportService {
     required String title,
     required List<String> headers,
     required List<List<dynamic>> rows,
+    List<String> notes = const [],
     LetterHeadData letterhead = defaultLetterHead,
   }) async {
     final excel = buildExcelWorkbook(
       title: title,
       headers: headers,
       rows: rows,
+      notes: notes,
       letterhead: letterhead,
     );
 
@@ -48,6 +50,7 @@ class ExportService {
     required String title,
     required List<String> headers,
     required List<List<dynamic>> rows,
+    List<String> notes = const [],
     LetterHeadData letterhead = defaultLetterHead,
   }) {
     final excel = Excel.createExcel();
@@ -64,6 +67,10 @@ class ExportService {
 
     // Add title
     sheet.appendRow([TextCellValue(title)]);
+
+    for (final note in notes) {
+      sheet.appendRow([TextCellValue(note)]);
+    }
 
     // Add headers
     sheet.appendRow(headers.map((e) => TextCellValue(e)).toList());
@@ -90,13 +97,14 @@ class ExportService {
     required String title,
     required List<String> headers,
     required List<List<dynamic>> rows,
+    List<String> notes = const [],
     PdfPageFormat? pageFormat,
     LetterHeadData letterhead = defaultLetterHead,
     double? summaryTotal,
   }) async {
-    final hasKhmer = RegExp(
-      r'[\u1780-\u17ff]',
-    ).hasMatch([title, ...headers, ...rows.expand((row) => row)].join(' '));
+    final hasKhmer = RegExp(r'[\u1780-\u17ff]').hasMatch(
+      [title, ...notes, ...headers, ...rows.expand((row) => row)].join(' '),
+    );
     final khmerFont = hasKhmer
         ? pw.Font.ttf(await rootBundle.load('fonts/NotoSansKhmer.ttf'))
         : null;
@@ -118,6 +126,7 @@ class ExportService {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: pageFormat ?? PdfPageFormat.a4,
+        maxPages: 1000,
 
         margin: const pw.EdgeInsets.all(25),
 
@@ -139,6 +148,11 @@ class ExportService {
         // PDF CONTENT
         build: (context) {
           return [
+            for (final note in notes)
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(bottom: 8),
+                child: pw.Text(note, style: const pw.TextStyle(fontSize: 9)),
+              ),
             pw.TableHelper.fromTextArray(
               headers: headers,
 
@@ -187,6 +201,7 @@ class ExportService {
     required String title,
     required List<String> headers,
     required List<List<dynamic>> rows,
+    List<String> notes = const [],
     PdfPageFormat? pageFormat,
     double? summaryTotal,
   }) async {
@@ -194,6 +209,7 @@ class ExportService {
       title: title,
       headers: headers,
       rows: rows,
+      notes: notes,
       pageFormat: pageFormat,
       summaryTotal: summaryTotal,
     );
