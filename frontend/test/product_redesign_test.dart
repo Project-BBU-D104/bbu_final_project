@@ -379,6 +379,40 @@ void main() {
   });
 
   group('product detail', () {
+    for (final width in [390.0, 1440.0]) {
+      testWidgets('product detail lists stock by warehouse at width $width', (
+        tester,
+      ) async {
+        final product = productFixture(1, 'Water')
+          ..['stock_qty'] = 5
+          ..['warehouse_availability'] = [
+            {'warehouse_id': 1, 'warehouse_name': 'Main', 'qty': 1},
+            {'warehouse_id': 2, 'warehouse_name': 'Branch', 'qty': 4},
+            {'warehouse_id': 3, 'warehouse_name': 'Depot', 'qty': 0},
+          ];
+        final ctr = await pumpProductScreen(
+          tester,
+          service: FakeProductService([product]),
+          realDetail: true,
+          size: Size(width, 900),
+        );
+        await tester.tap(find.text('Water'));
+        await tester.pumpAndSettle();
+        for (final label in ['Main · 1', 'Branch · 4', 'Depot · 0']) {
+          expect(find.text(label), findsOneWidget);
+        }
+        ctr.products.assignAll([
+          {...product, 'warehouse_availability': []},
+        ]);
+        await tester.pump();
+        expect(find.text('No warehouse assigned'), findsOneWidget);
+        ctr.products.assignAll([
+          Map<String, dynamic>.from(product)..remove('warehouse_availability'),
+        ]);
+        await tester.pump();
+        expect(find.text('Warehouse availability unavailable'), findsOneWidget);
+      });
+    }
     const longName =
         'Premium Imported Sparkling Mineral Water Family Size 1500ml';
     const longBarcode = '12345678901234567890';

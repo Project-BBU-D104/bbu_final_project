@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/app_form.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
@@ -147,6 +148,7 @@ class ProductCardDetailWidget extends StatelessWidget {
             ),
           );
 
+          final warehouses = product['warehouse_availability'];
           final infoSection = HomeSectionCard(
             title: 'Product Information',
             child: Column(
@@ -156,6 +158,17 @@ class ProductCardDetailWidget extends StatelessWidget {
                 info('Sale Price', price),
                 info('Unit', _field(product['unit'])),
                 info('Category', _field(product['category'])),
+                if (product['stock_qty'] != null)
+                  info('Total stock', product['stock_qty'].toString()),
+                AppFormSection(title: 'Stock by warehouse', children: [
+                  if (warehouses is! List)
+                    Text('Warehouse availability unavailable'.tr)
+                  else if (warehouses.isEmpty)
+                    Text('No warehouse assigned'.tr)
+                  else
+                    for (final row in warehouses)
+                      Text('${row['warehouse_name']} · ${row['qty']}'),
+                ]),
               ],
             ),
           );
