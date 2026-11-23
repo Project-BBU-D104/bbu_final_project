@@ -185,12 +185,40 @@ class SaleScreen extends StatelessWidget {
       ? Get.back()
       : Get.offNamed(AppRoutes.home);
 
+  Future<void> _selectWarehouse(Map<String, dynamic> product) async {
+    final rows = SaleController.warehouses(product);
+    if (rows.length == 1) {
+      ctr.addProduct(product);
+      return;
+    }
+    final selected = await Get.dialog<int>(
+      SimpleDialog(
+        title: Text('Select warehouse'.tr),
+        children: [
+          for (final row in rows)
+            ListTile(
+              title: Text('${row['warehouse_name']} · ${row['qty']}'),
+              enabled:
+                  (ctr.cart[(product['id'], row['warehouse_id'])]?['qty'] ??
+                      0) <
+                  row['qty'],
+              onTap: () => Get.back(result: row['warehouse_id']),
+            ),
+          TextButton(onPressed: () => Get.back(), child: Text('Cancel'.tr)),
+        ],
+      ),
+    );
+    if (selected != null) ctr.addProduct(product, warehouseId: selected);
+  }
+
   Widget _tile(Map<String, dynamic> product) => Obx(
     () => CardItemWidget(
       product: product,
-      quantity: ctr.cart[product['id']]?['qty'] as int? ?? 0,
+      quantity: ctr.cart.entries
+          .where((e) => e.key.$1 == product['id'])
+          .fold<int>(0, (sum, e) => sum + (e.value['qty'] as int)),
       currency: ctr.currency.value,
-      onTap: () => ctr.addProduct(product),
+      onTap: ctr.checkoutBusy ? null : () => _selectWarehouse(product),
     ),
   );
 }

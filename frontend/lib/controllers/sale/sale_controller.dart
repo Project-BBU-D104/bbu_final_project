@@ -41,7 +41,7 @@ class SaleController extends GetxController {
   final currency = Rxn<Map<String, dynamic>>();
   final selectedCustomer = Rxn<Map<String, dynamic>>();
   final selectedPaymentType = Rxn<Map<String, dynamic>>();
-  final cart = <int, Map<String, dynamic>>{}.obs;
+  final cart = <(int, int), Map<String, dynamic>>{}.obs;
   final isLoading = false.obs;
   final isCustomersLoading = false.obs;
   final isPaymentTypesLoading = false.obs;
@@ -260,23 +260,50 @@ class SaleController extends GetxController {
     }
   }
 
-  void addProduct(Map<String, dynamic> product) {
-    if (checkoutBusy) return;
-    final id = product['id'] as int;
-    final quantity = (cart[id]?['qty'] as int? ?? 0) + 1;
-    cart[id] = {...product, 'qty': quantity};
+  static List<Map<String, dynamic>> warehouses(Map<String, dynamic> product) {
+    final rows = product['warehouse_availability'];
+    if (rows is! List ||
+        rows.any(
+          (r) =>
+              r is! Map<String, dynamic> ||
+              r['warehouse_id'] is! int ||
+              r['warehouse_name'] is! String ||
+              r['qty'] is! int,
+        )) {
+      return [];
+    }
+    return rows.cast<Map<String, dynamic>>();
   }
 
-  void changeQuantity(int productId, int change) {
+  void addProduct(Map<String, dynamic> product, {int? warehouseId}) {
     if (checkoutBusy) return;
-    final product = cart[productId];
-    if (product == null) return;
+    final rows = warehouses(product);
+    final row = warehouseId == null
+        ? rows.singleOrNull
+        : rows.firstWhereOrNull((r) => r['warehouse_id'] == warehouseId);
+    if (row == null) return;
+    final key = (product['id'] as int, row['warehouse_id'] as int);
+    final quantity = (cart[key]?['qty'] as int? ?? 0) + 1;
+    if (quantity > row['qty']) return;
+    cart[key] = {
+      ...product,
+      'warehouse_id': key.$2,
+      'warehouse_name': row['warehouse_name'],
+      'available_qty': row['qty'],
+      'qty': quantity,
+    };
+  }
 
+  void changeQuantity(int productId, int warehouseId, int change) {
+    if (checkoutBusy) return;
+    final key = (productId, warehouseId);
+    final product = cart[key];
+    if (product == null) return;
     final quantity = (product['qty'] as int) + change;
     if (quantity <= 0) {
-      cart.remove(productId);
-    } else {
-      cart[productId] = {...product, 'qty': quantity};
+      cart.remove(key);
+    } else if (change < 0 || quantity <= product['available_qty']) {
+      cart[key] = {...product, 'qty': quantity};
     }
   }
 
@@ -371,6 +398,7 @@ class SaleController extends GetxController {
               .map(
                 (product) => {
                   'product_id': product['id'],
+                  'warehouse_id': product['warehouse_id'],
                   'qty': product['qty'],
                 },
               )

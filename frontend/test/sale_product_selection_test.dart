@@ -26,7 +26,11 @@ void main() {
       ctr.currency.value = {'symbol': r'$', 'code': 'USD'};
       ctr.categories.add({
         'name': 'Drinks',
-        'products': [saleProductJson(1, 'Water')],
+        'products': [
+          saleProductJson(1, 'Water')
+            ..['qty'] = 0
+            ..['warehouse_availability'] = [warehouseRow(1, 'Main', 0)],
+        ],
       });
       await pumpSalesPage(tester, SaleScreen(), size: const Size(1440, 900));
       final button = find.bySemanticsLabel('Add Water, quantity 0');
@@ -35,8 +39,10 @@ void main() {
       expect(semantics.value, contains(r'$5.00'));
       expect(semantics.value, contains('Sold out'));
       final node = tester.getSemantics(button);
-      expect(semantics.hasAction(SemanticsAction.tap), isTrue);
+      expect(semantics.hasAction(SemanticsAction.tap), isFalse);
       expect(node.childrenCount, 0);
+      await tester.tap(find.text('Water'));
+      expect(ctr.cart, isEmpty);
     },
   );
   testWidgets(
@@ -79,6 +85,38 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+  testWidgets('picker shows balances and adds only the chosen warehouse', (
+    tester,
+  ) async {
+    final ctr = Get.put<SaleController>(SellingController());
+    final product = saleProductJson(1, 'Water')
+      ..['warehouse_availability'] = [
+        warehouseRow(1, 'Main', 1),
+        warehouseRow(2, 'Branch', 4),
+      ];
+    ctr.categories.add({
+      'name': 'Drinks',
+      'products': [
+        product,
+        saleProductJson(2, 'Bread')..remove('warehouse_availability'),
+      ],
+    });
+    await pumpSalesPage(tester, SaleScreen(), size: const Size(1440, 900));
+    await tester.tap(find.text('Bread'));
+    expect(ctr.cart, isEmpty);
+    await tester.tap(find.text('Water'));
+    await tester.pumpAndSettle();
+    expect(find.text('Main · 1'), findsOneWidget);
+    expect(find.text('Branch · 4'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(ctr.cart, isEmpty);
+    await tester.tap(find.text('Water'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Branch · 4'));
+    await tester.pumpAndSettle();
+    expect(ctr.selectedProducts.single['warehouse_name'], 'Branch');
+  });
   testWidgets('product tiles use shared list surfaces', (tester) async {
     final ctr = Get.put<SaleController>(SellingController());
     ctr.categories.add({

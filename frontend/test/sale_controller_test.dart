@@ -102,8 +102,20 @@ void main() {
     final sales = SaleTestSaleService();
     final payments = SaleTestPaymentService();
     final ctr = SaleController(service: sales, salePaymentService: payments);
-    ctr.addProduct(saleProductJson(1, 'Water'));
-    ctr.addProduct(saleProductJson(1, 'Water'));
+    final product = saleProductJson(1, 'Water')
+      ..['warehouse_availability'] = [
+        warehouseRow(1, 'Main', 1),
+        warehouseRow(2, 'Branch', 4),
+      ];
+    ctr.addProduct(product, warehouseId: 1);
+    for (var i = 0; i < 3; i++) {
+      ctr.addProduct(product, warehouseId: 2);
+    }
+    ctr.changeQuantity(1, 1, 1);
+    expect(ctr.cart.length, 2);
+    expect(ctr.totalItems, 4);
+    ctr.changeQuantity(1, 2, -1);
+    expect(ctr.cart[(1, 1)]!['qty'], 1);
     ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
     ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
     await tester.pumpWidget(
@@ -159,7 +171,8 @@ void main() {
     expect(paymentRequest['payment_date'], saleRequest['sale_date']);
     expect(paymentRequest['created_at'], saleRequest['sale_date']);
     expect(sales.createCalls.single['sale_items'], [
-      {'product_id': 1, 'qty': 2},
+      {'product_id': 1, 'warehouse_id': 1, 'qty': 1},
+      {'product_id': 1, 'warehouse_id': 2, 'qty': 2},
     ]);
     expect(ctr.totalItems, 0);
     expect(Get.currentRoute, '/payment-success');
@@ -273,8 +286,8 @@ void main() {
     final service = Categories();
     final ctr = SaleController(service: service, productService: Products());
     ctr.categories.add({'id': 1, 'products': []});
-    ctr.addProduct({'id': 1, 'sale_price': '5'});
-    ctr.addProduct({'id': 1, 'sale_price': '5'});
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.searchCtr.keyword.value = 'water';
     service.fail = true;
     await ctr.loadProductCategories();
@@ -292,10 +305,10 @@ void main() {
   });
   test('confirmation busy freezes cart mutations', () {
     final ctr = SaleController();
-    ctr.addProduct({'id': 1, 'sale_price': '5'});
+    ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.isConfirmingPayment.value = true;
-    ctr.addProduct({'id': 1, 'sale_price': '5'});
-    ctr.changeQuantity(1, -1);
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    ctr.changeQuantity(1, 1, -1);
     expect(ctr.totalItems, 1);
     expect(ctr.checkoutBusy, isTrue);
     expect(ctr.canCheckout, isFalse);

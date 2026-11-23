@@ -18,8 +18,16 @@ Map<String, dynamic> saleProductJson(int id, String name) => {
   'name': name,
   'sale_price': '5.00',
   'barcode': '12345',
+  'qty': 10,
+  'warehouse_availability': [warehouseRow(1, 'Main', 10)],
   'photo': null,
 };
+Map<String, dynamic> warehouseRow(int id, String name, int qty) => {
+  'warehouse_id': id,
+  'warehouse_name': name,
+  'qty': qty,
+};
+
 Map<String, dynamic> saleJson(int id, {String invoice = 'SALE-1'}) => {
   'id': id,
   'invoice_no': invoice,

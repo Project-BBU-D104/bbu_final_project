@@ -1,4 +1,7 @@
 const Map<String, String> enUS = {
+  "Select warehouse": "Select warehouse",
+  "Warehouse availability unavailable": "Warehouse availability unavailable",
+  "The stock allocation needs review before deleting this sale.": "The stock allocation needs review before deleting this sale.",
   "Add Payment": "Add Payment",
   "Edit Payment": "Edit Payment",
   "Search Payment": "Search Payment",

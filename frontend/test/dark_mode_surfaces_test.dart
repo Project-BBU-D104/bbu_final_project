@@ -31,10 +31,7 @@ Future<void> pumpDark(WidgetTester tester, Widget child) async {
 void expectThemedCard(WidgetTester tester) {
   final cardFinder = find.byType(Card).first;
   final context = tester.element(cardFinder);
-  expect(
-    tester.widget<Card>(cardFinder).color,
-    Theme.of(context).cardColor,
-  );
+  expect(tester.widget<Card>(cardFinder).color, Theme.of(context).cardColor);
 }
 
 void main() {
@@ -46,11 +43,13 @@ void main() {
     Get.reset();
   });
 
-  testWidgets('current sale item renders on the dark card surface',
-      (tester) async {
+  testWidgets('current sale item renders on the dark card surface', (
+    tester,
+  ) async {
     await pumpDark(
       tester,
       CurrentSaleItemWidget(
+        warehouseName: 'Main',
         productName: 'Coffee',
         imageUrl: '',
         quantity: 2,
@@ -76,7 +75,10 @@ void main() {
   });
 
   testWidgets('purchase KPI renders on the dark card surface', (tester) async {
-    await pumpDark(tester, const PurchaseKpiWidget(title: 'Purchases', value: 3));
+    await pumpDark(
+      tester,
+      const PurchaseKpiWidget(title: 'Purchases', value: 3),
+    );
 
     expectThemedCard(tester);
   });
@@ -84,7 +86,11 @@ void main() {
   testWidgets('dashboard KPI renders on the dark card surface', (tester) async {
     await pumpDark(
       tester,
-      const CardKpiWidget(icon: Icons.shopping_cart, title: 'Sales', value: '5'),
+      const CardKpiWidget(
+        icon: Icons.shopping_cart,
+        title: 'Sales',
+        value: '5',
+      ),
     );
 
     expectThemedCard(tester);

@@ -1,5 +1,6 @@
 import 'package:frontend/widget/app_cached_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/currency_formatter.dart';
@@ -16,7 +17,7 @@ class CardItemWidget extends StatelessWidget {
   final Map<String, dynamic> product;
   final int quantity;
   final Map<String, dynamic>? currency;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) {
     final photo = product['photo']?.toString() ?? '';
@@ -24,20 +25,28 @@ class CardItemWidget extends StatelessWidget {
       double.tryParse(product['sale_price']?.toString() ?? '') ?? 0,
       currency,
     );
-    final soldOut =
-        (double.tryParse(product['qty']?.toString() ?? '') ?? 0) <= 0;
+    final rows = SaleController.warehouses(product);
+    final soldOut = rows.isNotEmpty && rows.every((row) => row['qty'] <= 0);
+    final stock = rows.isEmpty
+        ? 'Warehouse availability unavailable'.tr
+        : soldOut
+        ? 'Sold out'.tr
+        : rows.length == 1
+        ? '${rows.first['warehouse_name']} · ${rows.first['qty']}'
+        : 'Select warehouse'.tr;
+    final tap = rows.isEmpty || soldOut ? null : onTap;
     return Semantics(
       button: true,
       excludeSemantics: true,
-      onTap: onTap,
-      value: [price, if (soldOut) 'Sold out'.tr].join(', '),
+      onTap: tap,
+      value: [price, stock].join(', '),
       label: 'Add @name, quantity @quantity'.trParams({
         'name': product['name']?.toString() ?? '',
         'quantity': '$quantity',
       }),
       child: AppListCard(
         margin: EdgeInsets.zero,
-        onTap: onTap,
+        onTap: tap,
         child: LayoutBuilder(
           builder: (context, bounds) {
             final grid = bounds.hasBoundedHeight;
@@ -53,7 +62,11 @@ class CardItemWidget extends StatelessWidget {
                 overflow: grid ? TextOverflow.ellipsis : null,
               ),
               Text(price),
-              if (soldOut) Text('Sold out'.tr),
+              Text(
+                stock,
+                maxLines: grid ? 1 : null,
+                overflow: grid ? TextOverflow.ellipsis : null,
+              ),
               Text('Quantity: @quantity'.trParams({'quantity': '$quantity'})),
             ];
             if (grid) {

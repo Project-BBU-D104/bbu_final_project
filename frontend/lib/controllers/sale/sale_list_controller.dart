@@ -3,6 +3,7 @@ import 'package:frontend/controllers/search_controller.dart';
 import 'package:frontend/helper/confirm_dialog_helper.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
@@ -122,7 +123,16 @@ class SaleListController extends GetxController {
               type: ToastType.success,
             );
           } catch (e) {
-            loadError.value = 'Unable to delete sale. Please try again.';
+            if (e is ApiException && e.statusCode == 409) {
+              loadError.value =
+                  'The stock allocation needs review before deleting this sale.';
+              ToastWidget.show(
+                message: loadError.value.tr,
+                type: ToastType.error,
+              );
+            } else {
+              loadError.value = 'Unable to delete sale. Please try again.';
+            }
           } finally {
             deletingIds.remove(saleId);
           }

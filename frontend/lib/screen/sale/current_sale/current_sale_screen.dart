@@ -98,14 +98,25 @@ class CurrentSaleWidget extends StatelessWidget {
                               0;
                           return CurrentSaleItemWidget(
                             enabled: !ctr.checkoutBusy,
+                            warehouseName: p['warehouse_name'],
                             productName: p['name']?.toString() ?? '',
                             imageUrl: p['photo']?.toString() ?? '',
                             quantity: p['qty'],
                             unitPrice: price,
                             subtotal: price * p['qty'],
                             currency: ctr.currency.value,
-                            onIncrease: () => ctr.changeQuantity(p['id'], 1),
-                            onDecrease: () => ctr.changeQuantity(p['id'], -1),
+                            onIncrease: p['qty'] >= p['available_qty']
+                                ? null
+                                : () => ctr.changeQuantity(
+                                    p['id'],
+                                    p['warehouse_id'],
+                                    1,
+                                  ),
+                            onDecrease: () => ctr.changeQuantity(
+                              p['id'],
+                              p['warehouse_id'],
+                              -1,
+                            ),
                           );
                         }).toList(),
                       );

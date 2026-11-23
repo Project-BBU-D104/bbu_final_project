@@ -53,7 +53,7 @@ void main() {
     expect(sales.createCalls, hasLength(1));
     expect(payments.createCalls, isEmpty);
     ctr.addProduct(saleProductJson(2, 'Bread'));
-    ctr.changeQuantity(1, -1);
+    ctr.changeQuantity(1, 1, -1);
     ctr.selectCustomer({'id': 2});
     ctr.selectPaymentType({'id': 2});
     expect(ctr.totalItems, 1);

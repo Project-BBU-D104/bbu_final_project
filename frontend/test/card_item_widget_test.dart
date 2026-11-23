@@ -3,7 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/screen/sale/widget/card_item_widget.dart';
 
 Map<String, dynamic> productWithQty(num qty) {
-  return {'id': 1, 'name': 'Coke', 'photo': '', 'sale_price': 2.0, 'qty': qty};
+  return {
+    'id': 1,
+    'name': 'Coke',
+    'photo': '',
+    'sale_price': 2.0,
+    'qty': qty,
+    'warehouse_availability': [
+      {'warehouse_id': 1, 'warehouse_name': 'Main', 'qty': qty.toInt()},
+    ],
+  };
 }
 
 Widget wrap({required num stockQty}) {

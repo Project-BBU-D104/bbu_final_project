@@ -5,16 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 
 class CurrentSaleItemWidget extends StatelessWidget {
+  final String warehouseName;
   final String productName;
   final String imageUrl;
   final int quantity;
   final double unitPrice;
   final double subtotal;
   final Map<String, dynamic>? currency;
-  final VoidCallback onIncrease;
+  final VoidCallback? onIncrease;
   final VoidCallback onDecrease;
 
   const CurrentSaleItemWidget({
+    required this.warehouseName,
     required this.productName,
     required this.imageUrl,
     required this.quantity,
@@ -34,6 +36,7 @@ class CurrentSaleItemWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(productName),
+        Text(warehouseName),
         Text(CurrencyFormatter.format(subtotal, currency)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,

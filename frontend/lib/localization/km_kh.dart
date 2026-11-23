@@ -1,4 +1,7 @@
 const Map<String, String> kmKH = {
+  "Select warehouse": "ជ្រើសរើសឃ្លាំង",
+  "Warehouse availability unavailable": "មិនមានព័ត៌មានស្តុកតាមឃ្លាំង",
+  "The stock allocation needs review before deleting this sale.": "សូមពិនិត្យមើលការបែងចែកស្តុក មុនពេលលុបការលក់នេះ។",
   "Add Payment": "បន្ថែមការទូទាត់",
   "Edit Payment": "កែប្រែការទូទាត់",
   "Search Payment": "ស្វែងរកការទូទាត់",
