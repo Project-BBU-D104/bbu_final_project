@@ -6,14 +6,15 @@ from fastapi import HTTPException
 from sqlmodel import select
 
 from app.crud.product.product import create_product
-from app.crud.sale.sale import create_sale
+from app.crud.sale.sale import create_sale, update_sale, delete_sale
+from app.models.sale_payment import SalePayment
 from app.models.customer import Customer
 from app.models.sale import Sale
 from app.models.role import Role
 from app.models.user import User
 from app.models.warehouse_stock import WarehouseStock
 from app.schemas.product.product import ProductCreate
-from app.schemas.sale.sale import SaleCreate
+from app.schemas.sale.sale import SaleCreate, SaleUpdate
 from app.schemas.sale.sale_item import SaleItemCreate
 
 
@@ -67,12 +68,12 @@ def stock_qty(session, product_id, warehouse_id):
     ).one().qty
 
 
-def sale_payload(user_id, customer_id, product_id, qty):
+def sale_payload(user_id, customer_id, product_id, qty, warehouse_id=None):
     return SaleCreate(
         user_id=user_id, customer_id=customer_id,
         sale_date=datetime.now(timezone.utc),
         status="completed", payment_method="Cash",
-        sale_items=[SaleItemCreate(product_id=product_id, qty=qty)],
+        sale_items=[SaleItemCreate(product_id=product_id, qty=qty, warehouse_id=warehouse_id)],
     )
 
 
@@ -83,6 +84,7 @@ def test_sale_deducts_warehouse_stock(session, seed):
     sale = create_sale(session, sale_payload(user.id, customer.id, product.id, 3))
 
     assert stock_qty(session, product.id, seed["warehouse_a"].id) == 7
+    assert sale.sale_items[0].warehouse_id == seed["warehouse_a"].id
     assert sale.subtotal == Decimal("6.00")          # 3 x sale_price 2.00
     assert sale.total_amount == Decimal("6.00")
     assert sale.payment_status == "unpaid"
@@ -269,3 +271,75 @@ def test_fractional_purchase_quantity_is_rejected(session, seed):
         make_purchase(session, seed, user, supplier, product, qty=Decimal("2.5"))
 
     assert stock_qty(session, product.id, seed["warehouse_a"].id) == 0
+@pytest.fixture
+def allocation(session, seed):
+    product = make_stocked_product(session, seed, qty=1)
+    a, b = seed["warehouse_a"].id, seed["warehouse_b"].id
+    for qty in [2, 2]:
+        session.add(WarehouseStock(product_id=product.id, warehouse_id=b, qty=qty))
+    session.commit()
+    payload = sale_payload(make_user(session).id, make_customer(session).id, product.id, 3, b)
+    return payload, product.id, a, b
+
+
+def balances(session, product_id, *warehouses):
+    return tuple(sum(session.exec(select(WarehouseStock.qty).where(
+        WarehouseStock.product_id == product_id, WarehouseStock.warehouse_id == warehouse
+    )).all()) for warehouse in warehouses)
+
+
+def test_sale_reverses_into_recorded_warehouse(session, allocation):
+    payload, product, a, b = allocation
+    sale = create_sale(session, payload)
+    line, = sale.sale_items
+    assert (line.warehouse_id, line.qty) == (b, 3)
+    assert balances(session, product, a, b) == (1, 1)
+    delete_sale(session, sale.id)
+    assert balances(session, product, a, b) == (1, 4)
+
+
+def test_replace_warehouse(session, allocation):
+    payload, product, a, b = allocation
+    sale = create_sale(session, payload)
+    edited = update_sale(session, sale.id, SaleUpdate(sale_items=[
+        SaleItemCreate(product_id=product, qty=1, warehouse_id=a)]))
+    assert edited.sale_items[0].warehouse_id == a
+    assert balances(session, product, a, b) == (0, 4)
+
+
+@pytest.mark.parametrize("source,qty", [(None, 3), (999, 1), ("b", 2)])
+def test_failed_second_line_rolls_back(session, allocation, source, qty):
+    payload, product, a, b = allocation
+    payload.sale_items.append(SaleItemCreate(product_id=product,
+        warehouse_id=b if source == "b" else source, qty=qty))
+    with pytest.raises(HTTPException) as error:
+        create_sale(session, payload)
+    assert error.value.status_code == 400
+    assert session.exec(select(Sale)).all() == []
+    assert balances(session, product, a, b) == (1, 4)
+
+
+@pytest.mark.parametrize("missing", ["warehouse", "balance"])
+def test_unresolvable_reversal_preserves_invoice(session, allocation, missing):
+    payload, product, a, b = allocation
+    sale = create_sale(session, payload)
+    line = sale.sale_items[0]
+    if missing == "warehouse":
+        line.warehouse_id = None
+    else:
+        for row in session.exec(select(WarehouseStock).where(WarehouseStock.warehouse_id == b)).all():
+            session.delete(row)
+    payment = SalePayment(sale_id=sale.id, user_id=payload.user_id, amount=1,
+                          payment_method="Cash", reference_no="", note="")
+    session.add(payment)
+    session.commit()
+    before = balances(session, product, a, b)
+    assert update_sale(session, sale.id, SaleUpdate(status="review")).status == "review"
+    for operation in [lambda: update_sale(session, sale.id, SaleUpdate(sale_items=[])),
+                      lambda: delete_sale(session, sale.id)]:
+        with pytest.raises(HTTPException) as error:
+            operation()
+        assert error.value.status_code == 409
+        assert sale.sale_items == [line]
+        assert sale.sale_payments == [payment]
+        assert balances(session, product, a, b) == before

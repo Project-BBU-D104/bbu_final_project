@@ -12,45 +12,54 @@ from fastapi import HTTPException
 from app.schemas.sale.sale_item import SaleItemCreate
 
 
-def _warehouse_stock_for_product(session: Session, product_id: int):
-    return session.exec(
-        select(WarehouseStock).where(WarehouseStock.product_id == product_id)
-    ).first()
+def _stock_rows(session: Session, product_id: int, warehouse_id: int | None):
+    statement = select(WarehouseStock).where(WarehouseStock.product_id == product_id)
+    if warehouse_id is not None:
+        statement = statement.where(WarehouseStock.warehouse_id == warehouse_id)
+    return session.exec(statement.order_by(WarehouseStock.id).with_for_update()
+                        .execution_options(populate_existing=True)).all()
 
 
-def _decrease_warehouse_stock(
-    session: Session, product: Product, quantity: int
-) -> None:
-    stock = _warehouse_stock_for_product(session, product.id)
+def _decrease_warehouse_stock(session: Session, product: Product, item: SaleItemCreate) -> int:
+    rows = _stock_rows(session, product.id, item.warehouse_id)
+    if not rows:
+        raise HTTPException(400, f'No warehouse stock for "{product.name}" in this selection.')
+    if item.warehouse_id is None and len({row.warehouse_id for row in rows}) != 1:
+        raise HTTPException(400, f'Select a warehouse for "{product.name}".')
 
-    if stock is None:
-        raise HTTPException(
-            status_code=400,
-            detail=f'Product "{product.name}" is not in any warehouse stock.',
-        )
-
-    if stock.qty < quantity:
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                f'Not enough stock for "{product.name}". '
-                f'Only {stock.qty} left, but {quantity} requested.'
-            ),
-        )
-
-    stock.qty -= quantity
-    session.add(stock)
+    available = sum(row.qty for row in rows)
+    if available < item.qty:
+        raise HTTPException(400, f'Not enough stock for "{product.name}". '
+                                 f'Only {available} left, but {item.qty} requested.')
+    remaining = item.qty
+    for row in rows:
+        taken = min(remaining, max(0, row.qty))
+        row.qty -= taken
+        remaining -= taken
+        if remaining == 0:
+            break
+    return rows[0].warehouse_id
 
 
-def _restore_warehouse_stock(
-    session: Session, product_id: int, quantity: int
-) -> None:
-    stock = _warehouse_stock_for_product(session, product_id)
-    if stock is None:
-        return
+def _restore_warehouse_stock(session: Session, item: SaleItems) -> None:
+    if item.warehouse_id is None:
+        raise HTTPException(409, f'Review product {item.product_id}: original warehouse is unknown.')
+    rows = _stock_rows(session, item.product_id, item.warehouse_id)
+    if not rows:
+        raise HTTPException(409, f'Review product {item.product_id}: stock row for '
+                                 f'warehouse {item.warehouse_id} is missing.')
+    rows[0].qty += item.qty
 
-    stock.qty += quantity
-    session.add(stock)
+
+def _locked_sale(session: Session, sale_id: int):
+    return session.exec(select(Sale).where(Sale.id == sale_id).with_for_update()
+                        .execution_options(populate_existing=True)).first()
+
+
+def _locked_lines(session: Session, sale_id: int):
+    return session.exec(select(SaleItems).where(SaleItems.sale_id == sale_id)
+                        .order_by(SaleItems.id).with_for_update()
+                        .execution_options(populate_existing=True)).all()
 
 
 def _build_sale_items(
@@ -79,12 +88,13 @@ def _build_sale_items(
 
     for item in sale_items:
         product = products[item.product_id]
-        _decrease_warehouse_stock(session, product, item.qty)
+        warehouse_id = _decrease_warehouse_stock(session, product, item)
         line_subtotal = product.sale_price * item.qty
         subtotal += line_subtotal
         items.append(SaleItems(
             sale_id=sale_id,
             product_id=product.id,
+            warehouse_id=warehouse_id,
             qty=item.qty,
             sale_price=product.sale_price,
             subtotal=line_subtotal,
@@ -179,8 +189,7 @@ def get_sale(session: Session, sale_id: int):
     return session.exec(statement).first()
 
 def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
-    statement = select(Sale).where(Sale.id == sale_id).options(selectinload(Sale.sale_items))
-    db_sale = session.exec(statement).first()
+    db_sale = _locked_sale(session, sale_id)
     if not db_sale:
         return db_sale
 
@@ -195,15 +204,14 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
 
         if sale.sale_items is not None:
             # Put the old quantities back before deducting the new ones.
-            for old_item in db_sale.sale_items:
-                _restore_warehouse_stock(
-                    session, old_item.product_id, old_item.qty
-                )
+            old_items = _locked_lines(session, sale_id)
+            for old_item in old_items:
+                _restore_warehouse_stock(session, old_item)
 
             items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
-            for old_item in db_sale.sale_items:
+            for old_item in old_items:
                 session.delete(old_item)
-            db_sale.sale_items = items
+            session.add_all(items)
 
         _set_sale_totals(db_sale)
 
@@ -218,18 +226,15 @@ def update_sale(session: Session, sale_id: int, sale: SaleUpdate):
 
 def delete_sale(session: Session, sale_id: int):
 
-    sale = session.get(Sale, sale_id)
+    sale = _locked_sale(session, sale_id)
 
     if not sale:
         return None
 
     try:
         # Put the sold quantities back into warehouse stock.
-        for item in sale.sale_items:
-            _restore_warehouse_stock(session, item.product_id, item.qty)
-
-        # delete sale items first
-        for item in sale.sale_items:
+        for item in _locked_lines(session, sale_id):
+            _restore_warehouse_stock(session, item)
             session.delete(item)
 
         # delete payments if exists

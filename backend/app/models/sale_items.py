@@ -14,6 +14,7 @@ class SaleItems(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     sale_id: int = Field(foreign_key="sales.id")
     product_id: int = Field(foreign_key="product.id")
+    warehouse_id: int | None = Field(default=None, foreign_key="warehouses.id")
     qty: int
     sale_price: Decimal = Field(sa_type=Numeric(12, 2))
     subtotal: Decimal = Field(sa_type=Numeric(12, 2))

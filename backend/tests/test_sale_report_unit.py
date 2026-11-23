@@ -76,3 +76,4 @@ def test_sale_items_include_product_unit(session, seed):
     payload = SaleRead.model_validate(sale_row).model_dump(mode="json")
 
     assert payload["sale_items"][0]["product"]["unit"]["short_name"] == "pc"
+    assert payload["sale_items"][0]["warehouse_id"] is None
