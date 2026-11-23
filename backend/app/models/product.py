@@ -65,3 +65,15 @@ class Product(SQLModel, table=True):
     def stock_qty(self) -> int:
         """Total quantity on hand across all warehouses."""
         return sum(stock.qty for stock in self.warehouse_stock or [])
+
+    @property
+    def warehouse_availability(self):
+        balances = {}
+        for stock in self.warehouse_stock:
+            entry = balances.setdefault(stock.warehouse_id, {
+                "warehouse_id": stock.warehouse_id,
+                "warehouse_name": stock.warehouse.name,
+                "qty": 0,
+            })
+            entry["qty"] += stock.qty
+        return [balances[key] for key in sorted(balances)]

@@ -19,6 +19,8 @@ def get_product_category():
             p.photo,
             p.sale_price,
             p.barcode,
+            w.id AS warehouse_id,
+            w.name AS warehouse_name,
             COALESCE(SUM(ws.qty), 0) AS qty
            
         FROM categories c
@@ -26,6 +28,7 @@ def get_product_category():
             ON p.category_id = c.id
         JOIN warehouse_stock ws
             ON ws.product_id = p.id
+        JOIN warehouses w ON w.id = ws.warehouse_id
         GROUP BY
             c.id,
             c.name,
@@ -33,14 +36,15 @@ def get_product_category():
             p.name,
             p.photo,
             p.sale_price,
-            p.barcode
-        ORDER BY c.id, p.id
+            p.barcode, w.id, w.name
+        ORDER BY c.id, p.id, w.id
     """)
 
     with engine.connect() as conn:
         result = conn.execute(sql).mappings().all()
 
     categories = {}
+    products = {}
 
     for row in result:
         category_id = row["category_id"]
@@ -52,14 +56,25 @@ def get_product_category():
                 "products": []
             }
 
-        if row["product_id"] is not None:
-            categories[category_id]["products"].append({
+        if row["product_id"] not in products:
+            product = {
                 "id": row["product_id"],
                 "name": row["product_name"],
                 "photo": row["photo"],
                 "sale_price": row["sale_price"],
                 "barcode": row["barcode"],
-                "qty": int(row["qty"])
-            })
+                "qty": 0,
+                "warehouse_availability": [],
+            }
+            products[row["product_id"]] = product
+            categories[category_id]["products"].append(product)
+        product = products[row["product_id"]]
+        qty = int(row["qty"])
+        product["qty"] += qty
+        product["warehouse_availability"].append({
+            "warehouse_id": row["warehouse_id"],
+            "warehouse_name": row["warehouse_name"],
+            "qty": qty,
+        })
 
     return list(categories.values())

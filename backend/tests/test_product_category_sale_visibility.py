@@ -98,8 +98,9 @@ def test_sale_products_expose_total_warehouse_qty(session, seed, monkeypatch):
     session.commit()
     session.refresh(product)
 
-    stock_for(session, product, seed["warehouse_a"], 3)
-    stock_for(session, product, seed["warehouse_b"], 4)
+    stock_for(session, product, seed["warehouse_a"], 1)
+    stock_for(session, product, seed["warehouse_b"], 2)
+    stock_for(session, product, seed["warehouse_b"], 2)
     session.commit()
 
     monkeypatch.setattr(product_category, "engine", session.get_bind())
@@ -107,7 +108,11 @@ def test_sale_products_expose_total_warehouse_qty(session, seed, monkeypatch):
     response = product_category.get_product_category()
 
     [sale_product] = response[0]["products"]
-    assert sale_product["qty"] == 7
+    assert sale_product["qty"] == 5
+    assert sale_product["warehouse_availability"] == [
+        {"warehouse_id": w.id, "warehouse_name": w.name, "qty": qty}
+        for w, qty in [(seed["warehouse_a"], 1), (seed["warehouse_b"], 4)]
+    ]
 
 
 def test_sale_products_are_not_duplicated_across_warehouses(

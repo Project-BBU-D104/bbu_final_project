@@ -33,6 +33,12 @@ class ProductUpdate(SQLModel):
     warehouse_id: Optional[int] = None
     updated_at: Optional[datetime] = None
 
+class WarehouseAvailability(SQLModel):
+    warehouse_id: int
+    warehouse_name: str
+    qty: int
+
+
 class ProductRead(SQLModel):
     id: int
     category: CategorySimple
@@ -45,6 +51,7 @@ class ProductRead(SQLModel):
     sale_price: Optional[Decimal] = None
     description: Optional[str] = None
     stock_qty: int = 0
+    warehouse_availability: list[WarehouseAvailability] = []
     warehouse: Optional[WarehouseSimple] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

@@ -172,3 +172,22 @@ def test_cached_product_payload_keeps_warehouse(session, seed):
     assert read.warehouse.id == seed["warehouse_a"].id
 
 
+
+def test_product_read_exposes_warehouse_availability(session, seed):
+    from app.core.cache import ORMJsonCoder
+
+    product = create_product(session, make_product(seed))
+    a, b = seed["warehouse_a"], seed["warehouse_b"]
+    assert ProductRead.model_validate(product).warehouse_availability == []
+    for warehouse, qty in [(a, 0), (a, 1), (b, 2), (b, 2)]:
+        session.add(WarehouseStock(product_id=product.id, warehouse_id=warehouse.id, qty=qty))
+        session.commit()
+        if qty == 0:
+            assert ProductRead.model_validate(get_product(session, product.id)).warehouse_availability[0].qty == 0
+    fresh = get_product(session, product.id)
+    for value in [fresh, ORMJsonCoder.decode(ORMJsonCoder.encode(fresh))]:
+        read = ProductRead.model_validate(value)
+        assert [(row.warehouse_id, row.warehouse_name, row.qty) for row in read.warehouse_availability] == [
+            (a.id, a.name, 1), (b.id, b.name, 4)
+        ]
+        assert read.stock_qty == 5
