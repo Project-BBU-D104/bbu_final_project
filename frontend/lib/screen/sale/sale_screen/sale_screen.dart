@@ -213,10 +213,7 @@ class SaleScreen extends StatelessWidget {
           for (final row in rows)
             ListTile(
               title: Text('${row['warehouse_name']} · ${row['qty']}'),
-              enabled:
-                  (ctr.cart[(product['id'], row['warehouse_id'])]?['qty'] ??
-                      0) <
-                  row['qty'],
+              enabled: _hasCapacity(product, row),
               onTap: () => Get.back(result: row['warehouse_id']),
             ),
           TextButton(onPressed: () => Get.back(), child: Text('Cancel'.tr)),
@@ -226,6 +223,9 @@ class SaleScreen extends StatelessWidget {
     if (selected != null) ctr.addProduct(product, warehouseId: selected);
   }
 
+  bool _hasCapacity(Map<String, dynamic> product, Map<String, dynamic> row) =>
+      (ctr.cart[(product['id'], row['warehouse_id'])]?['qty'] ?? 0) < row['qty'];
+
   Widget _tile(Map<String, dynamic> product) => Obx(
     () => CardItemWidget(
       product: product,
@@ -233,7 +233,10 @@ class SaleScreen extends StatelessWidget {
           .where((e) => e.key.$1 == product['id'])
           .fold<int>(0, (sum, e) => sum + (e.value['qty'] as int)),
       currency: ctr.currency.value,
-      onTap: ctr.checkoutBusy ? null : () => _selectWarehouse(product),
+      onTap: !ctr.checkoutBusy &&
+              SaleController.warehouses(product).any((row) => _hasCapacity(product, row))
+          ? () => _selectWarehouse(product)
+          : null,
     ),
   );
 }

@@ -91,8 +91,8 @@ void main() {
     final ctr = Get.put<SaleController>(SellingController());
     final product = saleProductJson(1, 'Water')
       ..['warehouse_availability'] = [
-        warehouseRow(1, 'Main', 1),
-        warehouseRow(2, 'Branch', 4),
+        warehouseRow(1, 'Main', 0),
+        warehouseRow(2, 'Branch', 2),
       ];
     ctr.categories.add({
       'name': 'Drinks',
@@ -106,16 +106,22 @@ void main() {
     expect(ctr.cart, isEmpty);
     await tester.tap(find.text('Water'));
     await tester.pumpAndSettle();
-    expect(find.text('Main · 1'), findsOneWidget);
-    expect(find.text('Branch · 4'), findsOneWidget);
+    expect(find.text('Main · 0'), findsOneWidget);
+    expect(find.text('Branch · 2'), findsOneWidget);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(ctr.cart, isEmpty);
     await tester.tap(find.text('Water'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Branch · 4'));
+    await tester.tap(find.text('Branch · 2'));
     await tester.pumpAndSettle();
     expect(ctr.selectedProducts.single['warehouse_name'], 'Branch');
+    ctr.addProduct(product, warehouseId: 2);
+    ctr.addProduct(product, warehouseId: 2);
+    await tester.pump();
+    expect(ctr.totalItems, 2);
+    expect(tester.getSemantics(find.bySemanticsLabel('Add Water, quantity 2'))
+        .getSemanticsData().hasAction(SemanticsAction.tap), isFalse);
   });
   testWidgets('refresh recovers missing warehouse availability', (
     tester,

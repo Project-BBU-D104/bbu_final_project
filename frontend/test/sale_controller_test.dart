@@ -322,10 +322,15 @@ void main() {
         },
       ];
       await ctr.loadProductCategories();
+      ctr.selectedCustomer.value = {'id': 1};
+      ctr.selectedPaymentType.value = {'id': 1};
+      expect(ctr.canCheckout, isFalse);
+      ctr.addProduct(product); // Stale picker row from before the refresh.
       ctr.changeQuantity(1, 1, 1);
       expect(ctr.totalItems, 2);
       ctr.changeQuantity(1, 1, -1);
       expect(ctr.totalItems, 1);
+      expect(ctr.canCheckout, isTrue);
       service.response = [];
       await ctr.loadProductCategories();
       ctr.changeQuantity(1, 1, 1);

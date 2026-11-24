@@ -35,6 +35,7 @@ class SaleController extends GetxController {
   final CurrencyService currencyService;
   final PaymentTypeService paymentTypeService;
   final SalePaymentService salePaymentService;
+  Map<int, Map<String, dynamic>>? _catalog;
   final categories = <Map<String, dynamic>>[].obs;
   final customers = <Map<String, dynamic>>[].obs;
   final paymentTypes = <Map<String, dynamic>>[].obs;
@@ -59,6 +60,7 @@ class SaleController extends GetxController {
   bool get canCheckout =>
       !checkoutBusy &&
       cart.isNotEmpty &&
+      cart.values.every((row) => row['qty'] <= row['available_qty']) &&
       selectedCustomer.value != null &&
       selectedPaymentType.value != null;
 
@@ -209,6 +211,11 @@ class SaleController extends GetxController {
           return category;
         }).toList();
         await _mergeProductBarcodes(categoryList);
+        _catalog = {
+          for (final category in categoryList)
+            for (final product in category['products'])
+              product['id'] as int: product as Map<String, dynamic>,
+        };
         categories.value = categoryList;
         if (cart.isNotEmpty) {
           final limits = {
@@ -293,6 +300,11 @@ class SaleController extends GetxController {
 
   void addProduct(Map<String, dynamic> product, {int? warehouseId}) {
     if (checkoutBusy) return;
+    if (_catalog != null) {
+      final current = _catalog![product['id']];
+      if (current == null) return;
+      product = current;
+    }
     final rows = warehouses(product);
     final row = warehouseId == null
         ? rows.singleOrNull
@@ -358,6 +370,7 @@ class SaleController extends GetxController {
       );
       return;
     }
+    if (!canCheckout) return;
     if (userId == null) {
       ToastWidget.show(
         message: 'Unable to identify the logged-in user.'.tr,
