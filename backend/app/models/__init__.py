@@ -1,3 +1,4 @@
+from .checkout import Checkout
 from .user import User
 from .category import Category
 from .product import Product
@@ -25,5 +26,5 @@ from .purchase_request_items import PurchaseRequestItems
 
 from .system_configuration import SystemConfiguration
 
-# __all__ = ["User", "Employee", "Overtime"]
-__all__ = ["User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment", "Unit", "PaymentType", "Currency", "PurchasePayment", "PurchaseRequest", "PurchaseRequestItems", "ProductTransferItem", "SystemConfiguration"]
+# __all__ = ["Checkout", "User", "Employee", "Overtime"]
+__all__ = ["Checkout", "User", "Category", "Product", "Supplier", "Customer", "Role", "AuditLogs", "Warehouse","StockAdjustment", "ProductTransfer", "WarehouseStock", "Purchase", "PurchaseItem", "Sale", "SaleItems", "SalePayment", "Unit", "PaymentType", "Currency", "PurchasePayment", "PurchaseRequest", "PurchaseRequestItems", "ProductTransferItem", "SystemConfiguration"]

@@ -28,14 +28,19 @@ def _recalculate_sale(session: Session, sale_id: int) -> None:
     session.add(sale)
 
 
-def create_sale_payment(session: Session, sale: SalePaymentCreate):
+def _stage_sale_payment(session: Session, sale: SalePaymentCreate) -> SalePayment:
     db_sale_payment = SalePayment.model_validate(sale.model_dump(exclude_none=True))
     if session.get(Sale, db_sale_payment.sale_id) is None:
         raise HTTPException(status_code=404, detail="Sale not found.")
+    session.add(db_sale_payment)
+    session.flush()
+    _recalculate_sale(session, db_sale_payment.sale_id)
+    return db_sale_payment
+
+
+def create_sale_payment(session: Session, sale: SalePaymentCreate):
     try:
-        session.add(db_sale_payment)
-        session.flush()
-        _recalculate_sale(session, db_sale_payment.sale_id)
+        db_sale_payment = _stage_sale_payment(session, sale)
         session.commit()
         session.refresh(db_sale_payment)
     except Exception:

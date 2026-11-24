@@ -140,7 +140,7 @@ def generate_invoice_no(session: Session) -> str:
     return f"{prefix}{next_number:03d}"
 
 
-def create_sale(session: Session, sale: SaleCreate):
+def _stage_sale(session: Session, sale: SaleCreate) -> Sale:
     sale_data = sale.model_dump(
         exclude={"sale_items"},
         exclude_none=True,
@@ -148,12 +148,18 @@ def create_sale(session: Session, sale: SaleCreate):
     invoice_no = (sale_data.get("invoice_no") or "").strip()
     sale_data["invoice_no"] = invoice_no or generate_invoice_no(session)
     db_sale = Sale.model_validate(sale_data)
+    session.add(db_sale)
+    session.flush()
+    items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
+    db_sale.sale_items.extend(items)
+    _set_sale_totals(db_sale)
+    session.flush()
+    return db_sale
+
+
+def create_sale(session: Session, sale: SaleCreate):
     try:
-        session.add(db_sale)
-        session.flush()
-        items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
-        db_sale.sale_items.extend(items)
-        _set_sale_totals(db_sale)
+        db_sale = _stage_sale(session, sale)
         session.commit()
     except Exception:
         session.rollback()

@@ -5,6 +5,10 @@ from sqlmodel import Session
 from database import get_session
 from app.schemas.sale.sale import SaleCreate,SaleRead,SaleUpdate
 from app.crud.sale.sale import  create_sale, get_all_sales, get_sale, update_sale, delete_sale
+from app.crud.sale.checkout import checkout_sale
+from app.schemas.sale.checkout import CheckoutCreate, CheckoutReceipt
+from app.security import get_current_user
+from app.models.user import User
 from app.core.cache import clear_stock_caches
 
 router = APIRouter(prefix="/sale", tags=["sale"])
@@ -17,6 +21,14 @@ async def _clear_sale_caches():
     # Sales change warehouse quantities, so the warehouse cache is stale too.
     await FastAPICache.clear(namespace=CACHE_NS)
     await clear_stock_caches()
+
+
+@router.post("/checkout/", response_model=CheckoutReceipt)
+async def checkout(request: CheckoutCreate, session: Session = Depends(get_session),
+                   user: User = Depends(get_current_user)):
+    receipt = checkout_sale(session, request, user.id)
+    await _clear_sale_caches()
+    return receipt
 
 
 @router.post("/", response_model=SaleRead)

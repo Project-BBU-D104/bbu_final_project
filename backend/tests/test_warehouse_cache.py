@@ -56,7 +56,8 @@ def test_cached_warehouse_payload_keeps_stock(session, seed):
     assert read.warehouse_stock[0].product.name == "Coke"
 
 
-def test_clear_stock_caches_clears_product_and_warehouse_only():
+def test_clear_stock_caches_clears_product_and_warehouse_only(request):
+    request.addfinalizer(FastAPICache.reset)
     FastAPICache.init(InMemoryBackend(), prefix="test-clear")
     backend = FastAPICache.get_backend()
 

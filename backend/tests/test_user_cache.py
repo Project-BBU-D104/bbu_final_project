@@ -32,7 +32,8 @@ def make_user(session):
     return user
 
 
-def test_user_endpoint_returns_role_on_cache_hit(session):
+def test_user_endpoint_returns_role_on_cache_hit(session, request):
+    request.addfinalizer(FastAPICache.reset)
     # Starlette's TestClient needs httpx2, which is not always installed.
     try:
         from fastapi.testclient import TestClient
