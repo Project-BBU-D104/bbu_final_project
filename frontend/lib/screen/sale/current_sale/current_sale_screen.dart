@@ -97,8 +97,10 @@ class CurrentSaleWidget extends StatelessWidget {
                               ) ??
                               0;
                           return CurrentSaleItemWidget(
-                            enabled: !ctr.checkoutBusy,
-                            warehouseName: p['warehouse_name'],
+                            enabled: !ctr.cartLocked,
+                            warehouseName: p['qty'] > p['available_qty']
+                                ? "${p['warehouse_name']} · ${'Available: @qty'.trParams({'qty': "${p['available_qty']}"})}"
+                                : p['warehouse_name'],
                             productName: p['name']?.toString() ?? '',
                             imageUrl: p['photo']?.toString() ?? '',
                             quantity: p['qty'],
@@ -124,16 +126,16 @@ class CurrentSaleWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           IgnorePointer(
-                            ignoring: ctr.checkoutBusy,
+                            ignoring: ctr.cartLocked,
                             child: SelectCustomerCardWidget(
-                              enabled: !ctr.checkoutBusy,
+                              enabled: !ctr.cartLocked,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           PaymentMethodCardWidget(
                             loadError: ctr.paymentTypesLoadError.value,
                             onRetry: ctr.loadPaymentTypes,
-                            enabled: !ctr.checkoutBusy,
+                            enabled: !ctr.cartLocked,
                             paymentTypes: ctr.paymentTypes.toList(),
                             selectedPaymentType: ctr.selectedPaymentType.value,
                             isLoading:
@@ -197,12 +199,35 @@ class CurrentSaleWidget extends StatelessWidget {
                       onPressed: ctr.checkoutBusy ? null : () => Get.back(),
                       child: Text('Back to products'.tr),
                     ),
-                    FilledButton(
-                      onPressed: ctr.canCheckout ? ctr.onPayment : null,
-                      child: Text(
-                        (ctr.checkoutBusy ? 'Processing...' : 'Payment').tr,
+                    if (ctr.checkoutConflict.value &&
+                        ctr.hasPendingCheckout) ...[
+                      OutlinedButton(
+                        onPressed: () => Get.toNamed(AppRoutes.saleList),
+                        child: Text('Sales history'.tr),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: ctr.checkoutBusy
+                            ? null
+                            : ctr.dismissConflict,
+                        child: Text('Dismiss conflicting checkout'.tr),
+                      ),
+                    ] else
+                      FilledButton(
+                        onPressed:
+                            (ctr.hasPendingCheckout
+                                ? !ctr.checkoutBusy
+                                : ctr.canCheckout)
+                            ? ctr.onPayment
+                            : null,
+                        child: Text(
+                          (ctr.checkoutBusy
+                                  ? 'Processing...'
+                                  : ctr.hasPendingCheckout
+                                  ? 'Retry checkout'
+                                  : 'Payment')
+                              .tr,
+                        ),
+                      ),
                   ],
                 ),
               ],

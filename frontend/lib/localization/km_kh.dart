@@ -1,4 +1,11 @@
 const Map<String, String> kmKH = {
+  "Available: @qty": "មានស្តុក៖ @qty",
+  "Retry checkout": "ព្យាយាមទូទាត់ម្ដងទៀត",
+  "Review checkout": "ពិនិត្យការទូទាត់",
+  "Sales history": "ប្រវត្តិការលក់",
+  "Dismiss conflicting checkout": "បោះបង់ការទូទាត់ដែលប៉ះទង្គិច",
+  "Checkout requires a backend upgrade.": "សូមធ្វើបច្ចុប្បន្នភាពម៉ាស៊ីនមេដើម្បីទូទាត់។",
+  "Unable to save checkout. Please try again.": "មិនអាចរក្សាទុកការទូទាត់បានទេ។ សូមព្យាយាមម្ដងទៀត។",
   "Stock by warehouse": "ស្តុកតាមឃ្លាំង",
   "Total stock": "ស្តុកសរុប",
   "No warehouse assigned": "មិនទាន់បានកំណត់ឃ្លាំង",

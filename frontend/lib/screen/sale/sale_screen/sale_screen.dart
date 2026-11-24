@@ -181,7 +181,23 @@ class SaleScreen extends StatelessWidget {
             ),
             if (!shortKeyboard)
               Obx(
-                () => ctr.totalItems == 0
+                () => ctr.hasPendingCheckout
+                    ? FilledButton(
+                        onPressed: ctr.checkoutBusy
+                            ? null
+                            : () {
+                                ctr.onCurrentSale();
+                                if (!ctr.checkoutConflict.value)
+                                  ctr.onPayment();
+                              },
+                        child: Text(
+                          (ctr.checkoutConflict.value
+                                  ? 'Review checkout'
+                                  : 'Retry checkout')
+                              .tr,
+                        ),
+                      )
+                    : ctr.totalItems == 0
                     ? const SizedBox.shrink()
                     : PaymentFooterWidget(
                         onTap: ctr.onCurrentSale,
@@ -224,7 +240,8 @@ class SaleScreen extends StatelessWidget {
   }
 
   bool _hasCapacity(Map<String, dynamic> product, Map<String, dynamic> row) =>
-      (ctr.cart[(product['id'], row['warehouse_id'])]?['qty'] ?? 0) < row['qty'];
+      (ctr.cart[(product['id'], row['warehouse_id'])]?['qty'] ?? 0) <
+      row['qty'];
 
   Widget _tile(Map<String, dynamic> product) => Obx(
     () => CardItemWidget(
@@ -233,8 +250,11 @@ class SaleScreen extends StatelessWidget {
           .where((e) => e.key.$1 == product['id'])
           .fold<int>(0, (sum, e) => sum + (e.value['qty'] as int)),
       currency: ctr.currency.value,
-      onTap: !ctr.checkoutBusy &&
-              SaleController.warehouses(product).any((row) => _hasCapacity(product, row))
+      onTap:
+          !ctr.cartLocked &&
+              SaleController.warehouses(
+                product,
+              ).any((row) => _hasCapacity(product, row))
           ? () => _selectWarehouse(product)
           : null,
     ),

@@ -1,3 +1,6 @@
+import 'package:frontend/global.dart' show storage;
+import 'package:frontend/services/api_service.dart';
+import 'profile_widget_test.dart' show FakeStorageService;
 import 'package:flutter/material.dart';
 import 'sale_test_support.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
@@ -97,175 +100,132 @@ void main() {
     await ctr.loadProductCategories();
     expect(ctr.categories, isEmpty);
   });
-  testWidgets('success alone clears cart and opens receipt', (tester) async {
-    setUpCustomerTests();
-    final sales = SaleTestSaleService();
-    final payments = SaleTestPaymentService();
-    final ctr = SaleController(service: sales, salePaymentService: payments);
-    final product = saleProductJson(1, 'Water')
-      ..['warehouse_availability'] = [
-        warehouseRow(1, 'Main', 1),
-        warehouseRow(2, 'Branch', 4),
+  for (final failure in [
+    'timeout',
+    'malformed',
+    'server',
+    'cleanup',
+    'save',
+    'shortage',
+    'conflict',
+    'endpoint',
+  ]) {
+    testWidgets('confirmed checkout recovers from $failure', (tester) async {
+      setUpCustomerTests();
+      final local = storage as FakeStorageService;
+      local.values.clear();
+      final sales = SaleTestSaleService();
+      final product = saleProductJson(1, 'Water');
+      sales.categories = [
+        {
+          'products': [product],
+        },
       ];
-    ctr.addProduct(product, warehouseId: 1);
-    for (var i = 0; i < 3; i++) {
-      ctr.addProduct(product, warehouseId: 2);
-    }
-    ctr.changeQuantity(1, 1, 1);
-    expect(ctr.cart.length, 2);
-    expect(ctr.totalItems, 4);
-    ctr.changeQuantity(1, 2, -1);
-    expect(ctr.cart[(1, 1)]!['qty'], 1);
-    ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
-    ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
-    await tester.pumpWidget(
-      GetMaterialApp(
-        home: const Scaffold(),
+      final ctr = SaleController(
+        service: sales,
+        productService: SaleTestProductService(),
+      );
+      ctr.addProduct(product);
+      ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
+      ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
+      await pumpSalesPage(
+        tester,
+        const Scaffold(),
         getPages: [
           GetPage(
             name: '/payment-success',
             page: () => const Scaffold(body: Text('Receipt')),
           ),
         ],
-      ),
-    );
-    final action = ctr.onPayment();
-    await tester.pumpAndSettle();
-    final duplicate = ctr.onPayment();
-    await tester.tap(find.text('Confirm'));
-    await tester.pumpAndSettle();
-    await action;
-    await duplicate;
-    expect(payments.createCalls.single['amount'], 12.5);
-    final saleRequest = sales.createCalls.single;
-    final paymentRequest = payments.createCalls.single;
-    expect(
-      saleRequest.keys,
-      unorderedEquals([
-        'user_id',
-        'customer_id',
-        'sale_date',
-        'status',
-        'payment_method',
-        'sale_items',
-      ]),
-    );
-    expect(
-      paymentRequest.keys,
-      unorderedEquals([
-        'user_id',
-        'sale_id',
-        'amount',
-        'payment_method',
-        'reference_no',
-        'payment_date',
-        'note',
-        'created_at',
-      ]),
-    );
-    expect(saleRequest['user_id'], 5);
-    expect(saleRequest['customer_id'], 1);
-    expect(saleRequest['status'], 'completed');
-    expect(saleRequest['payment_method'], 'Cash');
-    expect(DateTime.parse(saleRequest['sale_date']).isUtc, isTrue);
-    expect(paymentRequest['payment_date'], saleRequest['sale_date']);
-    expect(paymentRequest['created_at'], saleRequest['sale_date']);
-    expect(sales.createCalls.single['sale_items'], [
-      {'product_id': 1, 'warehouse_id': 1, 'qty': 1},
-      {'product_id': 1, 'warehouse_id': 2, 'qty': 2},
-    ]);
-    expect(ctr.totalItems, 0);
-    expect(Get.currentRoute, '/payment-success');
-    expect((Get.arguments as Map)['customer'], 'Dara');
-    expect((Get.arguments as Map)['total'], 12.5);
-    expect(
-      (Get.arguments as Map).keys,
-      unorderedEquals([
-        'customer',
-        'payment_method',
-        'payment_date',
-        'transaction_id',
-        'subtotal',
-        'total',
-        'currency',
-      ]),
-    );
-    expect(
-      (Get.arguments as Map)['transaction_id'],
-      paymentRequest['reference_no'],
-    );
-  });
-  for (final cleanupFails in [false, true]) {
-    testWidgets('failed checkout retains draft cleanup failure=$cleanupFails', (
-      tester,
-    ) async {
-      setUpCustomerTests();
-      final sales = SaleTestSaleService()
-        ..deleteError = cleanupFails ? Exception('offline') : null;
-      final payments = SaleTestPaymentService()
-        ..writeError = Exception('offline');
-      final ctr = SaleController(service: sales, salePaymentService: payments);
-      ctr.addProduct(saleProductJson(1, 'Water'));
-      ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
-      ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
-      await pumpSalesPage(tester, const Scaffold(body: Text('Checkout')));
-      final payment = ctr.onPayment();
+      );
+      sales.loseResponse = failure == 'timeout';
+      sales.malformed = failure == 'malformed' ? {} : null;
+      sales.createError = switch (failure) {
+        'server' => ApiException(503, 'Service unavailable'),
+        'shortage' => ApiException(400, 'Only 0 left'),
+        'conflict' => ApiException(409, 'Checkout ID conflict'),
+        'endpoint' => ApiException(404, 'Not found'),
+        _ => null,
+      };
+      local.failSave = failure == 'save';
+      local.failCleanup = failure == 'cleanup';
+      final action = ctr.onPayment();
       await tester.pumpAndSettle();
       await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
-      await payment;
-      expect(sales.createCalls.length, 1);
-      expect(payments.createCalls.single['amount'], 12.5);
-      final saleRequest = sales.createCalls.single;
-      final paymentRequest = payments.createCalls.single;
-      expect(
-        saleRequest.keys,
-        unorderedEquals([
-          'user_id',
-          'customer_id',
-          'sale_date',
-          'status',
-          'payment_method',
-          'sale_items',
-        ]),
+      await action;
+      local.failSave = local.failCleanup = false;
+      expect(sales.createCalls, isEmpty);
+      expect(sales.deleteCalls, isEmpty);
+      if (failure == 'save') {
+        expect(sales.requests, isEmpty);
+        expect(ctr.totalItems, 1);
+        return;
+      }
+      final first = sales.requests.single;
+      expect(first['checkout_id'], matches(RegExp(r'^[0-9a-f]{32}$')));
+      expect(first['expected_total'], '5.00');
+      if (failure == 'shortage' || failure == 'endpoint') {
+        expect(
+          ctr.checkoutError.value,
+          contains(failure == 'shortage' ? 'Only 0 left' : 'upgrade'),
+        );
+        expect(ctr.hasPendingCheckout, failure == 'endpoint');
+        expect(ctr.totalItems, 1);
+        return;
+      }
+      if (failure == 'conflict') {
+        expect(ctr.checkoutConflict.value, isTrue);
+        await ctr.dismissConflict();
+        expect(ctr.hasPendingCheckout, isFalse);
+        expect(sales.requests, hasLength(1));
+        return;
+      }
+      expect(ctr.hasPendingCheckout, isTrue);
+      final user = local.stored['user']['id'];
+      local.stored['user']['id'] = 88;
+      final other = SaleController(service: sales);
+      other.restorePendingCheckout();
+      expect(other.hasPendingCheckout, isFalse);
+      local.stored['user']['id'] = user;
+      final resumed = SaleController(
+        service: sales,
+        productService: SaleTestProductService(),
       );
-      expect(
-        paymentRequest.keys,
-        unorderedEquals([
-          'user_id',
-          'sale_id',
-          'amount',
-          'payment_method',
-          'reference_no',
-          'payment_date',
-          'note',
-          'created_at',
-        ]),
-      );
-      expect(saleRequest['user_id'], 5);
-      expect(saleRequest['customer_id'], 1);
-      expect(saleRequest['status'], 'completed');
-      expect(saleRequest['payment_method'], 'Cash');
-      expect(DateTime.parse(saleRequest['sale_date']).isUtc, isTrue);
-      expect(paymentRequest['payment_date'], saleRequest['sale_date']);
-      expect(paymentRequest['created_at'], saleRequest['sale_date']);
-      expect(sales.deleteCalls, [1]);
-      expect(ctr.totalItems, 1);
-      expect(ctr.selectedCustomer.value?['id'], 1);
-      expect(ctr.checkoutBusy, isFalse);
-      expect(
-        ctr.checkoutError.value,
-        cleanupFails
-            ? 'The sale may have been created. Check Sales before trying again.'
-            : 'Unable to complete payment. Please try again.',
-      );
+      resumed.restorePendingCheckout();
+      expect(resumed.totalItems, 0);
+      sales.categories = [];
+      sales.malformed = null;
+      sales.createError = null;
+      await resumed.onPayment();
+      await tester.pumpAndSettle();
+      expect(sales.requests[1], equals(first));
+      expect(find.text('Receipt'), findsOneWidget);
+      expect(Get.arguments['invoice_no'], 'POS-42');
+      expect(sales.receipts, hasLength(1));
+      expect(resumed.hasPendingCheckout, isFalse);
+      sales.categories = [
+        {
+          'products': [product],
+        },
+      ];
+      await resumed.loadProductCategories();
+      resumed.addProduct(product);
+      resumed.selectedCustomer.value = {'id': 1};
+      resumed.selectedPaymentType.value = {'id': 1};
+      final another = resumed.onPayment();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
+      await another;
+      expect(sales.requests.last['checkout_id'], isNot(first['checkout_id']));
     });
   }
   testWidgets('rapid checkout taps share one confirmation', (tester) async {
     setUpCustomerTests();
+    (storage as FakeStorageService).values.clear();
     final sales = SaleTestSaleService();
-    final payments = SaleTestPaymentService();
-    final ctr = SaleController(service: sales, salePaymentService: payments);
+    final ctr = SaleController(service: sales);
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
     ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
@@ -279,7 +239,7 @@ void main() {
     await tester.pumpAndSettle();
     await Future.wait([first, second]);
     expect(sales.createCalls, isEmpty);
-    expect(payments.createCalls, isEmpty);
+    expect(sales.requests, isEmpty);
     expect(ctr.checkoutBusy, isFalse);
   });
   test('category load failure retains cart and query', () async {

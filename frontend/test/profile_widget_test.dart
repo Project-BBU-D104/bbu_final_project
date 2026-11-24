@@ -34,10 +34,17 @@ class FakeStorageService implements IStorageService {
   bool hasRole(String role) => false;
 
   @override
-  T? readStorage<T>(StorageKey key) => null;
+  T? readStorage<T>(StorageKey key) => values[key] as T?;
+  final values = <StorageKey, dynamic>{};
+  bool failSave = false, failCleanup = false;
 
   @override
-  Future<void> writeStorage(StorageKey key, dynamic value) async {}
+  Future<void> writeStorage(StorageKey key, dynamic value) async {
+    if (failSave || (failCleanup && value is Map && value.isEmpty)) {
+      throw StateError('Storage write failed');
+    }
+    values[key] = value;
+  }
 
   @override
   Future<void> removeStorage(StorageKey key) async {}

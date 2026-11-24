@@ -1,4 +1,11 @@
 const Map<String, String> enUS = {
+  "Available: @qty": "Available: @qty",
+  "Retry checkout": "Retry checkout",
+  "Review checkout": "Review checkout",
+  "Sales history": "Sales history",
+  "Dismiss conflicting checkout": "Dismiss conflicting checkout",
+  "Checkout requires a backend upgrade.": "Checkout requires a backend upgrade.",
+  "Unable to save checkout. Please try again.": "Unable to save checkout. Please try again.",
   "Stock by warehouse": "Stock by warehouse",
   "Total stock": "Total stock",
   "No warehouse assigned": "No warehouse assigned",

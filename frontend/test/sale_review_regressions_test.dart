@@ -1,3 +1,5 @@
+import 'package:frontend/global.dart' show storage;
+import 'profile_widget_test.dart' show FakeStorageService;
 import 'package:flutter/services.dart';
 import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/locator.dart';
@@ -14,30 +16,24 @@ import 'sale_test_support.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
 
 class ReviewSaleController extends SaleController {
-  ReviewSaleController(
-    SaleTestSaleService sales, {
-    SaleTestPaymentService? payments,
-  }) : super(
-         service: sales,
-         salePaymentService: payments,
-         productService: SaleTestProductService(),
-       );
+  ReviewSaleController(SaleTestSaleService sales)
+    : super(service: sales, productService: SaleTestProductService());
   @override
   // ignore: must_call_super
   void onInit() {}
 }
 
 void main() {
-  setUp(setUpCustomerTests);
+  setUp(() {
+    setUpCustomerTests();
+    (storage as FakeStorageService).values.clear();
+  });
   tearDown(Get.reset);
   testWidgets('actual held checkout freezes draft back and selectors', (
     tester,
   ) async {
     final sales = SaleTestSaleService()..heldCreate = Completer<dynamic>();
-    final payments = SaleTestPaymentService()..heldWrite = Completer<dynamic>();
-    final ctr = Get.put<SaleController>(
-      ReviewSaleController(sales, payments: payments),
-    );
+    final ctr = Get.put<SaleController>(ReviewSaleController(sales));
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
     ctr.paymentTypes.add({'id': 1, 'name': 'Cash'});
@@ -50,8 +46,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Confirm'));
     await tester.pumpAndSettle();
-    expect(sales.createCalls, hasLength(1));
-    expect(payments.createCalls, isEmpty);
+    expect(sales.requests, hasLength(1));
     ctr.addProduct(saleProductJson(2, 'Bread'));
     ctr.changeQuantity(1, 1, -1);
     ctr.selectCustomer({'id': 2});
@@ -66,27 +61,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(Get.currentRoute, route);
     await ctr.onPayment();
-    expect(sales.createCalls, hasLength(1));
-    sales.heldCreate!.complete(saleJson(1));
-    await tester.pumpAndSettle();
-    expect(payments.createCalls, hasLength(1));
-    expect(ctr.checkoutBusy, isTrue);
-    expect(
-      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-      isNull,
-    );
-    payments.heldWrite!.completeError(Exception('offline'));
+    expect(sales.requests, hasLength(1));
+    sales.heldCreate!.completeError(Exception('offline'));
     await tester.pumpAndSettle();
     await action;
     expect(ctr.totalItems, 1);
     expect(ctr.checkoutBusy, isFalse);
-    expect(sales.deleteCalls, [1]);
+    expect(sales.deleteCalls, isEmpty);
   });
   for (final missing in ['customer', 'method', 'cart', 'user']) {
     testWidgets('missing $missing prevents checkout writes', (tester) async {
       final sales = SaleTestSaleService();
-      final payments = SaleTestPaymentService();
-      final ctr = ReviewSaleController(sales, payments: payments);
+      final ctr = ReviewSaleController(sales);
       ctr.addProduct(saleProductJson(1, 'Water'));
       ctr.selectedCustomer.value = {'id': 1};
       ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
@@ -100,42 +86,12 @@ void main() {
         await pumpSalesPage(tester, const Scaffold());
         await ctr.onPayment();
         await tester.pumpAndSettle();
-        expect(sales.createCalls, isEmpty);
-        expect(payments.createCalls, isEmpty);
+        expect(sales.requests, isEmpty);
         expect(find.byType(AlertDialog), findsNothing);
       } finally {
         stored['user'] = user;
       }
     });
-  }
-  for (final invoiceRequired in [false, true]) {
-    testWidgets(
-      'invoice compatibility retries only missing invoice=$invoiceRequired',
-      (tester) async {
-        final sales = SaleTestSaleService()
-          ..createError = Exception(
-            invoiceRequired ? 'invoice_no Field required' : 'offline',
-          );
-        final payments = SaleTestPaymentService();
-        final ctr = ReviewSaleController(sales, payments: payments);
-        ctr.addProduct(saleProductJson(1, 'Water'));
-        ctr.selectedCustomer.value = {'id': 1};
-        ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
-        await pumpSalesPage(tester, const Scaffold());
-        final action = ctr.onPayment();
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Confirm'));
-        await tester.pumpAndSettle();
-        await action;
-        expect(sales.createCalls, hasLength(invoiceRequired ? 2 : 1));
-        expect(sales.createCalls.first.containsKey('invoice_no'), isFalse);
-        if (invoiceRequired) {
-          expect(sales.createCalls.last['invoice_no'], startsWith('SALE-'));
-        }
-        expect(payments.createCalls, isEmpty);
-        expect(ctr.totalItems, 1);
-      },
-    );
   }
   testWidgets('mounted method reload and keyboard quantity remain usable', (
     tester,

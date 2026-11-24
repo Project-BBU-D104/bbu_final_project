@@ -98,7 +98,7 @@ class FakeSalePaymentService implements SalePaymentService {
   }
 }
 
-class FakeSaleService implements SaleService {
+class FakeSaleService extends SaleService {
   FakeSaleService({List<Map<String, dynamic>>? sales}) : sales = sales ?? [];
 
   List<Map<String, dynamic>> sales;

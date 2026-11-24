@@ -7,7 +7,9 @@ import 'package:frontend/services/main_service/customer_service.dart';
 import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/services/main_service/product_service.dart';
-import 'package:frontend/services/main_service/sale_payment_service.dart';
+import 'dart:math';
+import 'package:frontend/constants/enum.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
 import 'package:frontend/utils/barcode_utils.dart';
 import 'package:frontend/utils/currency_formatter.dart';
@@ -21,20 +23,18 @@ class SaleController extends GetxController {
     CustomerService? customerService,
     CurrencyService? currencyService,
     PaymentTypeService? paymentTypeService,
-    SalePaymentService? salePaymentService,
   }) : service = service ?? SaleService(),
        productService = productService ?? ProductService(),
        customerService = customerService ?? CustomerService(),
        currencyService = currencyService ?? CurrencyService(),
-       paymentTypeService = paymentTypeService ?? PaymentTypeService(),
-       salePaymentService = salePaymentService ?? SalePaymentService();
+       paymentTypeService = paymentTypeService ?? PaymentTypeService();
 
   final SaleService service;
   final ProductService productService;
   final CustomerService customerService;
   final CurrencyService currencyService;
   final PaymentTypeService paymentTypeService;
-  final SalePaymentService salePaymentService;
+
   Map<int, Map<String, dynamic>>? _catalog;
   final categories = <Map<String, dynamic>>[].obs;
   final customers = <Map<String, dynamic>>[].obs;
@@ -57,6 +57,54 @@ class SaleController extends GetxController {
   final isConfirmingPayment = false.obs;
   bool get checkoutBusy =>
       isConfirmingPayment.value || isProcessingPayment.value;
+  final _pending = Rxn<Map<String, dynamic>>();
+  String? _owner;
+  final checkoutConflict = false.obs;
+  String? get _scope {
+    final id = storage.lastUserLoginRead['user']?['id'];
+    return id == null ? null : '${service.baseUrl}|$id';
+  }
+
+  bool get hasPendingCheckout => _pending.value != null && _owner == _scope;
+  bool get cartLocked => checkoutBusy || hasPendingCheckout;
+  Map<String, dynamic> get _entries => Map<String, dynamic>.from(
+    storage.readStorage<Map>(StorageKey.pendingCheckouts) ?? {},
+  );
+
+  void restorePendingCheckout() {
+    _owner = _scope;
+    _pending.value = _entries[_owner];
+    checkoutConflict.value = _pending.value?['conflict'] == true;
+  }
+
+  Future<void> _save(String owner, Map<String, dynamic>? entry) async {
+    final entries = _entries;
+    if (entry == null) {
+      entries.remove(owner);
+    } else {
+      entries[owner] = entry;
+    }
+    await storage.writeStorage(StorageKey.pendingCheckouts, entries);
+    if (_scope == owner) {
+      _owner = owner;
+      _pending.value = entry;
+      checkoutConflict.value = entry?['conflict'] == true;
+    }
+  }
+
+  Future<void> dismissConflict() async {
+    if (checkoutBusy || !hasPendingCheckout || !checkoutConflict.value) return;
+    isProcessingPayment.value = true;
+    try {
+      await _save(_owner!, null);
+      checkoutError.value = '';
+    } catch (_) {
+      checkoutError.value = 'Unable to save checkout. Please try again.'.tr;
+    } finally {
+      isProcessingPayment.value = false;
+    }
+  }
+
   bool get canCheckout =>
       !checkoutBusy &&
       cart.isNotEmpty &&
@@ -102,6 +150,7 @@ class SaleController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    restorePendingCheckout();
     loadProductCategories();
     loadCustomers();
     loadPaymentTypes();
@@ -150,7 +199,7 @@ class SaleController extends GetxController {
   }
 
   void selectPaymentType(Map<String, dynamic> paymentType) {
-    if (checkoutBusy) return;
+    if (cartLocked) return;
     selectedPaymentType.value = paymentType;
   }
 
@@ -177,7 +226,7 @@ class SaleController extends GetxController {
   }
 
   void selectCustomer(Map<String, dynamic> customer) {
-    if (checkoutBusy) return;
+    if (cartLocked) return;
     selectedCustomer.value = customer;
   }
 
@@ -299,7 +348,7 @@ class SaleController extends GetxController {
   }
 
   void addProduct(Map<String, dynamic> product, {int? warehouseId}) {
-    if (checkoutBusy) return;
+    if (cartLocked) return;
     if (_catalog != null) {
       final current = _catalog![product['id']];
       if (current == null) return;
@@ -323,7 +372,7 @@ class SaleController extends GetxController {
   }
 
   void changeQuantity(int productId, int warehouseId, int change) {
-    if (checkoutBusy) return;
+    if (cartLocked) return;
     final key = (productId, warehouseId);
     final product = cart[key];
     if (product == null) return;
@@ -356,12 +405,21 @@ class SaleController extends GetxController {
 
   Future<void> onPayment() async {
     if (checkoutBusy) return;
+    final owner = _scope;
+    if (owner == null) {
+      ToastWidget.show(
+        message: 'Unable to identify the logged-in user.'.tr,
+        type: ToastType.error,
+      );
+      return;
+    }
+    restorePendingCheckout();
+    if (hasPendingCheckout) {
+      if (!checkoutConflict.value) await _submit(owner, _pending.value!);
+      return;
+    }
     final customer = selectedCustomer.value;
     final paymentType = selectedPaymentType.value;
-    final userId = int.tryParse(
-      storage.lastUserLoginRead['user']?['id']?.toString() ?? '',
-    );
-
     if (selectedProducts.isEmpty || customer == null || paymentType == null) {
       ToastWidget.show(
         message:
@@ -371,28 +429,21 @@ class SaleController extends GetxController {
       return;
     }
     if (!canCheckout) return;
-    if (userId == null) {
-      ToastWidget.show(
-        message: 'Unable to identify the logged-in user.'.tr,
-        type: ToastType.error,
-      );
-      return;
-    }
-    if (isProcessingPayment.value) return;
-
     isConfirmingPayment.value = true;
     checkoutError.value = '';
     try {
       final confirmedProducts = selectedProducts
           .map((row) => Map<String, dynamic>.from(row))
           .toList();
+      final total = subtotal;
+      final displayCurrency = currency.value;
       final method = paymentType['name']?.toString() ?? '';
       final confirmed = await Get.dialog<bool>(
         AlertDialog(
           title: Text('Confirm payment'.tr),
           content: Text(
             'Charge @amount to @customer using @method?'.trParams({
-              'amount': CurrencyFormatter.format(subtotal, currency.value),
+              'amount': CurrencyFormatter.format(total, displayCurrency),
               'customer': customer['name']?.toString() ?? '',
               'method': method,
             }),
@@ -412,113 +463,173 @@ class SaleController extends GetxController {
       );
       if (confirmed != true) return;
 
-      isProcessingPayment.value = true;
-      int? saleId;
-      try {
-        final now = DateTime.now().toUtc();
-        final reference = 'SALE-${now.microsecondsSinceEpoch}';
-        final saleResponse = await _createSale({
-          'user_id': userId,
+      if (_scope != owner) return;
+      final random = Random.secure();
+      final id = List.generate(
+        16,
+        (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ).join();
+      final entry = {
+        'currency': displayCurrency,
+        'request': {
+          'checkout_id': id,
           'customer_id': customer['id'],
-          'sale_date': now.toIso8601String(),
-          'status': 'completed',
-          'payment_method': method,
-          'sale_items': confirmedProducts
-              .map(
-                (product) => {
-                  'product_id': product['id'],
-                  'warehouse_id': product['warehouse_id'],
-                  'qty': product['qty'],
-                },
-              )
-              .toList(),
-        });
-
-        SaleListController.invalidateCache();
-        saleId = int.tryParse(saleResponse['id']?.toString() ?? '');
-        final amount = double.tryParse(
-          saleResponse['total_amount']?.toString() ?? '',
-        );
-        if (saleId == null ||
-            amount == null ||
-            !amount.isFinite ||
-            amount <= 0) {
-          throw Exception('The sale response did not include an ID and total.');
-        }
-
-        await salePaymentService.createSalePayment({
-          'user_id': userId,
-          'sale_id': saleId,
-          'amount': amount,
-          'payment_method': method,
-          'reference_no': reference,
-          'payment_date': now.toIso8601String(),
-          'note': 'Sale payment',
-          'created_at': now.toIso8601String(),
-        });
-        SaleListController.invalidateCache();
-
-        final receipt = {
-          'customer': customer['name']?.toString() ?? '',
-          'payment_method': method,
-          'payment_date': now.toIso8601String(),
-          'transaction_id': reference,
-          'subtotal': saleResponse['subtotal'] ?? subtotal,
-          'total': amount,
-          'currency': currency.value,
-        };
-        cart.clear();
-        selectedCustomer.value = null;
-        selectedPaymentType.value = null;
-        Get.offNamed(AppRoutes.paymentSuccess, arguments: receipt);
-      } catch (error) {
-        checkoutError.value =
-            'Unable to complete payment. Please try again.'.tr;
-        if (saleId != null) {
-          try {
-            await service.deleteSale(saleId);
-            SaleListController.invalidateCache();
-          } catch (_) {
-            checkoutError.value =
-                'The sale may have been created. Check Sales before trying again.'
-                    .tr;
-          }
-        }
-        ToastWidget.show(message: checkoutError.value, type: ToastType.error);
-      } finally {
-        isProcessingPayment.value = false;
+          'payment_type_id': paymentType['id'],
+          'expected_total': total.toStringAsFixed(2),
+          'sale_items': [
+            for (final p in confirmedProducts)
+              {
+                'product_id': p['id'],
+                'warehouse_id': p['warehouse_id'],
+                'qty': p['qty'],
+              },
+          ],
+        },
+      };
+      try {
+        await _save(owner, entry);
+      } catch (_) {
+        checkoutError.value = 'Unable to save checkout. Please try again.'.tr;
+        return;
       }
+      if (_scope == owner) await _submit(owner, entry);
     } finally {
       isConfirmingPayment.value = false;
     }
   }
 
-  Future<dynamic> _createSale(Map<String, dynamic> data) async {
+  Future<void> _submit(String owner, Map<String, dynamic> entry) async {
+    isProcessingPayment.value = true;
+    checkoutError.value = '';
+    final request = Map<String, dynamic>.from(entry['request']);
     try {
-      return await service.createSale(data);
-    } catch (error) {
-      final message = error.toString();
-      final invoiceRequired =
-          message.contains('invoice_no') &&
-          (message.contains('Field required') || message.contains('missing'));
-
-      if (!invoiceRequired) rethrow;
-
-      // Older deployed backends require invoice_no even though the current
-      // backend generates it automatically. Send one only for that case.
-      final now = DateTime.now();
-      final date = '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}';
-      final time =
-          '${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
-
-      return await service.createSale({
-        ...data,
-        'invoice_no': 'SALE-$date-$time',
-      });
+      late final Map<String, dynamic> receipt;
+      try {
+        receipt = await service.checkout(request);
+      } on ApiException catch (error) {
+        if (_scope != owner) return;
+        checkoutError.value = error.message;
+        if (error.statusCode == 404) {
+          checkoutError.value = 'Checkout requires a backend upgrade.'.tr;
+        } else if ([400, 422].contains(error.statusCode)) {
+          await loadProductCategories();
+          if (_scope != owner) return;
+          _restoreDraft(request);
+          await _save(owner, null);
+        } else if (error.statusCode == 409) {
+          checkoutConflict.value = true;
+          await _save(owner, {...entry, 'conflict': true});
+        }
+        return;
+      }
+      _validateReceipt(receipt, request);
+      SaleListController.invalidateCache();
+      if (_scope != owner) return;
+      await loadProductCategories();
+      if (_scope != owner) return;
+      if (productLoadError.value.isNotEmpty) {
+        checkoutError.value = productLoadError.value;
+        return;
+      }
+      await _save(owner, null);
+      if (_scope != owner) return;
+      cart.clear();
+      selectedCustomer.value = null;
+      selectedPaymentType.value = null;
+      Get.offNamed(
+        AppRoutes.paymentSuccess,
+        arguments: {...receipt, 'currency': entry['currency']},
+      );
+    } catch (_) {
+      checkoutError.value = 'Unable to complete payment. Please try again.'.tr;
+    } finally {
+      isProcessingPayment.value = false;
     }
   }
 
-  String _twoDigits(int value) => value.toString().padLeft(2, '0');
+  void _restoreDraft(Map<String, dynamic> request) {
+    for (final line in request['sale_items']) {
+      final id = line['product_id'] as int;
+      final warehouse = line['warehouse_id'] as int;
+      final key = (id, warehouse);
+      final product = _catalog?[id];
+      final row = product == null
+          ? null
+          : warehouses(
+              product,
+            ).firstWhereOrNull((r) => r['warehouse_id'] == warehouse);
+      cart[key] = {
+        ...?cart[key],
+        ...?product,
+        'id': id,
+        'warehouse_id': warehouse,
+        'name': product?['name'] ?? cart[key]?['name'] ?? '#$id',
+        'warehouse_name': row?['warehouse_name'] ?? '#$warehouse',
+        'available_qty': row?['qty'] ?? 0,
+        'qty': line['qty'],
+      };
+    }
+    selectedCustomer.value =
+        customers.firstWhereOrNull((r) => r['id'] == request['customer_id']) ??
+        (selectedCustomer.value?['id'] == request['customer_id']
+            ? selectedCustomer.value
+            : null);
+    selectedPaymentType.value =
+        paymentTypes.firstWhereOrNull(
+          (r) => r['id'] == request['payment_type_id'],
+        ) ??
+        (selectedPaymentType.value?['id'] == request['payment_type_id']
+            ? selectedPaymentType.value
+            : null);
+  }
+
+  void _validateReceipt(
+    Map<String, dynamic> receipt,
+    Map<String, dynamic> request,
+  ) {
+    int cents(dynamic value) {
+      if (value is! String || !RegExp(r'^\d+\.\d{2}$').hasMatch(value)) {
+        throw const FormatException('Invalid receipt amount');
+      }
+      return int.parse(value.replaceAll('.', ''));
+    }
+
+    final expected = {
+      for (final line in request['sale_items'])
+        (line['product_id'], line['warehouse_id']): line['qty'],
+    };
+    final date = DateTime.tryParse(receipt['payment_date']?.toString() ?? '');
+    if (receipt['checkout_id'] != request['checkout_id'] ||
+        receipt['reference_no'] != request['checkout_id'] ||
+        receipt['sale_id'] is! int ||
+        receipt['sale_id'] <= 0 ||
+        receipt['invoice_no'] != 'POS-${receipt['sale_id']}' ||
+        receipt['customer'] is! String ||
+        receipt['payment_method'] is! String ||
+        date == null ||
+        !date.isUtc ||
+        receipt['lines'] is! List ||
+        receipt['total'] != request['expected_total']) {
+      throw const FormatException('Invalid receipt');
+    }
+    var total = 0;
+    for (final line in receipt['lines']) {
+      if (line is! Map ||
+          line['product_name'] is! String ||
+          line['qty'] is! int ||
+          line['qty'] !=
+              expected.remove((line['product_id'], line['warehouse_id'])) ||
+          cents(line['sale_price']) * line['qty'] != cents(line['subtotal'])) {
+        throw const FormatException('Invalid receipt line');
+      }
+      total += cents(line['subtotal']);
+    }
+    if (expected.isNotEmpty ||
+        cents(receipt['subtotal']) != total ||
+        cents(receipt['total']) != total) {
+      throw const FormatException('Invalid receipt total');
+    }
+  }
 
   void onConfirm() {
     Get.offNamed(AppRoutes.paymentSuccess);

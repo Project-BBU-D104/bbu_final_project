@@ -1,3 +1,5 @@
+import 'package:frontend/global.dart' show storage;
+import 'profile_widget_test.dart' show FakeStorageService;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -26,29 +28,17 @@ import 'sale_test_support.dart';
 
 class _IntegrationSales extends SaleTestSaleService {
   int reads = 0;
-  bool requireInvoice = false;
 
   @override
   Future<dynamic> getSales() async {
     reads++;
     return sales;
   }
-
-  @override
-  Future<dynamic> createSale(Map<String, dynamic> data) async {
-    if (requireInvoice && !data.containsKey('invoice_no')) {
-      createCalls.add(Map.of(data));
-      throw Exception('invoice_no Field required');
-    }
-    return super.createSale(data);
-  }
 }
 
 class _QuietSaleController extends SaleController {
-  _QuietSaleController(
-    SaleTestSaleService sales,
-    SaleTestPaymentService payments,
-  ) : super(service: sales, salePaymentService: payments);
+  _QuietSaleController(SaleTestSaleService sales)
+    : super(service: sales, productService: SaleTestProductService());
   @override
   // ignore: must_call_super
   void onInit() {}
@@ -103,6 +93,7 @@ Finder _field(String label) => find.byWidgetPredicate(
 void main() {
   setUp(() {
     setUpCustomerTests();
+    (storage as FakeStorageService).values.clear();
     SaleListController.invalidateCache();
   });
   tearDown(() {
@@ -113,10 +104,7 @@ void main() {
   testWidgets('desktop sidebar cannot abandon a held checkout', (tester) async {
     final held = Completer<dynamic>();
     final ctr = Get.put<SaleController>(
-      _QuietSaleController(
-        _IntegrationSales(),
-        SaleTestPaymentService()..heldWrite = held,
-      ),
+      _QuietSaleController(_IntegrationSales()..heldCreate = held),
     );
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.customers.add({'id': 1, 'name': 'Dara'});
@@ -232,7 +220,6 @@ void main() {
               customerService: SaleTestCustomerService(),
               currencyService: SaleTestCurrencyService(),
               paymentTypeService: SaleTestPaymentTypeService(),
-              salePaymentService: SaleTestPaymentService(),
             ),
           );
           page = SaleScreen();
@@ -271,54 +258,6 @@ void main() {
     );
   }
 
-  for (final fallback in [false, true]) {
-    testWidgets(
-      'checkout invalidates history before payment and cleanup fallback=$fallback',
-      (tester) async {
-        final sales = _IntegrationSales()..requireInvoice = fallback;
-        await SaleListController(service: sales).onGetSaleList();
-        final held = Completer<dynamic>();
-        final payments = SaleTestPaymentService()..heldWrite = held;
-        final ctr = SaleController(
-          service: sales,
-          salePaymentService: payments,
-        );
-        ctr.addProduct(saleProductJson(1, 'Water'));
-        ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
-        ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
-        await pumpSalesPage(tester, const Scaffold());
-        final checkout = ctr.onPayment();
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Confirm'));
-        await tester.pump();
-        final afterCreate = SaleListController(service: sales)..onInit();
-        await tester.pump();
-        expect(
-          sales.reads,
-          2,
-          reason:
-              'A successful create invalidates cached history before payment completes',
-        );
-        held.completeError(Exception('offline'));
-        await tester.pumpAndSettle();
-        await checkout;
-        final afterCleanup = SaleListController(service: sales)..onInit();
-        await tester.pump();
-        expect(sales.deleteCalls, [1]);
-        expect(
-          sales.reads,
-          3,
-          reason:
-              'Successful compensating deletion invalidates history warmed during payment',
-        );
-        expect(ctr.totalItems, 1);
-        afterCreate.onClose();
-        afterCleanup.onClose();
-        ctr.onClose();
-      },
-    );
-  }
-
   testWidgets('successful checkout invalidates history loaded during payment', (
     tester,
   ) async {
@@ -327,7 +266,7 @@ void main() {
     final held = Completer<dynamic>();
     final ctr = SaleController(
       service: sales,
-      salePaymentService: SaleTestPaymentService()..heldWrite = held,
+      productService: SaleTestProductService(),
     );
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
@@ -343,19 +282,20 @@ void main() {
         ],
       ),
     );
+    sales.heldCreate = held;
     final checkout = ctr.onPayment();
     await tester.pumpAndSettle();
     await tester.tap(find.text('Confirm'));
     await tester.pump();
     final during = SaleListController(service: sales)..onInit();
     await tester.pump();
-    expect(sales.reads, 2);
+    expect(sales.reads, 1);
     held.complete(salePaymentJson(1));
     await tester.pumpAndSettle();
     await checkout;
     final after = SaleListController(service: sales)..onInit();
     await tester.pump();
-    expect(sales.reads, 3);
+    expect(sales.reads, 2);
     expect(find.text('Receipt'), findsOneWidget);
     during.onClose();
     after.onClose();
@@ -382,7 +322,6 @@ void main() {
             customerService: SaleTestCustomerService(),
             currencyService: SaleTestCurrencyService(),
             paymentTypeService: SaleTestPaymentTypeService(),
-            salePaymentService: SaleTestPaymentService(),
           ),
           permanent: true,
         );

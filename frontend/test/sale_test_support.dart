@@ -68,6 +68,46 @@ class SaleTestSaleService extends SaleService with ReadState {
   Map<String, dynamic> createResult = saleJson(1);
   Object? createError, deleteError;
   Completer<dynamic>? heldCreate;
+  final requests = <Map<String, dynamic>>[];
+  final receipts = <String, Map<String, dynamic>>{};
+  bool loseResponse = false;
+  Map<String, dynamic>? malformed;
+  @override
+  Future<Map<String, dynamic>> checkout(Map<String, dynamic> request) async {
+    requests.add(request);
+    if (heldCreate != null) await heldCreate!.future;
+    if (createError != null) throw createError!;
+    final key = request['checkout_id'] as String;
+    final receipt = receipts.putIfAbsent(
+      key,
+      () => {
+        'checkout_id': key,
+        'sale_id': 42,
+        'invoice_no': 'POS-42',
+        'customer': 'Dara',
+        'payment_method': 'Cash',
+        'reference_no': key,
+        'payment_date': '2026-11-23T00:00:00Z',
+        'subtotal': request['expected_total'],
+        'total': request['expected_total'],
+        'lines': [
+          for (final line in request['sale_items'])
+            {
+              ...line as Map,
+              'product_name': 'Recorded item',
+              'sale_price': '5.00',
+              'subtotal': (5 * (line['qty'] as int)).toStringAsFixed(2),
+            },
+        ],
+      },
+    );
+    if (loseResponse) {
+      loseResponse = false;
+      throw TimeoutException('Lost response');
+    }
+    return malformed ?? receipt;
+  }
+
   @override
   Future<dynamic> getSales() => read(sales);
   @override

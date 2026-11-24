@@ -1,3 +1,6 @@
+import 'package:frontend/constants/enum.dart';
+import 'package:frontend/services/storage_service.dart';
+import 'package:frontend/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
@@ -13,10 +16,8 @@ import 'sale_test_support.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
 
 class NavigationSaleController extends SaleController {
-  NavigationSaleController(
-    SaleTestSaleService sales,
-    SaleTestPaymentService payments,
-  ) : super(service: sales, salePaymentService: payments);
+  NavigationSaleController(SaleTestSaleService sales)
+    : super(service: sales, productService: SaleTestProductService());
   @override
   // ignore: must_call_super
   void onInit() {}
@@ -25,13 +26,50 @@ class NavigationSaleController extends SaleController {
 void main() {
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  testWidgets('retry from the empty product screen submits the saved request', (
+    tester,
+  ) async {
+    final sales = SaleTestSaleService();
+    final ctr = Get.put<SaleController>(NavigationSaleController(sales));
+    final local = locator<IStorageService>();
+    await local.writeStorage(StorageKey.pendingCheckouts, {
+      '${sales.baseUrl}|5': {
+        'request': {
+          'checkout_id': 'a' * 32,
+          'customer_id': 1,
+          'payment_type_id': 1,
+          'expected_total': '5.00',
+          'sale_items': [
+            {'product_id': 1, 'warehouse_id': 1, 'qty': 1},
+          ],
+        },
+      },
+    });
+    addTearDown(() => local.writeStorage(StorageKey.pendingCheckouts, {}));
+    ctr.restorePendingCheckout();
+    await pumpSalesPage(
+      tester,
+      SaleScreen(),
+      getPages: [
+        GetPage(name: '/current-sale', page: () => CurrentSaleWidget()),
+        GetPage(
+          name: '/payment-success',
+          page: () => const PaymentSuccessWidget(),
+        ),
+      ],
+    );
+    await tester.tap(find.text('Retry checkout'));
+    await tester.pumpAndSettle();
+    expect(sales.requests, hasLength(1));
+    expect(Get.currentRoute, '/payment-success');
+  });
   testWidgets('sell through current cart confirmation receipt and back', (
     tester,
   ) async {
     final sales = SaleTestSaleService();
     final payments = SaleTestPaymentService();
     final ctr = Get.put<SaleController>(
-      NavigationSaleController(sales, payments),
+      NavigationSaleController(sales),
       permanent: true,
     );
     ctr.categories.add({
@@ -90,8 +128,8 @@ void main() {
     await tester.tap(find.text('Confirm'));
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/payment-success');
-    expect(sales.createCalls, hasLength(1));
-    expect(payments.createCalls, hasLength(1));
+    expect(sales.requests, hasLength(1));
+    expect(payments.createCalls, isEmpty);
     await tester.ensureVisible(find.text('Back to Sale'));
     await tester.tap(find.text('Back to Sale'));
     await tester.pumpAndSettle();

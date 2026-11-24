@@ -19,6 +19,15 @@ class SaleService {
     return await _api.getById(endpoint, id.toString());
   }
 
+  String get baseUrl => _api.baseUrl;
+
+  Future<Map<String, dynamic>> checkout(Map<String, dynamic> request) async {
+    final response = await _api
+        .post('sale/checkout', request)
+        .timeout(const Duration(seconds: 30));
+    return Map<String, dynamic>.from(response as Map);
+  }
+
   /// Create Sale
   Future<dynamic> createSale(Map<String, dynamic> data) async {
     return await _api.post(endpoint, data);

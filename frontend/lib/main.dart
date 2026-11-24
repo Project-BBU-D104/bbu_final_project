@@ -6,6 +6,7 @@ import 'package:frontend/app_background.dart';
 import 'package:frontend/controllers/language_controller.dart';
 import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/locator.dart';
+import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
   await _initConfig();
 
   await _initStorage();
+  await StorageService.loadPendingCheckouts();
 
   await GetStorage.init();
   setupLocator();
@@ -104,14 +106,15 @@ class _MyAppState extends State<MyApp> {
     final languageController = Get.find<LanguageController>();
     final themeController = Get.find<ThemeController>();
 
+    final previewLocale = DevicePreview.isEnabled(context)
+        ? DevicePreview.locale(context)
+        : null;
     return Obx(
       () => GetMaterialApp(
         debugShowCheckedModeBanner: false,
 
         useInheritedMediaQuery: true,
-        locale: DevicePreview.isEnabled(context)
-            ? DevicePreview.locale(context)
-            : languageController.locale.value,
+        locale: previewLocale ?? languageController.locale.value,
         fallbackLocale: const Locale("en", "US"),
 
         scrollBehavior: _CustomScrollBehavior(),

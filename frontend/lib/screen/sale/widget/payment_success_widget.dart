@@ -113,9 +113,9 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
 
     _exporting.value = true;
     try {
-      final transactionId = receipt['transaction_id']?.toString() ?? '';
+      final invoice = receipt['invoice_no']?.toString() ?? '';
       final path = await _exportController.exportPdf(
-        title: 'Sale Receipt @id'.trParams({'id': transactionId}).trim(),
+        title: 'Sale Receipt @id'.trParams({'id': invoice}).trim(),
         headers: ['Field'.tr, 'Value'.tr],
         rows: _receiptRows(receipt, currency, paymentDate),
         pageFormat: null,
@@ -150,7 +150,13 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
       ['Customer'.tr, receipt['customer']?.toString() ?? '—'],
       ['Payment Method'.tr, receipt['payment_method']?.toString() ?? '—'],
       ['Date'.tr, DateFormatter.formatDateTime(paymentDate?.toLocal())],
-      ['Transaction ID'.tr, receipt['transaction_id']?.toString() ?? '—'],
+      ['Invoice'.tr, receipt['invoice_no'] ?? '—'],
+      ['Reference No'.tr, receipt['reference_no'] ?? '—'],
+      for (final line in receipt['lines'] ?? [])
+        [
+          line['product_name'],
+          "${line['qty']} × ${_formatAmount(line['sale_price'], currency)} = ${_formatAmount(line['subtotal'], currency)}",
+        ],
       ['Subtotal'.tr, _formatAmount(receipt['subtotal'], currency)],
       ['Total'.tr, _formatAmount(receipt['total'], currency)],
     ];

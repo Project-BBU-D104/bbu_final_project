@@ -331,7 +331,7 @@ void main() {
               : PaymentSuccessWidget(exportController: fake),
           arguments: detail
               ? {...saleJson(1), 'invoice_no': longValue}
-              : {...receipt_fixtures.receipt, 'transaction_id': longValue},
+              : {...receipt_fixtures.receipt, 'reference_no': longValue},
         );
         await tester.pumpAndSettle();
         expect(find.text(longValue), findsOneWidget);
@@ -368,7 +368,10 @@ void main() {
       ['Customer', 'Alice'],
       ['Payment Method', 'Cash'],
       ['Date', '08-11-2026 11:30'],
-      ['Transaction ID', 'SALE-1'],
+      ['Invoice', 'POS-42'],
+      ['Reference No', 'REF-7'],
+      ['Tea', r'2 × $3.00 = $6.00'],
+      ['Lime', r'1 × $4.00 = $4.00'],
       ['Subtotal', r'$8.00'],
       ['Total', r'$10.00'],
     ];
@@ -385,7 +388,7 @@ void main() {
     expect(fake.calls.single.rows, rows);
     fake.held!.completeError(Exception('disk full'));
     await tester.pumpAndSettle();
-    expect(find.text('SALE-1'), findsOneWidget);
+    expect(find.text('POS-42'), findsOneWidget);
     expect(find.text(r'$10.00'), findsOneWidget);
     Get.closeAllSnackbars();
     await tester.pumpAndSettle();
@@ -404,7 +407,7 @@ void main() {
       final sales = SaleTestSaleService();
       final payments = SaleTestPaymentService();
       final ctr = Get.put<SaleController>(
-        NavigationSaleController(sales, payments),
+        NavigationSaleController(sales),
         permanent: true,
       );
       ctr.addProduct(saleProductJson(1, 'Water'));
@@ -504,9 +507,7 @@ void main() {
             (tester) async {
               final sales = SaleTestSaleService();
               final payments = SaleTestPaymentService();
-              Get.put<SaleController>(
-                NavigationSaleController(sales, payments),
-              );
+              Get.put<SaleController>(NavigationSaleController(sales));
               SaleListController.invalidateCache();
               Get.put(SaleListController(service: sales));
               Get.put(PaymentController(service: payments, saleService: sales));
@@ -571,7 +572,7 @@ final longMobileValue = List.filled(8, 'ទំនិញឈ្មោះវែង�
 
 SaleController seedCart({String? productName}) {
   final cart = Get.put<SaleController>(
-    NavigationSaleController(SaleTestSaleService(), SaleTestPaymentService()),
+    NavigationSaleController(SaleTestSaleService()),
   );
   final product = saleProductJson(1, productName ?? longMobileValue);
   cart.categories.add({

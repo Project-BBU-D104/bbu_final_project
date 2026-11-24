@@ -66,7 +66,17 @@ const receipt = <String, dynamic>{
   'customer': 'Alice',
   'payment_method': 'Cash',
   'payment_date': '2026-11-08T04:30:00.000Z',
-  'transaction_id': 'SALE-1',
+  'invoice_no': 'POS-42',
+  'reference_no': 'REF-7',
+  'lines': [
+    {'product_name': 'Tea', 'qty': 2, 'sale_price': '3.00', 'subtotal': '6.00'},
+    {
+      'product_name': 'Lime',
+      'qty': 1,
+      'sale_price': '4.00',
+      'subtotal': '4.00',
+    },
+  ],
   'subtotal': 8.0,
   'total': 10.0,
   'currency': {'symbol': '\$', 'code': 'USD'},
@@ -201,7 +211,7 @@ void main() {
 
     expect(fake.calls, hasLength(1));
     final call = fake.calls.single;
-    expect(call.title, 'Sale Receipt SALE-1');
+    expect(call.title, 'Sale Receipt POS-42');
     expect(call.headers, ['Field', 'Value']);
 
     final paymentDate = DateTime.parse(
@@ -211,7 +221,10 @@ void main() {
       ['Customer', 'Alice'],
       ['Payment Method', 'Cash'],
       ['Date', DateFormatter.formatDateTime(paymentDate)],
-      ['Transaction ID', 'SALE-1'],
+      ['Invoice', 'POS-42'],
+      ['Reference No', 'REF-7'],
+      ['Tea', r'2 × $3.00 = $6.00'],
+      ['Lime', r'1 × $4.00 = $4.00'],
       ['Subtotal', '\$8.00'],
       ['Total', '\$10.00'],
     ]);
