@@ -32,11 +32,26 @@ class SaleScreen extends StatelessWidget {
     final hideToolbar =
         shortKeyboard &&
         availableHeight < kToolbarHeight + 2 * AppTokens.controlHeight;
-    final search = AppSearchField(
-      key: _searchKey,
-      title: 'Search',
-      showScan: true,
-      searchController: ctr.searchCtr,
+    final search = Row(
+      children: [
+        Expanded(
+          child: AppSearchField(
+            key: _searchKey,
+            title: 'Search',
+            showScan: true,
+            searchController: ctr.searchCtr,
+          ),
+        ),
+        Obx(
+          () => IconButton(
+            tooltip: 'Refresh'.tr,
+            icon: const Icon(Icons.refresh),
+            onPressed: ctr.isLoading.value || ctr.checkoutBusy
+                ? null
+                : ctr.loadProductCategories,
+          ),
+        ),
+      ],
     );
     return Scaffold(
       appBar: hideToolbar || desktop

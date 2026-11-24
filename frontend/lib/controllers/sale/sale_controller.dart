@@ -210,6 +210,22 @@ class SaleController extends GetxController {
         }).toList();
         await _mergeProductBarcodes(categoryList);
         categories.value = categoryList;
+        if (cart.isNotEmpty) {
+          final limits = {
+            for (final category in categoryList)
+              for (final product in category['products'])
+                for (final row in warehouses(product))
+                  (product['id'] as int, row['warehouse_id'] as int):
+                      row['qty'] as int,
+          };
+          cart.assignAll({
+            for (final entry in cart.entries)
+              entry.key: {
+                ...entry.value,
+                'available_qty': limits[entry.key] ?? 0,
+              },
+          });
+        }
       }
     } catch (error) {
       productLoadError.value = 'Unable to load products. Please try again.'.tr;

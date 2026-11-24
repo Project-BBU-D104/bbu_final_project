@@ -117,6 +117,40 @@ void main() {
     await tester.pumpAndSettle();
     expect(ctr.selectedProducts.single['warehouse_name'], 'Branch');
   });
+  testWidgets('refresh recovers missing warehouse availability', (
+    tester,
+  ) async {
+    final source = SaleTestSaleService();
+    final ctr = Get.put(
+      SaleController(
+        service: source,
+        productService: SaleTestProductService(),
+        customerService: SaleTestCustomerService(),
+        paymentTypeService: SaleTestPaymentTypeService(),
+        currencyService: SaleTestCurrencyService(),
+      ),
+    );
+    final product = saleProductJson(1, 'Water');
+    source.categories = [
+      {
+        'products': [Map.of(product)..remove('warehouse_availability')],
+      },
+    ];
+    await ctr.loadProductCategories();
+    source.categories = [
+      {
+        'products': [product],
+      },
+    ];
+    await pumpSalesPage(tester, SaleScreen(), size: const Size(1440, 900));
+    await tester.pumpAndSettle();
+    expect(find.text('Warehouse availability unavailable'), findsOneWidget);
+    await tester.tap(find.byTooltip('Refresh'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Water'));
+    await tester.pump();
+    expect(ctr.totalItems, 1);
+  });
   testWidgets('product tiles use shared list surfaces', (tester) async {
     final ctr = Get.put<SaleController>(SellingController());
     ctr.categories.add({

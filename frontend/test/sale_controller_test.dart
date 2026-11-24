@@ -303,6 +303,36 @@ void main() {
     expect(ctr.productLoadError.value, isEmpty);
     expect(ctr.categories.single['id'], 2);
   });
+  test(
+    'catalog refresh updates each cart limit and preserves requested quantities',
+    () async {
+      final service = Categories();
+      final ctr = SaleController(service: service, productService: Products());
+      final product = saleProductJson(1, 'Water');
+      ctr.addProduct(product);
+      ctr.addProduct(product);
+      service.response = [
+        {
+          'products': [
+            {
+              ...product,
+              'warehouse_availability': [warehouseRow(1, 'Main', 1)],
+            },
+          ],
+        },
+      ];
+      await ctr.loadProductCategories();
+      ctr.changeQuantity(1, 1, 1);
+      expect(ctr.totalItems, 2);
+      ctr.changeQuantity(1, 1, -1);
+      expect(ctr.totalItems, 1);
+      service.response = [];
+      await ctr.loadProductCategories();
+      ctr.changeQuantity(1, 1, 1);
+      expect(ctr.totalItems, 1);
+      expect(ctr.cart.values.single['available_qty'], 0);
+    },
+  );
   test('confirmation busy freezes cart mutations', () {
     final ctr = SaleController();
     ctr.addProduct(saleProductJson(1, 'Water'));
