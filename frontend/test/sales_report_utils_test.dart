@@ -98,10 +98,7 @@ void main() {
     });
 
     test('returns null for soft-deleted sales', () {
-      expect(
-        saleReportRow(rawSale(deletedAt: '2026-11-05T10:00:00')),
-        isNull,
-      );
+      expect(saleReportRow(rawSale(deletedAt: '2026-11-05T10:00:00')), isNull);
     });
 
     test('returns null when the sale date is invalid', () {
@@ -215,7 +212,13 @@ void main() {
           price: '20.00',
           amount: '60.00',
         ),
-        item(product: 'Oil', unit: 'l', qty: 1, price: '15.00', amount: '15.00'),
+        item(
+          product: 'Oil',
+          unit: 'l',
+          qty: 1,
+          price: '15.00',
+          amount: '15.00',
+        ),
       ]);
 
       expect(merged, hasLength(2));
@@ -228,7 +231,13 @@ void main() {
 
     test('keeps the same product name apart when the unit differs', () {
       final merged = mergeSaleItems([
-        item(product: 'Rope', unit: 'm', qty: 2, price: '5.00', amount: '10.00'),
+        item(
+          product: 'Rope',
+          unit: 'm',
+          qty: 2,
+          price: '5.00',
+          amount: '10.00',
+        ),
         item(
           product: 'Rope',
           unit: 'roll',
@@ -268,6 +277,19 @@ void main() {
   });
 
   group('saleExportRows', () {
+    test('export columns exclude customer', () {
+      expect(salesExportHeaders, [
+        'Invoice',
+        'Date',
+        'Product',
+        'Qty',
+        'Unit',
+        'Price',
+        'Amount',
+        'Status',
+      ]);
+    });
+
     test('writes one row per merged product with formatted values', () {
       final row = saleReportRow(
         rawSale(
@@ -301,7 +323,6 @@ void main() {
       expect(rows, hasLength(1));
       expect(rows.single, [
         'SALE-1',
-        'Walk-in',
         '05 Nov 2026',
         'Helmet',
         5,
@@ -317,10 +338,16 @@ void main() {
       final rows = saleExportRows([row]);
 
       expect(rows, hasLength(1));
-      expect(rows.single[1], 'Walk-in');
-      expect(rows.single[3], '-');
-      expect(rows.single[7], 90.0);
+      expect(rows.single, [
+        'SALE-1',
+        '05 Nov 2026',
+        '-',
+        0,
+        '-',
+        '-',
+        90.0,
+        'Paid',
+      ]);
     });
   });
-
-  }
+}

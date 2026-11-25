@@ -339,6 +339,7 @@ const Map<String, String> enUS = {
   "Start date": "Start date",
   "End date": "End date",
   "Customize Report": "Customize Report",
+  "Filter": "Filter",
   "Show Chart": "Show Chart",
   "Show Table": "Show Table",
   "Purchase Payment Chart": "Purchase Payment Chart",

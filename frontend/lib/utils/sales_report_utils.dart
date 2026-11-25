@@ -120,7 +120,6 @@ List<Map<String, dynamic>> saleItemRows(List<Map<String, dynamic>> sales) {
 /// units: each unit gets its own bucket.
 const List<String> salesExportHeaders = [
   'Invoice',
-  'Customer',
   'Date',
   'Product',
   'Qty',
@@ -147,7 +146,6 @@ List<List<dynamic>> saleExportRows(List<Map<String, dynamic>> sales) {
     if (items.isEmpty) {
       rows.add([
         sale['invoice'],
-        sale['customer'],
         date,
         '-',
         0,
@@ -163,7 +161,6 @@ List<List<dynamic>> saleExportRows(List<Map<String, dynamic>> sales) {
       final unit = (item['unit'] ?? '').toString().trim();
       rows.add([
         sale['invoice'],
-        sale['customer'],
         date,
         item['product'],
         item['qty'],

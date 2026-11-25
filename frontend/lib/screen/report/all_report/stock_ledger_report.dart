@@ -1,5 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/report/report_date_range_fields.dart';
+import 'package:frontend/screen/report/report_visibility_checkbox.dart';
 import 'package:frontend/screen/report/report_export_menu.dart';
 import 'package:frontend/services/main_service/product_transfer_service.dart';
 import 'package:frontend/services/main_service/purchase/purchase_service.dart';
@@ -286,61 +288,28 @@ class _StockLedgerReportState extends State<StockLedgerReport> {
     });
   }
 
-  Widget _dateButton({
-    required String label,
-    required DateTime date,
-    required VoidCallback onPressed,
-    required IconData icon,
-  }) => OutlinedButton.icon(
-    onPressed: onPressed,
-    icon: Icon(icon),
-    label: Text('$label: ${_dateFormat.format(date)}'),
+  Widget _buildDateFilter() => ReportDateRangeFields(
+    startDate: _startDate,
+    endDate: _endDate,
+    onChooseStart: () => _chooseDate(start: true),
+    onChooseEnd: () => _chooseDate(start: false),
   );
 
-  Widget _buildDateFilter() => AppSectionCard(
-    title: 'Date Range Filter',
-    child: Wrap(
-      spacing: AppSpacing.md,
-      runSpacing: AppSpacing.md,
-      children: [
-        _dateButton(
-          label: 'Start date'.tr,
-          date: _startDate,
-          icon: Icons.calendar_today_outlined,
-          onPressed: () => _chooseDate(start: true),
-        ),
-        _dateButton(
-          label: 'End date'.tr,
-          date: _endDate,
-          icon: Icons.event_outlined,
-          onPressed: () => _chooseDate(start: false),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildVisibilityOptions() => AppSectionCard(
-    title: 'Customize Report',
-    child: Column(
-      children: [
-        CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
-          dense: true,
-          title: Text('Show Chart'.tr),
-          value: _showChart,
-          onChanged: (value) => setState(() => _showChart = value ?? true),
-          controlAffinity: ListTileControlAffinity.leading,
-        ),
-        CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
-          dense: true,
-          title: Text('Show Table'.tr),
-          value: _showTable,
-          onChanged: (value) => setState(() => _showTable = value ?? true),
-          controlAffinity: ListTileControlAffinity.leading,
-        ),
-      ],
-    ),
+  Widget _buildVisibilityOptions() => Wrap(
+    spacing: AppSpacing.md,
+    runSpacing: AppSpacing.sm,
+    children: [
+      ReportVisibilityCheckbox(
+        label: 'Show Chart'.tr,
+        value: _showChart,
+        onChanged: (value) => setState(() => _showChart = value ?? true),
+      ),
+      ReportVisibilityCheckbox(
+        label: 'Show Table'.tr,
+        value: _showTable,
+        onChanged: (value) => setState(() => _showTable = value ?? true),
+      ),
+    ],
   );
 
   Widget _buildChart() {
@@ -594,7 +563,17 @@ class _StockLedgerReportState extends State<StockLedgerReport> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                _buildDateFilter(),
+                AppSectionCard(
+                  title: 'Filter',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildDateFilter(),
+                      const SizedBox(height: AppSpacing.lg),
+                      _buildVisibilityOptions(),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 AppSectionCard(
                   child: Text(
@@ -604,8 +583,7 @@ class _StockLedgerReportState extends State<StockLedgerReport> {
                         .tr,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                _buildVisibilityOptions(),
+
                 if (_showChart) ...[
                   const SizedBox(height: AppSpacing.lg),
                   _buildChart(),

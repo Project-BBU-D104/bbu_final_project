@@ -3,7 +3,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/report_export_controller.dart';
 import 'package:frontend/screen/report/pdf_preview_screen.dart';
+import 'package:frontend/screen/report/report_date_range_fields.dart';
+import 'package:frontend/screen/report/report_visibility_checkbox.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/ui/app_section_card.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/sales_report_utils.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/toast_widget.dart';
@@ -37,7 +41,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
   final ReportExportController exportCtr = ReportExportController();
   List<Map<String, dynamic>> sales = [];
 
-  /// Invoice keys whose product breakdown is currently expanded.
   final Set<String> _expandedInvoices = <String>{};
 
   static DateTime _monthStart() {
@@ -62,8 +65,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     super.dispose();
   }
 
-  /// ponytail: filters the whole sales list client-side; move to
-  /// GET /sale?start_date=&end_date= once the list is too big to fetch.
   Future<void> loadSales() async {
     if (mounted) setState(() => loading = true);
     try {
@@ -79,7 +80,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           }
           final sale = Map<String, dynamic>.from(item);
 
-          // Soft-deleted and cancelled sales are not sales.
           if (sale['deleted_at'] != null) continue;
           if ((sale['status'] ?? '').toString().toLowerCase() == 'cancelled') {
             continue;
@@ -90,7 +90,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             invalidSaleCount++;
             continue;
           }
-
           rows.add(row);
         }
       }
@@ -99,8 +98,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       setState(() => sales = rows);
       if (invalidSaleCount > 0) {
         ToastWidget.show(
-          message:
-              '$invalidSaleCount invalid sale record(s) were excluded.',
+          message: '$invalidSaleCount invalid sale record(s) were excluded.',
           type: ToastType.error,
         );
       }
@@ -182,76 +180,22 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     );
   }
 
-  Widget dateButton({
-    required String label,
-    required DateTime date,
-    required VoidCallback onPressed,
-    required IconData icon,
-  }) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(
-        '$label: ${dateFormat.format(date)}',
-        overflow: TextOverflow.ellipsis,
-      ),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      ),
-    );
-  }
-
-  Widget buildDateFilter() {
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            sectionTitle('Date Range Filter', Icons.date_range),
-            const SizedBox(height: 16),
-
-            // Keep both date filters in the same section.
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final bool isWide = constraints.maxWidth >= 450;
-
-                final fromButton = dateButton(
-                  label: 'From',
-                  date: startDate,
-                  icon: Icons.calendar_today,
-                  onPressed: () => chooseDate(true),
-                );
-
-                final toButton = dateButton(
-                  label: 'To',
-                  date: endDate,
-                  icon: Icons.event,
-                  onPressed: () => chooseDate(false),
-                );
-
-                if (isWide) {
-                  return Row(
-                    children: [
-                      Expanded(child: fromButton),
-                      const SizedBox(width: 12),
-                      Expanded(child: toButton),
-                    ],
-                  );
-                }
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [fromButton, const SizedBox(height: 8), toButton],
-                );
-              },
-            ),
-          ],
+  Widget buildDateFilter() => AppSectionCard(
+    title: 'Filter',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ReportDateRangeFields(
+          startDate: startDate,
+          endDate: endDate,
+          onChooseStart: () => chooseDate(true),
+          onChooseEnd: () => chooseDate(false),
         ),
-      ),
-    );
-  }
+        const SizedBox(height: AppSpacing.lg),
+        buildCustomizeReport(),
+      ],
+    ),
+  );
 
   Widget buildKpiCard({
     required String title,
@@ -473,8 +417,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             ),
           ),
           SimpleDialogOption(
-            onPressed: () =>
-                Navigator.pop(context, PdfPageFormat.a4.landscape),
+            onPressed: () => Navigator.pop(context, PdfPageFormat.a4.landscape),
             child: const ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.crop_landscape),
@@ -551,12 +494,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
 
     for (var index = 0; index < sales.length; index++) {
       final sale = sales[index];
-      // Duplicate lines of the same product in one invoice are collapsed
-      // into a single row with the summed quantity.
+
       final items = mergeSaleItems((sale['items'] as List?) ?? const []);
       final invoice = sale['invoice'].toString();
-      // Invoice numbers are unique, but fall back to the row index so the
-      // expand state still works for records without one.
+
       final key = invoice.isNotEmpty ? invoice : 'row_$index';
       final isExpanded = _expandedInvoices.contains(key);
       final isPaid = sale['status'] == 'Paid';
@@ -590,7 +531,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                 ),
               ),
             ),
-            DataCell(Text(sale['customer'].toString())),
             DataCell(Text(dateFormat.format(sale['date'] as DateTime))),
             DataCell(
               Text('${items.length} item${items.length == 1 ? '' : 's'}'),
@@ -624,7 +564,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             cells: const [
               DataCell(Text('')),
               DataCell(Text('')),
-              DataCell(Text('')),
               DataCell(
                 Padding(
                   padding: EdgeInsets.only(left: 24),
@@ -654,7 +593,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             cells: [
               const DataCell(Text('')),
               const DataCell(Text('')),
-              const DataCell(Text('')),
               DataCell(
                 Padding(
                   padding: const EdgeInsets.only(left: 24),
@@ -680,22 +618,15 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           children: [
             sectionTitle('Sales Details', Icons.receipt_long),
 
-            
-            // Give the table at least the available width so it fills the
-            // card, while still allowing horizontal scrolling when the
-            // columns need more room than the screen has.
             LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: constraints.maxWidth,
-                    ),
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
                     child: DataTable(
                       columns: const [
                         DataColumn(label: Text('Invoice')),
-                        DataColumn(label: Text('Customer')),
                         DataColumn(label: Text('Date')),
                         DataColumn(label: Text('Product')),
                         DataColumn(label: Text('Qty'), numeric: true),
@@ -715,56 +646,33 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     );
   }
 
-  Widget visibilityCheckbox({
-    required String title,
-    required bool value,
-    required ValueChanged<bool?> onChanged,
-  }) {
-    return CheckboxListTile(
-      contentPadding: EdgeInsets.zero,
-      dense: true,
-      title: Text(title),
-      value: value,
-      onChanged: onChanged,
-      controlAffinity: ListTileControlAffinity.leading,
-    );
-  }
-
   Widget buildCustomizeReport() {
-    return Card(
-      elevation: 1,
-      child: ExpansionTile(
-        leading: const Icon(Icons.tune),
-        title: const Text(
-          'Customize Report',
-          style: TextStyle(fontWeight: FontWeight.bold),
+    return Wrap(
+      spacing: AppSpacing.md,
+      runSpacing: AppSpacing.sm,
+      children: [
+        ReportVisibilityCheckbox(
+          label: 'Show KPI Cards',
+          value: showKpi,
+          onChanged: (value) {
+            setState(() => showKpi = value ?? true);
+          },
         ),
-        childrenPadding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          visibilityCheckbox(
-            title: 'Show KPI Cards',
-            value: showKpi,
-            onChanged: (value) {
-              setState(() => showKpi = value ?? true);
-            },
-          ),
-          visibilityCheckbox(
-            title: 'Show Sales Chart',
-            value: showChart,
-            onChanged: (value) {
-              setState(() => showChart = value ?? true);
-            },
-          ),
-          visibilityCheckbox(
-            title: 'Show Sales Table',
-            value: showTable,
-            onChanged: (value) {
-              setState(() => showTable = value ?? true);
-            },
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
+        ReportVisibilityCheckbox(
+          label: 'Show Sales Chart',
+          value: showChart,
+          onChanged: (value) {
+            setState(() => showChart = value ?? true);
+          },
+        ),
+        ReportVisibilityCheckbox(
+          label: 'Show Sales Table',
+          value: showTable,
+          onChanged: (value) {
+            setState(() => showTable = value ?? true);
+          },
+        ),
+      ],
     );
   }
 
@@ -866,10 +774,6 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                         children: [
                           // The two date filters stay grouped.
                           buildDateFilter(),
-
-                          const SizedBox(height: 16),
-
-                          buildCustomizeReport(),
 
                           if (showKpi) ...[
                             const SizedBox(height: 16),

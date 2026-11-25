@@ -334,6 +334,7 @@ const Map<String, String> kmKH = {
   "Start date": "កាលបរិច្ឆេទចាប់ផ្តើម",
   "End date": "កាលបរិច្ឆេទបញ្ចប់",
   "Customize Report": "ប្ដូររបាយការណ៍",
+  "Filter": "តម្រង",
   "Show Chart": "បង្ហាញគំនូសតាង",
   "Show Table": "បង្ហាញតារាង",
   "Purchase Payment Chart": "គំនូសតាងការទូទាត់ការទិញ",
