@@ -119,9 +119,9 @@ Future<ProfileController> pumpProfile(
 }
 
 Future<void> openEdit(WidgetTester tester) async {
-  await tester.ensureVisible(find.text('Edit Profile'));
+  await tester.ensureVisible(find.byTooltip('Edit Profile'));
   await tester.pumpAndSettle();
-  await tester.tap(find.text('Edit Profile'));
+  await tester.tap(find.byTooltip('Edit Profile'));
   await tester.pumpAndSettle();
 }
 

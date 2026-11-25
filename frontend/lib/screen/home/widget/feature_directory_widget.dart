@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:frontend/controllers/search_feature_controller.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/card_feature_widget.dart';
 import 'package:frontend/widget/search_feature_widget.dart';
 import 'package:get/get.dart';
@@ -14,6 +16,9 @@ class FeatureDirectoryWidget extends StatelessWidget {
     required this.searchController,
     required this.sections,
     required this.onNavigate,
+    required this.maxColumns,
+    this.stickySearch = false,
+    this.alignContentStart = false,
   });
   final String title;
   final String subtitle;
@@ -21,16 +26,25 @@ class FeatureDirectoryWidget extends StatelessWidget {
   final SearchFeatureController searchController;
   final List<Map<String, dynamic>> sections;
   final ValueChanged<String> onNavigate;
+  final int maxColumns;
+  final bool stickySearch;
+  final bool alignContentStart;
 
   @override
   Widget build(BuildContext context) => HomeTabLayout(
     title: title,
     subtitle: subtitle,
+    alignContentStart: alignContentStart,
+    pinnedChild: stickySearch
+        ? SearchFeatureWidget(title: searchTitle, ctr: searchController)
+        : null,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SearchFeatureWidget(title: searchTitle, ctr: searchController),
-        const SizedBox(height: 32),
+        if (!stickySearch) ...[
+          SearchFeatureWidget(title: searchTitle, ctr: searchController),
+          const SizedBox(height: AppSpacing.xxxl),
+        ],
         if (sections.isEmpty)
           HomeSectionCard(
             child: Column(
@@ -71,19 +85,28 @@ class FeatureDirectoryWidget extends StatelessWidget {
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              final columns = constraints.maxWidth < 600
-                  ? 1
-                  : constraints.maxWidth < 1000
-                  ? 2
-                  : 3;
+              final textScale = math.max(
+                1.0,
+                MediaQuery.textScalerOf(context).scale(14) / 14,
+              );
+              final fittingColumns = math.max(
+                1,
+                ((constraints.maxWidth + AppSpacing.lg) /
+                        (AppTokens.featureCardMinWidth * textScale +
+                            AppSpacing.lg))
+                    .floor(),
+              );
+              final columns = math.min(maxColumns, fittingColumns);
               return Wrap(
-                spacing: 16,
-                runSpacing: 16,
+                spacing: AppSpacing.lg,
+                runSpacing: AppSpacing.lg,
                 children: [
                   for (final item in section['items'] as List)
                     SizedBox(
                       width:
-                          (constraints.maxWidth - 16 * (columns - 1)) / columns,
+                          (constraints.maxWidth -
+                              AppSpacing.lg * (columns - 1)) /
+                          columns,
                       child: CardFeatureWidget(
                         title: item['title'],
                         icon: item['icon'],

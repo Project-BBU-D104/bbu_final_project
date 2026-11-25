@@ -4,6 +4,7 @@ import 'package:frontend/screen/home/widget/home_tab_layout.dart';
 import 'package:frontend/screen/profile/widget/card_personal_info_widget.dart';
 import 'package:frontend/screen/profile/widget/card_profile_widget.dart';
 import 'package:frontend/screen/profile/widget/setting_widget.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -44,33 +45,10 @@ class ProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               CardPersonalInfoWidget(),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  FilledButton.icon(
-                    onPressed: () => ctr.openEditProfile(context),
-                    icon: const Icon(Icons.edit_outlined),
-                    label: Text('Edit Profile'.tr),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                      padding: const EdgeInsets.all(16),
-                    ),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => ctr.openChangePassword(context),
-                    icon: const Icon(Icons.lock_outline),
-                    label: Text('Change Password'.tr),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                      padding: const EdgeInsets.all(16),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: AppSpacing.xxl),
+              SettingWidget(
+                onChangePassword: () => ctr.openChangePassword(context),
               ),
-              const SizedBox(height: 24),
-              SettingWidget(),
             ],
           );
           if (constraints.maxWidth < 900) {

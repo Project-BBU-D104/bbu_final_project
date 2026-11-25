@@ -13,9 +13,9 @@ class FakeStorageService implements IStorageService {
 
   @override
   Map<String, dynamic> get lastUserLoginRead => {
-        'token': 'token',
-        'user': {'id': 1, 'role': role},
-      };
+    'token': 'token',
+    'user': {'id': 1, 'role': role},
+  };
 
   @override
   String get currentUserRole => role;
@@ -85,6 +85,7 @@ Future<void> tapTile(WidgetTester tester, String title) async {
   final tile = find.text(title);
   expect(tile, findsWidgets);
   await tester.ensureVisible(tile.first);
+  await tester.pumpAndSettle();
   await tester.tap(tile.first);
   await tester.pumpAndSettle();
 }
@@ -100,33 +101,39 @@ void main() {
     Get.reset();
   });
 
-  test('cashier can access Customer and Sale Payment but not Warehouse Stock or Audit Logs', () {
-    fake.role = 'cashier';
-    final controller = ManageController();
+  test(
+    'cashier can access Customer and Sale Payment but not Warehouse Stock or Audit Logs',
+    () {
+      fake.role = 'cashier';
+      final controller = ManageController();
 
-    final titles = visibleItemTitles(controller);
+      final titles = visibleItemTitles(controller);
 
-    expect(titles, contains('Customer'));
-    expect(titles, contains('Sale Payment'));
-    expect(titles, isNot(contains('Warehouse Stock')));
-    expect(titles, isNot(contains('Audit Logs')));
-    expect(
-      controller.accessibleSections.map((section) => section['title']),
-      isNot(contains('History Management')),
-    );
-  });
+      expect(titles, contains('Customer'));
+      expect(titles, contains('Sale Payment'));
+      expect(titles, isNot(contains('Warehouse Stock')));
+      expect(titles, isNot(contains('Audit Logs')));
+      expect(
+        controller.accessibleSections.map((section) => section['title']),
+        isNot(contains('History Management')),
+      );
+    },
+  );
 
-  test('stock manager can access Warehouse Stock but not Customer, Sale Payment, or Audit Logs', () {
-    fake.role = 'stock manager';
-    final controller = ManageController();
+  test(
+    'stock manager can access Warehouse Stock but not Customer, Sale Payment, or Audit Logs',
+    () {
+      fake.role = 'stock manager';
+      final controller = ManageController();
 
-    final titles = visibleItemTitles(controller);
+      final titles = visibleItemTitles(controller);
 
-    expect(titles, contains('Warehouse Stock'));
-    expect(titles, isNot(contains('Customer')));
-    expect(titles, isNot(contains('Sale Payment')));
-    expect(titles, isNot(contains('Audit Logs')));
-  });
+      expect(titles, contains('Warehouse Stock'));
+      expect(titles, isNot(contains('Customer')));
+      expect(titles, isNot(contains('Sale Payment')));
+      expect(titles, isNot(contains('Audit Logs')));
+    },
+  );
 
   for (final role in ['admin', 'owner']) {
     test('$role can access all four restored tiles and History Management', () {

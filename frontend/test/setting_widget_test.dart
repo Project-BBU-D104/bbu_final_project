@@ -5,6 +5,7 @@ import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/screen/profile/widget/setting_widget.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/ui/app_text_scale.dart';
 import 'package:get/get.dart';
 
 class FakeStorageService implements IStorageService {
@@ -57,8 +58,9 @@ void main() {
     Get.reset();
   });
 
-  testWidgets('dark mode switch toggles the theme and persists it',
-      (tester) async {
+  testWidgets('dark mode switch toggles the theme and persists it', (
+    tester,
+  ) async {
     final storage = FakeStorageService();
     final ctr = Get.put<ThemeController>(
       ThemeController(storageService: storage),
@@ -70,7 +72,7 @@ void main() {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: ctr.isDark.value ? ThemeMode.dark : ThemeMode.light,
-          home: Scaffold(body: SettingWidget()),
+          home: Scaffold(body: SingleChildScrollView(child: SettingWidget())),
         ),
       ),
     );
@@ -101,5 +103,98 @@ void main() {
       Brightness.light,
     );
     expect(storage.values[StorageKey.darkMode], isFalse);
+  });
+
+  testWidgets('font size updates app text and survives a restart', (
+    tester,
+  ) async {
+    final storage = FakeStorageService();
+    final controller = Get.put(ThemeController(storageService: storage));
+
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.25)),
+            child: AppTextScale(
+              controller: controller,
+              child: Scaffold(
+                body: SingleChildScrollView(child: SettingWidget()),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    double scaledText() => MediaQuery.textScalerOf(
+      tester.element(find.byType(SettingWidget)),
+    ).scale(20);
+
+    expect(controller.fontScale.value, 1.0);
+    expect(scaledText(), 25);
+    expect(find.text('100%'), findsOneWidget);
+    final slider = find.byType(Slider);
+    final sliderRect = tester.getRect(slider);
+    await tester.tapAt(Offset(sliderRect.right - 1, sliderRect.center.dy));
+    await tester.pumpAndSettle();
+    expect(scaledText(), closeTo(32.5, 0.001));
+    expect(find.text('130%'), findsOneWidget);
+    expect(storage.values[StorageKey.fontScale], 1.3);
+
+    final restored = ThemeController(storageService: storage)..onInit();
+    expect(restored.fontScale.value, 1.3);
+
+    tester.widget<Slider>(slider).onChanged!(1.0);
+    await tester.pumpAndSettle();
+    expect(scaledText(), 25);
+    expect(storage.values[StorageKey.fontScale], 1.0);
+  });
+
+  test('invalid saved font sizes fall back to normal', () {
+    final storage = FakeStorageService()..values[StorageKey.fontScale] = 'bad';
+    final controller = ThemeController(storageService: storage)..onInit();
+    expect(controller.fontScale.value, 1.0);
+  });
+
+  test('restores font sizes between the old preset values', () {
+    final storage = FakeStorageService()..values[StorageKey.fontScale] = 1.07;
+    final controller = ThemeController(storageService: storage)..onInit();
+    expect(controller.fontScale.value, 1.07);
+  });
+
+  testWidgets('directory column dropdowns save separate preferences', (
+    tester,
+  ) async {
+    final storage = FakeStorageService();
+    final controller = Get.put(ThemeController(storageService: storage));
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: SettingWidget())),
+      ),
+    );
+
+    final manage = find.byKey(const ValueKey('Manage columns'));
+    final report = find.byKey(const ValueKey('Report columns'));
+    await tester.ensureVisible(manage);
+    await tester.tap(manage);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('5').last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(report);
+    await tester.tap(report);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2').last);
+    await tester.pumpAndSettle();
+
+    expect(controller.manageColumns.value, 5);
+    expect(controller.reportColumns.value, 2);
+    final restored = ThemeController(storageService: storage)..onInit();
+    expect(restored.manageColumns.value, 5);
+    expect(restored.reportColumns.value, 2);
+    await restored.setManageColumns(6);
+    expect(restored.manageColumns.value, 5);
   });
 }

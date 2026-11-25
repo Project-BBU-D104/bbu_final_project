@@ -10,6 +10,11 @@ class CardPersonalInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => HomeSectionCard(
     title: 'Personal information',
+    action: IconButton(
+      tooltip: 'Edit Profile'.tr,
+      icon: const Icon(Icons.edit_outlined),
+      onPressed: () => ctr.openEditProfile(context),
+    ),
     child: Obx(() {
       final details = [
         (label: 'Full Name', value: ctr.username.value),

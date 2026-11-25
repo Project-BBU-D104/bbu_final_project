@@ -39,6 +39,8 @@ class AppTokens {
   /// Page gutter below 600px.
   static const double gutterCompact = 16;
 
+  static const double bpPageGutter = 600;
+
   /// Page gutter at 600px and above.
   static const double gutterWide = 32;
 
@@ -65,6 +67,9 @@ class AppTokens {
 
   /// Two meta fields side by side.
   static const double bpMetaPair = 400;
+
+  /// Minimum width of a directory card before reducing the column count.
+  static const double featureCardMinWidth = 200;
 }
 
 /// Spacing scale. Screens use these instead of literal gaps.

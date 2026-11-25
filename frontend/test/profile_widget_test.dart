@@ -7,6 +7,8 @@ import 'package:frontend/locator.dart';
 import 'package:frontend/screen/profile/profile_screen.dart';
 import 'package:frontend/screen/profile/widget/edit_profile_widget.dart';
 import 'package:frontend/screen/profile/widget/change_password_widget.dart';
+import 'package:frontend/screen/profile/widget/card_personal_info_widget.dart';
+import 'package:frontend/screen/profile/widget/setting_widget.dart';
 import 'package:frontend/services/main_service/profile_service.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
@@ -89,9 +91,12 @@ Future<ProfileController> pumpProfile(
 }
 
 Future<void> openSheet(WidgetTester tester, String label) async {
-  await tester.ensureVisible(find.text(label));
+  final action = label == 'Edit Profile'
+      ? find.byTooltip(label)
+      : find.text(label);
+  await tester.ensureVisible(action);
   await tester.pumpAndSettle();
-  await tester.tap(find.text(label));
+  await tester.tap(action);
   await tester.pumpAndSettle();
 }
 
@@ -126,6 +131,22 @@ void main() {
   ) async {
     final service = FakeProfileService();
     await pumpProfile(tester, service);
+
+    expect(
+      find.descendant(
+        of: find.byType(CardPersonalInfoWidget),
+        matching: find.byTooltip('Edit Profile'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Edit Profile'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(SettingWidget),
+        matching: find.text('Change Password'),
+      ),
+      findsOneWidget,
+    );
 
     await openSheet(tester, 'Edit Profile');
 

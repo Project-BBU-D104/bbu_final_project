@@ -1,7 +1,10 @@
   enum StorageKey {
     appStartUp,
     lastUserLogin,
-    darkMode
+    darkMode,
+    fontScale,
+    manageColumns,
+    reportColumns
   }
 
   enum SystemMode { system, light, dark }

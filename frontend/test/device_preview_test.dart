@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:frontend/app_background.dart';
 import 'package:frontend/controllers/language_controller.dart';
 import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/main.dart';
@@ -66,6 +67,15 @@ void main() {
       final app = tester.widget<GetMaterialApp>(find.byType(GetMaterialApp));
       expect(app.themeMode, ThemeMode.dark);
       expect(app.locale, const Locale('km', 'KH'));
+
+      final background = tester.element(find.byType(AppBackground));
+      final originalSize = MediaQuery.textScalerOf(background).scale(20);
+      await Get.find<ThemeController>().setFontScale(1.3);
+      await tester.pumpAndSettle();
+      expect(
+        MediaQuery.textScalerOf(background).scale(20),
+        closeTo(originalSize * 1.3, 0.001),
+      );
     });
   }
 }

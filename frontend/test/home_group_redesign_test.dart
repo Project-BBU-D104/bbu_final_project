@@ -23,6 +23,7 @@ import 'package:frontend/screen/profile/widget/setting_widget.dart';
 import 'package:frontend/screen/report/report_screen.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/themes/app_theme.dart';
+import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/widget/card_feature_widget.dart';
 import 'package:get/get.dart';
 import 'profile_widget_test.dart' show FakeProfileService, FakeStorageService;
@@ -237,7 +238,11 @@ void main() {
                       ? ReportScreen
                       : ProfileScreen,
                 ),
-                matching: find.byType(SingleChildScrollView),
+                matching: find.byType(
+                  entry.key == 'Manage' || entry.key == 'Report'
+                      ? CustomScrollView
+                      : SingleChildScrollView,
+                ),
               )
               .first;
           await tester.drag(scroll, const Offset(0, -5000));
@@ -247,6 +252,116 @@ void main() {
       );
     }
   }
+
+  for (final directory in [
+    (name: 'Manage', screen: ManageScreen.new, type: ManageScreen),
+    (name: 'Report', screen: ReportScreen.new, type: ReportScreen),
+  ]) {
+    testWidgets(
+      '${directory.name} search stays visible while scrolling and filtering',
+      (tester) async {
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await pumpHomeGroupTab(
+          tester,
+          directory.screen(),
+          size: const Size(375, 520),
+        );
+        final scroll = find.descendant(
+          of: find.byType(directory.type),
+          matching: find.byType(CustomScrollView),
+        );
+        final search = find.byType(TextField);
+        await tester.drag(scroll, const Offset(0, -800));
+        await tester.pumpAndSettle();
+        final pinnedPosition = tester.getTopLeft(search).dy;
+        expect(pinnedPosition, greaterThanOrEqualTo(0));
+        expect(pinnedPosition, lessThan(200));
+        await tester.drag(scroll, const Offset(0, -400));
+        await tester.pumpAndSettle();
+        expect(tester.getTopLeft(search).dy, closeTo(pinnedPosition, 0.1));
+        await tester.enterText(search, 'no-such-feature');
+        await tester.pumpAndSettle();
+        expect(find.text('No matching results'), findsOneWidget);
+        expect(find.byType(TextField), findsOneWidget);
+        await tester.tap(find.byTooltip('Clear search'));
+        await tester.pumpAndSettle();
+        expect(find.text('No matching results'), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  for (final directory in [
+    (name: 'Manage', screen: ManageScreen.new),
+    (name: 'Report', screen: ReportScreen.new),
+  ]) {
+    testWidgets(
+      '${directory.name} heading, search, and cards align on the left',
+      (tester) async {
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await pumpHomeGroupTab(
+          tester,
+          directory.screen(),
+          size: const Size(1920, 900),
+        );
+
+        final heading = find.descendant(
+          of: find.byType(AppPageHeader),
+          matching: find.text(directory.name),
+        );
+        final headingLeft = tester.getTopLeft(heading).dx;
+        final searchLeft = tester.getTopLeft(find.byType(TextField)).dx;
+        final cardLeft = tester
+            .getTopLeft(find.byType(CardFeatureWidget).first)
+            .dx;
+        final viewport = tester.getRect(find.byType(CustomScrollView));
+        final search = tester.getRect(find.byType(TextField));
+
+        expect(headingLeft, closeTo(searchLeft, 0.1));
+        expect(cardLeft, closeTo(searchLeft, 0.1));
+        expect(searchLeft - viewport.left, greaterThan(32));
+        expect(
+          searchLeft - viewport.left,
+          closeTo(viewport.right - search.right, 0.1),
+        );
+      },
+    );
+  }
+
+  testWidgets('Manage and Report each follow their own column preference', (
+    tester,
+  ) async {
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final preferences = Get.find<ThemeController>();
+    await preferences.setManageColumns(2);
+    await preferences.setReportColumns(5);
+    await pumpHomeGroupTab(tester, ManageScreen(), size: const Size(1600, 900));
+    final manageWidth = tester
+        .getSize(find.byType(CardFeatureWidget).first)
+        .width;
+    await preferences.setManageColumns(5);
+    await tester.pumpAndSettle();
+    final narrowerManageWidth = tester
+        .getSize(find.byType(CardFeatureWidget).first)
+        .width;
+    expect(narrowerManageWidth, lessThan(manageWidth));
+
+    await pumpHomeGroupTab(tester, ReportScreen(), size: const Size(1600, 900));
+    final reportWidth = tester
+        .getSize(find.byType(CardFeatureWidget).first)
+        .width;
+    await preferences.setReportColumns(2);
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSize(find.byType(CardFeatureWidget).first).width,
+      greaterThan(reportWidth),
+    );
+    expect(preferences.manageColumns.value, 5);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'Manage and Report searches are independent, support clear, and navigate',
