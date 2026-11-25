@@ -3,6 +3,8 @@ import 'package:frontend/constants/constant.dart';
 import 'package:frontend/controllers/login_controller.dart';
 import 'package:frontend/controllers/theme_controller.dart';
 import 'package:frontend/screen/auth/widget/input_login_widget.dart';
+import 'package:frontend/ui/app_section_card.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/dailog_select_language_widget.dart';
 import 'package:get/get.dart';
 
@@ -19,20 +21,24 @@ class LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 900;
-            final compact = constraints.maxWidth < 600;
-            final form = Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(compact ? 0 : 32),
-              decoration: compact
-                  ? null
-                  : BoxDecoration(
+            final wide = constraints.maxWidth >= AppTokens.bpTwoColumn;
+            final compact = constraints.maxWidth < AppTokens.bpPageGutter;
+            final loginForm = _LoginForm(
+              controller: controller,
+              formKey: _formKey,
+            );
+            final form = compact
+                ? AppSectionCard(child: loginForm)
+                : Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppTokens.gutterWide),
+                    decoration: BoxDecoration(
                       color: colors.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: colors.outlineVariant),
                     ),
-              child: _LoginForm(controller: controller, formKey: _formKey),
-            );
+                    child: loginForm,
+                  );
             final content = Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(

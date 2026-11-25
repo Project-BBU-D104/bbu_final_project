@@ -13,6 +13,7 @@ import 'package:frontend/constants/enum.dart';
 import 'package:frontend/screen/landing.dart';
 import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/screen/auth/login_screen.dart';
+import 'package:frontend/ui/app_section_card.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/themes/app_theme.dart';
@@ -155,6 +156,36 @@ void main() {
       }),
     );
     await tester.pump();
+  }
+
+  for (final dark in [false, true]) {
+    testWidgets(
+      'mobile login form is in a card in ${dark ? 'dark' : 'light'} mode',
+      (tester) async {
+        tester.view.physicalSize = const Size(375, 667);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await showLogin(
+          tester,
+          theme: dark ? AppTheme.dark() : AppTheme.light(),
+        );
+
+        final card = find.byType(AppSectionCard);
+        expect(card, findsOneWidget);
+        expect(
+          find.descendant(of: card, matching: find.byType(TextFormField)),
+          findsNWidgets(2),
+        );
+        expect(
+          find.descendant(of: card, matching: find.byType(FilledButton)),
+          findsOneWidget,
+        );
+        await tester.ensureVisible(find.byType(FilledButton));
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
 
   testWidgets('empty submit focuses username and corrections revalidate', (
