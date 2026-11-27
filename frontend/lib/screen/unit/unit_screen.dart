@@ -83,15 +83,6 @@ class UnitScreen extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 8),
                                       ],
-                                      Text(
-                                        'Manage product units.'.tr,
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(
-                                              color: theme
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                      ),
                                     ],
                                   ),
                                 ),

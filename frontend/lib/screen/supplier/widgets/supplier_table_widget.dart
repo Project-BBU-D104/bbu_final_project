@@ -81,7 +81,7 @@ class SupplierTableWidget extends StatelessWidget {
           width: 132,
           builder: (context, item) => StatusWidget(
             text: (item.status == true ? 'Active' : 'Inactive').tr,
-            color: item.status == true ? active : colors.onSurface,
+            status: item.status == true ? 'Active' : 'Inactive',
           ),
         ),
         AppTableColumn<SupplierModel>(

@@ -108,21 +108,23 @@ class SettingWidget extends StatelessWidget {
             onChanged: themeController.setFontScale,
           ),
         ),
-        const Divider(height: AppSpacing.xxl),
-        Obx(
-          () => _columnSetting(
-            label: 'Manage columns',
-            value: themeController.manageColumns.value,
-            onChanged: themeController.setManageColumns,
+        if (MediaQuery.sizeOf(context).width >= AppTokens.bpPageGutter) ...[
+          const Divider(height: AppSpacing.xxl),
+          Obx(
+            () => _columnSetting(
+              label: 'Manage columns',
+              value: themeController.manageColumns.value,
+              onChanged: themeController.setManageColumns,
+            ),
           ),
-        ),
-        Obx(
-          () => _columnSetting(
-            label: 'Report columns',
-            value: themeController.reportColumns.value,
-            onChanged: themeController.setReportColumns,
+          Obx(
+            () => _columnSetting(
+              label: 'Report columns',
+              value: themeController.reportColumns.value,
+              onChanged: themeController.setReportColumns,
+            ),
           ),
-        ),
+        ],
         const Divider(height: AppSpacing.xxl),
         TextButton(
           onPressed: onChangePassword,
@@ -131,6 +133,41 @@ class SettingWidget extends StatelessWidget {
               const ExcludeSemantics(child: Icon(Icons.lock_outline)),
               const SizedBox(width: AppSpacing.lg),
               Expanded(child: Text('Change Password'.tr)),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
+        const Divider(height: AppSpacing.xxl),
+        TextButton(
+          onPressed: () => showDialog<void>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              title: Text('About'.tr),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ePOS App',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text('Inventory Management'.tr),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text('Close'.tr),
+                ),
+              ],
+            ),
+          ),
+          child: Row(
+            children: [
+              const ExcludeSemantics(child: Icon(Icons.info_outline)),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(child: Text('About'.tr)),
               const Icon(Icons.chevron_right),
             ],
           ),

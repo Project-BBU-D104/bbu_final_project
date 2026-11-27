@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 
-/// The page shell: safe area, gutter and a capped content width.
 class AppPage extends StatelessWidget {
   const AppPage({
     super.key,
@@ -51,7 +50,7 @@ class AppPage extends StatelessWidget {
 class AppPageHeader extends StatelessWidget {
   const AppPageHeader({
     super.key,
-    required this.title,
+    this.title,
     this.subtitle,
     this.leading,
     this.actions,
@@ -59,7 +58,7 @@ class AppPageHeader extends StatelessWidget {
     this.translateTitle = true,
   });
 
-  final String title;
+  final String? title;
   final String? subtitle;
 
   /// e.g. a back [IconButton].
@@ -82,28 +81,31 @@ class AppPageHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: AppSpacing.md),
-              ],
-              Flexible(
-                child: Semantics(
-                  header: true,
-                  child: Text(
-                    translateTitle ? title.tr : title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.5,
+          if (title != null || leading != null)
+            Row(
+              children: [
+                if (leading != null) ...[
+                  leading!,
+                  if (title != null) const SizedBox(width: AppSpacing.md),
+                ],
+                if (title != null)
+                  Flexible(
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        translateTitle ? title!.tr : title!,
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
+              ],
+            ),
           if (subtitle != null) ...[
-            const SizedBox(height: AppSpacing.sm),
+            if (title != null || leading != null)
+              const SizedBox(height: AppSpacing.sm),
             Text(
               subtitle!.tr,
               style: theme.textTheme.bodyMedium?.copyWith(

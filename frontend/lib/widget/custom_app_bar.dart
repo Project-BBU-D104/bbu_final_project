@@ -20,7 +20,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBack = true,
     this.onBack,
     this.actions,
-    this.centerTitle = true,
+    this.centerTitle = false,
     this.onRefresh,
     this.showRefresh = false,
   });
@@ -28,6 +28,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      centerTitle: centerTitle,
       backgroundColor: useTheme
           ? Theme.of(context).colorScheme.surface
           : titleColor,
@@ -35,8 +36,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
 
-      // showBack fully controls the back button; without this the AppBar
-      // would imply its own BackButton whenever the route can pop.
       automaticallyImplyLeading: false,
       leading: showBack
           ? IconButton(

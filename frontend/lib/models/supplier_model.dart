@@ -29,7 +29,13 @@ class SupplierModel {
       email: json['email'] as String?,
       map: json['map'] as String?,
       address: (json['address'] as String?),
-      status: (json['status'] as bool?) ?? true,
+      status: switch (json['status']) {
+        null => true,
+        bool value => value,
+        0 => false,
+        1 => true,
+        _ => throw const FormatException('Invalid supplier status'),
+      },
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)
           : null,

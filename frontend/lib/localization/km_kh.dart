@@ -233,6 +233,12 @@ const Map<String, String> kmKH = {
   "Active": "សកម្ម",
   "Inactive": "អសកម្ម",
   "Cancel": "បោះបង់",
+  "true": "ពិត",
+  "false": "មិនពិត",
+  "Leave sale?": "ចាកចេញពីការលក់?",
+  "You have selected products. Are you sure you want to leave?":
+      "អ្នកបានជ្រើសរើសទំនិញ។ តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?",
+  "Leave": "ចាកចេញ",
   "Confirm": "បញ្ជាក់",
   "Do you want to delete this supplier?": "តើអ្នកចង់លុបអ្នកផ្គត់ផ្គង់នេះមែនទេ?",
   "Email is required": "សូមបញ្ចូលអ៊ីមែល",
@@ -276,6 +282,7 @@ const Map<String, String> kmKH = {
   "Contact your administrator to reset your password in User Management.":
       "សូមទាក់ទងអ្នកគ្រប់គ្រងរបស់អ្នក ដើម្បីកំណត់ពាក្យសម្ងាត់ឡើងវិញនៅក្នុងការគ្រប់គ្រងអ្នកប្រើប្រាស់។",
   "Close": "បិទ",
+  "About": "អំពីកម្មវិធី",
   "Report": "របាយការណ៍",
   "Your daily inventory workspace.":
       "កន្លែងធ្វើការគ្រប់គ្រងសារពើភណ្ឌប្រចាំថ្ងៃរបស់អ្នក។",

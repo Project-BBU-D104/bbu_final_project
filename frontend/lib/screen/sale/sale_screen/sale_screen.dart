@@ -38,7 +38,7 @@ class SaleScreen extends StatelessWidget {
       showScan: true,
       searchController: ctr.searchCtr,
     );
-    return Scaffold(
+    final page = Scaffold(
       appBar: hideToolbar || desktop
           ? null
           : CustomAppBar(title: 'Sale', onBack: () => _back(context)),
@@ -179,11 +179,46 @@ class SaleScreen extends StatelessWidget {
         ),
       ),
     );
+    return Obx(
+      () => PopScope(
+        canPop: ctr.cart.isEmpty,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) _back(context);
+        },
+        child: page,
+      ),
+    );
   }
 
-  void _back(BuildContext context) => Navigator.of(context).canPop()
-      ? Get.back()
-      : Get.offNamed(AppRoutes.home);
+  Future<void> _back(BuildContext context) async {
+    if (ctr.cart.isNotEmpty) {
+      final leave = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text('Leave sale?'.tr),
+          content: Text(
+            'You have selected products. Are you sure you want to leave?'.tr,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('Cancel'.tr),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('Leave'.tr),
+            ),
+          ],
+        ),
+      );
+      if (leave != true || !context.mounted) return;
+    }
+    if (Navigator.of(context).canPop()) {
+      Get.back();
+    } else {
+      Get.offNamed(AppRoutes.home);
+    }
+  }
 
   Widget _tile(Map<String, dynamic> product) => Obx(
     () => CardItemWidget(

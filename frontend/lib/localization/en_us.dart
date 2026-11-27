@@ -239,6 +239,12 @@ const Map<String, String> enUS = {
   "Active": "Active",
   "Inactive": "Inactive",
   "Cancel": "Cancel",
+  "true": "true",
+  "false": "false",
+  "Leave sale?": "Leave sale?",
+  "You have selected products. Are you sure you want to leave?":
+      "You have selected products. Are you sure you want to leave?",
+  "Leave": "Leave",
   "Confirm": "Confirm",
   "Do you want to delete this supplier?":
       "Do you want to delete this supplier?",
@@ -283,6 +289,7 @@ const Map<String, String> enUS = {
   "Contact your administrator to reset your password in User Management.":
       "Contact your administrator to reset your password in User Management.",
   "Close": "Close",
+  "About": "About",
   "Your daily inventory workspace.": "Your daily inventory workspace.",
   "Your tools for day-to-day operations.":
       "Your tools for day-to-day operations.",

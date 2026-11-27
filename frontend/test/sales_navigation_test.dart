@@ -25,6 +25,64 @@ class NavigationSaleController extends SaleController {
 void main() {
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  testWidgets('leaving a sale with selected products requires confirmation', (
+    tester,
+  ) async {
+    final ctr = Get.put<SaleController>(
+      NavigationSaleController(SaleTestSaleService(), SaleTestPaymentService()),
+      permanent: true,
+    );
+    ctr.categories.add({
+      'name': 'Drinks',
+      'products': [saleProductJson(1, 'Water')],
+    });
+    await tester.pumpWidget(
+      GetMaterialApp(
+        theme: AppTheme.light(),
+        initialRoute: '/home',
+        getPages: [
+          GetPage(
+            name: '/home',
+            page: () => Scaffold(
+              body: TextButton(
+                onPressed: () => Get.toNamed('/sale'),
+                child: const Text('Quick sale'),
+              ),
+            ),
+          ),
+          GetPage(name: '/sale', page: () => SaleScreen()),
+        ],
+      ),
+    );
+    await tester.tap(find.text('Quick sale'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Water'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave sale?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, '/sale');
+    expect(ctr.totalItems, 1);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Leave sale?'), findsOneWidget);
+    await tester.tap(find.text('Leave'));
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, '/home');
+
+    ctr.cart.clear();
+    await tester.tap(find.text('Quick sale'));
+    await tester.pumpAndSettle();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, '/home');
+    expect(find.text('Leave sale?'), findsNothing);
+  });
+
   testWidgets('sell through current cart confirmation receipt and back', (
     tester,
   ) async {

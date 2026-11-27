@@ -77,7 +77,7 @@ class UnitCardWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(Icons.straighten, color: colors.primary),
                   const SizedBox(width: 12),

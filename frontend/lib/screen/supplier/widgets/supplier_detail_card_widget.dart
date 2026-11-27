@@ -68,9 +68,6 @@ class SupplierDetailCardWidget extends StatelessWidget {
     final desktop = DesktopAppShell.isVisible(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final active = theme.brightness == Brightness.light
-        ? colors.primaryContainer
-        : colors.primary;
     return Scaffold(
       appBar: desktop
           ? null
@@ -110,29 +107,27 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: colors.primary.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.business_outlined,
-                              size: 24,
-                              color: active,
+                          Expanded(
+                            child: Text(
+                              supplier.name.trim().isEmpty
+                                  ? '-'
+                                  : supplier.name,
+                              style: theme.textTheme.titleLarge,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          StatusWidget(
-                            text:
-                                (supplier.status == true
-                                        ? 'Active'
-                                        : 'Inactive')
-                                    .tr,
-                            color: supplier.status == true
-                                ? active
-                                : colors.onSurface,
+                          const SizedBox(width: AppSpacing.sm),
+                          Flexible(
+                            child: StatusWidget(
+                              text: (supplier.status == true
+                                      ? 'Active'
+                                      : 'Inactive')
+                                  .tr,
+                              status: supplier.status == true
+                                  ? 'Active'
+                                  : 'Inactive',
+                            ),
                           ),
                         ],
                       ),
@@ -143,19 +138,19 @@ class SupplierDetailCardWidget extends StatelessWidget {
                         spacing: 12,
                         runSpacing: 12,
                         children: [
-                          OutlinedButton.icon(
+                          IconButton.outlined(
+                            tooltip: 'Call supplier'.tr,
                             onPressed: supplier.phone.trim().isEmpty
                                 ? null
                                 : () => callPhone(supplier.phone),
                             icon: const Icon(Icons.phone_outlined, size: 18),
-                            label: Text('Call supplier'.tr),
                           ),
-                          OutlinedButton.icon(
+                          IconButton.outlined(
+                            tooltip: 'Email supplier'.tr,
                             onPressed: (supplier.email ?? '').trim().isEmpty
                                 ? null
                                 : () => openEmail(supplier.email!),
                             icon: const Icon(Icons.email_outlined, size: 18),
-                            label: Text('Email supplier'.tr),
                           ),
                         ],
                       ),
@@ -163,56 +158,48 @@ class SupplierDetailCardWidget extends StatelessWidget {
                   ),
                 );
                 final location = HomeSectionCard(
-                  title: 'Location details',
+                  title: 'Location',
+                  action: OutlinedButton.icon(
+                    onPressed: usableMapValue(supplier.map) == null
+                        ? null
+                        : () => openGoogleMap(supplier.map!),
+                    icon: const Icon(Icons.location_on_outlined, size: 18),
+                    label: Text('Open location'.tr),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       info('Address', supplier.address),
                       info('Map', supplier.map),
-                      OutlinedButton.icon(
-                        onPressed: usableMapValue(supplier.map) == null
-                            ? null
-                            : () => openGoogleMap(supplier.map!),
-                        icon: const Icon(Icons.location_on_outlined, size: 18),
-                        label: Text('Open location'.tr),
-                      ),
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: Divider(height: 1),
                       ),
-                      LayoutBuilder(
-                        builder: (context, constraints) => Wrap(
-                          spacing: 20,
-                          runSpacing: 12,
-                          children: [
-                            SizedBox(
-                              width: constraints.maxWidth >= 400
-                                  ? (constraints.maxWidth - 20) / 2
-                                  : constraints.maxWidth,
-                              child: info(
-                                'Created At',
-                                supplier.createdAt == null
-                                    ? null
-                                    : DateFormatter.formatDate(
-                                        supplier.createdAt,
-                                      ),
-                              ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: info(
+                              'Created At',
+                              supplier.createdAt == null
+                                  ? null
+                                  : DateFormatter.formatDate(
+                                      supplier.createdAt,
+                                    ),
                             ),
-                            SizedBox(
-                              width: constraints.maxWidth >= 400
-                                  ? (constraints.maxWidth - 20) / 2
-                                  : constraints.maxWidth,
-                              child: info(
-                                'Updated At',
-                                supplier.updatedAt == null
-                                    ? null
-                                    : DateFormatter.formatDate(
-                                        supplier.updatedAt,
-                                      ),
-                              ),
+                          ),
+                          const SizedBox(width: AppSpacing.xl),
+                          Expanded(
+                            child: info(
+                              'Updated At',
+                              supplier.updatedAt == null
+                                  ? null
+                                  : DateFormatter.formatDate(
+                                      supplier.updatedAt,
+                                    ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -223,20 +210,18 @@ class SupplierDetailCardWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        AppPageHeader(
-                          translateTitle: false,
-                          title: supplier.name.isEmpty ? '-' : supplier.name,
-                          subtitle: 'Supplier Detail',
-                          leading: desktop
-                              ? IconButton.outlined(
-                                  tooltip: 'Back'.tr,
-                                  onPressed: () => Get.back(),
-                                  icon: const Icon(Icons.arrow_back, size: 20),
-                                )
-                              : null,
-                          actions: desktop ? _actions(context, supplier) : null,
-                        ),
-                        const SizedBox(height: 32),
+                        if (desktop) ...[
+                          AppPageHeader(
+                            title: 'Supplier Detail',
+                            leading: IconButton.outlined(
+                              tooltip: 'Back'.tr,
+                              onPressed: () => Get.back(),
+                              icon: const Icon(Icons.arrow_back, size: 20),
+                            ),
+                            actions: _actions(context, supplier),
+                          ),
+                          const SizedBox(height: AppSpacing.xxl),
+                        ],
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [

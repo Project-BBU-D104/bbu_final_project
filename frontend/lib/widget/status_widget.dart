@@ -3,18 +3,20 @@ import 'package:flutter/material.dart';
 class StatusWidget extends StatelessWidget {
   final String text;
   final Color? color;
+  final String? status;
 
   const StatusWidget({
     super.key,
     required this.text,
     this.color,
+    this.status,
   });
 
   Color _getColor(BuildContext context) {
     if (color != null) return color!;
 
     // Auto color based on status text (optional smart behavior)
-    switch (text.toLowerCase()) {
+    switch ((status ?? text).toLowerCase()) {
       case "verified":
         return Colors.green;
       case "on hold":

@@ -6,6 +6,7 @@ import 'package:frontend/screen/profile/widget/setting_widget.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/themes/app_theme.dart';
 import 'package:frontend/ui/app_text_scale.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 
 class FakeStorageService implements IStorageService {
@@ -196,5 +197,56 @@ void main() {
     expect(restored.reportColumns.value, 2);
     await restored.setManageColumns(6);
     expect(restored.manageColumns.value, 5);
+  });
+
+  testWidgets('column preferences are hidden on compact screens', (
+    tester,
+  ) async {
+    final storage = FakeStorageService();
+    final controller = Get.put(ThemeController(storageService: storage));
+    await controller.setManageColumns(5);
+    await controller.setReportColumns(2);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(AppTokens.bpPageGutter - 1, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: SettingWidget())),
+      ),
+    );
+
+    final manage = find.byKey(const ValueKey('Manage columns'));
+    final report = find.byKey(const ValueKey('Report columns'));
+    expect(manage, findsNothing);
+    expect(report, findsNothing);
+    expect(find.text('Change Password'), findsOneWidget);
+
+    tester.view.physicalSize = const Size(AppTokens.bpPageGutter, 800);
+    await tester.pumpAndSettle();
+    expect(manage, findsOneWidget);
+    expect(report, findsOneWidget);
+    expect(tester.widget<DropdownButton<int>>(manage).value, 5);
+    expect(tester.widget<DropdownButton<int>>(report).value, 2);
+  });
+
+  testWidgets('about opens and closes app information', (tester) async {
+    Get.put(ThemeController(storageService: FakeStorageService()));
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: SettingWidget())),
+      ),
+    );
+
+    await tester.ensureVisible(find.text('About'));
+    await tester.tap(find.text('About'));
+    await tester.pumpAndSettle();
+    expect(find.text('ePOS App'), findsOneWidget);
+    expect(find.text('Inventory Management'), findsOneWidget);
+
+    await tester.tap(find.text('Close'));
+    await tester.pumpAndSettle();
+    expect(find.text('ePOS App'), findsNothing);
   });
 }
