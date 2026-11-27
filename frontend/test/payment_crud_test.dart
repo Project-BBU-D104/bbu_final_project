@@ -268,7 +268,9 @@ void main() {
     final paymentService = FakeSalePaymentService(payments: [paymentFixture()]);
     final ctr = await pumpScreen(tester, paymentService: paymentService);
 
-    await tester.tap(find.byTooltip('Edit'));
+    await tester.tap(find.byTooltip('Actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
 
     expect(find.byType(EditPaymentWidget), findsOneWidget);
@@ -316,7 +318,9 @@ void main() {
       sales: [saleFixture(due: 10.0)],
     );
 
-    await tester.tap(find.byTooltip('Edit'));
+    await tester.tap(find.byTooltip('Actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
 
     ctr.amountCtrl.text = '50.01';
@@ -360,7 +364,9 @@ void main() {
       );
       await pumpScreen(tester, paymentService: paymentService);
 
-      await tester.tap(find.byTooltip('Delete'));
+      await tester.tap(find.byTooltip('Actions'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog).evaluate().isEmpty, isTrue);
 
@@ -368,7 +374,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(paymentService.deleteCalls, isEmpty);
 
-      await tester.tap(find.byTooltip('Delete'));
+      await tester.tap(find.byTooltip('Actions'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       final callsBefore = paymentService.getPaymentsCalls;
       await tester.tap(find.text('Ok'));

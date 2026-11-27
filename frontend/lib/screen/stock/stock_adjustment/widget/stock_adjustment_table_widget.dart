@@ -55,23 +55,8 @@ class StockAdjustmentTableWidget extends StatelessWidget {
         ),
         AppTableColumn(
           title: 'Actions',
-          builder: (context, data) => Obx(
-            () => PopupMenuButton<String>(
-              enabled: !c.isSaving.value && !c.isOpeningEdit.value,
-              tooltip: 'Actions'.tr,
-              onSelected: (value) {
-                if (value == 'edit') {
-                  c.editStockAdjustment(context, data['id']);
-                } else {
-                  c.onDeleteStockAdjustment(data['id'], context);
-                }
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(value: 'edit', child: Text('Edit'.tr)),
-                PopupMenuItem(value: 'delete', child: Text('Delete'.tr)),
-              ],
-            ),
-          ),
+          builder: (context, data) =>
+              StockAdjustmentActions(id: int.tryParse('${data['id']}')),
         ),
       ],
     );

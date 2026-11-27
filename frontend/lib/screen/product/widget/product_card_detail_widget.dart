@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/product_controller.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/app_cached_image.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
@@ -85,9 +87,7 @@ class ProductCardDetailWidget extends StatelessWidget {
       ),
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: desktop
-            ? null
-            : const CustomAppBar(title: 'Product Detail'),
+        appBar: desktop ? null : const CustomAppBar(title: 'Product Detail'),
         body: Obx(() {
           // Keep the detail in sync with the controller's current record
           // after an edit refreshes the list.
@@ -152,6 +152,7 @@ class ProductCardDetailWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                info('Product Name', name),
                 info('Barcode', barcode),
                 info('Sale Price', price),
                 info('Unit', _field(product['unit'])),
@@ -173,59 +174,67 @@ class ProductCardDetailWidget extends StatelessWidget {
             ),
           );
 
-          return HomeTabLayout(
-            translateTitle: false,
-            title: name.isEmpty ? '-' : name,
-            subtitle: 'Product Detail',
-            leading: desktop
-                ? IconButton.outlined(
-                    tooltip: 'Back'.tr,
-                    onPressed: () => Get.back(),
-                    icon: const Icon(Icons.arrow_back, size: 20),
-                  )
-                : null,
-            action: desktop ? _actions(context, product) : null,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (error.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Semantics(
-                      liveRegion: true,
-                      child: Text(error, style: TextStyle(color: colors.error)),
+          return AppPage(
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (desktop) ...[
+                    AppPageHeader(
+                      title: 'Product Detail',
+                      leading: IconButton.outlined(
+                        tooltip: 'Back'.tr,
+                        onPressed: () => Get.back(),
+                        icon: const Icon(Icons.arrow_back, size: 20),
+                      ),
+                      actions: _actions(context, product),
                     ),
-                  ),
-                LayoutBuilder(
-                  builder: (context, constraints) => constraints.maxWidth >= 900
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: imageSection),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  infoSection,
-                                  const SizedBox(height: 24),
-                                  descriptionSection,
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            imageSection,
-                            const SizedBox(height: 24),
-                            infoSection,
-                            const SizedBox(height: 24),
-                            descriptionSection,
-                          ],
+                    const SizedBox(height: AppSpacing.xxl),
+                  ],
+                  if (error.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Semantics(
+                        liveRegion: true,
+                        child: Text(
+                          error,
+                          style: TextStyle(color: colors.error),
                         ),
-                ),
-              ],
+                      ),
+                    ),
+                  LayoutBuilder(
+                    builder: (context, constraints) =>
+                        constraints.maxWidth >= 900
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: imageSection),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    infoSection,
+                                    const SizedBox(height: 24),
+                                    descriptionSection,
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              imageSection,
+                              const SizedBox(height: 24),
+                              infoSection,
+                              const SizedBox(height: 24),
+                              descriptionSection,
+                            ],
+                          ),
+                  ),
+                ],
+              ),
             ),
           );
         }),

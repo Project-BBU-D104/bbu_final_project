@@ -24,31 +24,6 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: AppSpacing.md),
     child: Text('${label.tr}: $value'),
   );
-  Widget _actions(BuildContext context, int id) => Wrap(
-    spacing: AppSpacing.md,
-    runSpacing: AppSpacing.md,
-    alignment: WrapAlignment.end,
-    children: [
-      OutlinedButton.icon(
-        onPressed: ctr.isSaving.value || ctr.isOpeningEdit.value
-            ? null
-            : () => ctr.onDeleteStockAdjustment(
-                id,
-                context,
-                closeDetailOnSuccess: true,
-              ),
-        icon: const Icon(Icons.delete_outline),
-        label: Text('Delete'.tr),
-      ),
-      FilledButton.icon(
-        onPressed: ctr.isSaving.value || ctr.isOpeningEdit.value
-            ? null
-            : () => ctr.editStockAdjustment(context, id),
-        icon: const Icon(Icons.edit_outlined),
-        label: Text('Edit'.tr),
-      ),
-    ],
-  );
   @override
   Widget build(BuildContext context) {
     final argument = Get.arguments;
@@ -64,15 +39,13 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
       return Scaffold(
         appBar: desktop
             ? null
-            : const CustomAppBar(title: 'Stock Adjustment Detail'),
-        bottomNavigationBar: !desktop && id != null && id > 0
-            ? SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: _actions(context, id),
-                ),
-              )
-            : null,
+            : CustomAppBar(
+                title: 'Stock Adjustment Detail',
+                actions: [
+                  if (data != null && id != null && id > 0)
+                    StockAdjustmentActions(id: id, closeDetailOnSuccess: true),
+                ],
+              ),
         body: AppPage(
           child: data == null || id == null || id <= 0
               ? Column(
@@ -102,7 +75,12 @@ class StockAdjustmentDetailWidget extends StatelessWidget {
                                 icon: const Icon(Icons.arrow_back),
                               )
                             : null,
-                        actions: desktop ? _actions(context, id) : null,
+                        actions: desktop
+                            ? StockAdjustmentActions(
+                                id: id,
+                                closeDetailOnSuccess: true,
+                              )
+                            : null,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
                       if (error.isNotEmpty) ...[

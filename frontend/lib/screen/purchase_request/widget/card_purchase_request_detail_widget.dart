@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/purchase/purchase_request_controller.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 
@@ -130,6 +131,7 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -143,8 +145,15 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
                         color: active,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    _StatusChip(status: status),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        _value(purchaseRequest['request_no']),
+                        style: theme.textTheme.titleLarge,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Flexible(child: _StatusChip(status: status)),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -191,9 +200,7 @@ class CardPurchaseRequestDetailWidget extends StatelessWidget {
                   ),
           );
           return HomeTabLayout(
-            translateTitle: false,
-            title: _value(purchaseRequest["request_no"]),
-            subtitle: 'Purchase Request Detail',
+            title: desktop ? 'Purchase Request Detail' : null,
             leading: desktop
                 ? IconButton.outlined(
                     tooltip: 'Back'.tr,

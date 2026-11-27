@@ -77,12 +77,7 @@ class PurchasesScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 8),
                                 ],
-                                Text(
-                                  'Manage purchases.'.tr,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
+                                
                               ],
                             ),
                           ),

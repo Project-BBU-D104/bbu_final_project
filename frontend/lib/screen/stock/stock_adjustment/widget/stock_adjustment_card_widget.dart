@@ -36,9 +36,16 @@ class StockAdjustmentCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            adjustmentValue(data['reference_no']),
-            style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  adjustmentValue(data['reference_no']),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              StockAdjustmentActions(id: int.tryParse('${data['id']}')),
+            ],
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(adjustmentRelation(data, 'product')),
@@ -48,23 +55,66 @@ class StockAdjustmentCardWidget extends StatelessWidget {
           Text(
             '${'Previous Stock'.tr}: ${adjustmentValue(data['previous_qty'])} → ${'New Quantity'.tr}: ${adjustmentValue(data['new_qty'])}',
           ),
-          Obx(
-            () => Wrap(
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.sm,
+        ],
+      ),
+    );
+  }
+}
+
+class StockAdjustmentActions extends StatelessWidget {
+  const StockAdjustmentActions({
+    super.key,
+    required this.id,
+    this.closeDetailOnSuccess = false,
+  });
+
+  final int? id;
+  final bool closeDetailOnSuccess;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<StockAdjustmentController>();
+    final errorColor = Theme.of(context).colorScheme.error;
+    return Obx(
+      () => PopupMenuButton<String>(
+        tooltip: 'Actions'.tr,
+        enabled:
+            !controller.isSaving.value &&
+            !controller.isOpeningEdit.value &&
+            id != null &&
+            id! > 0,
+        icon: const Icon(Icons.more_vert),
+        onSelected: (action) {
+          final adjustmentId = id;
+          if (adjustmentId == null || adjustmentId <= 0) return;
+          if (action == 'edit') {
+            controller.editStockAdjustment(context, adjustmentId);
+          } else if (action == 'delete') {
+            controller.onDeleteStockAdjustment(
+              adjustmentId,
+              context,
+              closeDetailOnSuccess: closeDetailOnSuccess,
+            );
+          }
+        },
+        itemBuilder: (_) => [
+          PopupMenuItem(
+            value: 'edit',
+            child: Row(
               children: [
-                TextButton(
-                  onPressed: c.isSaving.value || c.isOpeningEdit.value
-                      ? null
-                      : () => c.editStockAdjustment(context, data['id']),
-                  child: Text('Edit'.tr),
-                ),
-                TextButton(
-                  onPressed: c.isSaving.value
-                      ? null
-                      : () => c.onDeleteStockAdjustment(data['id'], context),
-                  child: Text('Delete'.tr),
-                ),
+                const Icon(Icons.edit_outlined),
+                const SizedBox(width: AppSpacing.sm),
+                Text('Edit'.tr),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete_outline, color: errorColor),
+                const SizedBox(width: AppSpacing.sm),
+                Text('Delete'.tr, style: TextStyle(color: errorColor)),
               ],
             ),
           ),

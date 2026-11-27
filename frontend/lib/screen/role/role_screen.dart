@@ -84,16 +84,7 @@ class RoleScreen extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 8),
                                       ],
-                                      Text(
-                                        'Manage roles and access permissions.'
-                                            .tr,
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(
-                                              color: theme
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                      ),
+                                    
                                     ],
                                   ),
                                 ),

@@ -41,8 +41,6 @@ class WarehouseScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         AppPageHeader(
-                          title: 'Warehouses',
-                          subtitle: 'Manage warehouse locations and stock.',
                           compactActionsAlignment: Alignment.centerLeft,
                           leading: desktop
                               ? IconButton.outlined(

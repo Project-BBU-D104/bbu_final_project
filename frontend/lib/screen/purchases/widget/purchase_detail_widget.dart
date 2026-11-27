@@ -270,9 +270,9 @@ class PurchaseDetailWidget extends StatelessWidget {
       return Scaffold(
         appBar: appBar,
         body: HomeTabLayout(
-          title: current['invoice_no']?.toString() ?? '-',
+          
           translateTitle: false,
-          subtitle: 'Purchase Detail',
+          
           leading: desktop
               ? IconButton.outlined(
                   tooltip: 'Back'.tr,

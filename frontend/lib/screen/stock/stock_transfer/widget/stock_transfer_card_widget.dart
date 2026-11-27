@@ -28,14 +28,61 @@ class StockTransferCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Get.find<ProductTransferController>();
+    final id = stockTransfer['id'];
+    final errorColor = Theme.of(context).colorScheme.error;
     return AppListCard(
       onTap: () => c.gotoStockTransferDetail(stockTransfer),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            stockTransfer['reference_no']?.toString() ?? '-',
-            style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  stockTransfer['reference_no']?.toString() ?? '-',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Obx(
+                () => PopupMenuButton<String>(
+                  tooltip: 'Actions'.tr,
+                  enabled: !c.isSaving.value &&
+                      !c.isOpeningEdit.value &&
+                      id is int,
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (action) {
+                    if (id is! int) return;
+                    if (action == 'edit') {
+                      c.editStockTransfer(context, stockTransfer);
+                    } else if (action == 'delete') {
+                      c.onDeleteStockTransfer(context, id);
+                    }
+                  },
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.edit_outlined),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text('Edit'.tr),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline, color: errorColor),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text('Delete'.tr, style: TextStyle(color: errorColor)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -49,23 +96,6 @@ class StockTransferCardWidget extends StatelessWidget {
             '${'Product lines'.tr}: ${transferRows(stockTransfer).length} · ${'Total quantity'.tr}: ${transferTotal(stockTransfer)}',
           ),
           Text('${'Transfer date'.tr}: ${transferDate(stockTransfer)}'),
-          Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.sm,
-            children: [
-              TextButton.icon(
-                onPressed: () => c.editStockTransfer(context, stockTransfer),
-                icon: const Icon(Icons.edit_outlined),
-                label: Text('Edit'.tr),
-              ),
-              TextButton.icon(
-                onPressed: () =>
-                    c.onDeleteStockTransfer(context, stockTransfer['id']),
-                icon: const Icon(Icons.delete_outline),
-                label: Text('Delete'.tr),
-              ),
-            ],
-          ),
         ],
       ),
     );

@@ -97,7 +97,7 @@ class StockDetailCardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   AppPageHeader(
-                    title: 'Stock Transfer Detail',
+                  
                     leading: DesktopAppShell.isVisible(context)
                         ? IconButton(
                             tooltip: 'Back'.tr,

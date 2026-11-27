@@ -15,12 +15,24 @@ class SaleListDetailWidget extends StatelessWidget {
   const SaleListDetailWidget({super.key});
 
   Widget _row(String label, String value, {bool translateLabel = true}) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        child: Wrap(
-          spacing: AppSpacing.lg,
-          runSpacing: AppSpacing.xs,
-          children: [Text(translateLabel ? label.tr : label), Text(value)],
+      Builder(
+        builder: (context) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  translateLabel ? label.tr : label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(child: Text(value, textAlign: TextAlign.end)),
+            ],
+          ),
         ),
       );
 
@@ -50,7 +62,6 @@ class SaleListDetailWidget extends StatelessWidget {
           child: ListView(
             children: [
               AppPageHeader(
-                title: 'Sale',
                 leading: backControl,
                 compactActionsAlignment: Alignment.centerLeft,
               ),
@@ -65,6 +76,13 @@ class SaleListDetailWidget extends StatelessWidget {
     final items = sale['sale_items'] is List
         ? sale['sale_items'] as List
         : const [];
+    final newSale = Obx(
+      () => FilledButton.icon(
+        onPressed: ctr.deletingIds.isEmpty ? ctr.onNewSale : null,
+        icon: const Icon(Icons.add),
+        label: Text('New Sale'.tr),
+      ),
+    );
     final invoice = AppSectionCard(
       title: 'Invoice',
       child: Column(
@@ -83,7 +101,8 @@ class SaleListDetailWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (items.isEmpty) Text('No items'.tr),
-          for (final raw in items) ...[
+          for (final (index, raw) in items.indexed) ...[
+            if (index > 0) const Divider(),
             _row(
               saleText(saleMap(saleMap(raw)['product'])['name']),
               '${saleText(saleMap(raw)['qty'])} × ${formatSaleAmount(saleMap(raw)['sale_price'])}',
@@ -101,10 +120,30 @@ class SaleListDetailWidget extends StatelessWidget {
         children: [
           _row('Payment Method', saleText(sale['payment_method'])),
           _row('Sale Status', saleText(sale['status'])),
-          AppStatusBadge(
-            label: salePaymentStatusLabel(sale['payment_status']),
-            tone: salePaymentStatusTone(sale['payment_status']),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Payment status'.tr,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Flexible(
+                  child: AppStatusBadge(
+                    label: salePaymentStatusLabel(sale['payment_status']),
+                    tone: salePaymentStatusTone(sale['payment_status']),
+                  ),
+                ),
+              ],
+            ),
           ),
+          const Divider(),
           for (final entry in {
             'Subtotal': 'subtotal',
             'Tax': 'tax_amount',
@@ -124,34 +163,14 @@ class SaleListDetailWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppPageHeader(
-                title: 'Sale',
-                leading: backControl,
-                compactActionsAlignment: Alignment.centerLeft,
-                actions: Wrap(
-                  spacing: AppSpacing.md,
-                  runSpacing: AppSpacing.md,
-                  children: [
-                    Obx(
-                      () => FilledButton.icon(
-                        onPressed: ctr.deletingIds.isEmpty
-                            ? ctr.onNewSale
-                            : null,
-                        icon: const Icon(Icons.add),
-                        label: Text('New Sale'.tr),
-                      ),
-                    ),
-                    Obx(
-                      () => TextButton(
-                        onPressed: ctr.deletingIds.contains(sale['id'])
-                            ? null
-                            : () => ctr.onDeleteSale(sale['id'], context),
-                        child: Text('Delete'.tr),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              if (desktop)
+                AppPageHeader(
+                  title: 'Sale',
+                  leading: backControl,
+                  actions: newSale,
+                )
+              else
+                Align(alignment: Alignment.centerLeft, child: newSale),
               Obx(
                 () => ctr.loadError.value.isEmpty
                     ? const SizedBox.shrink()

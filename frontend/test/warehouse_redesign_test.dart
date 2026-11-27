@@ -137,9 +137,11 @@ void main() {
           await tester.tap(find.text('Alpha'));
           await tester.pumpAndSettle();
         }
-        await tester.tap(
-          detail ? find.text('Delete') : find.byTooltip('Delete').first,
-        );
+        if (!detail) {
+          await tester.tap(find.byTooltip('Actions').first);
+          await tester.pumpAndSettle();
+        }
+        await tester.tap(find.text('Delete').first);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Ok'));
         await tester.pumpAndSettle();

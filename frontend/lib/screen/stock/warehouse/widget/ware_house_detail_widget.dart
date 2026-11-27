@@ -6,6 +6,7 @@ import 'package:frontend/ui/app_empty_state.dart';
 import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_page.dart';
 import 'package:frontend/ui/app_tokens.dart';
+import 'package:frontend/utils/date_formatter.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'warehouse_card_widget.dart';
@@ -39,6 +40,7 @@ class WareHouseDetailWidget extends StatelessWidget {
       );
     }
     return Obx(() {
+      final theme = Theme.of(context);
       final warehouse = ctr.warehouseList.firstWhere(
         (r) => r['id'] == argument['id'],
         orElse: () => argument,
@@ -46,12 +48,28 @@ class WareHouseDetailWidget extends StatelessWidget {
       final raw = warehouse['warehouse_stock'];
       final stocks = raw is List ? raw.whereType<Map>().toList() : <Map>[];
       final busy = ctr.isSaving.value || ctr.isOpeningEdit.value;
+      Widget detail(String label, dynamic value) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.tr,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(warehouseValue(value), style: theme.textTheme.bodyLarge),
+        ],
+      );
       final actions = Wrap(
         spacing: AppSpacing.md,
         runSpacing: AppSpacing.md,
         alignment: WrapAlignment.end,
         children: [
           OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+            ),
             onPressed: busy
                 ? null
                 : () => ctr.deleteWarehouse(
@@ -88,31 +106,56 @@ class WareHouseDetailWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    AppPageHeader(
-                      title: warehouseValue(warehouse['name']),
-                      translateTitle: false,
-                      subtitle: 'Warehouse Detail',
-                      leading: desktop
-                          ? IconButton.outlined(
-                              tooltip: 'Back'.tr,
-                              onPressed: () => Get.back(),
-                              icon: const Icon(Icons.arrow_back),
-                            )
-                          : null,
-                      actions: desktop ? actions : null,
-                    ),
-                    const SizedBox(height: AppSpacing.xxl),
+                    if (desktop) ...[
+                      AppPageHeader(
+                        title: 'Warehouse Detail',
+                        leading: IconButton.outlined(
+                          tooltip: 'Back'.tr,
+                          onPressed: () => Get.back(),
+                          icon: const Icon(Icons.arrow_back),
+                        ),
+                        actions: actions,
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                    ],
                     HomeSectionCard(
-                      title: 'Warehouse details',
+                      title: 'Warehouse infor',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _info('Reference No', warehouse['reference_no']),
-                          _info('Location', warehouse['location']),
-                          _info('Note', warehouse['note']),
-                          _info('Created At', _date(warehouse['created_at'])),
-                          _info('Updated At', _date(warehouse['updated_at'])),
-                          _info('Products', stocks.length),
+                          Text(
+                            warehouseValue(warehouse['name']),
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          detail('Reference No', warehouse['reference_no']),
+                          const SizedBox(height: AppSpacing.lg),
+                          detail('Location', warehouse['location']),
+                          const SizedBox(height: AppSpacing.lg),
+                          detail('Note', warehouse['note']),
+                          const SizedBox(height: AppSpacing.lg),
+                          detail('Products', stocks.length),
+                          const SizedBox(height: AppSpacing.lg),
+                          const Divider(),
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: detail(
+                                  'Created At',
+                                  _date(warehouse['created_at']),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.lg),
+                              Expanded(
+                                child: detail(
+                                  'Updated At',
+                                  _date(warehouse['updated_at']),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -163,9 +206,7 @@ class WareHouseDetailWidget extends StatelessWidget {
 
   static String? _date(dynamic value) {
     final date = DateTime.tryParse(value?.toString() ?? '');
-    return date == null
-        ? null
-        : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return date == null ? null : DateFormatter.formatDate(date);
   }
 
   static Widget _info(String label, dynamic value) => Padding(

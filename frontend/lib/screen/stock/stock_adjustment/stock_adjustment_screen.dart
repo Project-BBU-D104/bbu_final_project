@@ -40,9 +40,7 @@ class StockAdjustmentScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       AppPageHeader(
-                        title: 'Stock Adjustment',
-                        subtitle:
-                            'Review stock corrections and their quantities.',
+                        
                         compactActionsAlignment: Alignment.centerLeft,
                         leading: DesktopAppShell.isVisible(context)
                             ? IconButton.outlined(

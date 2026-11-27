@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 class HomeTabLayout extends StatelessWidget {
   const HomeTabLayout({
     super.key,
-    required this.title,
-    required this.subtitle,
+    this.title,
+     this.subtitle,
     required this.child,
     this.action,
     this.leading,
@@ -15,8 +15,8 @@ class HomeTabLayout extends StatelessWidget {
     this.alignContentStart = false,
     this.translateTitle = true,
   });
-  final String title;
-  final String subtitle;
+  final String? title;
+  final String? subtitle;
   final Widget child;
   final Widget? action;
   final Widget? leading;

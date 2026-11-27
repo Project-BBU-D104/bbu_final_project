@@ -15,25 +15,58 @@ class WarehouseCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Get.find<WarehouseController>();
+    final theme = Theme.of(context);
+    final name = warehouseValue(warehouse['name']);
+
+    Widget detail(IconData icon, String label, dynamic value) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: theme.colorScheme.onSurfaceVariant),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label.tr,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(warehouseValue(value)),
+            ],
+          ),
+        ),
+      ],
+    );
+
     return AppListCard(
       onTap: () => c.gotoWarehouseDetail(warehouse),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            warehouseValue(warehouse['name']),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Tooltip(
+                  message: name,
+                  child: Text(
+                    name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleLarge,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              WarehouseRowActions(warehouse: warehouse),
+            ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            '${'Reference No'.tr}: ${warehouseValue(warehouse['reference_no'])}',
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text('${'Location'.tr}: ${warehouseValue(warehouse['location'])}'),
           const SizedBox(height: AppSpacing.md),
-          WarehouseRowActions(warehouse: warehouse),
+          detail(Icons.tag, 'Reference No', warehouse['reference_no']),
+          const SizedBox(height: AppSpacing.md),
+          detail(Icons.location_on_outlined, 'Location', warehouse['location']),
         ],
       ),
     );
@@ -49,23 +82,39 @@ class WarehouseRowActions extends StatelessWidget {
     return Obx(() {
       final busy = c.isSaving.value || c.isOpeningEdit.value;
       final id = warehouse['id'];
-      return Wrap(
-        spacing: AppSpacing.sm,
-        runSpacing: AppSpacing.sm,
-        children: [
-          IconButton(
-            tooltip: 'Edit'.tr,
-            onPressed: busy || id is! int
-                ? null
-                : () => c.editWarehouse(context, id),
-            icon: const Icon(Icons.edit_outlined),
+      final error = Theme.of(context).colorScheme.error;
+      return PopupMenuButton<String>(
+        tooltip: 'Actions'.tr,
+        enabled: !busy && id is int,
+        icon: const Icon(Icons.more_vert),
+        onSelected: (action) {
+          if (id is! int) return;
+          if (action == 'edit') {
+            c.editWarehouse(context, id);
+          } else if (action == 'delete') {
+            c.deleteWarehouse(context, id);
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: 'edit',
+            child: Row(
+              children: [
+                const Icon(Icons.edit_outlined),
+                const SizedBox(width: AppSpacing.sm),
+                Text('Edit'.tr),
+              ],
+            ),
           ),
-          IconButton(
-            tooltip: 'Delete'.tr,
-            onPressed: busy || id is! int
-                ? null
-                : () => c.deleteWarehouse(context, id),
-            icon: const Icon(Icons.delete_outline),
+          PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete_outline, color: error),
+                const SizedBox(width: AppSpacing.sm),
+                Text('Delete'.tr, style: TextStyle(color: error)),
+              ],
+            ),
           ),
         ],
       );

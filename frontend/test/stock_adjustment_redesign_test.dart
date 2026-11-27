@@ -121,6 +121,8 @@ void main() {
       c.gotoStockAdjustmentDetailScreen(s.items.first);
       await tester.pumpAndSettle();
       expect(Get.currentRoute, AppRoutes.stockAdjustmentDetail);
+      await tester.tap(find.byTooltip('Actions').first);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Cancel'));
@@ -128,6 +130,8 @@ void main() {
       expect(Get.currentRoute, AppRoutes.stockAdjustmentDetail);
       expect(s.deleteCalls, 0);
       s.failWrite = true;
+      await tester.tap(find.byTooltip('Actions').first);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Ok'));
@@ -138,6 +142,8 @@ void main() {
         findsOneWidget,
       );
       s.failWrite = false;
+      await tester.tap(find.byTooltip('Actions').first);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Ok'));
@@ -149,6 +155,8 @@ void main() {
   );
   testWidgets('list deletion never pops list', (tester) async {
     await pumpAdjustmentHost(tester, home: StockAdjustmentScreen());
+    await tester.tap(find.byTooltip('Actions').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Ok'));

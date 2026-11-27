@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/payment/widget/payment_actions_widget.dart';
 import 'package:frontend/screen/sale/sale_presentation.dart';
 import 'package:frontend/ui/app_list_card.dart';
 import 'package:frontend/ui/app_tokens.dart';
@@ -21,7 +22,17 @@ class PaymentCardListWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(saleText(sale['invoice_no']), style: textTheme.titleMedium),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  saleText(sale['invoice_no']),
+                  style: textTheme.titleMedium,
+                ),
+              ),
+              PaymentActionsWidget(onEdit: onEdit, onDelete: onDelete),
+            ],
+          ),
           const SizedBox(height: AppSpacing.xs),
           Text(saleText(saleMap(sale['customer'])['name'])),
           const SizedBox(height: AppSpacing.md),
@@ -44,33 +55,10 @@ class PaymentCardListWidget extends StatelessWidget {
             ],
           ),
           const Divider(height: AppSpacing.xxl),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.sm,
-            children: [
-              _PaymentField(
-                label: 'Amount',
-                value: formatSaleAmount(payment['amount']),
-                valueStyle: textTheme.titleMedium,
-              ),
-              Wrap(
-                spacing: AppSpacing.sm,
-                children: [
-                  IconButton.outlined(
-                    tooltip: 'Edit'.tr,
-                    onPressed: onEdit,
-                    icon: const Icon(Icons.edit_outlined),
-                  ),
-                  IconButton.outlined(
-                    tooltip: 'Delete'.tr,
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete_outline),
-                  ),
-                ],
-              ),
-            ],
+          _PaymentField(
+            label: 'Amount',
+            value: formatSaleAmount(payment['amount']),
+            valueStyle: textTheme.titleMedium,
           ),
         ],
       ),

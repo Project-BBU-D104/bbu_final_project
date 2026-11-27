@@ -39,7 +39,7 @@ class CardPurchaseRequestWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(Icons.assignment_outlined, color: colors.primary),
                   const SizedBox(width: 12),

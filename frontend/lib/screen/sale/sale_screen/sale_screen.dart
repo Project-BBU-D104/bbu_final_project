@@ -70,18 +70,18 @@ class SaleScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              AppPageHeader(
-                                title: 'Sale',
-                                compactActionsAlignment: Alignment.centerLeft,
-                                leading: desktop
-                                    ? IconButton.outlined(
-                                        tooltip: 'Back'.tr,
-                                        onPressed: () => _back(context),
-                                        icon: const Icon(Icons.arrow_back),
-                                      )
-                                    : null,
-                              ),
-                              const SizedBox(height: AppSpacing.lg),
+                              if (desktop) ...[
+                                AppPageHeader(
+                                  title: 'Sale',
+                                  compactActionsAlignment: Alignment.centerLeft,
+                                  leading: IconButton.outlined(
+                                    tooltip: 'Back'.tr,
+                                    onPressed: () => _back(context),
+                                    icon: const Icon(Icons.arrow_back),
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                              ],
                               search,
                               const SizedBox(height: AppSpacing.lg),
                             ],

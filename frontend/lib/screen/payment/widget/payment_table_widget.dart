@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screen/payment/widget/payment_actions_widget.dart';
 import 'package:frontend/ui/app_table.dart';
 import 'package:frontend/screen/sale/sale_presentation.dart';
-import 'package:get/get.dart';
 
 class PaymentTableWidget extends StatelessWidget {
   const PaymentTableWidget({
@@ -38,19 +38,9 @@ class PaymentTableWidget extends StatelessWidget {
         ),
       AppTableColumn(
         title: 'Actions',
-        builder: (context, p) => Wrap(
-          children: [
-            IconButton(
-              tooltip: 'Edit'.tr,
-              onPressed: () => onEdit(p),
-              icon: const Icon(Icons.edit_outlined),
-            ),
-            IconButton(
-              tooltip: 'Delete'.tr,
-              onPressed: () => onDelete(p),
-              icon: const Icon(Icons.delete_outline),
-            ),
-          ],
+        builder: (context, p) => PaymentActionsWidget(
+          onEdit: () => onEdit(p),
+          onDelete: () => onDelete(p),
         ),
       ),
     ],

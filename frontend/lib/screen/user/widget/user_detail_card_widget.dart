@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/screen/home/widget/home_tab_layout.dart';
+import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:frontend/widget/status_widget.dart';
 import 'package:get/get.dart';
@@ -108,60 +110,72 @@ class UserDetailCardWidget extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: desktop
-          ? null
-          : const CustomAppBar(title: 'User Detail'),
+      appBar: desktop ? null : const CustomAppBar(title: 'User Detail'),
       body: user.isEmpty
           ? Center(child: Text('No user data found'.tr))
-          : HomeTabLayout(
-              translateTitle: false,
-              title: user['name']?.toString().trim().isNotEmpty == true
-                  ? user['name'].toString()
-                  : '-',
-              subtitle: 'User Detail',
-              leading: desktop
-                  ? IconButton.outlined(
-                      tooltip: 'Back'.tr,
-                      onPressed: Get.back,
-                      icon: const Icon(Icons.arrow_back, size: 20),
-                    )
-                  : null,
-              action: desktop
-                  ? Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: id == null
-                              ? null
-                              : () => ctr.deleteUser(id, context),
-                          icon: const Icon(Icons.delete_outline),
-                          label: Text('Delete'.tr),
+          : AppPage(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (desktop) ...[
+                      AppPageHeader(
+                        translateTitle: false,
+                        title:
+                            user['name']?.toString().trim().isNotEmpty == true
+                            ? user['name'].toString()
+                            : '-',
+                        subtitle: 'User Detail',
+                        leading: IconButton.outlined(
+                          tooltip: 'Back'.tr,
+                          onPressed: Get.back,
+                          icon: const Icon(Icons.arrow_back, size: 20),
                         ),
-                        FilledButton.icon(
-                          onPressed: id == null
-                              ? null
-                              : () => ctr.editUser(context, id),
-                          icon: const Icon(Icons.edit_outlined),
-                          label: Text('Edit'.tr),
+                        actions: Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: id == null
+                                  ? null
+                                  : () => ctr.deleteUser(id, context),
+                              icon: const Icon(Icons.delete_outline),
+                              label: Text('Delete'.tr),
+                            ),
+                            FilledButton.icon(
+                              onPressed: id == null
+                                  ? null
+                                  : () => ctr.editUser(context, id),
+                              icon: const Icon(Icons.edit_outlined),
+                              label: Text('Edit'.tr),
+                            ),
+                          ],
                         ),
-                      ],
-                    )
-                  : null,
-              child: LayoutBuilder(
-                builder: (context, constraints) => constraints.maxWidth >= 900
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: account),
-                          const SizedBox(width: 24),
-                          Expanded(child: system),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [account, const SizedBox(height: 24), system],
                       ),
+                      const SizedBox(height: AppSpacing.xxl),
+                    ],
+                    LayoutBuilder(
+                      builder: (context, constraints) =>
+                          constraints.maxWidth >= 900
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: account),
+                                const SizedBox(width: 24),
+                                Expanded(child: system),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                account,
+                                const SizedBox(height: 24),
+                                system,
+                              ],
+                            ),
+                    ),
+                  ],
+                ),
               ),
             ),
       bottomNavigationBar: user.isEmpty || desktop

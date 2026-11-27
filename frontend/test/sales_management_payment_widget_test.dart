@@ -19,7 +19,7 @@ void main() {
     expect(find.text('\$12.50'), findsOneWidget);
   });
 
-  testWidgets('payment card groups details and keeps actions visible', (
+  testWidgets('payment card groups details and provides an actions menu', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 844);
@@ -62,8 +62,14 @@ void main() {
       expect(valuePosition.dy, greaterThan(labelPosition.dy));
       expect(valuePosition.dy, lessThan(footerTop));
     }
-    await tester.tap(find.byTooltip('Edit'));
-    await tester.tap(find.byTooltip('Delete'));
+    await tester.tap(find.byTooltip('Actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
     expect(edits, 1);
     expect(deletes, 1);
     expect(tester.takeException(), isNull);

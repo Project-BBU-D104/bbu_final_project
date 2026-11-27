@@ -183,10 +183,14 @@ void main() {
         for (final editing in [false, true]) {
           if (editing) {
             await expectReachable(tester, find.text('REF-1'));
-            await expectReachable(tester, find.byTooltip('Delete'.tr));
+            final actions = find.byTooltip('Actions'.tr);
+            await expectReachable(tester, actions);
+            await tester.tap(actions);
+            await tester.pumpAndSettle();
+            await expectReachable(tester, find.text('Delete'.tr));
           }
           final open = editing
-              ? find.byTooltip('Edit'.tr)
+              ? find.text('Edit'.tr)
               : find.text('Add Payment'.tr);
           await expectReachable(tester, open);
           await tester.tap(open);
