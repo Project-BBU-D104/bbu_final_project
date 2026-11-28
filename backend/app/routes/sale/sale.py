@@ -3,8 +3,8 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 from sqlmodel import Session
 from database import get_session
-from app.schemas.sale.sale import SaleCreate,SaleRead,SaleUpdate
-from app.crud.sale.sale import  create_sale, get_all_sales, get_sale, update_sale, delete_sale
+from app.schemas.sale.sale import SaleCheckoutCreate, SaleCheckoutRead, SaleCreate,SaleRead,SaleUpdate
+from app.crud.sale.sale import  create_sale, create_sale_checkout, get_all_sales, get_sale, update_sale, delete_sale
 from app.core.cache import clear_stock_caches
 
 router = APIRouter(prefix="/sale", tags=["sale"])
@@ -17,6 +17,13 @@ async def _clear_sale_caches():
     # Sales change warehouse quantities, so the warehouse cache is stale too.
     await FastAPICache.clear(namespace=CACHE_NS)
     await clear_stock_caches()
+
+
+@router.post("/checkout/", response_model=SaleCheckoutRead)
+async def checkout_sale(checkout: SaleCheckoutCreate, session: Session = Depends(get_session)):
+    result = create_sale_checkout(session, checkout)
+    await _clear_sale_caches()
+    return result
 
 
 @router.post("/", response_model=SaleRead)

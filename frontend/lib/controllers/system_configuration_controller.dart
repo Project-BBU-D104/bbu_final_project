@@ -57,8 +57,6 @@ class SystemConfigurationController extends GetxController {
           ..clear()
           ..addAll(systemConfigurationList);
         _cachedAt = DateTime.now();
-
-        print('System configurations fetched successfully, $systemConfigurationList.value');
       }
     } catch (e) {
       ToastWidget.show(message: e.toString(), type: ToastType.error);

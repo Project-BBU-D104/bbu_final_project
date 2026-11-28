@@ -61,7 +61,7 @@ void main() {
 
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
-    expect(find.text('Leave sale?'), findsOneWidget);
+    expect(find.text('Confirm'), findsOneWidget);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/sale');
@@ -69,7 +69,7 @@ void main() {
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Leave sale?'), findsOneWidget);
+    expect(find.text('Confirm'), findsOneWidget);
     await tester.tap(find.text('Leave'));
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/home');
@@ -80,7 +80,7 @@ void main() {
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/home');
-    expect(find.text('Leave sale?'), findsNothing);
+    expect(find.text('Confirm'), findsNothing);
   });
 
   testWidgets('sell through current cart confirmation receipt and back', (
@@ -136,8 +136,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/current-sale');
     expect(find.byType(CustomAppBar), findsOneWidget);
-    await tester.ensureVisible(find.text('Back to products'));
-    await tester.tap(find.text('Back to products'));
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     expect(ctr.totalItems, 1);
     await tester.tap(find.textContaining('Continue'));

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:frontend/controllers/search_controller.dart';
+import 'package:frontend/constants/enum.dart';
 import 'package:frontend/controllers/sale/sale_list_controller.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:frontend/global.dart';
 import 'package:frontend/services/main_service/customer_service.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/services/main_service/product_service.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/services/storage_service.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/barcode_utils.dart';
 import 'package:frontend/utils/currency_formatter.dart';
 import 'package:frontend/widget/toast_widget.dart';
@@ -22,12 +26,14 @@ class SaleController extends GetxController {
     CurrencyService? currencyService,
     PaymentTypeService? paymentTypeService,
     SalePaymentService? salePaymentService,
+    IStorageService? storageService,
   }) : service = service ?? SaleService(),
        productService = productService ?? ProductService(),
        customerService = customerService ?? CustomerService(),
        currencyService = currencyService ?? CurrencyService(),
        paymentTypeService = paymentTypeService ?? PaymentTypeService(),
-       salePaymentService = salePaymentService ?? SalePaymentService();
+       salePaymentService = salePaymentService ?? SalePaymentService(),
+       _storageService = storageService;
 
   final SaleService service;
   final ProductService productService;
@@ -35,13 +41,21 @@ class SaleController extends GetxController {
   final CurrencyService currencyService;
   final PaymentTypeService paymentTypeService;
   final SalePaymentService salePaymentService;
+  final IStorageService? _storageService;
+  IStorageService get _layoutStorage => _storageService ?? storage;
   final categories = <Map<String, dynamic>>[].obs;
   final customers = <Map<String, dynamic>>[].obs;
   final paymentTypes = <Map<String, dynamic>>[].obs;
+  final currencies = <Map<String, dynamic>>[].obs;
   final currency = Rxn<Map<String, dynamic>>();
   final selectedCustomer = Rxn<Map<String, dynamic>>();
   final selectedPaymentType = Rxn<Map<String, dynamic>>();
   final cart = <int, Map<String, dynamic>>{}.obs;
+
+  /// Null keeps the adaptive default until the user chooses a layout.
+  final productGridView = RxnBool();
+  final productGridColumns = 2.obs;
+  Future<void> _layoutSave = Future.value();
   final isLoading = false.obs;
   final isCustomersLoading = false.obs;
   final isPaymentTypesLoading = false.obs;
@@ -61,6 +75,23 @@ class SaleController extends GetxController {
       cart.isNotEmpty &&
       selectedCustomer.value != null &&
       selectedPaymentType.value != null;
+
+  /// Exchange rates share a base, so their ratio gives riel per US dollar.
+  double? get usdToKhrRate {
+    double? rateFor(String code) {
+      final row = currencies.firstWhereOrNull(
+        (item) => item['code']?.toString().trim().toUpperCase() == code,
+      );
+      final rate = double.tryParse(row?['exchange_rate']?.toString() ?? '');
+      return rate != null && rate.isFinite && rate > 0 ? rate : null;
+    }
+
+    final usd = rateFor('USD');
+    final khr = rateFor('KHR');
+    if (usd == null || khr == null) return null;
+    final result = khr / usd;
+    return result.isFinite && result > 0 ? result : null;
+  }
 
   @override
   void onClose() {
@@ -100,10 +131,42 @@ class SaleController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadProductLayout();
     loadProductCategories();
     loadCustomers();
     loadPaymentTypes();
     loadCurrency();
+  }
+
+  void loadProductLayout() {
+    final saved = _layoutStorage.readStorage<dynamic>(StorageKey.saleLayout);
+    if (saved is! Map) return;
+    final grid = saved['grid'];
+    final columns = saved['columns'];
+    if (grid is bool) productGridView.value = grid;
+    if (columns is int &&
+        columns >= 2 &&
+        columns <= AppTokens.saleGridMaxColumns) {
+      productGridColumns.value = columns;
+    }
+  }
+
+  Future<void> setProductLayout({required bool grid, int? columns}) {
+    if (columns != null &&
+        (columns < 2 || columns > AppTokens.saleGridMaxColumns)) {
+      return Future.value();
+    }
+    if (columns != null) productGridColumns.value = columns;
+    productGridView.value = grid;
+    final preference = {'grid': grid, 'columns': productGridColumns.value};
+    _layoutSave = _layoutSave
+        .then(
+          (_) => _layoutStorage.writeStorage(StorageKey.saleLayout, preference),
+        )
+        .catchError((Object error) {
+          debugPrint('Unable to save sale layout: $error');
+        });
+    return _layoutSave;
   }
 
   /// The sale grid and cart total are priced in the shop's default currency.
@@ -113,10 +176,11 @@ class SaleController extends GetxController {
       final response = await currencyService.getCurrencies();
       if (response is! List) throw const FormatException('Expected list');
       {
-        final currencies = List<Map<String, dynamic>>.from(response);
+        final rows = List<Map<String, dynamic>>.from(response);
+        currencies.assignAll(rows);
         currency.value =
-            currencies.firstWhereOrNull((c) => c['is_default'] == true) ??
-            currencies.firstOrNull;
+            rows.firstWhereOrNull((c) => c['is_default'] == true) ??
+            rows.firstOrNull;
       }
     } catch (error) {
       currencyLoadError.value = 'Unable to load currency. Please try again.'.tr;
@@ -358,10 +422,12 @@ class SaleController extends GetxController {
 
       isProcessingPayment.value = true;
       int? saleId;
+      var legacyCheckout = false;
+      var checkoutRejected = false;
       try {
         final now = DateTime.now().toUtc();
         final reference = 'SALE-${now.microsecondsSinceEpoch}';
-        final saleResponse = await _createSale({
+        final saleData = <String, dynamic>{
           'user_id': userId,
           'customer_id': customer['id'],
           'sale_date': now.toIso8601String(),
@@ -375,7 +441,26 @@ class SaleController extends GetxController {
                 },
               )
               .toList(),
-        });
+        };
+        dynamic saleResponse;
+        try {
+          saleResponse = await service.createCheckout({
+            ...saleData,
+            'reference_no': reference,
+          });
+        } on ApiException catch (error) {
+          final unsupported =
+              (error.statusCode == 404 && error.message == 'Not Found') ||
+              (error.statusCode == 405 &&
+                  error.message == 'Method Not Allowed');
+          if (!unsupported) {
+            checkoutRejected =
+                error.statusCode >= 400 && error.statusCode < 500;
+            rethrow;
+          }
+          legacyCheckout = true;
+          saleResponse = await _createSale(saleData);
+        }
 
         SaleListController.invalidateCache();
         saleId = int.tryParse(saleResponse['id']?.toString() ?? '');
@@ -389,16 +474,18 @@ class SaleController extends GetxController {
           throw Exception('The sale response did not include an ID and total.');
         }
 
-        await salePaymentService.createSalePayment({
-          'user_id': userId,
-          'sale_id': saleId,
-          'amount': amount,
-          'payment_method': method,
-          'reference_no': reference,
-          'payment_date': now.toIso8601String(),
-          'note': 'Sale payment',
-          'created_at': now.toIso8601String(),
-        });
+        if (legacyCheckout) {
+          await salePaymentService.createSalePayment({
+            'user_id': userId,
+            'sale_id': saleId,
+            'amount': amount,
+            'payment_method': method,
+            'reference_no': reference,
+            'payment_date': now.toIso8601String(),
+            'note': 'Sale payment',
+            'created_at': now.toIso8601String(),
+          });
+        }
         SaleListController.invalidateCache();
 
         final receipt = {
@@ -417,7 +504,11 @@ class SaleController extends GetxController {
       } catch (error) {
         checkoutError.value =
             'Unable to complete payment. Please try again.'.tr;
-        if (saleId != null) {
+        if (!legacyCheckout && !checkoutRejected) {
+          checkoutError.value =
+              'The sale may have been created. Check Sales before trying again.'
+                  .tr;
+        } else if (legacyCheckout && saleId != null) {
           try {
             await service.deleteSale(saleId);
             SaleListController.invalidateCache();

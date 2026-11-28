@@ -4,8 +4,10 @@ import 'customer_test_support.dart' show setUpCustomerTests;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/controllers/sale/sale_controller.dart';
+import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
 import 'package:frontend/services/main_service/product_service.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:get/get.dart';
 
 class Categories extends SaleService {
@@ -23,12 +25,58 @@ class Products extends ProductService {
   Future<dynamic> getProducts() async => throw Exception('optional');
 }
 
+class FastCheckoutSales extends SaleTestSaleService {
+  final checkoutCalls = <Map<String, dynamic>>[];
+  Object? checkoutError;
+
+  @override
+  Future<dynamic> createCheckout(Map<String, dynamic> data) async {
+    checkoutCalls.add(Map.from(data));
+    if (checkoutError != null) throw checkoutError!;
+    return {'id': 1, 'subtotal': '10.00', 'total_amount': '10.00'};
+  }
+}
+
+class QuietCheckoutController extends SaleController {
+  QuietCheckoutController(
+    FastCheckoutSales sales,
+    SaleTestPaymentService payments,
+  ) : super(service: sales, salePaymentService: payments);
+
+  @override
+  // ignore: must_call_super
+  void onInit() {}
+}
+
 void main() {
   setUp(() {
     dotenv.testLoad(fileInput: 'API_URL=http://localhost:8000');
     Get.testMode = true;
   });
   tearDown(Get.reset);
+  test('loads USD to KHR rate from both currency records', () async {
+    final currencies = SaleTestCurrencyService()
+      ..rows = [
+        {'code': 'USD', 'exchange_rate': '2', 'is_default': true},
+        {'code': 'KHR', 'exchange_rate': 8000},
+      ];
+    final ctr = SaleController(currencyService: currencies);
+    await ctr.loadCurrency();
+    expect(ctr.currency.value?['code'], 'USD');
+    expect(ctr.usdToKhrRate, 4000);
+
+    currencies.rows = [
+      {'code': 'USD', 'exchange_rate': 0},
+      {'code': 'KHR', 'exchange_rate': 4000},
+    ];
+    await ctr.loadCurrency();
+    expect(ctr.usdToKhrRate, isNull);
+    currencies.rows = [
+      {'code': 'USD', 'exchange_rate': 1},
+    ];
+    await ctr.loadCurrency();
+    expect(ctr.usdToKhrRate, isNull);
+  });
   test(
     'reloaded method and customer selections use current map instances',
     () async {
@@ -180,6 +228,84 @@ void main() {
     expect(
       (Get.arguments as Map)['transaction_id'],
       paymentRequest['reference_no'],
+    );
+  });
+  testWidgets('checkout records sale and payment in one request', (
+    tester,
+  ) async {
+    setUpCustomerTests();
+    final sales = FastCheckoutSales();
+    final payments = SaleTestPaymentService();
+    final ctr = Get.put<SaleController>(
+      QuietCheckoutController(sales, payments),
+    );
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
+    ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
+    ctr.paymentTypes.add(ctr.selectedPaymentType.value!);
+    await pumpSalesPage(
+      tester,
+      CurrentSaleWidget(),
+      getPages: [
+        GetPage(name: '/payment-success', page: () => const Scaffold()),
+      ],
+    );
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Payment'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Payment'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirm'));
+    await tester.pumpAndSettle();
+    expect(sales.checkoutCalls, hasLength(1));
+    expect(sales.checkoutCalls.single['reference_no'], startsWith('SALE-'));
+    expect(sales.createCalls, isEmpty);
+    expect(payments.createCalls, isEmpty);
+    expect(ctr.cart, isEmpty);
+    expect(Get.currentRoute, '/payment-success');
+  });
+  testWidgets('uncertain checkout does not retry or delete the sale', (
+    tester,
+  ) async {
+    setUpCustomerTests();
+    final sales = FastCheckoutSales()..checkoutError = Exception('offline');
+    final ctr = SaleController(service: sales);
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
+    ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
+    await pumpSalesPage(tester, const Scaffold());
+    final action = ctr.onPayment();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirm'));
+    await tester.pumpAndSettle();
+    await action;
+    expect(sales.checkoutCalls, hasLength(1));
+    expect(sales.createCalls, isEmpty);
+    expect(sales.deleteCalls, isEmpty);
+    expect(ctr.cart, hasLength(1));
+    expect(ctr.checkoutError.value, contains('Check Sales'));
+  });
+  testWidgets('checkout rejection is not mistaken for an older backend', (
+    tester,
+  ) async {
+    setUpCustomerTests();
+    final sales = FastCheckoutSales()
+      ..checkoutError = ApiException(404, 'Product(s) [1] not found');
+    final ctr = SaleController(service: sales);
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
+    ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
+    await pumpSalesPage(tester, const Scaffold());
+    final action = ctr.onPayment();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirm'));
+    await tester.pumpAndSettle();
+    await action;
+    expect(sales.checkoutCalls, hasLength(1));
+    expect(sales.createCalls, isEmpty);
+    expect(sales.deleteCalls, isEmpty);
+    expect(ctr.cart, hasLength(1));
+    expect(
+      ctr.checkoutError.value,
+      'Unable to complete payment. Please try again.',
     );
   });
   for (final cleanupFails in [false, true]) {

@@ -1,11 +1,12 @@
 from sqlmodel import Session, select
 from app.models.sale import Sale
 from app.models.product import Product
-from app.schemas.sale.sale import SaleCreate, SaleUpdate
+from app.schemas.sale.sale import SaleCheckoutCreate, SaleCreate, SaleUpdate
 from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy.orm import selectinload
 from app.models.sale_items import SaleItems
+from app.models.sale_payment import SalePayment
 from app.models.warehouse_stock import WarehouseStock
 from app.models.user import User
 from fastapi import HTTPException
@@ -130,26 +131,62 @@ def generate_invoice_no(session: Session) -> str:
     return f"{prefix}{next_number:03d}"
 
 
-def create_sale(session: Session, sale: SaleCreate):
+def _add_sale(session: Session, sale: SaleCreate) -> Sale:
     sale_data = sale.model_dump(
-        exclude={"sale_items"},
+        exclude={"sale_items", "reference_no"},
         exclude_none=True,
     )
     invoice_no = (sale_data.get("invoice_no") or "").strip()
     sale_data["invoice_no"] = invoice_no or generate_invoice_no(session)
     db_sale = Sale.model_validate(sale_data)
+    session.add(db_sale)
+    session.flush()
+    items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
+    db_sale.sale_items.extend(items)
+    _set_sale_totals(db_sale)
+    return db_sale
+
+
+def create_sale(session: Session, sale: SaleCreate):
     try:
-        session.add(db_sale)
-        session.flush()
-        items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
-        db_sale.sale_items.extend(items)
-        _set_sale_totals(db_sale)
+        db_sale = _add_sale(session, sale)
         session.commit()
     except Exception:
         session.rollback()
         raise
 
     return get_sale(session, db_sale.id)
+
+
+def create_sale_checkout(session: Session, checkout: SaleCheckoutCreate):
+    """Save a fully paid sale, its payment, and stock changes atomically."""
+    try:
+        db_sale = _add_sale(session, checkout)
+        if db_sale.total_amount <= 0:
+            raise HTTPException(status_code=400, detail="Sale total must be positive.")
+        session.add(SalePayment(
+            user_id=checkout.user_id,
+            sale_id=db_sale.id,
+            amount=db_sale.total_amount,
+            payment_method=checkout.payment_method,
+            reference_no=checkout.reference_no,
+            payment_date=checkout.sale_date,
+            note="Sale payment",
+            created_at=checkout.sale_date,
+        ))
+        db_sale.paid_amount = db_sale.total_amount
+        _set_sale_totals(db_sale)
+        session.add(db_sale)
+        result = {
+            "id": db_sale.id,
+            "subtotal": db_sale.subtotal,
+            "total_amount": db_sale.total_amount,
+        }
+        session.commit()
+        return result
+    except Exception:
+        session.rollback()
+        raise
 
 def get_all_sales(session: Session):
     statement = (

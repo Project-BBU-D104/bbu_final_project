@@ -32,11 +32,61 @@ class SaleScreen extends StatelessWidget {
     final hideToolbar =
         shortKeyboard &&
         availableHeight < kToolbarHeight + 2 * AppTokens.controlHeight;
-    final search = AppSearchField(
+    final search = LayoutBuilder(
       key: _searchKey,
-      title: 'Search',
-      showScan: true,
-      searchController: ctr.searchCtr,
+      builder: (context, bounds) => Row(
+        children: [
+          Expanded(
+            child: AppSearchField(
+              title: 'Search',
+              showScan: true,
+              searchController: ctr.searchCtr,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Obx(() {
+            final grid =
+                ctr.productGridView.value ??
+                !_usesListByDefault(context, bounds.maxWidth, shortViewport);
+            final maxColumns = _maxGridColumns(bounds.maxWidth);
+            final columns = _gridColumns(bounds.maxWidth, grid);
+            return PopupMenuButton<int>(
+              tooltip: 'Layout'.tr,
+              icon: const Icon(Icons.view_quilt_outlined),
+              onSelected: (value) {
+                ctr.setProductLayout(
+                  grid: value != 0,
+                  columns: value >= 2 ? value : null,
+                );
+              },
+              itemBuilder: (context) => [
+                CheckedPopupMenuItem<int>(
+                  value: 0,
+                  checked: !grid,
+                  child: Text('List view'.tr),
+                ),
+                CheckedPopupMenuItem<int>(
+                  value: 1,
+                  checked: grid,
+                  child: Text('Grid view'.tr),
+                ),
+                const PopupMenuDivider(),
+                for (
+                  var count = 2;
+                  count <= AppTokens.saleGridMaxColumns;
+                  count++
+                )
+                  CheckedPopupMenuItem<int>(
+                    value: count,
+                    enabled: count <= maxColumns,
+                    checked: grid && count == columns,
+                    child: Text('@count columns'.trParams({'count': '$count'})),
+                  ),
+              ],
+            );
+          }),
+        ],
+      ),
     );
     final page = Scaffold(
       appBar: hideToolbar || desktop
@@ -48,123 +98,200 @@ class SaleScreen extends StatelessWidget {
           children: [
             if (shortKeyboard) search,
             Expanded(
-              child: LayoutBuilder(
-                builder: (context, bounds) => Obx(() {
-                  final groups = ctr.filteredCategories;
-                  final count = groups.fold<int>(
-                    0,
-                    (n, c) => n + (c['products'] as List? ?? []).length,
-                  );
-                  final natural =
-                      shortViewport ||
-                      bounds.maxWidth < AppTokens.bpSearchField ||
-                      MediaQuery.textScalerOf(context).scale(
-                            Theme.of(context).textTheme.bodyMedium?.fontSize ??
-                                AppSpacing.lg,
-                          ) >
-                          AppTokens.tableMaxScaledBodySize;
-                  return CustomScrollView(
-                    slivers: [
-                      if (!shortKeyboard)
-                        SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (desktop) ...[
-                                AppPageHeader(
-                                  title: 'Sale',
-                                  compactActionsAlignment: Alignment.centerLeft,
-                                  leading: IconButton.outlined(
-                                    tooltip: 'Back'.tr,
-                                    onPressed: () => _back(context),
-                                    icon: const Icon(Icons.arrow_back),
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.lg),
-                              ],
-                              search,
-                              const SizedBox(height: AppSpacing.lg),
-                            ],
-                          ),
-                        ),
-                      if (ctr.isLoading.value && ctr.categories.isEmpty)
-                        const SliverToBoxAdapter(
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      if (ctr.productLoadError.value.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: Column(
-                            children: [
-                              Text(ctr.productLoadError.value),
-                              TextButton(
-                                onPressed: ctr.loadProductCategories,
-                                child: Text('Retry'.tr),
+              child: Stack(
+                children: [
+                  LayoutBuilder(
+                    builder: (context, bounds) => Obx(() {
+                      final groups = ctr.filteredCategories;
+                      final count = groups.fold<int>(
+                        0,
+                        (n, c) => n + (c['products'] as List? ?? []).length,
+                      );
+                      final defaultList = _usesListByDefault(
+                        context,
+                        bounds.maxWidth,
+                        shortViewport,
+                      );
+                      final grid = ctr.productGridView.value ?? !defaultList;
+                      final columns = _gridColumns(bounds.maxWidth, grid);
+                      return CustomScrollView(
+                        slivers: [
+                          if (!shortKeyboard)
+                            SliverToBoxAdapter(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (desktop) ...[
+                                    AppPageHeader(
+                                      title: 'Sale',
+                                      compactActionsAlignment:
+                                          Alignment.centerLeft,
+                                      leading: IconButton.outlined(
+                                        tooltip: 'Back'.tr,
+                                        onPressed: () => _back(context),
+                                        icon: const Icon(Icons.arrow_back),
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.lg),
+                                  ],
+                                  search,
+                                  const SizedBox(height: AppSpacing.lg),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      if (!ctr.isLoading.value &&
-                          count == 0 &&
-                          (ctr.productLoadError.value.isEmpty ||
-                              ctr.categories.isNotEmpty))
-                        SliverToBoxAdapter(
-                          child: Column(
-                            children: [
-                              AppEmptyState(
-                                message: ctr.searchCtr.keyword.value.isEmpty
-                                    ? 'No products available'
-                                    : 'No products found',
-                                icon: Icons.inventory_2_outlined,
-                              ),
-                              if (ctr.searchCtr.keyword.value.isNotEmpty)
-                                TextButton(
-                                  onPressed: ctr.searchCtr.clear,
-                                  child: Text('Clear search'.tr),
-                                ),
-                            ],
-                          ),
-                        ),
-                      for (final group in groups) ...[
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.md,
                             ),
-                            child: Text(group['name']?.toString() ?? ''),
-                          ),
-                        ),
-                        if (natural)
-                          SliverList.separated(
-                            itemCount:
-                                (group['products'] as List? ?? []).length,
-                            itemBuilder: (context, index) =>
-                                _tile((group['products'] as List)[index]),
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(height: AppSpacing.sm),
-                          )
-                        else
-                          SliverGrid.builder(
-                            itemCount:
-                                (group['products'] as List? ?? []).length,
-                            gridDelegate:
-                                const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent:
-                                      AppTokens.saleProductTileMaxExtent,
-                                  childAspectRatio:
-                                      AppTokens.saleProductTileAspectRatio,
-                                  mainAxisSpacing: AppSpacing.md,
-                                  crossAxisSpacing: AppSpacing.md,
+                          if (ctr.isLoading.value && ctr.categories.isEmpty)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                          if (ctr.productLoadError.value.isNotEmpty)
+                            SliverToBoxAdapter(
+                              child: Column(
+                                children: [
+                                  Text(ctr.productLoadError.value),
+                                  TextButton(
+                                    onPressed: ctr.loadProductCategories,
+                                    child: Text('Retry'.tr),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (!ctr.isLoading.value &&
+                              count == 0 &&
+                              (ctr.productLoadError.value.isEmpty ||
+                                  ctr.categories.isNotEmpty))
+                            SliverToBoxAdapter(
+                              child: Column(
+                                children: [
+                                  AppEmptyState(
+                                    message: ctr.searchCtr.keyword.value.isEmpty
+                                        ? 'No products available'
+                                        : 'No products found',
+                                    icon: Icons.inventory_2_outlined,
+                                  ),
+                                  if (ctr.searchCtr.keyword.value.isNotEmpty)
+                                    TextButton(
+                                      onPressed: ctr.searchCtr.clear,
+                                      child: Text('Clear search'.tr),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          for (final group in groups) ...[
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.md,
                                 ),
-                            itemBuilder: (context, index) =>
-                                _tile((group['products'] as List)[index]),
-                          ),
-                      ],
-                    ],
-                  );
-                }),
+                                child: Text(group['name']?.toString() ?? ''),
+                              ),
+                            ),
+                            if (!grid)
+                              SliverList.separated(
+                                itemCount:
+                                    (group['products'] as List? ?? []).length,
+                                itemBuilder: (context, index) =>
+                                    _tile((group['products'] as List)[index]),
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(height: AppSpacing.sm),
+                              )
+                            else if (ctr.productGridView.value == true)
+                              SliverList.separated(
+                                itemCount:
+                                    ((group['products'] as List? ?? []).length +
+                                        columns -
+                                        1) ~/
+                                    columns,
+                                itemBuilder: (context, row) {
+                                  final products = group['products'] as List;
+                                  return Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      for (
+                                        var column = 0;
+                                        column < columns;
+                                        column++
+                                      ) ...[
+                                        if (column > 0)
+                                          const SizedBox(width: AppSpacing.md),
+                                        Expanded(
+                                          child:
+                                              row * columns + column <
+                                                  products.length
+                                              ? _tile(
+                                                  products[row * columns +
+                                                      column],
+                                                  naturalGrid: true,
+                                                )
+                                              : const SizedBox.shrink(),
+                                        ),
+                                      ],
+                                    ],
+                                  );
+                                },
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(height: AppSpacing.md),
+                              )
+                            else
+                              SliverGrid.builder(
+                                itemCount:
+                                    (group['products'] as List? ?? []).length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: columns,
+                                      childAspectRatio:
+                                          AppTokens.saleProductTileAspectRatio,
+                                      mainAxisSpacing: AppSpacing.md,
+                                      crossAxisSpacing: AppSpacing.md,
+                                    ),
+                                itemBuilder: (context, index) =>
+                                    _tile((group['products'] as List)[index]),
+                              ),
+                          ],
+                          if (!shortKeyboard &&
+                              !shortViewport &&
+                              ctr.totalItems > 0)
+                            SliverToBoxAdapter(
+                              child: SizedBox(
+                                height:
+                                    AppTokens.controlHeight +
+                                    AppSpacing.xxl +
+                                    MediaQuery.textScalerOf(context).scale(
+                                          Theme.of(context)
+                                                  .textTheme
+                                                  .labelLarge
+                                                  ?.fontSize ??
+                                              AppSpacing.lg,
+                                        ) *
+                                        6,
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
+                  ),
+                  if (!shortKeyboard && !shortViewport)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Obx(
+                        () => ctr.totalItems == 0
+                            ? const SizedBox.shrink()
+                            : PaymentFooterWidget(
+                                onTap: ctr.onCurrentSale,
+                                itemCount: ctr.totalItems,
+                                total: ctr.subtotal,
+                                currency: ctr.currency.value,
+                                usdToKhrRate: ctr.usdToKhrRate,
+                              ),
+                      ),
+                    ),
+                ],
               ),
             ),
-            if (!shortKeyboard)
+            if (shortViewport && !shortKeyboard)
               Obx(
                 () => ctr.totalItems == 0
                     ? const SizedBox.shrink()
@@ -173,6 +300,7 @@ class SaleScreen extends StatelessWidget {
                         itemCount: ctr.totalItems,
                         total: ctr.subtotal,
                         currency: ctr.currency.value,
+                        usdToKhrRate: ctr.usdToKhrRate,
                       ),
               ),
           ],
@@ -195,9 +323,9 @@ class SaleScreen extends StatelessWidget {
       final leave = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: Text('Leave sale?'.tr),
+          title: Text('Confirm'.tr),
           content: Text(
-            'You have selected products. Are you sure you want to leave?'.tr,
+            'You have selected products. Are you sure you want to exit?'.tr,
           ),
           actions: [
             TextButton(
@@ -220,11 +348,35 @@ class SaleScreen extends StatelessWidget {
     }
   }
 
-  Widget _tile(Map<String, dynamic> product) => Obx(
+  bool _usesListByDefault(BuildContext context, double width, bool short) =>
+      short ||
+      width < AppTokens.bpSearchField ||
+      MediaQuery.textScalerOf(context).scale(
+            Theme.of(context).textTheme.bodyMedium?.fontSize ?? AppSpacing.lg,
+          ) >
+          AppTokens.tableMaxScaledBodySize;
+
+  int _maxGridColumns(double width) =>
+      ((width + AppSpacing.md) /
+              (AppTokens.saleGridMinTileWidth + AppSpacing.md))
+          .floor()
+          .clamp(1, AppTokens.saleGridMaxColumns);
+
+  int _gridColumns(double width, bool grid) {
+    final preferred = ctr.productGridView.value == null && grid
+        ? ((width + AppSpacing.md) /
+                  (AppTokens.saleProductTileMaxExtent + AppSpacing.md))
+              .ceil()
+        : ctr.productGridColumns.value;
+    return preferred.clamp(1, _maxGridColumns(width));
+  }
+
+  Widget _tile(Map<String, dynamic> product, {bool naturalGrid = false}) => Obx(
     () => CardItemWidget(
       product: product,
       quantity: ctr.cart[product['id']]?['qty'] as int? ?? 0,
       currency: ctr.currency.value,
+      naturalGrid: naturalGrid,
       onTap: () => ctr.addProduct(product),
     ),
   );

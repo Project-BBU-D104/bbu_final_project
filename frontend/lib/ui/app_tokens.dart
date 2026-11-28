@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 /// Single source of truth for the app's look values.
 ///
 /// Screens must not hardcode radii, colours, spacing, control sizes or
@@ -7,6 +9,23 @@ class AppTokens {
   static const double saleProductTileMaxExtent = 240;
   static const double saleProductTileAspectRatio = 0.78;
   static const double saleProductThumbnailSize = 64;
+  static const double saleGridMinTileWidth = 120;
+  static const double saleGridImageHeight = 96;
+  static const int saleGridMaxColumns = 4;
+
+  /// Elevation of the floating sale checkout action.
+  static const double saleFooterElevation = 6;
+
+  /// Receipt confirmation presentation.
+  static const double receiptContentMaxWidth = 560;
+  static const double successMarkSize = 80;
+  static const double successMarkIconSize = 44;
+  static const double successMarkInitialScale = 0.65;
+  static const Duration successMarkDuration = Duration(milliseconds: 650);
+  static const Color successMarkLightBackground = Color(0xffdef5e5);
+  static const Color successMarkLightForeground = Color(0xff137a40);
+  static const Color successMarkDarkBackground = Color(0xff123c29);
+  static const Color successMarkDarkForeground = Color(0xff8ce7af);
 
   static const double formMaxHeightFactor = 0.9;
 

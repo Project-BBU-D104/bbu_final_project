@@ -11,6 +11,7 @@ import 'package:frontend/services/main_service/customer_service.dart';
 import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
+import 'package:frontend/services/api_service.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
 
 Map<String, dynamic> saleProductJson(int id, String name) => {
@@ -60,6 +61,11 @@ class SaleTestSaleService extends SaleService with ReadState {
   Map<String, dynamic> createResult = saleJson(1);
   Object? createError, deleteError;
   Completer<dynamic>? heldCreate;
+  @override
+  Future<dynamic> createCheckout(Map<String, dynamic> data) async {
+    throw ApiException(404, 'Not Found');
+  }
+
   @override
   Future<dynamic> getSales() => read(sales);
   @override

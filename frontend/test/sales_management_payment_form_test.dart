@@ -99,6 +99,8 @@ class FakeSalePaymentService implements SalePaymentService {
 }
 
 class FakeSaleService implements SaleService {
+  @override
+  Future<dynamic> createCheckout(Map<String, dynamic> data) async => data;
   FakeSaleService({List<Map<String, dynamic>>? sales}) : sales = sales ?? [];
 
   List<Map<String, dynamic>> sales;

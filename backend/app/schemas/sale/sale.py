@@ -51,6 +51,16 @@ class SaleUpdate(SQLModel):
     updated_at: Optional[datetime] = None
     sale_items: Optional[List[SaleItemCreate]] = None
 
+
+class SaleCheckoutCreate(SaleCreate):
+    reference_no: str = Field(min_length=1)
+
+
+class SaleCheckoutRead(SQLModel):
+    id: int
+    subtotal: Decimal
+    total_amount: Decimal
+
 class SaleRead(SQLModel):
     id: Optional[int] = None
     user: UserRead

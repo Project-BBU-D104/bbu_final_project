@@ -3,17 +3,21 @@ from decimal import Decimal
 
 import pytest
 from fastapi import HTTPException
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from sqlmodel import select
+from sqlalchemy import event
 
 from app.crud.product.product import create_product
-from app.crud.sale.sale import create_sale
+from app.crud.sale.sale import create_sale, create_sale_checkout
 from app.models.customer import Customer
 from app.models.sale import Sale
 from app.models.role import Role
 from app.models.user import User
 from app.models.warehouse_stock import WarehouseStock
 from app.schemas.product.product import ProductCreate
-from app.schemas.sale.sale import SaleCreate
+from app.schemas.sale.sale import SaleCheckoutCreate, SaleCreate
+from app.models.sale_payment import SalePayment
 from app.schemas.sale.sale_item import SaleItemCreate
 
 
@@ -87,6 +91,72 @@ def test_sale_deducts_warehouse_stock(session, seed):
     assert sale.total_amount == Decimal("6.00")
     assert sale.payment_status == "unpaid"
     assert sale.invoice_no.startswith("SALE-")
+
+
+def test_checkout_saves_sale_payment_and_stock_together(session, seed):
+    user, customer = make_user(session), make_customer(session)
+    product = make_stocked_product(session, seed, qty=10)
+    sale = sale_payload(user.id, customer.id, product.id, 3)
+
+    result = create_sale_checkout(
+        session, SaleCheckoutCreate(**sale.model_dump(), reference_no="PAY-1")
+    )
+
+    saved = session.get(Sale, result["id"])
+    payment = session.exec(select(SalePayment)).one()
+    assert payment.sale_id == saved.id
+    assert payment.amount == Decimal("6.00")
+    assert payment.reference_no == "PAY-1"
+    assert saved.paid_amount == Decimal("6.00")
+    assert saved.due_amount == Decimal("0.00")
+    assert saved.payment_status == "paid"
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 7
+
+
+def test_checkout_endpoint_returns_paid_sale(session, seed, monkeypatch):
+    from app.routes.sale import sale as sale_routes
+    from database import get_session
+
+    user, customer = make_user(session), make_customer(session)
+    product = make_stocked_product(session, seed, qty=10)
+    app = FastAPI()
+    app.include_router(sale_routes.router)
+    app.dependency_overrides[get_session] = lambda: session
+
+    async def clear_caches():
+        pass
+
+    monkeypatch.setattr(sale_routes, "_clear_sale_caches", clear_caches)
+    payload = sale_payload(user.id, customer.id, product.id, 3).model_dump(mode="json")
+    payload["reference_no"] = "PAY-HTTP"
+    response = TestClient(app).post("/sale/checkout/", json=payload)
+
+    assert response.status_code == 200
+    assert Decimal(str(response.json()["total_amount"])) == Decimal("6.00")
+    assert session.exec(select(SalePayment)).one().reference_no == "PAY-HTTP"
+
+
+def test_checkout_rolls_back_sale_and_stock_if_payment_fails(session, seed):
+    user, customer = make_user(session), make_customer(session)
+    product = make_stocked_product(session, seed, qty=10)
+    sale = sale_payload(user.id, customer.id, product.id, 3)
+
+    def fail_payment(db_session, *_):
+        if any(isinstance(row, SalePayment) for row in db_session.new):
+            raise RuntimeError("payment write failed")
+
+    event.listen(session, "before_flush", fail_payment)
+    try:
+        with pytest.raises(RuntimeError, match="payment write failed"):
+            create_sale_checkout(
+                session, SaleCheckoutCreate(**sale.model_dump(), reference_no="PAY-1")
+            )
+    finally:
+        event.remove(session, "before_flush", fail_payment)
+
+    assert session.exec(select(Sale)).all() == []
+    assert session.exec(select(SalePayment)).all() == []
+    assert stock_qty(session, product.id, seed["warehouse_a"].id) == 10
 
 
 def test_overselling_is_rejected_and_nothing_is_saved(session, seed):

@@ -1,5 +1,6 @@
 import 'sale_test_support.dart';
 import 'package:frontend/ui/app_page.dart';
+import 'package:frontend/ui/app_success_receipt.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -111,6 +112,33 @@ Future<void> settleToast(WidgetTester tester) async {
 }
 
 void main() {
+  for (final reducedMotion in [false, true]) {
+    testWidgets('success mark respects reduced motion=$reducedMotion', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        GetMaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(disableAnimations: reducedMotion),
+            child: const Scaffold(body: AppSuccessReceipt(details: [])),
+          ),
+        ),
+      );
+      final transform = find.descendant(
+        of: find.byType(TweenAnimationBuilder<double>),
+        matching: find.byType(Transform),
+      );
+      final start = tester.widget<Transform>(transform).transform.entry(0, 0);
+      if (reducedMotion) {
+        expect(start, 1);
+      } else {
+        expect(start, lessThan(1));
+        await tester.pump(const Duration(milliseconds: 700));
+        expect(tester.widget<Transform>(transform).transform.entry(0, 0), 1);
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
   for (final dark in [false, true]) {
     for (final khmer in [false, true]) {
       for (final scale in [1.0, 2.0]) {
@@ -148,6 +176,10 @@ void main() {
     await openSuccess(tester, fake, receipt);
     expect(find.byType(AppPage), findsOneWidget);
     expect(find.byType(SingleChildScrollView), findsOneWidget);
+    expect(find.text('Payment successful'), findsOneWidget);
+    expect(find.text('Total'), findsNothing);
+    expect(find.text(r'$10.00'), findsNothing);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
   });
   tearDown(() {
     Get.closeAllSnackbars();

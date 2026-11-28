@@ -3,6 +3,7 @@ import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/currency_formatter.dart';
+import 'package:frontend/widget/app_cached_image.dart';
 
 class CurrentSaleItemWidget extends StatelessWidget {
   final String productName;
@@ -30,27 +31,56 @@ class CurrentSaleItemWidget extends StatelessWidget {
   final bool enabled;
   @override
   Widget build(BuildContext context) => AppListCard(
-    child: Column(
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(productName),
-        Text(CurrencyFormatter.format(subtotal, currency)),
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: AppSpacing.sm,
-          children: [
-            IconButton(
-              tooltip: 'Decrease quantity'.tr,
-              onPressed: enabled ? onDecrease : null,
-              icon: const Icon(Icons.remove),
-            ),
-            Text('$quantity'),
-            IconButton(
-              tooltip: 'Increase quantity'.tr,
-              onPressed: enabled ? onIncrease : null,
-              icon: const Icon(Icons.add),
-            ),
-          ],
+        ClipRRect(
+          borderRadius: BorderRadius.circular(AppTokens.radiusControl),
+          child: AppCachedImage(
+            url: imageUrl,
+            width: AppTokens.saleProductThumbnailSize,
+            height: AppTokens.saleProductThumbnailSize,
+            fit: BoxFit.cover,
+            fallbackIcon: Icons.inventory_2_outlined,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: Text(productName)),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      CurrencyFormatter.format(subtotal, currency),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                ],
+              ),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.sm,
+                children: [
+                  IconButton(
+                    tooltip: 'Decrease quantity'.tr,
+                    onPressed: enabled ? onDecrease : null,
+                    icon: const Icon(Icons.remove),
+                  ),
+                  Text('$quantity'),
+                  IconButton(
+                    tooltip: 'Increase quantity'.tr,
+                    onPressed: enabled ? onIncrease : null,
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     ),

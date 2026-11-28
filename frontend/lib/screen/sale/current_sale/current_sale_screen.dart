@@ -71,131 +71,136 @@ class CurrentSaleWidget extends StatelessWidget {
                 },
               ),
         body: AppPage(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const AppPageHeader(title: 'Current Sale'),
-                const SizedBox(height: AppSpacing.lg),
-                if (ctr.selectedProducts.isEmpty)
-                  const AppEmptyState(
-                    message: 'No products selected',
-                    icon: Icons.shopping_cart_outlined,
-                  )
-                else
-                  LayoutBuilder(
-                    builder: (context, bounds) => Obx(() {
-                      final alignment = DesktopAppShell.isVisible(context)
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.stretch;
-                      final items = Column(
-                        crossAxisAlignment: alignment,
-                        children: ctr.selectedProducts.map((p) {
-                          final price =
-                              double.tryParse(
-                                p['sale_price']?.toString() ?? '',
-                              ) ??
-                              0;
-                          return CurrentSaleItemWidget(
-                            enabled: !ctr.checkoutBusy,
-                            productName: p['name']?.toString() ?? '',
-                            imageUrl: p['photo']?.toString() ?? '',
-                            quantity: p['qty'],
-                            unitPrice: price,
-                            subtotal: price * p['qty'],
-                            currency: ctr.currency.value,
-                            onIncrease: () => ctr.changeQuantity(p['id'], 1),
-                            onDecrease: () => ctr.changeQuantity(p['id'], -1),
-                          );
-                        }).toList(),
-                      );
-                      final details = Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          IgnorePointer(
-                            ignoring: ctr.checkoutBusy,
-                            child: SelectCustomerCardWidget(
-                              enabled: !ctr.checkoutBusy,
-                            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (DesktopAppShell.isVisible(context)) ...[
+                        AppPageHeader(
+                          leading: IconButton.outlined(
+                            tooltip: 'Back'.tr,
+                            onPressed: ctr.checkoutBusy
+                                ? null
+                                : () {
+                                    if (Navigator.of(context).canPop()) {
+                                      Get.back();
+                                    } else {
+                                      Get.offNamed(AppRoutes.sale);
+                                    }
+                                  },
+                            icon: const Icon(Icons.arrow_back),
                           ),
-                          const SizedBox(height: AppSpacing.lg),
-                          PaymentMethodCardWidget(
-                            loadError: ctr.paymentTypesLoadError.value,
-                            onRetry: ctr.loadPaymentTypes,
-                            enabled: !ctr.checkoutBusy,
-                            paymentTypes: ctr.paymentTypes.toList(),
-                            selectedPaymentType: ctr.selectedPaymentType.value,
-                            isLoading:
-                                ctr.isPaymentTypesLoading.value ||
-                                ctr.checkoutBusy,
-                            onChanged: (value) {
-                              if (value != null) ctr.selectPaymentType(value);
-                            },
-                          ),
-                          if (ctr.currencyLoadError.value.isNotEmpty)
-                            Text(ctr.currencyLoadError.value),
-                          if (ctr.currencyLoadError.value.isNotEmpty)
-                            TextButton(
-                              onPressed: ctr.checkoutBusy
-                                  ? null
-                                  : ctr.loadCurrency,
-                              child: Text('Retry'.tr),
-                            ),
-                          const SizedBox(height: AppSpacing.lg),
-                          SummaryOrderWidget(
-                            subtotal: ctr.subtotal,
-                            currency: ctr.currency.value,
-                          ),
-                        ],
-                      );
-                      if (bounds.maxWidth >= AppTokens.bpTwoColumn &&
-                          MediaQuery.textScalerOf(context).scale(
-                                Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium?.fontSize ??
-                                    AppSpacing.lg,
-                              ) <=
-                              AppTokens.tableMaxScaledBodySize) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: items),
-                            const SizedBox(width: AppSpacing.lg),
-                            Expanded(child: details),
-                          ],
-                        );
-                      }
-                      return Column(
-                        crossAxisAlignment: alignment,
-                        children: [
-                          items,
-                          const SizedBox(height: AppSpacing.lg),
-                          details,
-                        ],
-                      );
-                    }),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      if (ctr.selectedProducts.isEmpty)
+                        const AppEmptyState(
+                          message: 'No products selected',
+                          icon: Icons.shopping_cart_outlined,
+                        )
+                      else
+                        LayoutBuilder(
+                          builder: (context, _) => Obx(() {
+                            final alignment = DesktopAppShell.isVisible(context)
+                                ? CrossAxisAlignment.center
+                                : CrossAxisAlignment.stretch;
+                            final items = Column(
+                              crossAxisAlignment: alignment,
+                              children: ctr.selectedProducts.map((p) {
+                                final price =
+                                    double.tryParse(
+                                      p['sale_price']?.toString() ?? '',
+                                    ) ??
+                                    0;
+                                return CurrentSaleItemWidget(
+                                  enabled: !ctr.checkoutBusy,
+                                  productName: p['name']?.toString() ?? '',
+                                  imageUrl: p['photo']?.toString() ?? '',
+                                  quantity: p['qty'],
+                                  unitPrice: price,
+                                  subtotal: price * p['qty'],
+                                  currency: ctr.currency.value,
+                                  onIncrease: () =>
+                                      ctr.changeQuantity(p['id'], 1),
+                                  onDecrease: () =>
+                                      ctr.changeQuantity(p['id'], -1),
+                                );
+                              }).toList(),
+                            );
+                            final details = Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                IgnorePointer(
+                                  ignoring: ctr.checkoutBusy,
+                                  child: SelectCustomerCardWidget(
+                                    enabled: !ctr.checkoutBusy,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                PaymentMethodCardWidget(
+                                  loadError: ctr.paymentTypesLoadError.value,
+                                  onRetry: ctr.loadPaymentTypes,
+                                  enabled: !ctr.checkoutBusy,
+                                  paymentTypes: ctr.paymentTypes.toList(),
+                                  selectedPaymentType:
+                                      ctr.selectedPaymentType.value,
+                                  isLoading:
+                                      ctr.isPaymentTypesLoading.value ||
+                                      ctr.checkoutBusy,
+                                  onChanged: (value) {
+                                    if (value != null)
+                                      ctr.selectPaymentType(value);
+                                  },
+                                ),
+                                if (ctr.currencyLoadError.value.isNotEmpty)
+                                  Text(ctr.currencyLoadError.value),
+                                if (ctr.currencyLoadError.value.isNotEmpty)
+                                  TextButton(
+                                    onPressed: ctr.checkoutBusy
+                                        ? null
+                                        : ctr.loadCurrency,
+                                    child: Text('Retry'.tr),
+                                  ),
+                                const SizedBox(height: AppSpacing.lg),
+                              ],
+                            );
+                            return Column(
+                              crossAxisAlignment: alignment,
+                              children: [
+                                details,
+                                items,
+                                SummaryOrderWidget(
+                                  subtotal: ctr.subtotal,
+                                  itemCount: ctr.totalItems,
+                                  currency: ctr.currency.value,
+                                ),
+                              ],
+                            );
+                          }),
+                        ),
+                      if (ctr.checkoutError.value.isNotEmpty)
+                        Text(ctr.checkoutError.value),
+                    ],
                   ),
-                if (ctr.checkoutError.value.isNotEmpty)
-                  Text(ctr.checkoutError.value),
+                ),
+              ),
+              if (MediaQuery.viewInsetsOf(context).bottom == 0) ...[
                 const SizedBox(height: AppSpacing.lg),
-                Wrap(
-                  spacing: AppSpacing.md,
-                  runSpacing: AppSpacing.md,
-                  children: [
-                    OutlinedButton(
-                      onPressed: ctr.checkoutBusy ? null : () => Get.back(),
-                      child: Text('Back to products'.tr),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton(
+                    onPressed: ctr.canCheckout ? ctr.onPayment : null,
+                    child: Text(
+                      (ctr.checkoutBusy ? 'Processing...' : 'Payment').tr,
                     ),
-                    FilledButton(
-                      onPressed: ctr.canCheckout ? ctr.onPayment : null,
-                      child: Text(
-                        (ctr.checkoutBusy ? 'Processing...' : 'Payment').tr,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
-            ),
+            ],
           ),
         ),
       ),

@@ -1,4 +1,4 @@
-import 'package:frontend/ui/app_section_card.dart';
+import 'package:frontend/ui/app_success_receipt.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -46,56 +46,42 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
               onBack: returnToSale,
             ),
       body: AppPage(
+        maxWidth: AppTokens.receiptContentMaxWidth,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppPageHeader(
-                title: receipt.isEmpty
-                    ? 'Receipt unavailable'
-                    : 'Payment successful',
-              ),
-              const SizedBox(height: AppSpacing.lg),
+              if (receipt.isEmpty) ...[
+                const AppPageHeader(title: 'Receipt unavailable'),
+                const SizedBox(height: AppSpacing.lg),
+              ],
               if (receipt.isEmpty)
                 const AppEmptyState(message: 'Receipt unavailable')
               else
-                AppSectionCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Icon(Icons.check_circle_outline),
-                      for (final row in rows)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.sm,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(row[0].toString()),
-                              Text(row[1].toString()),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+                AppSuccessReceipt(
+                  details: [
+                    for (final row in rows.take(rows.length - 1))
+                      (label: row[0].toString(), value: row[1].toString()),
+                  ],
                 ),
               const SizedBox(height: AppSpacing.lg),
               if (receipt.isNotEmpty)
                 Obx(
-                  () => ElevatedButton(
+                  () => ElevatedButton.icon(
                     onPressed: _exporting.value
                         ? null
                         : () => _exportReceipt(receipt, currency, date),
-                    child: Text(
+                    icon: const Icon(Icons.picture_as_pdf_outlined),
+                    label: Text(
                       (_exporting.value ? 'Exporting...' : 'Export Receipt').tr,
                     ),
                   ),
                 ),
               const SizedBox(height: AppSpacing.md),
-              OutlinedButton(
+              OutlinedButton.icon(
                 onPressed: returnToSale,
-                child: Text('Back to Sale'.tr),
+                icon: const Icon(Icons.arrow_back),
+                label: Text('Back to Sale'.tr),
               ),
             ],
           ),
