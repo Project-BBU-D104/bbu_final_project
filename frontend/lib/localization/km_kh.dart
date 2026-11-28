@@ -58,6 +58,14 @@ const Map<String, String> kmKH = {
 
   "Unable to load currency. Please try again.":
       "មិនអាចផ្ទុករូបិយប័ណ្ណបានទេ។ សូមព្យាយាមម្តងទៀត។",
+  "Unable to load the configured sale currency. Please check system configuration and retry.":
+      "មិនអាចផ្ទុករូបិយប័ណ្ណលក់បានទេ។ សូមពិនិត្យការកំណត់ប្រព័ន្ធ ហើយព្យាយាមម្តងទៀត។",
+  "Unable to calculate the sale total. Check product currencies and exchange rates.":
+      "មិនអាចគណនាតម្លៃសរុបបានទេ។ សូមពិនិត្យរូបិយប័ណ្ណទំនិញ និងអត្រាប្តូរប្រាក់។",
+  "Prices or exchange rates changed. Reload and review the total before paying.":
+      "តម្លៃ ឬអត្រាប្តូរប្រាក់បានផ្លាស់ប្តូរ។ សូមផ្ទុកឡើងវិញ និងពិនិត្យតម្លៃសរុបមុនបង់ប្រាក់។",
+  "The server must be updated before this sale can be paid.":
+      "ត្រូវធ្វើបច្ចុប្បន្នភាពម៉ាស៊ីនមេ មុនពេលអាចបង់ប្រាក់បាន។",
   "Unable to complete payment. Please try again.":
       "មិនអាចបញ្ចប់ការបង់ប្រាក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
   "Charge @amount to @customer using @method?":
@@ -245,7 +253,7 @@ const Map<String, String> kmKH = {
   "Inactive": "អសកម្ម",
   "Cancel": "បោះបង់",
   "true": "ពិត",
-  "false": "មិនពិត", 
+  "false": "មិនពិត",
   "You have selected products. Are you sure you want to leave?":
       "អ្នកបានជ្រើសរើសទំនិញ។ តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?",
   "Leave": "ចាកចេញ",
@@ -438,6 +446,8 @@ const Map<String, String> kmKH = {
   'Select Language': 'ជ្រើសរើសភាសា',
   'Recent Purchase Order': 'ការបញ្ជាទិញថ្មីៗ',
   'Recent Sale Order': 'ការលក់ថ្មីៗ',
+  'Unable to open sale. Please try again.':
+      'មិនអាចបើកព័ត៌មានលក់បានទេ។ សូមព្យាយាមម្តងទៀត។',
   'View All': 'មើលទាំងអស់',
   'Login': 'ចូលប្រព័ន្ធ',
   'Enter username': 'បញ្ចូលឈ្មោះអ្នកប្រើប្រាស់',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/date_formatter.dart';
+import 'package:frontend/utils/currency_formatter.dart';
+import 'package:frontend/ui/app_tokens.dart';
 import 'package:get/get.dart';
 
 class RecentOrdersWidget extends StatelessWidget {
@@ -12,6 +14,8 @@ class RecentOrdersWidget extends StatelessWidget {
     required this.hasError,
     required this.onRetry,
     required this.onViewAll,
+    this.onOrderTap,
+    this.openingOrderId,
   });
 
   final String title;
@@ -21,6 +25,21 @@ class RecentOrdersWidget extends StatelessWidget {
   final bool hasError;
   final VoidCallback onRetry;
   final VoidCallback onViewAll;
+  final ValueChanged<Map<String, dynamic>>? onOrderTap;
+  final int? openingOrderId;
+
+  String _amount(Map<String, dynamic> order) {
+    if (isPurchase) return (order['subtotal'] ?? '').toString();
+    final value = order['total_amount'] ?? order['subtotal'];
+    final code = order['currency_code']?.toString();
+    final symbol = order['currency_symbol']?.toString();
+    final amount = double.tryParse(value?.toString() ?? '');
+    if (amount == null || !amount.isFinite) return value?.toString() ?? '';
+    if (code == null || code.isEmpty || symbol == null || symbol.isEmpty) {
+      return value.toString();
+    }
+    return CurrencyFormatter.format(amount, {'code': code, 'symbol': symbol});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,53 +138,83 @@ class RecentOrdersWidget extends StatelessWidget {
                           endIndent: 20,
                           color: theme.dividerColor,
                         ),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              items[i]['invoice_no']?.toString() ?? '',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            if (isPurchase) ...[
-                              Text(
-                                '${'Supplier'.tr}: ${items[i]['supplier_name'] ?? ''}',
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            Wrap(
-                              spacing: 20,
-                              runSpacing: 8,
+                      Material(
+                        type: MaterialType.transparency,
+                        child: InkWell(
+                          onTap: onOrderTap == null || openingOrderId != null
+                              ? null
+                              : () => onOrderTap!(items[i]),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  '${(isPurchase ? 'Total' : 'Amount').tr}: ${items[i]['subtotal'] ?? ''}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (isPurchase)
-                                  Text('${'Qty'.tr}: ${items[i]['qty'] ?? ''}'),
-                                Text(
-                                  DateFormatter.formatDate(
-                                    DateTime.tryParse(
-                                      items[i][isPurchase
-                                                  ? 'purchase_date'
-                                                  : 'sale_date']
-                                              ?.toString() ??
-                                          '',
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        items[i]['invoice_no']?.toString() ??
+                                            '',
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
                                     ),
+                                    if (openingOrderId != null &&
+                                        items[i]['sale_id']?.toString() ==
+                                            openingOrderId.toString())
+                                      const SizedBox(
+                                        width: AppSpacing.lg,
+                                        height: AppSpacing.lg,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                if (isPurchase) ...[
+                                  Text(
+                                    '${'Supplier'.tr}: ${items[i]['supplier_name'] ?? ''}',
                                   ),
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: colors.onSurfaceVariant,
-                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                                Wrap(
+                                  spacing: 20,
+                                  runSpacing: 8,
+                                  children: [
+                                    Text(
+                                      '${(isPurchase ? 'Total' : 'Amount').tr}: ${_amount(items[i])}',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                    if (isPurchase)
+                                      Text(
+                                        '${'Qty'.tr}: ${items[i]['qty'] ?? ''}',
+                                      ),
+                                    Text(
+                                      DateFormatter.formatDate(
+                                        DateTime.tryParse(
+                                          items[i][isPurchase
+                                                      ? 'purchase_date'
+                                                      : 'sale_date']
+                                                  ?.toString() ??
+                                              '',
+                                        ),
+                                      ),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: colors.onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ],

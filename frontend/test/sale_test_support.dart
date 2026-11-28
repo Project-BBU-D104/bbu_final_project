@@ -11,16 +11,25 @@ import 'package:frontend/services/main_service/customer_service.dart';
 import 'package:frontend/services/main_service/currency_service.dart';
 import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
-import 'package:frontend/services/api_service.dart';
+import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
 
 Map<String, dynamic> saleProductJson(int id, String name) => {
   'id': id,
   'name': name,
   'sale_price': '5.00',
+  'currency_id': 1,
+  'currency': {'id': 1, 'code': 'USD', 'symbol': r'$'},
   'barcode': '12345',
   'photo': null,
 };
+
+void seedSaleCurrency(SaleController controller) {
+  final usd = {'id': 1, 'code': 'USD', 'symbol': r'$', 'exchange_rate': 1};
+  controller.currencies.assignAll([usd]);
+  controller.currency.value = usd;
+}
+
 Map<String, dynamic> saleJson(int id, {String invoice = 'SALE-1'}) => {
   'id': id,
   'invoice_no': invoice,
@@ -63,7 +72,14 @@ class SaleTestSaleService extends SaleService with ReadState {
   Completer<dynamic>? heldCreate;
   @override
   Future<dynamic> createCheckout(Map<String, dynamic> data) async {
-    throw ApiException(404, 'Not Found');
+    createCalls.add(Map.from(data));
+    if (heldCreate != null) return await heldCreate!.future;
+    if (createError != null) throw createError!;
+    return {
+      ...createResult,
+      'subtotal': data['expected_total'],
+      'total_amount': data['expected_total'],
+    };
   }
 
   @override

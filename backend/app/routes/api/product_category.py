@@ -19,6 +19,10 @@ def get_product_category():
             p.photo,
             p.sale_price,
             p.barcode,
+            p.currency_id,
+            product_currency.name AS currency_name,
+            product_currency.code AS currency_code,
+            product_currency.symbol AS currency_symbol,
             COALESCE(SUM(ws.qty), 0) AS qty
            
         FROM categories c
@@ -26,6 +30,8 @@ def get_product_category():
             ON p.category_id = c.id
         JOIN warehouse_stock ws
             ON ws.product_id = p.id
+        LEFT JOIN currency product_currency
+            ON product_currency.id = p.currency_id
         GROUP BY
             c.id,
             c.name,
@@ -33,7 +39,11 @@ def get_product_category():
             p.name,
             p.photo,
             p.sale_price,
-            p.barcode
+            p.barcode,
+            p.currency_id,
+            product_currency.name,
+            product_currency.code,
+            product_currency.symbol
         ORDER BY c.id, p.id
     """)
 
@@ -59,6 +69,13 @@ def get_product_category():
                 "photo": row["photo"],
                 "sale_price": row["sale_price"],
                 "barcode": row["barcode"],
+                "currency_id": row["currency_id"],
+                "currency": {
+                    "id": row["currency_id"],
+                    "name": row["currency_name"],
+                    "code": row["currency_code"],
+                    "symbol": row["currency_symbol"],
+                } if row["currency_code"] is not None else None,
                 "qty": int(row["qty"])
             })
 

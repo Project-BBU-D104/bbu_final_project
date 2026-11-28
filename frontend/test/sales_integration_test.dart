@@ -51,7 +51,7 @@ class _QuietSaleController extends SaleController {
   ) : super(service: sales, salePaymentService: payments);
   @override
   // ignore: must_call_super
-  void onInit() {}
+  void onInit() => seedSaleCurrency(this);
 }
 
 Future<void> _pumpWriteShell(
@@ -114,8 +114,8 @@ void main() {
     final held = Completer<dynamic>();
     final ctr = Get.put<SaleController>(
       _QuietSaleController(
-        _IntegrationSales(),
-        SaleTestPaymentService()..heldWrite = held,
+        _IntegrationSales()..heldCreate = held,
+        SaleTestPaymentService(),
       ),
     );
     ctr.addProduct(saleProductJson(1, 'Water'));
@@ -271,53 +271,38 @@ void main() {
     );
   }
 
-  for (final fallback in [false, true]) {
-    testWidgets(
-      'checkout invalidates history before payment and cleanup fallback=$fallback',
-      (tester) async {
-        final sales = _IntegrationSales()..requireInvoice = fallback;
-        await SaleListController(service: sales).onGetSaleList();
-        final held = Completer<dynamic>();
-        final payments = SaleTestPaymentService()..heldWrite = held;
-        final ctr = SaleController(
-          service: sales,
-          salePaymentService: payments,
-        );
-        ctr.addProduct(saleProductJson(1, 'Water'));
-        ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
-        ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
-        await pumpSalesPage(tester, const Scaffold());
-        final checkout = ctr.onPayment();
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Confirm'));
-        await tester.pump();
-        final afterCreate = SaleListController(service: sales)..onInit();
-        await tester.pump();
-        expect(
-          sales.reads,
-          2,
-          reason:
-              'A successful create invalidates cached history before payment completes',
-        );
-        held.completeError(Exception('offline'));
-        await tester.pumpAndSettle();
-        await checkout;
-        final afterCleanup = SaleListController(service: sales)..onInit();
-        await tester.pump();
-        expect(sales.deleteCalls, [1]);
-        expect(
-          sales.reads,
-          3,
-          reason:
-              'Successful compensating deletion invalidates history warmed during payment',
-        );
-        expect(ctr.totalItems, 1);
-        afterCreate.onClose();
-        afterCleanup.onClose();
-        ctr.onClose();
-      },
-    );
-  }
+  testWidgets('uncertain atomic checkout invalidates cached history', (
+    tester,
+  ) async {
+    final sales = _IntegrationSales();
+    await SaleListController(service: sales).onGetSaleList();
+    final held = Completer<dynamic>();
+    sales.heldCreate = held;
+    final ctr = SaleController(service: sales);
+    seedSaleCurrency(ctr);
+    ctr.addProduct(saleProductJson(1, 'Water'));
+    ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
+    ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
+    await pumpSalesPage(tester, const Scaffold());
+    final checkout = ctr.onPayment();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirm'));
+    await tester.pump();
+    final during = SaleListController(service: sales)..onInit();
+    await tester.pump();
+    expect(sales.reads, 1);
+    held.completeError(Exception('offline'));
+    await tester.pumpAndSettle();
+    await checkout;
+    final after = SaleListController(service: sales)..onInit();
+    await tester.pump();
+    expect(sales.reads, 2);
+    expect(sales.deleteCalls, isEmpty);
+    expect(ctr.totalItems, 1);
+    during.onClose();
+    after.onClose();
+    ctr.onClose();
+  });
 
   testWidgets('successful checkout invalidates history loaded during payment', (
     tester,
@@ -325,10 +310,9 @@ void main() {
     final sales = _IntegrationSales();
     await SaleListController(service: sales).onGetSaleList();
     final held = Completer<dynamic>();
-    final ctr = SaleController(
-      service: sales,
-      salePaymentService: SaleTestPaymentService()..heldWrite = held,
-    );
+    sales.heldCreate = held;
+    final ctr = SaleController(service: sales);
+    seedSaleCurrency(ctr);
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.selectedCustomer.value = {'id': 1, 'name': 'Dara'};
     ctr.selectedPaymentType.value = {'id': 1, 'name': 'Cash'};
@@ -349,13 +333,13 @@ void main() {
     await tester.pump();
     final during = SaleListController(service: sales)..onInit();
     await tester.pump();
-    expect(sales.reads, 2);
-    held.complete(salePaymentJson(1));
+    expect(sales.reads, 1);
+    held.complete({'id': 1, 'subtotal': '5.00', 'total_amount': '5.00'});
     await tester.pumpAndSettle();
     await checkout;
     final after = SaleListController(service: sales)..onInit();
     await tester.pump();
-    expect(sales.reads, 3);
+    expect(sales.reads, 2);
     expect(find.text('Receipt'), findsOneWidget);
     during.onClose();
     after.onClose();

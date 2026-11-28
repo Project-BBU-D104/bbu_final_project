@@ -9,6 +9,7 @@ import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
 import 'package:frontend/screen/payment/sale_with_payment/widget/payment_method_card_widget.dart';
 import 'package:frontend/services/export_service.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:get/get.dart';
 import 'sale_test_support.dart';
 import 'customer_test_support.dart' show setUpCustomerTests;
@@ -21,10 +22,12 @@ class ReviewSaleController extends SaleController {
          service: sales,
          salePaymentService: payments,
          productService: SaleTestProductService(),
-       );
+       ) {
+    seedSaleCurrency(this);
+  }
   @override
   // ignore: must_call_super
-  void onInit() {}
+  void onInit() => seedSaleCurrency(this);
 }
 
 void main() {
@@ -34,7 +37,7 @@ void main() {
     tester,
   ) async {
     final sales = SaleTestSaleService()..heldCreate = Completer<dynamic>();
-    final payments = SaleTestPaymentService()..heldWrite = Completer<dynamic>();
+    final payments = SaleTestPaymentService();
     final ctr = Get.put<SaleController>(
       ReviewSaleController(sales, payments: payments),
     );
@@ -67,20 +70,12 @@ void main() {
     expect(Get.currentRoute, route);
     await ctr.onPayment();
     expect(sales.createCalls, hasLength(1));
-    sales.heldCreate!.complete(saleJson(1));
-    await tester.pumpAndSettle();
-    expect(payments.createCalls, hasLength(1));
-    expect(ctr.checkoutBusy, isTrue);
-    expect(
-      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-      isNull,
-    );
-    payments.heldWrite!.completeError(Exception('offline'));
+    sales.heldCreate!.completeError(Exception('offline'));
     await tester.pumpAndSettle();
     await action;
     expect(ctr.totalItems, 1);
     expect(ctr.checkoutBusy, isFalse);
-    expect(sales.deleteCalls, [1]);
+    expect(sales.deleteCalls, isEmpty);
   });
   for (final missing in ['customer', 'method', 'cart', 'user']) {
     testWidgets('missing $missing prevents checkout writes', (tester) async {
@@ -108,13 +103,14 @@ void main() {
       }
     });
   }
-  for (final invoiceRequired in [false, true]) {
+  for (final status in [404, 405]) {
     testWidgets(
-      'invoice compatibility retries only missing invoice=$invoiceRequired',
+      'old server response $status does not retry an unsafe checkout',
       (tester) async {
         final sales = SaleTestSaleService()
-          ..createError = Exception(
-            invoiceRequired ? 'invoice_no Field required' : 'offline',
+          ..createError = ApiException(
+            status,
+            status == 404 ? 'Not Found' : 'Method Not Allowed',
           );
         final payments = SaleTestPaymentService();
         final ctr = ReviewSaleController(sales, payments: payments);
@@ -127,11 +123,8 @@ void main() {
         await tester.tap(find.text('Confirm'));
         await tester.pumpAndSettle();
         await action;
-        expect(sales.createCalls, hasLength(invoiceRequired ? 2 : 1));
+        expect(sales.createCalls, hasLength(1));
         expect(sales.createCalls.first.containsKey('invoice_no'), isFalse);
-        if (invoiceRequired) {
-          expect(sales.createCalls.last['invoice_no'], startsWith('SALE-'));
-        }
         expect(payments.createCalls, isEmpty);
         expect(ctr.totalItems, 1);
       },

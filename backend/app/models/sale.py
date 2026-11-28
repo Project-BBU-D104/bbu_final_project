@@ -27,6 +27,8 @@ class Sale(SQLModel, table=True):
     payment_status: str
     status: str
     payment_method: str
+    currency_code: Optional[str] = None
+    currency_symbol: Optional[str] = None
     deleted_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

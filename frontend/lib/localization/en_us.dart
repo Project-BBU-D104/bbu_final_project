@@ -58,6 +58,14 @@ const Map<String, String> enUS = {
 
   "Unable to load currency. Please try again.":
       "Unable to load currency. Please try again.",
+  "Unable to load the configured sale currency. Please check system configuration and retry.":
+      "Unable to load the configured sale currency. Please check system configuration and retry.",
+  "Unable to calculate the sale total. Check product currencies and exchange rates.":
+      "Unable to calculate the sale total. Check product currencies and exchange rates.",
+  "Prices or exchange rates changed. Reload and review the total before paying.":
+      "Prices or exchange rates changed. Reload and review the total before paying.",
+  "The server must be updated before this sale can be paid.":
+      "The server must be updated before this sale can be paid.",
   "Unable to complete payment. Please try again.":
       "Unable to complete payment. Please try again.",
   "Charge @amount to @customer using @method?":
@@ -251,7 +259,7 @@ const Map<String, String> enUS = {
   "Inactive": "Inactive",
   "Cancel": "Cancel",
   "true": "true",
-  "false": "false", 
+  "false": "false",
   "You have selected products. Are you sure you want to leave?":
       "You have selected products. Are you sure you want to leave?",
   "Leave": "Leave",
@@ -442,6 +450,8 @@ const Map<String, String> enUS = {
   'Select Language': 'Select Language',
   'Recent Purchase Order': 'Recent Purchase Order',
   'Recent Sale Order': 'Recent Sale Order',
+  'Unable to open sale. Please try again.':
+      'Unable to open sale. Please try again.',
   'View All': 'View All',
   'Login': 'Login',
   'Enter username': 'Enter username',

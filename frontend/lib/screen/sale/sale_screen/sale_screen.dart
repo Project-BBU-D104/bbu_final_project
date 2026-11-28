@@ -375,7 +375,7 @@ class SaleScreen extends StatelessWidget {
     () => CardItemWidget(
       product: product,
       quantity: ctr.cart[product['id']]?['qty'] as int? ?? 0,
-      currency: ctr.currency.value,
+      currency: ctr.currencyForProduct(product),
       naturalGrid: naturalGrid,
       onTap: () => ctr.addProduct(product),
     ),

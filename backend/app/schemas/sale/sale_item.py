@@ -13,3 +13,6 @@ class SaleItemRead(SQLModel):
     qty: int
     sale_price: Decimal
     subtotal: Decimal
+    original_unit_price: Optional[Decimal] = None
+    original_currency_code: Optional[str] = None
+    original_currency_symbol: Optional[str] = None

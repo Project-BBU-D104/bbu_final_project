@@ -16,7 +16,7 @@ class PaymentFooterWidget extends StatelessWidget {
   });
   final VoidCallback onTap;
   final int itemCount;
-  final double total;
+  final double? total;
   final Map<String, dynamic>? currency;
   final double? usdToKhrRate;
   @override
@@ -45,7 +45,9 @@ class PaymentFooterWidget extends StatelessWidget {
                       children: [
                         Text(
                           'Amount: @amount'.trParams({
-                            'amount': CurrencyFormatter.format(total, currency),
+                            'amount': total == null
+                                ? '—'
+                                : CurrencyFormatter.format(total!, currency),
                           }),
                         ),
                         const SizedBox(height: AppSpacing.xs),

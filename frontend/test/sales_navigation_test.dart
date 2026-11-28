@@ -4,6 +4,7 @@ import 'package:frontend/controllers/sale/sale_controller.dart';
 import 'package:frontend/screen/sale/sale_screen/sale_screen.dart';
 import 'package:frontend/screen/sale/current_sale/current_sale_screen.dart';
 import 'package:frontend/screen/sale/widget/payment_success_widget.dart';
+import 'package:frontend/screen/sale/widget/payment_footer_widget.dart';
 import 'package:frontend/screen/home/desktop_app_shell.dart';
 import 'package:frontend/localization/app_translation.dart';
 import 'package:frontend/themes/app_theme.dart';
@@ -19,7 +20,7 @@ class NavigationSaleController extends SaleController {
   ) : super(service: sales, salePaymentService: payments);
   @override
   // ignore: must_call_super
-  void onInit() {}
+  void onInit() => seedSaleCurrency(this);
 }
 
 void main() {
@@ -132,14 +133,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Water'));
     await tester.pump();
-    await tester.tap(find.textContaining('Continue'));
+    await tester.tap(find.byType(PaymentFooterWidget));
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/current-sale');
     expect(find.byType(CustomAppBar), findsOneWidget);
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     expect(ctr.totalItems, 1);
-    await tester.tap(find.textContaining('Continue'));
+    await tester.tap(find.byType(PaymentFooterWidget));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Payment'));
     await tester.tap(find.text('Payment'));
@@ -148,7 +149,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(Get.currentRoute, '/payment-success');
     expect(sales.createCalls, hasLength(1));
-    expect(payments.createCalls, hasLength(1));
+    expect(payments.createCalls, isEmpty);
     await tester.ensureVisible(find.text('Back to Sale'));
     await tester.tap(find.text('Back to Sale'));
     await tester.pumpAndSettle();

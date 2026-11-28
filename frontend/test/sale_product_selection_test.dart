@@ -17,7 +17,7 @@ import 'customer_test_support.dart' show setUpCustomerTests;
 class SellingController extends SaleController {
   @override
   // ignore: must_call_super
-  void onInit() {}
+  void onInit() => seedSaleCurrency(this);
 }
 
 Finder layoutOption(String label) => find.ancestor(
@@ -28,6 +28,36 @@ Finder layoutOption(String label) => find.ancestor(
 void main() {
   setUp(setUpCustomerTests);
   tearDown(Get.reset);
+  for (final grid in [false, true]) {
+    testWidgets('product cards use their own currencies grid=$grid', (
+      tester,
+    ) async {
+      final ctr = Get.put<SaleController>(SellingController());
+      ctr.productGridView.value = grid;
+      ctr.currencies.clear();
+      ctr.currency.value = {'code': 'KHR', 'symbol': '៛'};
+      ctr.categories.add({
+        'name': 'Products',
+        'products': [
+          {
+            ...saleProductJson(1, 'Water'),
+            'sale_price': '1000',
+            'currency': {'id': 1, 'code': 'KHR', 'symbol': '៛'},
+          },
+          {
+            ...saleProductJson(2, 'Books'),
+            'sale_price': '6',
+            'currency_id': 2,
+            'currency': {'id': 2, 'code': 'USD', 'symbol': r'$'},
+          },
+        ],
+      });
+      await pumpSalesPage(tester, SaleScreen(), size: const Size(390, 844));
+      expect(find.text('៛1,000'), findsOneWidget);
+      expect(find.text(r'$6.00'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
   for (final grid in [false, true]) {
     testWidgets('selected quantity appears in a top-right chip grid=$grid', (
       tester,
@@ -216,12 +246,12 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Qty: 1'), findsOneWidget);
-      expect(find.text('Amount: 5.00'), findsOneWidget);
+      expect(find.text(r'Amount: $5.00'), findsOneWidget);
       expect(find.text('Exchange rate: —'), findsOneWidget);
       ctr.addProduct(products.first);
       await tester.pump();
       expect(find.text('Qty: 2'), findsOneWidget);
-      expect(find.text('Amount: 10.00'), findsOneWidget);
+      expect(find.text(r'Amount: $10.00'), findsOneWidget);
       ctr.currency.value = {
         'code': 'KHR',
         'symbol': '៛',
@@ -293,7 +323,12 @@ void main() {
       ctr.currency.value = {'symbol': r'$', 'code': 'USD'};
       ctr.categories.add({
         'name': 'Drinks',
-        'products': [saleProductJson(1, 'Water')],
+        'products': [
+          {
+            ...saleProductJson(1, 'Water'),
+            'currency': {'code': 'USD', 'symbol': r'$'},
+          },
+        ],
       });
       await pumpSalesPage(tester, SaleScreen(), size: const Size(1440, 900));
       final button = find.bySemanticsLabel('Add Water, quantity 0');
@@ -353,7 +388,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(PaymentFooterWidget),
-          matching: find.text('ចំនួនទឹកប្រាក់៖ 5.00'),
+          matching: find.text(r'ចំនួនទឹកប្រាក់៖ $5.00'),
         ),
         findsOneWidget,
       );
@@ -446,7 +481,7 @@ void main() {
     });
     await pumpSalesPage(tester, SaleScreen());
     expect(find.byType(AppPage), findsOneWidget);
-    expect(find.byType(AppPageHeader), findsOneWidget);
+    expect(find.byTooltip('Back'), findsOneWidget);
     expect(find.text('Product 99'), findsNothing);
     await tester.tap(find.text('Product 0'));
     await tester.pump();

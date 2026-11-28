@@ -201,7 +201,7 @@ class _PaymentFormWidgetState extends State<PaymentFormWidget> {
                               DropdownMenuItem(
                                 value: int.tryParse(sale['id'].toString()),
                                 child: Text(
-                                  '${saleText(sale['invoice_no'])} (${'Due'.tr}: ${formatSaleAmount(sale['due_amount'])})',
+                                  '${saleText(sale['invoice_no'])} (${'Due'.tr}: ${formatSaleAmount(sale['due_amount'], currency: saleCurrency(sale))})',
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),

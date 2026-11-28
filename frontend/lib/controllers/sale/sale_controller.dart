@@ -11,10 +11,12 @@ import 'package:frontend/services/main_service/payment_type_service.dart';
 import 'package:frontend/services/main_service/product_service.dart';
 import 'package:frontend/services/main_service/sale_payment_service.dart';
 import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/services/main_service/system_configuration_service.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/ui/app_tokens.dart';
 import 'package:frontend/utils/barcode_utils.dart';
 import 'package:frontend/utils/currency_formatter.dart';
+import 'package:frontend/utils/sale_currency_calculator.dart';
 import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
@@ -27,13 +29,16 @@ class SaleController extends GetxController {
     PaymentTypeService? paymentTypeService,
     SalePaymentService? salePaymentService,
     IStorageService? storageService,
+    SystemConfigurationService? configurationService,
   }) : service = service ?? SaleService(),
        productService = productService ?? ProductService(),
        customerService = customerService ?? CustomerService(),
        currencyService = currencyService ?? CurrencyService(),
        paymentTypeService = paymentTypeService ?? PaymentTypeService(),
        salePaymentService = salePaymentService ?? SalePaymentService(),
-       _storageService = storageService;
+       _storageService = storageService,
+       configurationService =
+           configurationService ?? SystemConfigurationService();
 
   final SaleService service;
   final ProductService productService;
@@ -41,6 +46,7 @@ class SaleController extends GetxController {
   final CurrencyService currencyService;
   final PaymentTypeService paymentTypeService;
   final SalePaymentService salePaymentService;
+  final SystemConfigurationService configurationService;
   final IStorageService? _storageService;
   IStorageService get _layoutStorage => _storageService ?? storage;
   final categories = <Map<String, dynamic>>[].obs;
@@ -67,6 +73,7 @@ class SaleController extends GetxController {
   final paymentTypesLoadError = ''.obs;
   final currencyLoadError = ''.obs;
   final checkoutError = ''.obs;
+  final needsPriceRefresh = false.obs;
   final isConfirmingPayment = false.obs;
   bool get checkoutBusy =>
       isConfirmingPayment.value || isProcessingPayment.value;
@@ -74,7 +81,10 @@ class SaleController extends GetxController {
       !checkoutBusy &&
       cart.isNotEmpty &&
       selectedCustomer.value != null &&
-      selectedPaymentType.value != null;
+      selectedPaymentType.value != null &&
+      !needsPriceRefresh.value &&
+      subtotal != null &&
+      subtotal! > 0;
 
   /// Exchange rates share a base, so their ratio gives riel per US dollar.
   double? get usdToKhrRate {
@@ -169,21 +179,45 @@ class SaleController extends GetxController {
     return _layoutSave;
   }
 
-  /// The sale grid and cart total are priced in the shop's default currency.
+  /// Load the currency selected in the signed-in user's system configuration.
   Future<void> loadCurrency() async {
     currencyLoadError.value = '';
     try {
-      final response = await currencyService.getCurrencies();
-      if (response is! List) throw const FormatException('Expected list');
-      {
-        final rows = List<Map<String, dynamic>>.from(response);
-        currencies.assignAll(rows);
-        currency.value =
-            rows.firstWhereOrNull((c) => c['is_default'] == true) ??
-            rows.firstOrNull;
+      final user = _layoutStorage.lastUserLoginRead['user'];
+      final configId = user is Map
+          ? int.tryParse(user['system_configuration_id']?.toString() ?? '')
+          : null;
+      if (configId == null) {
+        throw const FormatException('Missing system configuration');
       }
+      final results = await Future.wait([
+        currencyService.getCurrencies(),
+        configurationService.getSystemConfigurationById(configId),
+      ]);
+      final response = results[0];
+      final config = results[1];
+      if (response is! List || config is! Map) {
+        throw const FormatException('Invalid currency configuration');
+      }
+      final configured = config['default_currency'];
+      final id = configured is Map
+          ? configured['id']
+          : config['default_currency_id'];
+      final rows = List<Map<String, dynamic>>.from(response);
+      final selected = rows.firstWhereOrNull(
+        (row) => id != null && row['id']?.toString() == id.toString(),
+      );
+      if (selected == null) {
+        throw const FormatException('Configured currency missing');
+      }
+      currencies.assignAll(rows);
+      currency.value = selected;
     } catch (error) {
-      currencyLoadError.value = 'Unable to load currency. Please try again.'.tr;
+      currencies.clear();
+      currency.value = null;
+      currencyLoadError.value =
+          'Unable to load the configured sale currency. Please check system configuration and retry.'
+              .tr;
     }
   }
 
@@ -272,8 +306,19 @@ class SaleController extends GetxController {
           }).toList();
           return category;
         }).toList();
-        await _mergeProductBarcodes(categoryList);
+        await _mergeProductDetails(categoryList);
         categories.value = categoryList;
+        if (!checkoutBusy) {
+          for (final group in categoryList) {
+            for (final product
+                in (group['products'] as List).cast<Map<String, dynamic>>()) {
+              final selected = cart[product['id']];
+              if (selected != null) {
+                cart[product['id']] = {...product, 'qty': selected['qty']};
+              }
+            }
+          }
+        }
       }
     } catch (error) {
       productLoadError.value = 'Unable to load products. Please try again.'.tr;
@@ -282,9 +327,8 @@ class SaleController extends GetxController {
     }
   }
 
-  /// The product-category endpoint does not always return the barcode.
-  /// Merge barcodes from the product endpoint so barcode search works.
-  Future<void> _mergeProductBarcodes(
+  /// Older product-category APIs omit barcodes and product currencies.
+  Future<void> _mergeProductDetails(
     List<Map<String, dynamic>> categoryList,
   ) async {
     try {
@@ -292,6 +336,7 @@ class SaleController extends GetxController {
       if (response is! List) return;
 
       final barcodes = <int, String>{};
+      final currenciesByProduct = <int, Map<String, dynamic>>{};
 
       for (final product in response) {
         if (product is! Map) continue;
@@ -301,6 +346,10 @@ class SaleController extends GetxController {
 
         if (id != null && barcode.isNotEmpty) {
           barcodes[id] = barcode;
+        }
+        final productCurrency = product['currency'];
+        if (id != null && productCurrency is Map) {
+          currenciesByProduct[id] = Map<String, dynamic>.from(productCurrency);
         }
       }
 
@@ -317,11 +366,28 @@ class SaleController extends GetxController {
           if (barcode != null) {
             product['barcode'] = barcode;
           }
+          final productCurrency = currenciesByProduct[id];
+          if (product['currency'] == null && productCurrency != null) {
+            product['currency'] = productCurrency;
+          }
         }
       }
     } catch (_) {
       // Barcode lookup is optional; keep the product list usable if it fails.
     }
+  }
+
+  /// Return the product's own currency, without guessing when it is missing.
+  Map<String, dynamic>? currencyForProduct(Map<String, dynamic> product) {
+    final raw = product['currency'];
+    final productCurrency = raw is Map ? Map<String, dynamic>.from(raw) : null;
+    final id = product['currency_id'] ?? productCurrency?['id'];
+    final known = currencies.firstWhereOrNull(
+      (row) => id != null && row['id']?.toString() == id.toString(),
+    );
+    if (known != null) return {...?productCurrency, ...known};
+    if (productCurrency?['symbol'] != null) return productCurrency;
+    return null;
   }
 
   void addProduct(Map<String, dynamic> product) {
@@ -351,16 +417,64 @@ class SaleController extends GetxController {
     (total, product) => total + (product['qty'] as int),
   );
 
-  double get subtotal => cart.values.fold<double>(
-    0,
-    (total, product) =>
-        total +
-        (double.tryParse(product['sale_price']?.toString() ?? '') ?? 0) *
-            (product['qty'] as int),
-  );
+  BigInt? get _subtotalMinor {
+    final target = currency.value;
+    if (target == null || target['id'] == null || target['code'] == null) {
+      return null;
+    }
+    var total = BigInt.zero;
+    for (final product in cart.values) {
+      final productCurrency = product['currency'];
+      final sourceId =
+          product['currency_id'] ??
+          (productCurrency is Map ? productCurrency['id'] : null);
+      final source = currencies.firstWhereOrNull(
+        (row) =>
+            sourceId != null && row['id']?.toString() == sourceId.toString(),
+      );
+      if (source == null) return null;
+      final qty = product['qty'];
+      if (qty is! int || qty <= 0) return null;
+      final minor = SaleCurrencyCalculator.convertedLineMinor(
+        price: product['sale_price'],
+        quantity: qty,
+        source: source,
+        target: target,
+      );
+      if (minor == null) return null;
+      total += minor;
+    }
+    final max = SaleCurrencyCalculator.decimalPlaces(target) == 0
+        ? BigInt.parse('9999999999')
+        : BigInt.parse('999999999999');
+    return total <= max ? total : null;
+  }
+
+  String? get confirmedSubtotal {
+    final target = currency.value;
+    final total = _subtotalMinor;
+    if (target == null || total == null) return null;
+    return SaleCurrencyCalculator.formatMinor(
+      total,
+      SaleCurrencyCalculator.decimalPlaces(target),
+    );
+  }
+
+  double? get subtotal => double.tryParse(confirmedSubtotal ?? '');
 
   void onCurrentSale() {
     Get.toNamed(AppRoutes.currentSale);
+  }
+
+  Future<void> refreshSalePrices() async {
+    if (checkoutBusy) return;
+    await Future.wait([loadCurrency(), loadProductCategories()]);
+    if (currencyLoadError.value.isEmpty &&
+        productLoadError.value.isEmpty &&
+        subtotal != null) {
+      needsPriceRefresh.value = false;
+      checkoutError.value = '';
+    }
   }
 
   Future<void> onPayment() async {
@@ -368,7 +482,7 @@ class SaleController extends GetxController {
     final customer = selectedCustomer.value;
     final paymentType = selectedPaymentType.value;
     final userId = int.tryParse(
-      storage.lastUserLoginRead['user']?['id']?.toString() ?? '',
+      _layoutStorage.lastUserLoginRead['user']?['id']?.toString() ?? '',
     );
 
     if (selectedProducts.isEmpty || customer == null || paymentType == null) {
@@ -386,6 +500,21 @@ class SaleController extends GetxController {
       );
       return;
     }
+    if (needsPriceRefresh.value) return;
+    final expectedTotal = confirmedSubtotal;
+    final targetCurrency = currency.value;
+    final expectedCurrencyId = int.tryParse(
+      targetCurrency?['id']?.toString() ?? '',
+    );
+    if (expectedTotal == null ||
+        expectedCurrencyId == null ||
+        subtotal == null ||
+        subtotal! <= 0) {
+      checkoutError.value =
+          'Unable to calculate the sale total. Check product currencies and exchange rates.'
+              .tr;
+      return;
+    }
     if (isProcessingPayment.value) return;
 
     isConfirmingPayment.value = true;
@@ -400,7 +529,10 @@ class SaleController extends GetxController {
           title: Text('Confirm payment'.tr),
           content: Text(
             'Charge @amount to @customer using @method?'.trParams({
-              'amount': CurrencyFormatter.format(subtotal, currency.value),
+              'amount': CurrencyFormatter.format(
+                double.parse(expectedTotal),
+                targetCurrency,
+              ),
               'customer': customer['name']?.toString() ?? '',
               'method': method,
             }),
@@ -422,7 +554,6 @@ class SaleController extends GetxController {
 
       isProcessingPayment.value = true;
       int? saleId;
-      var legacyCheckout = false;
       var checkoutRejected = false;
       try {
         final now = DateTime.now().toUtc();
@@ -447,19 +578,24 @@ class SaleController extends GetxController {
           saleResponse = await service.createCheckout({
             ...saleData,
             'reference_no': reference,
+            'expected_currency_id': expectedCurrencyId,
+            'expected_total': expectedTotal,
           });
         } on ApiException catch (error) {
-          final unsupported =
-              (error.statusCode == 404 && error.message == 'Not Found') ||
+          checkoutRejected = error.statusCode >= 400 && error.statusCode < 500;
+          if (error.statusCode == 409) {
+            needsPriceRefresh.value = true;
+            checkoutError.value =
+                'Prices or exchange rates changed. Reload and review the total before paying.'
+                    .tr;
+          } else if ((error.statusCode == 404 &&
+                  error.message == 'Not Found') ||
               (error.statusCode == 405 &&
-                  error.message == 'Method Not Allowed');
-          if (!unsupported) {
-            checkoutRejected =
-                error.statusCode >= 400 && error.statusCode < 500;
-            rethrow;
+                  error.message == 'Method Not Allowed')) {
+            checkoutError.value =
+                'The server must be updated before this sale can be paid.'.tr;
           }
-          legacyCheckout = true;
-          saleResponse = await _createSale(saleData);
+          rethrow;
         }
 
         SaleListController.invalidateCache();
@@ -474,49 +610,29 @@ class SaleController extends GetxController {
           throw Exception('The sale response did not include an ID and total.');
         }
 
-        if (legacyCheckout) {
-          await salePaymentService.createSalePayment({
-            'user_id': userId,
-            'sale_id': saleId,
-            'amount': amount,
-            'payment_method': method,
-            'reference_no': reference,
-            'payment_date': now.toIso8601String(),
-            'note': 'Sale payment',
-            'created_at': now.toIso8601String(),
-          });
-        }
-        SaleListController.invalidateCache();
-
         final receipt = {
           'customer': customer['name']?.toString() ?? '',
           'payment_method': method,
           'payment_date': now.toIso8601String(),
           'transaction_id': reference,
-          'subtotal': saleResponse['subtotal'] ?? subtotal,
+          'subtotal': saleResponse['subtotal'] ?? expectedTotal,
           'total': amount,
-          'currency': currency.value,
+          'currency': targetCurrency,
         };
         cart.clear();
         selectedCustomer.value = null;
         selectedPaymentType.value = null;
         Get.offNamed(AppRoutes.paymentSuccess, arguments: receipt);
       } catch (error) {
-        checkoutError.value =
-            'Unable to complete payment. Please try again.'.tr;
-        if (!legacyCheckout && !checkoutRejected) {
+        if (checkoutError.value.isEmpty) {
+          checkoutError.value =
+              'Unable to complete payment. Please try again.'.tr;
+        }
+        if (!checkoutRejected) {
+          SaleListController.invalidateCache();
           checkoutError.value =
               'The sale may have been created. Check Sales before trying again.'
                   .tr;
-        } else if (legacyCheckout && saleId != null) {
-          try {
-            await service.deleteSale(saleId);
-            SaleListController.invalidateCache();
-          } catch (_) {
-            checkoutError.value =
-                'The sale may have been created. Check Sales before trying again.'
-                    .tr;
-          }
         }
         ToastWidget.show(message: checkoutError.value, type: ToastType.error);
       } finally {
@@ -526,33 +642,6 @@ class SaleController extends GetxController {
       isConfirmingPayment.value = false;
     }
   }
-
-  Future<dynamic> _createSale(Map<String, dynamic> data) async {
-    try {
-      return await service.createSale(data);
-    } catch (error) {
-      final message = error.toString();
-      final invoiceRequired =
-          message.contains('invoice_no') &&
-          (message.contains('Field required') || message.contains('missing'));
-
-      if (!invoiceRequired) rethrow;
-
-      // Older deployed backends require invoice_no even though the current
-      // backend generates it automatically. Send one only for that case.
-      final now = DateTime.now();
-      final date = '${now.year}${_twoDigits(now.month)}${_twoDigits(now.day)}';
-      final time =
-          '${_twoDigits(now.hour)}${_twoDigits(now.minute)}${_twoDigits(now.second)}';
-
-      return await service.createSale({
-        ...data,
-        'invoice_no': 'SALE-$date-$time',
-      });
-    }
-  }
-
-  String _twoDigits(int value) => value.toString().padLeft(2, '0');
 
   void onConfirm() {
     Get.offNamed(AppRoutes.paymentSuccess);

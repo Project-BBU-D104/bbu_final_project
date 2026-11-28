@@ -3,9 +3,10 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 from sqlmodel import Session
 from database import get_session
-from app.schemas.sale.sale import SaleCheckoutCreate, SaleCheckoutRead, SaleCreate,SaleRead,SaleUpdate
-from app.crud.sale.sale import  create_sale, create_sale_checkout, get_all_sales, get_sale, update_sale, delete_sale
+from app.schemas.sale.sale import ConvertedSaleCheckoutCreate, SaleCheckoutCreate, SaleCheckoutRead, SaleCreate,SaleRead,SaleUpdate
+from app.crud.sale.sale import create_converted_sale_checkout, create_sale, create_sale_checkout, get_all_sales, get_sale, update_sale, delete_sale
 from app.core.cache import clear_stock_caches
+from app.security import get_current_user
 
 router = APIRouter(prefix="/sale", tags=["sale"])
 
@@ -17,6 +18,19 @@ async def _clear_sale_caches():
     # Sales change warehouse quantities, so the warehouse cache is stale too.
     await FastAPICache.clear(namespace=CACHE_NS)
     await clear_stock_caches()
+
+
+@router.post("/checkout-converted/", response_model=SaleCheckoutRead)
+async def checkout_converted_sale(
+    checkout: ConvertedSaleCheckoutCreate,
+    session: Session = Depends(get_session),
+    user=Depends(get_current_user),
+):
+    if checkout.user_id != user.id:
+        raise HTTPException(status_code=403, detail="The sale user does not match the signed-in user.")
+    result = create_converted_sale_checkout(session, checkout)
+    await _clear_sale_caches()
+    return result
 
 
 @router.post("/checkout/", response_model=SaleCheckoutRead)

@@ -69,7 +69,10 @@ class SaleCardWidget extends StatelessWidget {
                     Text(label.tr, style: textTheme.bodySmall),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      formatSaleAmount(sale[field]),
+                      formatSaleAmount(
+                        sale[field],
+                        currency: saleCurrency(sale),
+                      ),
                       style: textTheme.titleSmall,
                     ),
                   ],

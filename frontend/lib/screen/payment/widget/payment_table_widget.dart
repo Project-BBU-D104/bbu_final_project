@@ -31,7 +31,10 @@ class PaymentTableWidget extends StatelessWidget {
             'customer' => saleText(
               saleMap(saleMap(p['sale'])['customer'])['name'],
             ),
-            'amount' => formatSaleAmount(p['amount']),
+            'amount' => formatSaleAmount(
+              p['amount'],
+              currency: saleCurrency(saleMap(p['sale'])),
+            ),
             'payment_date' => formatSaleDate(p['payment_date']),
             _ => saleText(p[entry.value]),
           }),

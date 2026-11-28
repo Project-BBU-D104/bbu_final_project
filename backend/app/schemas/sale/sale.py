@@ -60,6 +60,13 @@ class SaleCheckoutRead(SQLModel):
     id: int
     subtotal: Decimal
     total_amount: Decimal
+    currency_code: Optional[str] = None
+    currency_symbol: Optional[str] = None
+
+
+class ConvertedSaleCheckoutCreate(SaleCheckoutCreate):
+    expected_currency_id: int
+    expected_total: Decimal = Field(ge=0)
 
 class SaleRead(SQLModel):
     id: Optional[int] = None
@@ -77,6 +84,8 @@ class SaleRead(SQLModel):
     payment_status: str
     status: str
     payment_method: Optional[str] = None
+    currency_code: Optional[str] = None
+    currency_symbol: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at : Optional[datetime] = None

@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from app.models.category import Category
 from app.models.product import Product
+from app.models.currency import Currency
 from app.models.warehouse_stock import WarehouseStock
 from app.routes.api import product_category
 
@@ -108,6 +109,36 @@ def test_sale_products_expose_total_warehouse_qty(session, seed, monkeypatch):
 
     [sale_product] = response[0]["products"]
     assert sale_product["qty"] == 7
+
+
+def test_sale_products_include_their_own_currency(session, seed, monkeypatch):
+    riel = Currency(name="Riel", code="KHR", symbol="៛", exchange_rate=4000)
+    session.add(riel)
+    session.flush()
+    dollar_product = make_product(seed, "Dollar product")
+    riel_product = make_product(seed, "Riel product")
+    riel_product.currency_id = riel.id
+    session.add_all([dollar_product, riel_product])
+    session.flush()
+    stock_for(session, dollar_product, seed["warehouse_a"], 2)
+    stock_for(session, riel_product, seed["warehouse_a"], 3)
+    session.commit()
+    monkeypatch.setattr(product_category, "engine", session.get_bind())
+
+    products = product_category.get_product_category()[0]["products"]
+    by_name = {product["name"]: product for product in products}
+    assert by_name["Dollar product"]["currency"] == {
+        "id": seed["currency"].id,
+        "name": "US Dollar",
+        "code": "USD",
+        "symbol": "$",
+    }
+    assert by_name["Riel product"]["currency"] == {
+        "id": riel.id,
+        "name": "Riel",
+        "code": "KHR",
+        "symbol": "៛",
+    }
 
 
 def test_sale_products_are_not_duplicated_across_warehouses(

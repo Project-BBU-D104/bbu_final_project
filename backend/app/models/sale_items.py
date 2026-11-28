@@ -17,6 +17,9 @@ class SaleItems(SQLModel, table=True):
     qty: int
     sale_price: Decimal = Field(sa_type=Numeric(12, 2))
     subtotal: Decimal = Field(sa_type=Numeric(12, 2))
+    original_unit_price: Optional[Decimal] = Field(default=None, sa_type=Numeric(12, 2))
+    original_currency_code: Optional[str] = None
+    original_currency_symbol: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

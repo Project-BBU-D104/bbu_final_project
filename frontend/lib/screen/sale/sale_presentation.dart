@@ -14,6 +14,13 @@ String saleText(Object? value, {String fallback = '—'}) =>
     value == null || value.toString().trim().isEmpty
     ? fallback
     : value.toString();
+Map<String, dynamic>? saleCurrency(Map<String, dynamic> sale) {
+  final code = sale['currency_code']?.toString();
+  final symbol = sale['currency_symbol']?.toString();
+  if (code == null || code.isEmpty || symbol == null) return null;
+  return {'code': code, 'symbol': symbol};
+}
+
 String formatSaleAmount(Object? value, {Map<String, dynamic>? currency}) {
   final amount = double.tryParse(value.toString());
   if (amount == null || !amount.isFinite) return '—';

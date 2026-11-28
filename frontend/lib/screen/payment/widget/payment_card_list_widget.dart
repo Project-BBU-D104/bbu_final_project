@@ -57,7 +57,10 @@ class PaymentCardListWidget extends StatelessWidget {
           const Divider(height: AppSpacing.xxl),
           _PaymentField(
             label: 'Amount',
-            value: formatSaleAmount(payment['amount']),
+            value: formatSaleAmount(
+              payment['amount'],
+              currency: saleCurrency(saleMap(payment['sale'])),
+            ),
             valueStyle: textTheme.titleMedium,
           ),
         ],

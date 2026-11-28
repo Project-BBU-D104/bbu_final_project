@@ -123,7 +123,7 @@ class CurrentSaleWidget extends StatelessWidget {
                                   quantity: p['qty'],
                                   unitPrice: price,
                                   subtotal: price * p['qty'],
-                                  currency: ctr.currency.value,
+                                  currency: ctr.currencyForProduct(p),
                                   onIncrease: () =>
                                       ctr.changeQuantity(p['id'], 1),
                                   onDecrease: () =>
@@ -152,8 +152,9 @@ class CurrentSaleWidget extends StatelessWidget {
                                       ctr.isPaymentTypesLoading.value ||
                                       ctr.checkoutBusy,
                                   onChanged: (value) {
-                                    if (value != null)
+                                    if (value != null) {
                                       ctr.selectPaymentType(value);
+                                    }
                                   },
                                 ),
                                 if (ctr.currencyLoadError.value.isNotEmpty)
@@ -162,9 +163,22 @@ class CurrentSaleWidget extends StatelessWidget {
                                   TextButton(
                                     onPressed: ctr.checkoutBusy
                                         ? null
-                                        : ctr.loadCurrency,
+                                        : ctr.refreshSalePrices,
                                     child: Text('Retry'.tr),
                                   ),
+                                if (ctr.currencyLoadError.value.isEmpty &&
+                                    ctr.subtotal == null) ...[
+                                  Text(
+                                    'Unable to calculate the sale total. Check product currencies and exchange rates.'
+                                        .tr,
+                                  ),
+                                  TextButton(
+                                    onPressed: ctr.checkoutBusy
+                                        ? null
+                                        : ctr.refreshSalePrices,
+                                    child: Text('Retry'.tr),
+                                  ),
+                                ],
                                 const SizedBox(height: AppSpacing.lg),
                               ],
                             );
@@ -182,8 +196,18 @@ class CurrentSaleWidget extends StatelessWidget {
                             );
                           }),
                         ),
-                      if (ctr.checkoutError.value.isNotEmpty)
+                      if (ctr.checkoutError.value.isNotEmpty) ...[
                         Text(ctr.checkoutError.value),
+                        if (ctr.checkoutError.value ==
+                            'Prices or exchange rates changed. Reload and review the total before paying.'
+                                .tr)
+                          TextButton(
+                            onPressed: ctr.checkoutBusy
+                                ? null
+                                : ctr.refreshSalePrices,
+                            child: Text('Retry'.tr),
+                          ),
+                      ],
                     ],
                   ),
                 ),

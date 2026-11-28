@@ -26,7 +26,7 @@ class SaleService {
 
   /// Records the sale and its full payment in one server transaction.
   Future<dynamic> createCheckout(Map<String, dynamic> data) async {
-    return await _api.post('$endpoint/checkout', data);
+    return await _api.post('$endpoint/checkout-converted', data);
   }
 
   /// UPDATE Sale

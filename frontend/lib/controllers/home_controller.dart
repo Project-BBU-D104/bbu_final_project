@@ -8,11 +8,14 @@ import 'package:frontend/screen/manage/manage_screen.dart';
 import 'package:frontend/screen/profile/profile_screen.dart';
 import 'package:frontend/screen/report/report_screen.dart';
 import 'package:frontend/services/main_service/home_service.dart';
+import 'package:frontend/services/main_service/sale_service.dart';
+import 'package:frontend/widget/toast_widget.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
-  HomeController({HomeService? homeService})
-    : service = homeService ?? HomeService();
+  HomeController({HomeService? homeService, SaleService? saleService})
+    : service = homeService ?? HomeService(),
+      saleService = saleService ?? SaleService();
 
   RxInt selectedIndex = 0.obs;
   final PageController pageController = PageController();
@@ -20,6 +23,8 @@ class HomeController extends GetxController {
   final Rxn<Map<String, dynamic>> welcomePage = Rxn<Map<String, dynamic>>();
 
   final HomeService service;
+  final SaleService saleService;
+  final openingSaleId = RxnInt();
   final purchasesLoading = true.obs;
   final salesLoading = true.obs;
   final purchasesError = false.obs;
@@ -72,6 +77,41 @@ class HomeController extends GetxController {
       salesError.value = true;
     } finally {
       salesLoading.value = false;
+    }
+  }
+
+  Future<void> openRecentSale(Map<String, dynamic> order) async {
+    if (openingSaleId.value != null) return;
+    final id = int.tryParse(order['sale_id']?.toString() ?? '');
+    if (id == null || id <= 0) {
+      ToastWidget.show(
+        message: 'Unable to open sale. Please try again.'.tr,
+        type: ToastType.error,
+      );
+      return;
+    }
+    final origin = Get.currentRoute;
+    openingSaleId.value = id;
+    try {
+      final response = await saleService.getSaleById(id);
+      if (response is! Map || response['id']?.toString() != id.toString()) {
+        throw const FormatException('Invalid sale details');
+      }
+      if (!isClosed && Get.currentRoute == origin) {
+        Get.toNamed(
+          AppRoutes.saleListDetail,
+          arguments: Map<String, dynamic>.from(response),
+        );
+      }
+    } catch (_) {
+      if (!isClosed && Get.currentRoute == origin) {
+        ToastWidget.show(
+          message: 'Unable to open sale. Please try again.'.tr,
+          type: ToastType.error,
+        );
+      }
+    } finally {
+      if (!isClosed) openingSaleId.value = null;
     }
   }
 

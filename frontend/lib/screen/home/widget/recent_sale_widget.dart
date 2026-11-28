@@ -18,6 +18,8 @@ class RecentStockOutWidget extends StatelessWidget {
       hasError: controller.salesError.value,
       onRetry: controller.getRecentSale,
       onViewAll: () => Get.toNamed(AppRoutes.saleList),
+      onOrderTap: controller.openRecentSale,
+      openingOrderId: controller.openingSaleId.value,
     ),
   );
 }

@@ -221,6 +221,47 @@ void main() {
     expect(views, 1);
   });
 
+  testWidgets('recent sales show the order total and its recorded currency', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: RecentOrdersWidget(
+            title: 'Recent Sale Order',
+            items: const [
+              {
+                'sale_id': 8,
+                'invoice_no': 'SALE-8',
+                'subtotal': '48000',
+                'total_amount': '52030',
+                'currency_code': 'KHR',
+                'currency_symbol': '៛',
+              },
+              {
+                'sale_id': 7,
+                'invoice_no': 'SALE-7',
+                'total_amount': '13.25',
+                'currency_code': 'USD',
+                'currency_symbol': r'$',
+              },
+              {'sale_id': 6, 'invoice_no': 'SALE-6', 'total_amount': '12.00'},
+            ],
+            isPurchase: false,
+            loading: false,
+            hasError: false,
+            onRetry: () {},
+            onViewAll: () {},
+          ),
+        ),
+      ),
+    );
+    expect(find.text('SALE-8'), findsOneWidget);
+    expect(find.text('Amount: ៛52,030'), findsOneWidget);
+    expect(find.text(r'Amount: $13.25'), findsOneWidget);
+    expect(find.text('Amount: 12.00'), findsOneWidget);
+  });
+
   test(
     'Recent orders distinguish loading, failure, retry, and empty results',
     () async {

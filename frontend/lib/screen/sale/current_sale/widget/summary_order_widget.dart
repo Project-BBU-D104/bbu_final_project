@@ -11,7 +11,7 @@ class SummaryOrderWidget extends StatelessWidget {
     this.itemCount,
     this.currency,
   });
-  final double subtotal;
+  final double? subtotal;
   final int? itemCount;
   final Map<String, dynamic>? currency;
   @override
@@ -39,7 +39,9 @@ class SummaryOrderWidget extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
-                CurrencyFormatter.format(subtotal, currency),
+                subtotal == null
+                    ? '—'
+                    : CurrencyFormatter.format(subtotal!, currency),
                 textAlign: TextAlign.end,
               ),
             ),

@@ -72,17 +72,20 @@ class SaleListDetailWidget extends StatelessWidget {
         ),
       );
     }
-    final ctr = Get.find<SaleListController>();
+    final ctr = Get.isRegistered<SaleListController>()
+        ? Get.find<SaleListController>()
+        : null;
     final items = sale['sale_items'] is List
         ? sale['sale_items'] as List
         : const [];
-    final newSale = Obx(
-      () => FilledButton.icon(
-        onPressed: ctr.deletingIds.isEmpty ? ctr.onNewSale : null,
-        icon: const Icon(Icons.add),
-        label: Text('New Sale'.tr),
-      ),
+    Widget newSaleButton(bool enabled) => FilledButton.icon(
+      onPressed: enabled ? () => Get.toNamed(AppRoutes.sale) : null,
+      icon: const Icon(Icons.add),
+      label: Text('New Sale'.tr),
     );
+    final newSale = ctr == null
+        ? newSaleButton(true)
+        : Obx(() => newSaleButton(ctr.deletingIds.isEmpty));
     final invoice = AppSectionCard(
       title: 'Invoice',
       child: Column(
@@ -105,10 +108,16 @@ class SaleListDetailWidget extends StatelessWidget {
             if (index > 0) const Divider(),
             _row(
               saleText(saleMap(saleMap(raw)['product'])['name']),
-              '${saleText(saleMap(raw)['qty'])} × ${formatSaleAmount(saleMap(raw)['sale_price'])}',
+              '${saleText(saleMap(raw)['qty'])} × ${formatSaleAmount(saleMap(raw)['original_unit_price'] ?? saleMap(raw)['sale_price'], currency: saleMap(raw)['original_currency_code'] == null ? saleCurrency(sale) : {'code': saleMap(raw)['original_currency_code'], 'symbol': saleMap(raw)['original_currency_symbol']})}',
               translateLabel: false,
             ),
-            _row('Subtotal', formatSaleAmount(saleMap(raw)['subtotal'])),
+            _row(
+              'Subtotal',
+              formatSaleAmount(
+                saleMap(raw)['subtotal'],
+                currency: saleCurrency(sale),
+              ),
+            ),
           ],
         ],
       ),
@@ -152,7 +161,10 @@ class SaleListDetailWidget extends StatelessWidget {
             'Paid': 'paid_amount',
             'Due': 'due_amount',
           }.entries)
-            _row(entry.key, formatSaleAmount(sale[entry.value])),
+            _row(
+              entry.key,
+              formatSaleAmount(sale[entry.value], currency: saleCurrency(sale)),
+            ),
         ],
       ),
     );
@@ -171,14 +183,15 @@ class SaleListDetailWidget extends StatelessWidget {
                 )
               else
                 Align(alignment: Alignment.centerLeft, child: newSale),
-              Obx(
-                () => ctr.loadError.value.isEmpty
-                    ? const SizedBox.shrink()
-                    : Semantics(
-                        liveRegion: true,
-                        child: Text(ctr.loadError.value.tr),
-                      ),
-              ),
+              if (ctr != null)
+                Obx(
+                  () => ctr.loadError.value.isEmpty
+                      ? const SizedBox.shrink()
+                      : Semantics(
+                          liveRegion: true,
+                          child: Text(ctr.loadError.value.tr),
+                        ),
+                ),
               const SizedBox(height: AppSpacing.lg),
               LayoutBuilder(
                 builder: (context, bounds) {

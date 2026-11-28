@@ -1,14 +1,16 @@
 from sqlmodel import Session, select
 from app.models.sale import Sale
 from app.models.product import Product
-from app.schemas.sale.sale import SaleCheckoutCreate, SaleCreate, SaleUpdate
+from app.schemas.sale.sale import ConvertedSaleCheckoutCreate, SaleCheckoutCreate, SaleCreate, SaleUpdate
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, DecimalException, ROUND_HALF_UP
 from sqlalchemy.orm import selectinload
 from app.models.sale_items import SaleItems
 from app.models.sale_payment import SalePayment
 from app.models.warehouse_stock import WarehouseStock
 from app.models.user import User
+from app.models.currency import Currency
+from app.models.system_configuration import SystemConfiguration
 from fastapi import HTTPException
 from app.schemas.sale.sale_item import SaleItemCreate
 
@@ -55,7 +57,8 @@ def _restore_warehouse_stock(
 
 
 def _build_sale_items(
-    session: Session, sale_id: int, sale_items: list[SaleItemCreate]
+    session: Session, sale_id: int, sale_items: list[SaleItemCreate],
+    settlement_currency: Currency | None = None,
 ) -> tuple[list[SaleItems], Decimal]:
     items = []
     subtotal = Decimal("0.00")
@@ -78,20 +81,77 @@ def _build_sale_items(
             detail=f"Product(s) {sorted(missing)} not found",
         )
 
+    currencies = {}
+    if settlement_currency is not None:
+        ids = {product.currency_id for product in products.values()}
+        currencies = {
+            currency.id: currency
+            for currency in session.exec(select(Currency).where(Currency.id.in_(ids))).all()
+        }
+
     for item in sale_items:
         product = products[item.product_id]
         _decrease_warehouse_stock(session, product, item.qty)
-        line_subtotal = product.sale_price * item.qty
+        unit_price = product.sale_price
+        line_subtotal = unit_price * item.qty
+        original = {}
+        if settlement_currency is not None:
+            source = currencies.get(product.currency_id)
+            if source is None:
+                raise HTTPException(status_code=400, detail="Product currency is unavailable.")
+            unit_price = _converted_amount(product.sale_price, source, settlement_currency, allow_zero=True)
+            line_subtotal = _converted_amount(product.sale_price * item.qty, source, settlement_currency)
+            original = {
+                "original_unit_price": product.sale_price,
+                "original_currency_code": source.code,
+                "original_currency_symbol": source.symbol,
+            }
         subtotal += line_subtotal
         items.append(SaleItems(
             sale_id=sale_id,
             product_id=product.id,
             qty=item.qty,
-            sale_price=product.sale_price,
+            sale_price=unit_price,
             subtotal=line_subtotal,
+            **original,
         ))
 
     return items, subtotal
+
+
+def _currency_rate(currency: Currency) -> Decimal:
+    try:
+        rate = Decimal(str(currency.exchange_rate))
+    except (DecimalException, ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="A currency exchange rate is invalid.")
+    if not rate.is_finite() or rate <= 0:
+        raise HTTPException(status_code=400, detail="A currency exchange rate is invalid.")
+    return rate
+
+
+def _converted_amount(price: Decimal, source: Currency, target: Currency, allow_zero: bool = False) -> Decimal:
+    try:
+        amount = Decimal(str(price))
+        if not amount.is_finite() or amount < 0:
+            raise ValueError("Invalid product price")
+        rate = _currency_rate(target) / _currency_rate(source)
+        precision = Decimal("1") if target.code.upper() == "KHR" else Decimal("0.01")
+        converted = (amount * rate).quantize(precision, rounding=ROUND_HALF_UP)
+        if amount > 0 and converted == 0 and not allow_zero:
+            raise HTTPException(status_code=400, detail="A product price is too small in the sale currency.")
+        return converted
+    except (DecimalException, ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Unable to convert a product price.")
+
+
+def _sale_currency(session: Session, user_id: int) -> Currency:
+    user = session.get(User, user_id)
+    config = session.get(SystemConfiguration, user.system_configuration_id) if user and user.system_configuration_id else None
+    currency = session.get(Currency, config.default_currency_id) if config else None
+    if currency is None:
+        raise HTTPException(status_code=400, detail="The user's system configuration has no sale currency.")
+    _currency_rate(currency)
+    return currency
 
 
 def _set_sale_totals(db_sale: Sale) -> None:
@@ -131,17 +191,20 @@ def generate_invoice_no(session: Session) -> str:
     return f"{prefix}{next_number:03d}"
 
 
-def _add_sale(session: Session, sale: SaleCreate) -> Sale:
+def _add_sale(session: Session, sale: SaleCreate, settlement_currency: Currency | None = None) -> Sale:
     sale_data = sale.model_dump(
-        exclude={"sale_items", "reference_no"},
+        exclude={"sale_items", "reference_no", "expected_currency_id", "expected_total"},
         exclude_none=True,
     )
     invoice_no = (sale_data.get("invoice_no") or "").strip()
     sale_data["invoice_no"] = invoice_no or generate_invoice_no(session)
     db_sale = Sale.model_validate(sale_data)
+    if settlement_currency is not None:
+        db_sale.currency_code = settlement_currency.code
+        db_sale.currency_symbol = settlement_currency.symbol
     session.add(db_sale)
     session.flush()
-    items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items)
+    items, db_sale.subtotal = _build_sale_items(session, db_sale.id, sale.sale_items, settlement_currency)
     db_sale.sale_items.extend(items)
     _set_sale_totals(db_sale)
     return db_sale
@@ -182,6 +245,36 @@ def create_sale_checkout(session: Session, checkout: SaleCheckoutCreate):
             "subtotal": db_sale.subtotal,
             "total_amount": db_sale.total_amount,
         }
+        session.commit()
+        return result
+    except Exception:
+        session.rollback()
+        raise
+
+
+def create_converted_sale_checkout(session: Session, checkout: ConvertedSaleCheckoutCreate):
+    """Recheck the confirmed total and atomically save the converted sale."""
+    try:
+        target = _sale_currency(session, checkout.user_id)
+        if target.id != checkout.expected_currency_id:
+            raise HTTPException(status_code=409, detail="The sale currency changed. Refresh and review the total.")
+        db_sale = _add_sale(session, checkout, target)
+        if db_sale.total_amount != checkout.expected_total:
+            raise HTTPException(status_code=409, detail="Prices or exchange rates changed. Refresh and review the total.")
+        if db_sale.total_amount <= 0:
+            raise HTTPException(status_code=400, detail="Sale total must be positive.")
+        session.add(SalePayment(
+            user_id=checkout.user_id, sale_id=db_sale.id,
+            amount=db_sale.total_amount, payment_method=checkout.payment_method,
+            reference_no=checkout.reference_no, payment_date=checkout.sale_date,
+            note="Sale payment", created_at=checkout.sale_date,
+        ))
+        db_sale.paid_amount = db_sale.total_amount
+        _set_sale_totals(db_sale)
+        session.add(db_sale)
+        result = {"id": db_sale.id, "subtotal": db_sale.subtotal,
+                  "total_amount": db_sale.total_amount,
+                  "currency_code": target.code, "currency_symbol": target.symbol}
         session.commit()
         return result
     except Exception:

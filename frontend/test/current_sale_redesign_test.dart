@@ -20,7 +20,7 @@ import 'customer_test_support.dart' show setUpCustomerTests;
 class CartController extends SaleController {
   @override
   // ignore: must_call_super
-  void onInit() {}
+  void onInit() => seedSaleCurrency(this);
 }
 
 void main() {
@@ -29,7 +29,7 @@ void main() {
   ) async {
     setUpCustomerTests();
     final ctr = Get.put<SaleController>(CartController());
-    ctr.currency.value = {'symbol': r'$', 'code': 'USD'};
+    seedSaleCurrency(ctr);
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.addProduct({...saleProductJson(2, 'Bread'), 'sale_price': '7.00'});
     await pumpSalesPage(
@@ -88,7 +88,7 @@ void main() {
     (tester) async {
       setUpCustomerTests();
       final ctr = Get.put<SaleController>(CartController());
-      ctr.currency.value = {'symbol': r'$', 'code': 'USD'};
+      seedSaleCurrency(ctr);
       ctr.addProduct(saleProductJson(1, 'Water'));
       await pumpSalesPage(
         tester,
@@ -97,7 +97,10 @@ void main() {
       );
 
       final name = find.text('Water');
-      final amount = find.text(r'$5.00');
+      final amount = find.descendant(
+        of: find.byType(CurrentSaleItemWidget),
+        matching: find.text(r'$5.00'),
+      );
       expect(tester.getTopLeft(amount).dy, tester.getTopLeft(name).dy);
       expect(
         tester.getTopLeft(amount).dx,
@@ -115,7 +118,13 @@ void main() {
       await tester.ensureVisible(increase);
       await tester.tap(increase);
       await tester.pump();
-      expect(find.text(r'$10.00'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(CurrentSaleItemWidget),
+          matching: find.text(r'$10.00'),
+        ),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     },
   );
@@ -257,7 +266,7 @@ void main() {
   testWidgets('cart sections use shared headings and surfaces', (tester) async {
     setUpCustomerTests();
     final ctr = Get.put<SaleController>(CartController());
-    ctr.currency.value = {'symbol': r'$', 'code': 'USD'};
+    seedSaleCurrency(ctr);
     ctr.addProduct(saleProductJson(1, 'Water'));
     ctr.customers.add({'id': 1, 'name': 'Dara'});
     ctr.paymentTypes.add({'id': 1, 'name': 'Cash'});

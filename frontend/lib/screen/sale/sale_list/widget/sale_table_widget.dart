@@ -25,9 +25,10 @@ class SaleTableWidget extends StatelessWidget {
           builder: (context, sale) => Text(switch (entry.value) {
             'customer' => saleText(saleMap(sale['customer'])['name']),
             'sale_date' => formatSaleDate(sale['sale_date']),
-            'total_amount' ||
-            'paid_amount' ||
-            'due_amount' => formatSaleAmount(sale[entry.value]),
+            'total_amount' || 'paid_amount' || 'due_amount' => formatSaleAmount(
+              sale[entry.value],
+              currency: saleCurrency(sale),
+            ),
             'payment_status' => salePaymentStatusLabel(sale[entry.value]),
             _ => saleText(sale[entry.value]),
           }),
